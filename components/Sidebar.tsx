@@ -13,26 +13,28 @@ export default function Sidebar() {
   const [profil, setProfil] = useState<Profil | null>(null)
 
   useEffect(() => {
-const load = async () => {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+    const load = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
 
-  const { data: esp } = await supabase.from('espaces').select('*').order('ordre')
-  setEspaces(esp || [])
+      const { data: esp } = await supabase.from('espaces').select('*').order('ordre')
+      setEspaces(esp || [])
 
-  let { data: prof } = await supabase.from('profils').select('*').eq('id', user.id).single()
-  
-  if (!prof) {
-    const { data: newProf } = await supabase.from('profils').insert({
-      id: user.id,
-      email: user.email,
-      role: 'etudiant'
-    }).select().single()
-    prof = newProf
-  }
-  
-  setProfil(prof)
-}
+      let { data: prof } = await supabase.from('profils').select('*').eq('id', user.id).single()
+
+      if (!prof) {
+        const { data: newProf } = await supabase.from('profils').insert({
+          id: user.id,
+          email: user.email,
+          role: 'etudiant'
+        }).select().single()
+        prof = newProf
+      }
+
+      setProfil(prof)
+    }
+    load()
+  }, [])
 
   const logout = async () => { await supabase.auth.signOut(); router.push('/login') }
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
