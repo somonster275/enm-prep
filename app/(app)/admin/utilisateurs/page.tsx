@@ -24,8 +24,9 @@ export default function AdminUtilisateurs() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, nom, motDePasse, role })
     })
-    if (!res.ok) { setMessage('Erreur lors de la création'); setLoading(false); return }
-    setMessage('Utilisateur créé avec succès')
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) { setMessage('❌ ' + (json.error || 'Erreur lors de la création')); setLoading(false); return }
+    setMessage('✅ Utilisateur créé avec succès')
     setEmail(''); setNom(''); setMotDePasse(''); setLoading(false)
     supabase.from('profils').select('*').then(({ data }) => setUtilisateurs(data || []))
     setTimeout(() => setMessage(''), 3000)
@@ -66,7 +67,7 @@ export default function AdminUtilisateurs() {
             </select>
           </div>
         </div>
-        {message && <div style={{ fontSize: 13, color: '#0F6E56', marginBottom: 10 }}>{message}</div>}
+        {message && <div style={{ fontSize: 13, color: message.startsWith('❌') ? '#D94A30' : '#0F6E56', marginBottom: 10 }}>{message}</div>}
         <button onClick={creerUtilisateur} disabled={loading}
           style={{ padding: '10px 20px', borderRadius: 8, background: '#534AB7', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: loading ? 0.7 : 1 }}>
           {loading ? 'Création...' : 'Créer le compte'}
