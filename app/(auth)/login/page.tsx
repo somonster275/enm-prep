@@ -10,6 +10,27 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // Demande d'accès lecteur (self-service)
+  const [modeDemande, setModeDemande] = useState(false)
+  const [dNom, setDNom] = useState('')
+  const [dEmail, setDEmail] = useState('')
+  const [dMessage, setDMessage] = useState('')
+  const [dStatut, setDStatut] = useState<'' | 'envoi' | 'ok'>('')
+  const [dErreur, setDErreur] = useState('')
+
+  const envoyerDemande = async () => {
+    if (!dEmail.trim()) { setDErreur('Indique ton adresse email.'); return }
+    setDStatut('envoi'); setDErreur('')
+    const res = await fetch('/api/acces/demande', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nom: dNom, email: dEmail, message: dMessage }),
+    })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) { setDStatut(''); setDErreur(json.error || 'Une erreur est survenue.'); return }
+    setDStatut('ok')
+  }
+
   const handleLogin = async () => {
     setLoading(true)
     setError('')
@@ -106,6 +127,51 @@ export default function LoginPage() {
         }}>
           {loading ? 'Connexion…' : 'Se connecter'}
         </button>
+
+        {/* Demande d'accès lecteur */}
+        <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px solid #EFE7D7' }}>
+          {!modeDemande && (
+            <div style={{ fontSize: 13.5, color: '#8A7E68', textAlign: 'center' }}>
+              Pas encore de compte ?{' '}
+              <button onClick={() => { setModeDemande(true); setDErreur('') }} style={{
+                background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                color: '#DC4A2B', fontWeight: 700, fontSize: 13.5, fontFamily: "'Hanken Grotesk', sans-serif", textDecoration: 'underline',
+              }}>Demander un accès lecteur</button>
+            </div>
+          )}
+
+          {modeDemande && dStatut === 'ok' && (
+            <div style={{ background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 12, padding: '14px 16px', fontSize: 13.5, color: '#0F6E56', textAlign: 'center' }}>
+              ✅ Demande envoyée ! Un administrateur l'examinera et créera ton accès. Tu seras recontacté(e) par email.
+            </div>
+          )}
+
+          {modeDemande && dStatut !== 'ok' && (
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#2A2018', marginBottom: 4 }}>Demander un accès lecteur</div>
+              <div style={{ fontSize: 12.5, color: '#8A7E68', marginBottom: 14 }}>Ta demande est envoyée à l'administrateur, qui valide la création de ton compte.</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <input value={dNom} onChange={e => setDNom(e.target.value)} placeholder="Ton nom"
+                  style={{ height: 46, border: '1.5px solid #EADFC9', borderRadius: 12, padding: '0 14px', background: '#FFFBF2', fontSize: 14, outline: 'none', fontFamily: "'Hanken Grotesk', sans-serif" }} />
+                <input type="email" value={dEmail} onChange={e => setDEmail(e.target.value)} placeholder="Ton email"
+                  style={{ height: 46, border: '1.5px solid #EADFC9', borderRadius: 12, padding: '0 14px', background: '#FFFBF2', fontSize: 14, outline: 'none', fontFamily: "'Hanken Grotesk', sans-serif" }} />
+                <textarea value={dMessage} onChange={e => setDMessage(e.target.value)} placeholder="Message (facultatif) — qui es-tu, pourquoi cet accès…" rows={2}
+                  style={{ border: '1.5px solid #EADFC9', borderRadius: 12, padding: '10px 14px', background: '#FFFBF2', fontSize: 14, outline: 'none', resize: 'vertical', fontFamily: "'Hanken Grotesk', sans-serif" }} />
+              </div>
+              {dErreur && <div style={{ marginTop: 10, fontSize: 13, color: '#D94A30' }}>{dErreur}</div>}
+              <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+                <button onClick={() => { setModeDemande(false); setDErreur('') }} style={{
+                  flex: 1, height: 48, border: '1.5px solid #EADFC9', background: '#fff', borderRadius: 12,
+                  fontSize: 14, fontWeight: 600, color: '#6E6456', cursor: 'pointer', fontFamily: "'Hanken Grotesk', sans-serif",
+                }}>Annuler</button>
+                <button onClick={envoyerDemande} disabled={dStatut === 'envoi'} style={{
+                  flex: 2, height: 48, border: 'none', background: '#DC4A2B', color: '#fff', borderRadius: 12,
+                  fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: dStatut === 'envoi' ? 0.7 : 1, fontFamily: "'Hanken Grotesk', sans-serif",
+                }}>{dStatut === 'envoi' ? 'Envoi…' : 'Envoyer la demande'}</button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

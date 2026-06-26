@@ -164,6 +164,22 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   embed question → `match_cours_chunks` testé (4 passages, similarité 57–64 %).
   Backfill `scripts/backfill-embeddings.mjs` créé et lancé (24 passages).
 
+### 2026-06-26 (suite 4) — Déploiement Vercel
+- **App en PRODUCTION sur Vercel** : projet `enm-prep` (compte somonster275, plan Hobby),
+  relié au repo GitHub `somonster275/enm-prep`, **Production suit la branche `main`**
+  (un push sur main = déploiement auto). URL : **https://codex-prepa.vercel.app (ancien : enm-prep-kohl.vercel.app, redirige vers le nouveau)**.
+- Commit de tout le travail non suivi (51 fichiers, `9cb0034`) puis push.
+- **Bug prod 500 sur toutes les pages** : `proxy.ts` lisait `process.env.NEXT_PUBLIC_SUPABASE_URL!`
+  / `ANON_KEY!` → `undefined` car les `NEXT_PUBLIC_*` ne sont PAS injectées dans le build
+  Edge (Vercel). Erreur : « Your project's URL and Key are required ». **Corrigé** (`5170c80`)
+  en donnant à `proxy.ts` le même **filet de secours en dur** que `lib/supabase.ts`
+  (URL + clé anon = valeurs publiques). → site OK (/ → 307 /login, /login → 200).
+- 5 variables d'env saisies dans Vercel (Production) ; les 3 secrètes (SERVICE_ROLE,
+  ANTHROPIC, VOYAGE) sont lues à l'exécution (pas besoin de rebuild).
+- **Vérifié en prod le 2026-06-26 : connexion OK + Question de cours (RAG) OK.**
+- TODO optionnel : ajouter l'URL prod dans Supabase Auth (Site URL / Redirect URLs) —
+  pas requis pour le login mot de passe, utile pour emails de confirmation / magic links.
+
 ### 2026-06-26 (suite 3) — Correction du modèle d'accès
 - **Quiproquo levé** : les 2 PDF n'étaient PAS la base ENM mais les documents perso de
   l'admin. Demande réelle : l'admin constitue la base ENM (docs de son choix), les
