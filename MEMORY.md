@@ -164,6 +164,21 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   embed question → `match_cours_chunks` testé (4 passages, similarité 57–64 %).
   Backfill `scripts/backfill-embeddings.mjs` créé et lancé (24 passages).
 
+### 2026-06-27 — Email demandeur, page Mon compte, suppression d'utilisateurs
+- **À l'approbation** : email Resend au demandeur (mot de passe provisoire + lien login +
+  invitation à le changer). ⚠️ **Ne part pas en mode test Resend** (3ᵉ partie refusée) :
+  fallback = identifiants affichés à l'admin avec mention « email non envoyé ». Pour
+  activer l'envoi réel : (A) vérifier un domaine dans Resend (nécessite un vrai domaine,
+  pas un .vercel.app) + changer `EMAIL_FROM`, ou (B) basculer sur les emails Supabase
+  (invite/recovery, sans domaine). **Décision user en attente (A ou B).**
+- **Page `/compte`** (`app/(app)/compte/page.tsx`, lien dans le menu TopNav) :
+  `supabase.auth.updateUser({ password })` → mot de passe définitif.
+- **Suppression d'utilisateurs** : route `/api/admin/supprimer-utilisateur` (admin only,
+  bloque l'auto-suppression) + bouton dans `admin/utilisateurs`. Supprime profil + auth user.
+- `lib/email.ts` : ajout d'`envoyerEmail(to, sujet, html)` générique.
+- Note : `TopNav.tsx` crée les profils manquants avec `role: 'etudiant'` (hors enum
+  'admin|editeur|lecteur') — incohérence latente à surveiller.
+
 ### 2026-06-26 (suite 5) — Demande d'accès lecteur (self-service) + fix création users
 - **Bug création d'utilisateurs** : la page `admin/utilisateurs` appelait
   `/api/admin/creer-utilisateur` qui **n'existait pas** (404). Route créée

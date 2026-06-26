@@ -16,7 +16,6 @@ export default function AdminUtilisateurs() {
   type Demande = { id: string; nom: string | null; email: string; message: string | null; created_at: string }
   const [demandes, setDemandes] = useState<Demande[]>([])
   const [traitement, setTraitement] = useState('')
-  const [identifiants, setIdentifiants] = useState<{ email: string; motDePasse: string; emailEnvoye: boolean } | null>(null)
 
   const [monId, setMonId] = useState('')
 
@@ -59,9 +58,11 @@ export default function AdminUtilisateurs() {
     const json = await res.json().catch(() => ({}))
     setTraitement('')
     if (!res.ok) { setMessage('❌ ' + (json.error || 'Erreur lors du traitement')); return }
-    if (action === 'approuver' && json.motDePasse) {
-      setIdentifiants({ email: json.email, motDePasse: json.motDePasse, emailEnvoye: !!json.emailEnvoye })
+    if (action === 'approuver') {
+      setMessage(`✅ Invitation envoyée à ${json.email || ''} — la personne va recevoir un email pour créer son mot de passe.`)
       rechargerUtilisateurs()
+    } else {
+      setMessage('Demande refusée.')
     }
     chargerDemandes()
   }
@@ -90,23 +91,6 @@ export default function AdminUtilisateurs() {
   return (
     <div style={{ padding: '1.5rem', maxWidth: 800, margin: '0 auto' }}>
       <h1 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 1.5rem' }}>Gestion des utilisateurs</h1>
-
-      {/* Identifiants générés après approbation — à communiquer à la personne */}
-      {identifiants && (
-        <div style={{ background: '#FFF8EE', border: '1px solid #F2D9A0', borderRadius: 12, padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#8A5A10', marginBottom: 6 }}>✅ Compte lecteur créé</div>
-          <div style={{ fontSize: 13, color: '#5C4A22', marginBottom: 10 }}>
-            {identifiants.emailEnvoye
-              ? "Un email avec ces identifiants a été envoyé à la personne. Tu peux aussi les lui transmettre directement :"
-              : "⚠️ L'email automatique n'a pas pu être envoyé (domaine Resend non vérifié). Transmets ces identifiants à la personne toi-même :"}
-          </div>
-          <div style={{ fontSize: 13, fontFamily: 'monospace', background: '#fff', border: '1px solid #EADFC9', borderRadius: 8, padding: '10px 12px' }}>
-            <div>Email : <b>{identifiants.email}</b></div>
-            <div>Mot de passe : <b>{identifiants.motDePasse}</b></div>
-          </div>
-          <button onClick={() => setIdentifiants(null)} style={{ marginTop: 10, background: 'none', border: 'none', color: '#9A8D72', fontSize: 12, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Fermer</button>
-        </div>
-      )}
 
       {/* Demandes d'accès en attente */}
       {demandes.length > 0 && (
