@@ -2,8 +2,11 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { utilisateurCourant, estAdmin } from '@/lib/auth-serveur'
 import { creerCompte } from '@/lib/creer-compte'
+import { envoyerEmail, escapeHtml } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://codex-prepa.vercel.app'
 
 async function garde() {
   const user = await utilisateurCourant()
@@ -56,7 +59,32 @@ export async function POST(request: NextRequest) {
   }
   await admin.from('demandes_acces').update({ statut: 'approuve', ...maj }).eq('id', id)
 
-  // On renvoie les identifiants pour que l'admin les communique à la personne
-  // (Resend en mode test ne peut pas écrire à une adresse tierce).
-  return NextResponse.json({ ok: true, statut: 'approuve', email: dem.email, motDePasse })
+  // Email au demandeur avec son mot de passe provisoire + lien de connexion.
+  // ⚠️ Échoue tant qu'un domaine n'est pas vérifié dans Resend (mode test =
+  // seul l'email du compte Resend est accepté). Non bloquant : le compte est créé.
+  let emailEnvoye = false
+  try {
+    await envoyerEmail(
+      dem.email,
+      'Ton accès à codex est validé ✅',
+      `<div style="font-family:sans-serif;font-size:14px;color:#2A2018;line-height:1.6">
+         <h2 style="margin:0 0 12px">Bienvenue sur codex 🎓</h2>
+         <p>Bonjour ${escapeHtml(dem.nom || '')},</p>
+         <p>Ta demande d'accès a été <b>approuvée</b>. Voici tes identifiants provisoires :</p>
+         <div style="background:#FFF8EE;border:1px solid #EADFC9;border-radius:8px;padding:12px 16px;margin:12px 0">
+           <div>Email : <b>${escapeHtml(dem.email)}</b></div>
+           <div>Mot de passe provisoire : <b>${escapeHtml(motDePasse)}</b></div>
+         </div>
+         <p><a href="${APP_URL}/login" style="background:#DC4A2B;color:#fff;padding:11px 20px;border-radius:8px;text-decoration:none;font-weight:600">Me connecter</a></p>
+         <p style="font-size:13px;color:#8A7E68">Après connexion, va dans <b>Mon compte</b> pour choisir ton mot de passe définitif.</p>
+       </div>`
+    )
+    emailEnvoye = true
+  } catch (e) {
+    console.error('Email demandeur échoué:', e)
+  }
+
+  // On renvoie aussi les identifiants : si l'email n'a pu partir (domaine non
+  // vérifié), l'admin peut les transmettre manuellement.
+  return NextResponse.json({ ok: true, statut: 'approuve', email: dem.email, motDePasse, emailEnvoye })
 }

@@ -165,6 +165,14 @@ export default function TopNav() {
                   {profil?.role === 'admin' ? 'Administrateur' : profil?.role === 'editeur' ? 'Éditeur' : 'Étudiant'}
                 </div>
               </div>
+              <Link href="/compte" onClick={() => setMenuOpen(false)} style={{
+                display: 'block', width: '100%', textAlign: 'left',
+                padding: '9px 14px', borderRadius: 8,
+                background: 'transparent', color: '#8A7E68', fontSize: 14, fontWeight: 600,
+                textDecoration: 'none', boxSizing: 'border-box',
+              }}>
+                Mon compte
+              </Link>
               <button onClick={logout} style={{
                 width: '100%', textAlign: 'left',
                 padding: '9px 14px', borderRadius: 8,

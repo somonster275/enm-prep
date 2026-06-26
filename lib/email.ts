@@ -21,8 +21,11 @@ export function escapeHtml(s: string): string {
     .replace(/'/g, '&#039;')
 }
 
-/** Envoie un email à l'administrateur. Lance une erreur si l'envoi échoue. */
-export async function envoyerEmailAdmin(sujet: string, html: string): Promise<void> {
+/** Envoie un email à un destinataire quelconque. Lance une erreur si l'envoi échoue.
+ *  ⚠️ En mode test Resend (domaine onboarding@resend.dev), seul l'email du compte
+ *  Resend est accepté ; les autres destinataires renvoient une 403 tant qu'un
+ *  domaine n'est pas vérifié dans Resend. */
+export async function envoyerEmail(to: string, sujet: string, html: string): Promise<void> {
   if (!RESEND_API_KEY) throw new Error('RESEND_API_KEY manquante')
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -30,7 +33,12 @@ export async function envoyerEmailAdmin(sujet: string, html: string): Promise<vo
       'Content-Type': 'application/json',
       Authorization: `Bearer ${RESEND_API_KEY}`,
     },
-    body: JSON.stringify({ from: EMAIL_FROM, to: ADMIN_EMAIL, subject: sujet, html }),
+    body: JSON.stringify({ from: EMAIL_FROM, to, subject: sujet, html }),
   })
   if (!res.ok) throw new Error(`Resend (${res.status}) : ${await res.text()}`)
+}
+
+/** Envoie un email à l'administrateur. */
+export async function envoyerEmailAdmin(sujet: string, html: string): Promise<void> {
+  return envoyerEmail(ADMIN_EMAIL, sujet, html)
 }

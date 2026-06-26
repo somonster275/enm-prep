@@ -164,6 +164,24 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   embed question → `match_cours_chunks` testé (4 passages, similarité 57–64 %).
   Backfill `scripts/backfill-embeddings.mjs` créé et lancé (24 passages).
 
+### 2026-06-26 (suite 5) — Demande d'accès lecteur (self-service) + fix création users
+- **Bug création d'utilisateurs** : la page `admin/utilisateurs` appelait
+  `/api/admin/creer-utilisateur` qui **n'existait pas** (404). Route créée
+  (admin only, `creerCompte` via service role + email_confirm). Helper partagé
+  `lib/creer-compte.ts`.
+- **Nouvelle feature « Demander un accès lecteur »** depuis la page de connexion :
+  formulaire (nom/email/message) → route PUBLIQUE `/api/acces/demande` (enregistre
+  + email Resend à l'admin). Espace admin : section « Demandes en attente »
+  (Approuver → crée le compte lecteur + affiche identifiants / Refuser).
+  Table `demandes_acces` (migration `0003_demandes_acces.sql`).
+- `proxy.ts` : `/api/acces` et `/auth` rendus accessibles **sans auth** (sinon le
+  POST public était redirigé vers /login).
+- **Email via Resend** (`lib/email.ts`) : nouvelle env **`RESEND_API_KEY`** ;
+  FROM=onboarding@resend.dev (mode test → écrit seulement à l'adresse du compte
+  Resend = titipaulin@gmail.com). Pour écrire aux nouveaux users, vérifier un
+  domaine. Env optionnelles : `EMAIL_FROM`, `ADMIN_NOTIF_EMAIL`, `NEXT_PUBLIC_APP_URL`.
+- À faire côté user : exécuter `0003` dans Supabase + ajouter `RESEND_API_KEY` dans Vercel.
+
 ### 2026-06-26 (suite 4) — Déploiement Vercel
 - **App en PRODUCTION sur Vercel** : projet `enm-prep` (compte somonster275, plan Hobby),
   relié au repo GitHub `somonster275/enm-prep`, **Production suit la branche `main`**

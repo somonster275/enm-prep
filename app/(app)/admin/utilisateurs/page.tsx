@@ -16,7 +16,9 @@ export default function AdminUtilisateurs() {
   type Demande = { id: string; nom: string | null; email: string; message: string | null; created_at: string }
   const [demandes, setDemandes] = useState<Demande[]>([])
   const [traitement, setTraitement] = useState('')
-  const [identifiants, setIdentifiants] = useState<{ email: string; motDePasse: string } | null>(null)
+  const [identifiants, setIdentifiants] = useState<{ email: string; motDePasse: string; emailEnvoye: boolean } | null>(null)
+
+  const [monId, setMonId] = useState('')
 
   const rechargerUtilisateurs = () => supabase.from('profils').select('*').then(({ data }) => setUtilisateurs(data || []))
   const chargerDemandes = async () => {
@@ -27,9 +29,25 @@ export default function AdminUtilisateurs() {
   }
 
   useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setMonId(data.user?.id || ''))
     rechargerUtilisateurs()
     chargerDemandes()
   }, [])
+
+  const supprimerUtilisateur = async (id: string, label: string) => {
+    if (!confirm(`Supprimer définitivement le compte de « ${label} » ? Cette action est irréversible.`)) return
+    setMessage('')
+    const res = await fetch('/api/admin/supprimer-utilisateur', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) { setMessage('❌ ' + (json.error || 'Erreur lors de la suppression')); return }
+    setUtilisateurs(u => u.filter(p => p.id !== id))
+    setMessage('✅ Compte supprimé')
+    setTimeout(() => setMessage(''), 3000)
+  }
 
   const traiterDemande = async (id: string, action: 'approuver' | 'refuser') => {
     setTraitement(id); setMessage('')
@@ -42,7 +60,7 @@ export default function AdminUtilisateurs() {
     setTraitement('')
     if (!res.ok) { setMessage('❌ ' + (json.error || 'Erreur lors du traitement')); return }
     if (action === 'approuver' && json.motDePasse) {
-      setIdentifiants({ email: json.email, motDePasse: json.motDePasse })
+      setIdentifiants({ email: json.email, motDePasse: json.motDePasse, emailEnvoye: !!json.emailEnvoye })
       rechargerUtilisateurs()
     }
     chargerDemandes()
@@ -77,7 +95,11 @@ export default function AdminUtilisateurs() {
       {identifiants && (
         <div style={{ background: '#FFF8EE', border: '1px solid #F2D9A0', borderRadius: 12, padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: '#8A5A10', marginBottom: 6 }}>✅ Compte lecteur créé</div>
-          <div style={{ fontSize: 13, color: '#5C4A22', marginBottom: 10 }}>Communique ces identifiants à la personne (ils ne seront plus affichés ensuite) :</div>
+          <div style={{ fontSize: 13, color: '#5C4A22', marginBottom: 10 }}>
+            {identifiants.emailEnvoye
+              ? "Un email avec ces identifiants a été envoyé à la personne. Tu peux aussi les lui transmettre directement :"
+              : "⚠️ L'email automatique n'a pas pu être envoyé (domaine Resend non vérifié). Transmets ces identifiants à la personne toi-même :"}
+          </div>
           <div style={{ fontSize: 13, fontFamily: 'monospace', background: '#fff', border: '1px solid #EADFC9', borderRadius: 8, padding: '10px 12px' }}>
             <div>Email : <b>{identifiants.email}</b></div>
             <div>Mot de passe : <b>{identifiants.motDePasse}</b></div>
@@ -157,12 +179,20 @@ export default function AdminUtilisateurs() {
                 <div style={{ fontSize: 13, fontWeight: 500 }}>{u.nom || u.email}</div>
                 <div style={{ fontSize: 11, color: '#888' }}>{u.email}</div>
               </div>
-              <select value={u.role} onChange={e => changerRole(u.id, e.target.value)}
-                style={{ padding: '5px 10px', borderRadius: 6, border: '1px solid #E0E0E0', fontSize: 12, cursor: 'pointer', background: '#fff' }}>
-                <option value="admin">Admin</option>
-                <option value="editeur">Éditeur</option>
-                <option value="lecteur">Lecteur</option>
-              </select>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <select value={u.role} onChange={e => changerRole(u.id, e.target.value)}
+                  style={{ padding: '5px 10px', borderRadius: 6, border: '1px solid #E0E0E0', fontSize: 12, cursor: 'pointer', background: '#fff' }}>
+                  <option value="admin">Admin</option>
+                  <option value="editeur">Éditeur</option>
+                  <option value="lecteur">Lecteur</option>
+                </select>
+                {u.id !== monId && (
+                  <button onClick={() => supprimerUtilisateur(u.id, u.nom || u.email)} title="Supprimer ce compte"
+                    style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #F3C9BE', background: '#FCE9E3', color: '#D94A30', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                    Supprimer
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
