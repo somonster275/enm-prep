@@ -16,6 +16,7 @@ export interface Module {
   nom: string
   description?: string
   ordre: number
+  parent_id?: string | null
 }
 
 export interface Fiche {
@@ -38,7 +39,8 @@ export interface Progression {
   id: string
   utilisateur_id: string
   fiche_id: string
-  niveau: Niveau
+  niveau: number          // dernier bouton pressé (0-3)
+  palier: number          // échelon dans l'échelonnage (0 = base répétitive)
   prochaine_revision: string
   derniere_revision?: string
 }

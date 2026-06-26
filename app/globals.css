@@ -12,6 +12,39 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Spinner outil IA */
+@keyframes ia-spin { to { transform: rotate(360deg); } }
+.ia-spinner {
+  width: 15px; height: 15px; border-radius: 50%;
+  border: 2px solid #D9D2F5; border-top-color: #534AB7;
+  animation: ia-spin 0.7s linear infinite; flex-shrink: 0;
+}
+@keyframes ia-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+.ia-pulse { animation: ia-pulse 1.4s ease-in-out infinite; }
+
+/* Rendu markdown des réponses IA */
+.md-response { font-family: 'Hanken Grotesk', sans-serif; }
+.md-response p { margin: 0 0 0.75em; }
+.md-response p:last-child { margin-bottom: 0; }
+.md-response strong { font-weight: 700; }
+.md-response em { font-style: italic; }
+.md-response h1, .md-response h2, .md-response h3 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800; margin: 1em 0 0.4em; color: #2A2018;
+}
+.md-response h1 { font-size: 1.2em; }
+.md-response h2 { font-size: 1.1em; }
+.md-response h3 { font-size: 1em; }
+.md-response ul, .md-response ol { padding-left: 1.4em; margin: 0.4em 0 0.75em; }
+.md-response li { margin-bottom: 0.25em; }
+.md-response table { border-collapse: collapse; width: 100%; margin: 0.75em 0; font-size: 13px; }
+.md-response th, .md-response td { border: 1px solid #EADFC9; padding: 7px 12px; text-align: left; }
+.md-response th { background: #FDF6EA; font-weight: 700; }
+.md-response tr:nth-child(even) td { background: #FFFBF2; }
+.md-response code { background: #F5F0E8; padding: 2px 5px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+.md-response blockquote { border-left: 3px solid #EADFC9; margin: 0.5em 0; padding: 4px 12px; color: #8A7E68; }
+.md-response hr { border: none; border-top: 1px solid #F0E7D6; margin: 0.75em 0; }
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -24,3 +57,32 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Contenu riche des fiches (importé d'Anki ou édité dans l'app) */
+.rich-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 8px 0;
+}
+.rich-content {
+  word-break: break-word;
+}
+.rich-content p { margin: 0 0 8px; }
+.rich-content p:last-child { margin-bottom: 0; }
+.rich-content ul, .rich-content ol { margin: 6px 0; padding-left: 22px; }
+.rich-content li { margin: 3px 0; }
+.rich-content table { border-collapse: collapse; margin: 8px 0; }
+.rich-content td, .rich-content th { border: 1px solid #EADFC9; padding: 6px 10px; }
+.rich-content a { color: #F2654B; }
+.rich-content mark { padding: 0 2px; border-radius: 3px; }
+.rich-content hr { border: none; border-top: 1px solid #F0E7D6; margin: 12px 0; }
+
+/* Éditeur de texte riche */
+.rich-editor:empty:before {
+  content: attr(data-placeholder);
+  color: #B5B0BF;
+  pointer-events: none;
+}
+.rich-editor:focus { outline: none; }
+.rich-editor img { max-width: 100%; height: auto; border-radius: 8px; margin: 8px 0; }

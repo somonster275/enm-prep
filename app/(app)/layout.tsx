@@ -1,10 +1,15 @@
-import Sidebar from '@/components/Sidebar'
+import TopNav from '@/components/TopNav'
+import AuthGuard from '@/components/AuthGuard'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#F8F8F8' }}>
-      <Sidebar />
-      <main style={{ flex: 1, overflowY: 'auto' }}>{children}</main>
-    </div>
+    <AuthGuard>
+      <div style={{ minHeight: '100vh', background: '#FDF6EA' }}>
+        <TopNav />
+        <main style={{ maxWidth: 1100, margin: '0 auto', padding: '0 36px 60px' }}>
+          {children}
+        </main>
+      </div>
+    </AuthGuard>
   )
 }
