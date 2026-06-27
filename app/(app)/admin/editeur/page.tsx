@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Espace, Module, Fiche } from '@/types'
 import RichEditor from '@/components/RichEditor'
+import GenerateurFiches from '@/components/GenerateurFiches'
 
 type Onglet = 'fiches' | 'modules'
 
@@ -285,6 +286,11 @@ export default function Editeur() {
                 <p style={{ fontSize: 12, color: '#9A8D72', marginTop: 8 }}>Cet espace n'a pas encore de module. Créez-en un pour ajouter des fiches.</p>
               )}
             </div>
+          )}
+
+          {/* Générateur de fiches par IA (quand un module est sélectionné) */}
+          {moduleId && (
+            <GenerateurFiches moduleId={moduleId} onAjoutees={nouvelles => setFiches(f => [...f, ...nouvelles])} />
           )}
 
           {/* Formulaire fiche */}
