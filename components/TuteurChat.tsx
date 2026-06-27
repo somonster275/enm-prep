@@ -187,7 +187,7 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
           </button>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
-          <span style={{ fontSize: 10.5, fontStyle: 'italic', color: '#A89880' }}>Aide à la révision — recoupe avec tes cours.</span>
+          <span style={{ fontSize: 10.5, fontStyle: 'italic', color: '#A89880' }}>Assistant IA — recoupe avec tes cours, n&apos;y inscris pas d&apos;informations personnelles ou sensibles.</span>
           {messages.length > 0 && <button onClick={effacer} style={{ background: 'none', border: 'none', color: '#A89880', fontSize: 10.5, cursor: 'pointer', textDecoration: 'underline', fontFamily: font }}>Effacer</button>}
         </div>
       </div>

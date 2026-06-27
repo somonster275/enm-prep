@@ -690,7 +690,7 @@ export default function CoursIAPage() {
                     )}
                   </span>
                   <span style={{ fontSize: 12, color: textMuted, fontFamily: "'Space Grotesk', sans-serif" }}>
-                    ⚠️ Aide à la révision — recoupez avec vos cours officiels.
+                    ⚠️ Assistant propulsé par Claude (Anthropic) — recoupez avec vos cours, n&apos;y inscrivez pas d&apos;informations personnelles.
                   </span>
                 </div>
               </div>
