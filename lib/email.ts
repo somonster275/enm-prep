@@ -9,7 +9,7 @@
  */
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 const EMAIL_FROM = process.env.EMAIL_FROM || 'codex <onboarding@resend.dev>'
-const ADMIN_EMAIL = process.env.ADMIN_NOTIF_EMAIL || 'titipaulin@gmail.com'
+const ADMIN_EMAIL = process.env.ADMIN_NOTIF_EMAIL || 'codex.prepa.dev@gmail.com'
 
 /** Échappe le HTML pour éviter toute injection dans le corps de l'email. */
 export function escapeHtml(s: string): string {
