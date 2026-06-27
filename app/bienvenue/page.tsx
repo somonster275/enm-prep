@@ -85,21 +85,30 @@ export default function BienvenuePage() {
     //    reconnecte en arrière-plan avec le mot de passe qu'on vient de définir,
     //    en réessayant quelques fois : l'étudiant entre directement, sans avoir
     //    à se reconnecter lui-même derrière.
+    // 2) Reconnexion explicite avec le mot de passe qu'on vient de définir.
+    //    On réessaie jusqu'à 6 fois car Supabase peut mettre quelques secondes
+    //    à propager le nouveau hash de mot de passe.
     let connecte = false
     if (email) {
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 6; i++) {
+        await new Promise(r => setTimeout(r, 600 + i * 400))
         const { data: sign, error: signErr } = await supabase.auth.signInWithPassword({ email, password: mdp })
         if (!signErr && sign.session) { connecte = true; break }
-        await new Promise(r => setTimeout(r, 800))
       }
     }
 
     setLoading(false)
+
+    if (!connecte) {
+      // La reconnexion a échoué : le mot de passe est bien enregistré mais
+      // l'étudiant doit se connecter manuellement.
+      setDone(true)
+      // On laisse 2 s pour lire le message, puis on envoie vers /login.
+      setTimeout(() => { window.location.assign('/login') }, 2500)
+      return
+    }
+
     setDone(true)
-    // 3) Entrée directe. Si la reconnexion en arrière-plan a échoué malgré les
-    //    tentatives, la session d'invitation reste valable : on tente l'entrée,
-    //    et l'AuthGuard renverra au besoin vers /login.
-    void connecte
     window.location.assign('/dashboard')
   }
 
@@ -172,8 +181,8 @@ export default function BienvenuePage() {
 
         {done && (
           <div style={{ textAlign: 'center', color: '#0F6E56' }}>
-            <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>✅ C&apos;est fait !</div>
-            <div style={{ fontSize: 14, color: '#8A7E68' }}>Redirection vers ton espace…</div>
+            <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>✅ Mot de passe enregistré !</div>
+            <div style={{ fontSize: 14, color: '#8A7E68' }}>Connexion en cours, redirection…</div>
           </div>
         )}
       </div>
