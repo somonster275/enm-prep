@@ -36,7 +36,13 @@ export default function LoginPage() {
     setError('')
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
-      setError('Identifiants incorrects.')
+      const m = error.message
+      setError(
+        m === 'Invalid login credentials' ? 'Email ou mot de passe incorrect.'
+        : m === 'Email not confirmed' ? "Ton email n'est pas encore confirmé."
+        : m.toLowerCase().includes('rate limit') ? 'Trop de tentatives, réessaie dans quelques minutes.'
+        : m
+      )
       setLoading(false)
       return
     }
