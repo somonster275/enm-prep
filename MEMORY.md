@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 12).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 13).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,12 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-06-27 (suite 13) — Bascule de l'email admin
+- Adresse admin passée de `titipaulin@gmail.com` à **`codex.prepa.dev@gmail.com`** (adresse dédiée au projet).
+- **Notifications** : variable Vercel `ADMIN_NOTIF_EMAIL` mise à jour + défaut code [`lib/email.ts`] aligné. **Compte Resend** rebasculé sur la nouvelle adresse par le user (mode test = livraison uniquement à l'adresse du compte). **Testé OK** (message via `/api/contact` reçu).
+- **Politique de confidentialité** (`/donnees`) : l'email en clair a été **retiré** (ne plus exposer l'adresse admin aux étudiants) → contact uniquement via le formulaire `/contact`. Aucun email admin n'est affiché ailleurs dans l'UI ; aucun contrôle d'accès ne repose sur l'email (rôle dans `profils`).
+- **Supabase** : table `profils.email` mise à jour par SQL. ⚠️ L'email de **connexion** (auth.users) reste `titipaulin@gmail.com` tant que non changé dans Supabase → Authentication → Users (non bloquant, droits admin liés à l'id).
 
 ### 2026-06-27 (suite 12) — Audit & mise en conformité RGPD
 **Constat clé** : le RGPD s'applique même si l'app n'est PAS publique (réservée à des étudiants) — le critère c'est le traitement de données personnelles, pas la publicité. À petite échelle, DPO/ROPA/DPIA probablement non obligatoires, mais base légale + transparence + sécurité + droits + transferts licites restent dus.
