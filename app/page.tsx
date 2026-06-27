@@ -80,7 +80,7 @@ export default function Accueil() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: CREAM, color: INK, fontFamily: "'Hanken Grotesk', sans-serif" }}>
+    <div className="bg-grille" style={{ minHeight: '100vh', backgroundColor: CREAM, color: INK, fontFamily: "'Hanken Grotesk', sans-serif" }}>
 
       {/* ───────────── Barre de navigation ───────────── */}
       <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(253,246,234,.85)', backdropFilter: 'blur(10px)', borderBottom: `1px solid ${BORDER}` }}>

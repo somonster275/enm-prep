@@ -117,7 +117,7 @@ export default function BienvenuePage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FDF6EA', fontFamily: "'Hanken Grotesk', sans-serif", color: '#2A2018', padding: 20 }}>
+    <div className="bg-grille" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FDF6EA', fontFamily: "'Hanken Grotesk', sans-serif", color: '#2A2018', padding: 20 }}>
       <div style={{ width: '100%', maxWidth: 420, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18, padding: '2rem', boxShadow: '0 20px 44px -28px rgba(60,40,20,.22)' }}>
 
         {etat === 'verif' && (

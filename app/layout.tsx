@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import SiteFooter from '@/components/SiteFooter'
 
 export const metadata: Metadata = {
   title: 'codex',
@@ -20,7 +21,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400..800&display=swap" rel="stylesheet" />
       </head>
-      <body style={{ margin: 0, fontFamily: "'Hanken Grotesk', sans-serif" }}>{children}</body>
+      <body style={{ margin: 0, fontFamily: "'Hanken Grotesk', sans-serif" }}>
+        {children}
+        <SiteFooter />
+      </body>
     </html>
   )
 }

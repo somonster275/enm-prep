@@ -99,7 +99,7 @@ export default function LoginPage() {
       </div>
 
       {/* Panneau droit — formulaire */}
-      <div className="login-form" style={{ padding: '64px 60px', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#fff' }}>
+      <div className="login-form bg-grille" style={{ padding: '64px 60px', display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: '#fff' }}>
         <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 30, letterSpacing: '-.01em' }}>
           Bon retour 👋
         </div>
