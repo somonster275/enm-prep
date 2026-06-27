@@ -43,7 +43,16 @@ export default function TopNav() {
     window.location.href = '/login'
   }
 
-  const initiales = profil?.email ? profil.email.slice(0, 2).toUpperCase() : '?'
+  // Initiales : prénom + nom si disponibles, sinon les 2 premières lettres de l'email.
+  const initiales = (() => {
+    const p = profil?.prenom?.trim()?.[0]
+    const n = profil?.nom?.trim()?.[0]
+    if (p || n) return `${p ?? ''}${n ?? ''}`.toUpperCase()
+    return profil?.email ? profil.email.slice(0, 2).toUpperCase() : '?'
+  })()
+  // Nom affiché : « Prénom Nom » si disponible, sinon la partie locale de l'email.
+  const nomAffiche = [profil?.prenom?.trim(), profil?.nom?.trim()].filter(Boolean).join(' ')
+    || profil?.email?.split('@')[0] || ''
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
 
   // Liens de navigation
@@ -144,7 +153,7 @@ export default function TopNav() {
           {menuOpen && (
             <div style={{ position: 'absolute', top: 46, right: 0, width: 200, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 14, boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', padding: 6, zIndex: 200 }}>
               <div style={{ padding: '10px 14px', borderBottom: '1px solid #F0E7D6', marginBottom: 4 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#2A2018' }}>{profil?.email?.split('@')[0]}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#2A2018' }}>{nomAffiche}</div>
                 <div style={{ fontSize: 12, color: '#9A8D72', marginTop: 2 }}>
                   {profil?.role === 'admin' ? 'Administrateur' : profil?.role === 'editeur' ? 'Éditeur' : 'Étudiant'}
                 </div>

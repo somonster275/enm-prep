@@ -76,7 +76,7 @@ export default function Dashboard() {
   const detailProg = calculerProgression({ progressions, modulesTotal, modulesAbordes, activite })
   const score = detailProg.global
   const totalDue = progressions.filter(p => estDue(p.prochaine_revision)).length
-  const prenom = profil?.email?.split('@')[0] ?? 'vous'
+  const prenom = profil?.prenom?.trim() || profil?.email?.split('@')[0] || 'vous'
 
   const streak = calculerStreak(activite)
   const semaine = derniers7Jours(activite)
