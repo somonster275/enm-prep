@@ -164,6 +164,13 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   embed question → `match_cours_chunks` testé (4 passages, similarité 57–64 %).
   Backfill `scripts/backfill-embeddings.mjs` créé et lancé (24 passages).
 
+### 2026-06-27 (suite 6) — Le coach connaît la progression de l'étudiant
+- `/api/tuteur` injecte dans le contexte : score `scoreGlobal`, fiches dues (`estDue`)
+  et maîtrisées (`palier >= PALIER_MAX`), total + **détail par matière** (fiches→modules→
+  espaces), activité 7 j (activite_jours), tâches en attente (notes). Prompt mis à jour :
+  le coach répond « où j'en suis » et priorise les matières en retard. Données lues via
+  admin filtrées sur `user.id` (best-effort, try/catch).
+
 ### 2026-06-27 (suite 5) — Coach sous DeepSeek, le reste sous Claude
 - `lib/ia.ts` : abstraction LLM, **provider par appel** (`streamIA`/`chatIA` prennent
   `provider: 'anthropic' | 'deepseek'`). DeepSeek = API compatible OpenAI (SSE).

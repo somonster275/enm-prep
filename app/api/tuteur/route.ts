@@ -2,7 +2,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { streamIA, iaConfiguree, CHATBOT_PROVIDER } from '@/lib/ia'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { utilisateurCourant } from '@/lib/auth-serveur'
-import { scoreGlobal, estDue, PALIER_MAX } from '@/lib/spaced-repetition'
+import { estDue, PALIER_MAX } from '@/lib/spaced-repetition'
+import { calculerProgression } from '@/lib/progression'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,13 +49,14 @@ export async function POST(request: NextRequest) {
       const today = new Date().toISOString().slice(0, 10)
       const il7j = new Date(); il7j.setDate(il7j.getDate() - 6)
 
-      const [evRes, espRes, fichesRes, progRes, actRes, notesRes] = await Promise.all([
+      const [evRes, espRes, fichesRes, progRes, actRes, notesRes, modsRes] = await Promise.all([
         admin.from('evenements').select('titre, date_debut, heure, type').gte('date_debut', today).order('date_debut').limit(15),
         admin.from('espaces').select('id, nom').order('ordre'),
-        admin.from('fiches').select('id, modules(espace_id)').is('deleted_at', null),
+        admin.from('fiches').select('id, module_id, modules(espace_id)').is('deleted_at', null),
         admin.from('progression').select('fiche_id, palier, prochaine_revision').eq('utilisateur_id', user.id),
         admin.from('activite_jours').select('jour, cartes').eq('utilisateur_id', user.id).gte('jour', il7j.toISOString().slice(0, 10)),
         admin.from('notes').select('contenu').eq('user_id', user.id).eq('fait', false).limit(20),
+        admin.from('modules').select('id').is('deleted_at', null),
       ])
 
       // --- Planning / compte à rebours ---
@@ -75,16 +77,25 @@ export async function POST(request: NextRequest) {
       const progs = (progRes.data || []) as Prog[]
       const espaces = (espRes.data || []) as { id: string; nom: string }[]
       const ficheEspace: Record<string, string> = {}
-      for (const f of (fichesRes.data || []) as { id: string; modules: { espace_id: string } | { espace_id: string }[] | null }[]) {
+      const ficheModule: Record<string, string> = {}
+      for (const f of (fichesRes.data || []) as { id: string; module_id: string; modules: { espace_id: string } | { espace_id: string }[] | null }[]) {
         const mod = Array.isArray(f.modules) ? f.modules[0] : f.modules
         if (mod?.espace_id) ficheEspace[f.id] = mod.espace_id
+        if (f.module_id) ficheModule[f.id] = f.module_id
       }
       const totalFiches = Object.keys(ficheEspace).length
       const due = progs.filter(p => estDue(p.prochaine_revision)).length
       const maitrisees = progs.filter(p => (p.palier ?? 0) >= PALIER_MAX).length
 
+      // Activité (7 jours) + progression composite (maîtrise / couverture / régularité)
+      const act: Record<string, number> = {}
+      for (const r of (actRes.data || []) as { jour: string; cartes: number }[]) act[r.jour] = r.cartes
+      const modulesTotal = (modsRes.data || []).length
+      const modulesAbordes = new Set(progs.map(p => ficheModule[p.fiche_id]).filter(Boolean)).size
+      const prog = calculerProgression({ progressions: progs, modulesTotal, modulesAbordes, activite: act })
+
       contexte += `\n\nPROGRESSION DE L'ÉTUDIANT :`
-      contexte += `\n- Score de mémorisation global : ${scoreGlobal(progs as never)} %`
+      contexte += `\n- Progression globale : ${prog.global} % (maîtrise ${prog.maitrise} %, couverture du programme ${prog.couverture} %, régularité ${prog.regularite} %).`
       contexte += `\n- Fiches : ${totalFiches} au total, ${progs.length} déjà travaillées, ${due} à réviser maintenant, ${maitrisees} bien maîtrisées.`
 
       if (espaces.length) {
@@ -100,8 +111,6 @@ export async function POST(request: NextRequest) {
       }
 
       // --- Activité (7 derniers jours) ---
-      const act: Record<string, number> = {}
-      for (const r of (actRes.data || []) as { jour: string; cartes: number }[]) act[r.jour] = r.cartes
       const semaine = Object.values(act).reduce((s, n) => s + n, 0)
       contexte += `\n- Activité : ${act[today] ?? 0} carte(s) révisée(s) aujourd'hui, ${semaine} sur les 7 derniers jours.`
 

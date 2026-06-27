@@ -2,12 +2,14 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Espace, Progression, Profil } from '@/types'
-import { scoreGlobal, estDue } from '@/lib/spaced-repetition'
+import { estDue } from '@/lib/spaced-repetition'
 import {
   chargerActivite, calculerStreak, derniers7Jours, cartesAujourdhui, OBJECTIF_QUOTIDIEN,
 } from '@/lib/streaks'
+import { calculerProgression } from '@/lib/progression'
 import Link from 'next/link'
 import NotesWidget from '@/components/NotesWidget'
+import ProgressionCard from '@/components/ProgressionCard'
 
 const OUTILS = [
   { href: '/espaces', icone: '🗂️', couleur: '#DC4A2B', titre: 'Fiches', desc: 'Réviser vos fiches par matière, en répétition espacée.' },
@@ -30,7 +32,8 @@ const MESSAGES = [
 export default function Dashboard() {
   const [espaces, setEspaces] = useState<Espace[]>([])
   const [progressions, setProgressions] = useState<Progression[]>([])
-  const [fiches, setFiches] = useState<{ id: string, espace_id: string }[]>([])
+  const [fiches, setFiches] = useState<{ id: string, espace_id: string, module_id: string }[]>([])
+  const [modulesTotal, setModulesTotal] = useState(0)
   const [profil, setProfil] = useState<Profil | null>(null)
   const [activite, setActivite] = useState<Record<string, number>>({})
   const [evenements, setEvenements] = useState<Evenement[]>([])
@@ -41,17 +44,19 @@ export default function Dashboard() {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const [{ data: esp }, { data: prog }, { data: fich }, { data: prof }, act, evs] = await Promise.all([
+      const [{ data: esp }, { data: prog }, { data: fich }, { data: prof }, act, evs, { data: mods }] = await Promise.all([
         supabase.from('espaces').select('*').order('ordre'),
         supabase.from('progression').select('*').eq('utilisateur_id', user.id),
-        supabase.from('fiches').select('id, modules(espace_id)').is('deleted_at', null),
+        supabase.from('fiches').select('id, module_id, modules(espace_id)').is('deleted_at', null),
         supabase.from('profils').select('*').eq('id', user.id).single(),
         chargerActivite(user.id),
         supabase.from('evenements').select('id,titre,date_debut,heure,type,couleur').gte('date_debut', new Date().toISOString().slice(0,10)).order('date_debut').limit(4),
+        supabase.from('modules').select('id').is('deleted_at', null),
       ])
       setEspaces(esp || [])
       setProgressions(prog || [])
-      setFiches((fich || []).map((f: any) => ({ id: f.id, espace_id: f.modules?.espace_id })))
+      setModulesTotal((mods || []).length)
+      setFiches((fich || []).map((f: any) => ({ id: f.id, espace_id: f.modules?.espace_id, module_id: f.module_id })))
       setProfil(prof)
       setActivite(act)
       setEvenements((evs as any)?.data || [])
@@ -67,7 +72,9 @@ export default function Dashboard() {
     <div style={{ paddingTop: '4rem', textAlign: 'center', color: '#9A8D72', fontFamily: font }}>Chargement…</div>
   )
 
-  const score = scoreGlobal(progressions)
+  const modulesAbordes = new Set(progressions.map(p => fiches.find(f => f.id === p.fiche_id)?.module_id).filter(Boolean)).size
+  const detailProg = calculerProgression({ progressions, modulesTotal, modulesAbordes, activite })
+  const score = detailProg.global
   const totalDue = progressions.filter(p => estDue(p.prochaine_revision)).length
   const prenom = profil?.email?.split('@')[0] ?? 'vous'
 
@@ -101,6 +108,11 @@ export default function Dashboard() {
         <div style={{ fontSize: 15, color: '#8A7E68', marginTop: 4 }}>
           {streak > 0 ? `${streak} jour${streak > 1 ? 's' : ''} d'affilée — ${message}` : message}
         </div>
+      </div>
+
+      {/* Progression globale (maîtrise · couverture · régularité) */}
+      <div style={{ marginBottom: 16 }}>
+        <ProgressionCard detail={detailProg} />
       </div>
 
       {/* Stats : série · objectif · semaine */}
