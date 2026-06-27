@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
 
 const FONT = "'Hanken Grotesk', sans-serif"
 
@@ -17,12 +16,13 @@ export default function RemarqueButton({ ficheId, style }: { ficheId: string; st
   const envoyer = async () => {
     if (!message.trim()) { setErr('Écris ta remarque.'); return }
     setStatut('envoi'); setErr('')
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { setStatut(''); setErr('Session expirée, reconnecte-toi.'); return }
-    const { error } = await supabase.from('remarques_fiches').insert({
-      fiche_id: ficheId, user_id: user.id, message: message.trim().slice(0, 2000),
+    const res = await fetch('/api/remarques', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ficheId, message: message.trim() }),
     })
-    if (error) { setStatut(''); setErr(error.message); return }
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) { setStatut(''); setErr(json.error || 'Une erreur est survenue.'); return }
     setStatut('ok')
   }
 
