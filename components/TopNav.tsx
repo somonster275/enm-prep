@@ -61,6 +61,7 @@ export default function TopNav() {
     { href: '/espaces', label: 'Espaces' },
     { href: '/actualites', label: 'Actualités' },
     { href: '/cours-ia', label: 'Questions de cours' },
+    { href: '/drive', label: 'Mon Drive' },
     ...(profil?.role === 'admin' ? [{ href: '/calendrier', label: 'Calendrier' }] : []),
   ]
   const liensAdmin: { href: string; label: string }[] =
