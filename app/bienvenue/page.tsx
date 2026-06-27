@@ -11,7 +11,30 @@ export default function BienvenuePage() {
   const [erreur, setErreur] = useState('')
   const [done, setDone] = useState(false)
 
+  // Message expliquant pourquoi le lien n'est plus valable (expiré, déjà utilisé…).
+  const [raisonLien, setRaisonLien] = useState('')
+  // Renvoi d'un lien en self-service.
+  const [rEmail, setREmail] = useState('')
+  const [rStatut, setRStatut] = useState<'' | 'envoi' | 'ok'>('')
+  const [rErreur, setRErreur] = useState('')
+
   useEffect(() => {
+    // Supabase signale une erreur de lien dans le fragment (#) ou la query (?) :
+    // ex. error_code=otp_expired quand le lien a expiré OU a déjà été ouvert
+    // (souvent par un anti-spam qui pré-charge les liens des emails).
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+    const query = new URLSearchParams(window.location.search)
+    const errCode = hash.get('error_code') || query.get('error_code')
+    const errDesc = hash.get('error_description') || query.get('error_description')
+    if (errCode || errDesc) {
+      const expire = (errCode || '').includes('expired') || (errDesc || '').toLowerCase().includes('expired')
+      setRaisonLien(expire
+        ? "Ton lien a expiré ou a déjà été ouvert. Renvoie-toi un lien ci-dessous pour définir ton mot de passe."
+        : (errDesc ? decodeURIComponent(errDesc.replace(/\+/g, ' ')) : "Ce lien n'est plus valable."))
+      setEtat('invalide')
+      return
+    }
+
     let resolu = false
     // Le client Supabase détecte automatiquement le jeton dans l'URL (invitation).
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -20,10 +43,28 @@ export default function BienvenuePage() {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) { resolu = true; setEtat('pret') }
     })
-    // Si rien après 5 s, on considère le lien invalide/expiré.
-    const t = setTimeout(() => { if (!resolu) setEtat('invalide') }, 5000)
+    // Si rien après 10 s (réseaux mobiles lents), on considère le lien invalide.
+    const t = setTimeout(() => {
+      if (!resolu) {
+        setRaisonLien("Ton lien n'a pas pu être validé. Il a peut-être expiré ou déjà été ouvert. Renvoie-toi un lien ci-dessous.")
+        setEtat('invalide')
+      }
+    }, 10000)
     return () => { sub.subscription.unsubscribe(); clearTimeout(t) }
   }, [])
+
+  // Renvoie un lien frais (email de réinitialisation Supabase). Le lien ramène
+  // sur cette page avec une session valide → l'étudiant définit son mot de passe.
+  const renvoyerLien = async () => {
+    setRErreur('')
+    if (!rEmail.trim()) { setRErreur('Indique ton adresse email.'); return }
+    setRStatut('envoi')
+    const { error } = await supabase.auth.resetPasswordForEmail(rEmail.trim(), {
+      redirectTo: `${window.location.origin}/bienvenue`,
+    })
+    if (error) { setRStatut(''); setRErreur(error.message); return }
+    setRStatut('ok')
+  }
 
   const definir = async () => {
     setErreur('')
@@ -74,10 +115,35 @@ export default function BienvenuePage() {
         )}
 
         {etat === 'invalide' && (
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Lien invalide ou expiré</div>
-            <div style={{ fontSize: 14, color: '#8A7E68', marginBottom: 18 }}>Ce lien d&apos;invitation n&apos;est plus valable. Demande à l&apos;administrateur de te renvoyer une invitation.</div>
-            <a href="/login" style={{ color: '#DC4A2B', fontWeight: 700, textDecoration: 'none' }}>Aller à la connexion</a>
+          <div>
+            <div style={{ textAlign: 'center', fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Lien invalide ou expiré</div>
+            <div style={{ textAlign: 'center', fontSize: 14, color: '#8A7E68', marginBottom: 20 }}>
+              {raisonLien || "Ce lien d'invitation n'est plus valable."}
+            </div>
+
+            {rStatut === 'ok' ? (
+              <div style={{ background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 12, padding: '14px 16px', fontSize: 13.5, color: '#0F6E56', textAlign: 'center' }}>
+                ✅ Un nouveau lien vient de t&apos;être envoyé. Ouvre-le depuis ta boîte mail pour définir ton mot de passe.
+              </div>
+            ) : (
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#5C4A22', marginBottom: 8 }}>Renvoyer un lien</div>
+                <input type="email" value={rEmail} onChange={e => setREmail(e.target.value)} placeholder="ton@email.fr"
+                  onKeyDown={e => { if (e.key === 'Enter') renvoyerLien() }} style={champ} />
+                {rErreur && <div style={{ marginTop: 10, fontSize: 13, color: '#D94A30' }}>{rErreur}</div>}
+                <button onClick={renvoyerLien} disabled={rStatut === 'envoi'} style={{
+                  marginTop: 14, height: 50, width: '100%', border: 'none', borderRadius: 12,
+                  background: '#DC4A2B', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer',
+                  opacity: rStatut === 'envoi' ? 0.7 : 1, fontFamily: "'Hanken Grotesk', sans-serif",
+                }}>
+                  {rStatut === 'envoi' ? 'Envoi…' : 'M’envoyer un nouveau lien'}
+                </button>
+              </div>
+            )}
+
+            <div style={{ textAlign: 'center', marginTop: 18 }}>
+              <a href="/login" style={{ color: '#8A7E68', fontWeight: 600, fontSize: 13.5, textDecoration: 'none' }}>Aller à la connexion</a>
+            </div>
           </div>
         )}
 
