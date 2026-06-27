@@ -41,7 +41,15 @@ export default function Accueil() {
     // redirige vers /bienvenue, qui gère la définition du mot de passe.
     const h = window.location.hash || ''
     const q = window.location.search || ''
-    const estRecup = /type=(recovery|invite)/.test(h) || /type=(recovery|invite)/.test(q)
+    const params = new URLSearchParams(q)
+    // PKCE (@supabase/ssr) renvoie un ?code=... ; le flux implicite un #type=recovery.
+    // Erreurs Supabase : ?error_code / #error_code. Dans tous ces cas, on bascule
+    // vers /bienvenue qui gère la définition du mot de passe.
+    const estRecup =
+      params.has('code') ||
+      params.has('error_code') ||
+      /type=(recovery|invite)/.test(h) ||
+      /error/.test(h)
     if (estRecup) {
       window.location.replace('/bienvenue' + h + q)
       return
