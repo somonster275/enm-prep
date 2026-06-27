@@ -2,6 +2,18 @@
 import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { supabase } from '@/lib/supabase'
+
+// Extrait un éventuel bloc <TACHES>…</TACHES> du message (caché pendant le streaming).
+function extraireTaches(txt: string): { visible: string; taches: string[] } {
+  const open = txt.search(/<TACHES>/i)
+  if (open === -1) return { visible: txt, taches: [] }
+  const close = txt.search(/<\/TACHES>/i)
+  if (close === -1) return { visible: txt.slice(0, open).trim(), taches: [] }
+  const inner = txt.slice(open + 8, close)
+  const taches = inner.split('\n').map(l => l.replace(/^[-*\d.)\s]+/, '').trim()).filter(Boolean)
+  return { visible: (txt.slice(0, open) + txt.slice(close + 9)).trim(), taches }
+}
 
 type Message = { role: 'user' | 'assistant'; contenu: string; ts: number }
 const CLE_LS = 'tuteur-messages'
@@ -32,11 +44,20 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
   const abortRef = useRef<AbortController | null>(null)
   const chatRef = useRef<HTMLDivElement>(null)
   const compact = variant === 'bubble'
+  const [userId, setUserId] = useState('')
+  const [tachesAjoutees, setTachesAjoutees] = useState<Record<string, boolean>>({})
 
   const font = "'Hanken Grotesk', sans-serif"
   const coral = '#DC4A2B'
 
   useEffect(() => { setMessages(charger()) }, [])
+  useEffect(() => { supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id || '')) }, [])
+
+  const ajouterTache = async (cle: string, contenu: string) => {
+    if (!userId || tachesAjoutees[cle]) return
+    const { error } = await supabase.from('notes').insert({ user_id: userId, contenu })
+    if (!error) setTachesAjoutees(s => ({ ...s, [cle]: true }))
+  }
   useEffect(() => { chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' }) }, [messages])
 
   const stop = () => abortRef.current?.abort()
@@ -98,7 +119,7 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
       <div ref={chatRef} style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: compact ? 10 : 14, padding: compact ? '12px' : '0', minHeight: 0 }}>
         {messages.length === 0 && (
           <div style={{ textAlign: 'center', paddingTop: compact ? '1.5rem' : '3rem', color: '#9A8D72' }}>
-            <div style={{ fontSize: compact ? 28 : 40, marginBottom: 10 }}>🧑‍🏫</div>
+            <div style={{ fontSize: compact ? 28 : 40, marginBottom: 10 }}>📕</div>
             <div style={{ fontSize: compact ? 14 : 16, fontWeight: 700, color: '#2A2018', marginBottom: 14 }}>Ton coach de révision ENM</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 7, maxWidth: 460, margin: '0 auto', padding: compact ? '0 6px' : 0 }}>
               {SUGGESTIONS.map((s, i) => (
@@ -107,18 +128,43 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
             </div>
           </div>
         )}
-        {messages.map((m, i) => m.role === 'user' ? (
-          <div key={i} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <div style={{ background: '#2A2018', color: '#fff', borderRadius: '14px 14px 4px 14px', padding: compact ? '9px 13px' : '12px 18px', maxWidth: '85%', fontSize: compact ? 13.5 : 14.5, lineHeight: 1.55 }}>{m.contenu}</div>
-          </div>
-        ) : (
-          <div key={i} style={{ display: 'flex', gap: 9, alignItems: 'flex-start' }}>
-            <div style={{ width: compact ? 26 : 34, height: compact ? 26 : 34, borderRadius: 9, flexShrink: 0, marginTop: 2, background: coral + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: compact ? 13 : 17 }}>🧑‍🏫</div>
-            <div style={{ flex: 1, minWidth: 0, background: '#fff', border: '1px solid #F0E7D6', borderRadius: '4px 14px 14px 14px', padding: compact ? '10px 13px' : '14px 18px', fontSize: compact ? 13.5 : 15, lineHeight: 1.6 }}>
-              {m.contenu ? <div className="md-response"><ReactMarkdown remarkPlugins={[remarkGfm]}>{m.contenu}</ReactMarkdown></div> : <span style={{ color: '#C2B7A0', fontStyle: 'italic' }}>…</span>}
+        {messages.map((m, i) => {
+          if (m.role === 'user') return (
+            <div key={i} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <div style={{ background: '#2A2018', color: '#fff', borderRadius: '14px 14px 4px 14px', padding: compact ? '9px 13px' : '12px 18px', maxWidth: '85%', fontSize: compact ? 13.5 : 14.5, lineHeight: 1.55 }}>{m.contenu}</div>
             </div>
-          </div>
-        ))}
+          )
+          const { visible, taches } = extraireTaches(m.contenu)
+          return (
+            <div key={i} style={{ display: 'flex', gap: 9, alignItems: 'flex-start' }}>
+              <div style={{ width: compact ? 26 : 34, height: compact ? 26 : 34, borderRadius: 9, flexShrink: 0, marginTop: 2, background: coral + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: compact ? 14 : 18 }}>📕</div>
+              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: '4px 14px 14px 14px', padding: compact ? '10px 13px' : '14px 18px', fontSize: compact ? 13.5 : 15, lineHeight: 1.6 }}>
+                  {visible ? <div className="md-response"><ReactMarkdown remarkPlugins={[remarkGfm]}>{visible}</ReactMarkdown></div> : <span style={{ color: '#C2B7A0', fontStyle: 'italic' }}>…</span>}
+                </div>
+                {taches.length > 0 && (
+                  <div style={{ background: '#FFF8EE', border: '1px solid #F2D9A0', borderRadius: 12, padding: '10px 12px' }}>
+                    <div style={{ fontSize: 11.5, fontWeight: 700, color: '#8A5A10', marginBottom: 8 }}>📝 Tâches proposées</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {taches.map((t, j) => {
+                        const cle = `${i}-${j}`
+                        const ajoutee = tachesAjoutees[cle]
+                        return (
+                          <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ flex: 1, fontSize: 13, color: '#3A3226' }}>{t}</span>
+                            <button onClick={() => ajouterTache(cle, t)} disabled={ajoutee} style={{ flexShrink: 0, fontSize: 12, fontWeight: 700, border: 'none', borderRadius: 8, padding: '5px 10px', cursor: ajoutee ? 'default' : 'pointer', background: ajoutee ? '#DDF3EE' : coral, color: ajoutee ? '#0F6E56' : '#fff', fontFamily: font }}>
+                              {ajoutee ? '✓ Ajoutée' : '+ Ajouter'}
+                            </button>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
       </div>
 
       {loading && (

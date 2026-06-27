@@ -7,6 +7,7 @@ import {
   chargerActivite, calculerStreak, derniers7Jours, cartesAujourdhui, OBJECTIF_QUOTIDIEN,
 } from '@/lib/streaks'
 import Link from 'next/link'
+import NotesWidget from '@/components/NotesWidget'
 
 const OUTILS = [
   { href: '/espaces', icone: '🗂️', couleur: '#DC4A2B', titre: 'Fiches', desc: 'Réviser vos fiches par matière, en répétition espacée.' },
@@ -193,6 +194,8 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Colonne droite : à venir + tâches */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Mini calendrier — événements à venir */}
         <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 18 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
@@ -227,6 +230,9 @@ export default function Dashboard() {
               })}
             </div>
           )}
+        </div>
+
+        <NotesWidget titre="Mes tâches" />
         </div>
       </div>
     </div>

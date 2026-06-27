@@ -164,6 +164,20 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   embed question → `match_cours_chunks` testé (4 passages, similarité 57–64 %).
   Backfill `scripts/backfill-embeddings.mjs` créé et lancé (24 passages).
 
+### 2026-06-27 (suite 3) — Coach IA (bulle flottante)
+- Le « Tuteur IA » devient un **Coach de révision** : prompt enrichi (programme +
+  épreuves ENM), et la route `/api/tuteur` injecte un **contexte temps réel** : date du
+  jour + compte à rebours vers le prochain `evenements.type='examen'` + liste des
+  événements à venir → conseils de planning adaptés au temps restant + méthodes.
+- **Bulle flottante** bas-droite (`components/ChatbotBulle.tsx`) montée dans `(app)/layout`
+  → présente sur toutes les pages. Composant chat réutilisable `components/TuteurChat.tsx`
+  (variantes `full` / `bubble`, mémoire 24h localStorage partagée clé `tuteur-messages`).
+- Ajouté comme **3ᵉ onglet « Coach IA »** dans `/cours-ia` (état `vueTuteur` qui masque le
+  RAG et rend `<TuteurChat/>`). Onglet « Tuteur IA » **retiré de la nav** (→ la bulle).
+- Page `/tuteur` conservée (wrapper TuteurChat) mais plus dans la nav.
+- TODO possible (v2) : laisser le coach **créer/modifier** des événements du calendrier
+  (tool-use) — pour l'instant il conseille mais ne modifie pas le planning.
+
 ### 2026-06-27 (suite 2) — Nouvelles fonctionnalités IA (via Claude API, pas de modèle local)
 - Décision : pas d'IA locale (trop lourd sur mobile, qualité moindre) → tout via l'API Claude.
 - **Tuteur IA** (`/tuteur` + `/api/tuteur`) : chat libre non limité aux docs importés

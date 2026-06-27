@@ -312,7 +312,7 @@ export default function CoursIAPage() {
                   background: vueTuteur ? coral : 'transparent',
                   color: vueTuteur ? '#fff' : textMid,
                   boxShadow: vueTuteur ? `0 6px 14px -7px rgba(242,101,75,.8)` : 'none',
-                }}>🧑‍🏫 Coach IA</button>
+                }}>📕 Coach IA</button>
               </div>
               {/* Sélection de documents : réservée à « Mes documents ».
                   En base ENM, les étudiants interrogent toute la base sans voir la liste. */}

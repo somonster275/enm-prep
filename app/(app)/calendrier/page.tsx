@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import NotesWidget from '@/components/NotesWidget'
 
 type Evenement = {
   id: string
@@ -294,6 +295,11 @@ export default function CalendrierPage() {
             }}>+ Ajouter un événement</button>
           )}
         </div>
+      </div>
+
+      {/* Notes / tâches personnelles */}
+      <div style={{ marginBottom: 20 }}>
+        <NotesWidget titre="Mes tâches" />
       </div>
 
       {tableManquante && (
