@@ -30,11 +30,33 @@ export default function BienvenuePage() {
     if (mdp.length < 6) { setErreur('Le mot de passe doit faire au moins 6 caractères.'); return }
     if (mdp !== mdp2) { setErreur('Les deux mots de passe ne correspondent pas.'); return }
     setLoading(true)
-    const { error } = await supabase.auth.updateUser({ password: mdp })
+
+    // 1) Enregistre le mot de passe (la session d'invitation est active).
+    const { data: upd, error } = await supabase.auth.updateUser({ password: mdp })
+    if (error) { setLoading(false); setErreur(error.message); return }
+    const email = upd.user?.email ?? ''
+
+    // 2) Établit une session pleinement valide AVANT d'entrer dans l'espace, pour
+    //    ne pas dépendre de la latence d'enregistrement chez Supabase. On se
+    //    reconnecte en arrière-plan avec le mot de passe qu'on vient de définir,
+    //    en réessayant quelques fois : l'étudiant entre directement, sans avoir
+    //    à se reconnecter lui-même derrière.
+    let connecte = false
+    if (email) {
+      for (let i = 0; i < 5; i++) {
+        const { data: sign, error: signErr } = await supabase.auth.signInWithPassword({ email, password: mdp })
+        if (!signErr && sign.session) { connecte = true; break }
+        await new Promise(r => setTimeout(r, 800))
+      }
+    }
+
     setLoading(false)
-    if (error) { setErreur(error.message); return }
     setDone(true)
-    setTimeout(() => { window.location.assign('/dashboard') }, 1500)
+    // 3) Entrée directe. Si la reconnexion en arrière-plan a échoué malgré les
+    //    tentatives, la session d'invitation reste valable : on tente l'entrée,
+    //    et l'AuthGuard renverra au besoin vers /login.
+    void connecte
+    window.location.assign('/dashboard')
   }
 
   const champ: React.CSSProperties = {
