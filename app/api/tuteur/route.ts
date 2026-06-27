@@ -49,7 +49,8 @@ export async function POST(request: NextRequest) {
       const today = new Date().toISOString().slice(0, 10)
       const il7j = new Date(); il7j.setDate(il7j.getDate() - 6)
 
-      const [evRes, espRes, fichesRes, progRes, actRes, notesRes, modsRes] = await Promise.all([
+      const [profilRes, evRes, espRes, fichesRes, progRes, actRes, notesRes, modsRes] = await Promise.all([
+        admin.from('profils').select('prenom, nom').eq('id', user.id).single(),
         admin.from('evenements').select('titre, date_debut, heure, type').gte('date_debut', today).order('date_debut').limit(15),
         admin.from('espaces').select('id, nom').order('ordre'),
         admin.from('fiches').select('id, module_id, modules(espace_id)').is('deleted_at', null),
@@ -58,6 +59,12 @@ export async function POST(request: NextRequest) {
         admin.from('notes').select('contenu').eq('user_id', user.id).eq('fait', false).limit(20),
         admin.from('modules').select('id').is('deleted_at', null),
       ])
+
+      // --- Identité : s'adresser à l'étudiant par son prénom ---
+      const prenom = (profilRes.data?.prenom || '').trim()
+      if (prenom) {
+        contexte += `\nPrénom de l'étudiant : ${prenom}. Adresse-toi à lui par son prénom de temps en temps, de façon naturelle (pas à chaque phrase).`
+      }
 
       // --- Planning / compte à rebours ---
       const evs = evRes.data || []
