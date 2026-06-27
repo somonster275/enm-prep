@@ -165,12 +165,18 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   Backfill `scripts/backfill-embeddings.mjs` créé et lancé (24 passages).
 
 ### 2026-06-27 — Email demandeur, page Mon compte, suppression d'utilisateurs
-- **À l'approbation** : email Resend au demandeur (mot de passe provisoire + lien login +
-  invitation à le changer). ⚠️ **Ne part pas en mode test Resend** (3ᵉ partie refusée) :
-  fallback = identifiants affichés à l'admin avec mention « email non envoyé ». Pour
-  activer l'envoi réel : (A) vérifier un domaine dans Resend (nécessite un vrai domaine,
-  pas un .vercel.app) + changer `EMAIL_FROM`, ou (B) basculer sur les emails Supabase
-  (invite/recovery, sans domaine). **Décision user en attente (A ou B).**
+- **À l'approbation (OPTION B retenue le 2026-06-27)** : `inviteUserByEmail` Supabase
+  → email d'invitation au demandeur (n'importe quelle adresse, sans domaine Resend),
+  redirectTo `/bienvenue` + profil lecteur. Page publique **`app/bienvenue/page.tsx`**
+  (exemptée dans `proxy.ts`) : le client Supabase détecte le jeton dans l'URL
+  (`onAuthStateChange`/`getUser`), la personne définit son mot de passe
+  (`updateUser({password})`) → /dashboard. Plus de mot de passe provisoire ni d'affichage
+  d'identifiants côté admin (juste « invitation envoyée »).
+  - ⚠️ Requiert dans Supabase : Redirect URLs doit inclure `…/bienvenue` (ou `/**`).
+    Email d'invitation via service intégré Supabase (gratuit mais limité/spam sur plan
+    gratuit → SMTP custom si volume). L'ancienne piste Resend-au-demandeur (option A,
+    nécessitait un domaine) est abandonnée. `lib/email.ts` garde `envoyerEmail` générique
+    (inutilisé pour l'instant) ; `envoyerEmailAdmin` sert encore à la notif admin Resend.
 - **Page `/compte`** (`app/(app)/compte/page.tsx`, lien dans le menu TopNav) :
   `supabase.auth.updateUser({ password })` → mot de passe définitif.
 - **Suppression d'utilisateurs** : route `/api/admin/supprimer-utilisateur` (admin only,

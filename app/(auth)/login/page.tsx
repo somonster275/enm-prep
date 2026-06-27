@@ -62,8 +62,8 @@ export default function LoginPage() {
       minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr',
       fontFamily: "'Hanken Grotesk', sans-serif", color: '#2A2018',
     }}>
-      {/* Panneau gauche — poster de marque */}
-      <div style={{
+      {/* Panneau gauche — poster de marque (masqué sur mobile) */}
+      <div className="hide-mobile" style={{
         position: 'relative', background: '#C6C4BD', overflow: 'hidden',
         padding: 52, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
         color: '#2A2018',
@@ -80,7 +80,7 @@ export default function LoginPage() {
       </div>
 
       {/* Panneau droit — formulaire */}
-      <div style={{ padding: '64px 60px', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#fff' }}>
+      <div className="login-form" style={{ padding: '64px 60px', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#fff' }}>
         <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 30, letterSpacing: '-.01em' }}>
           Bon retour 👋
         </div>

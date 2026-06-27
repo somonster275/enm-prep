@@ -6,12 +6,15 @@ import { useEffect, useState } from 'react'
 import type { Profil } from '@/types'
 import { chargerActivite, calculerStreak } from '@/lib/streaks'
 import { LogoBadge } from '@/components/Logo'
+import { useIsMobile } from '@/lib/useIsMobile'
 
 export default function TopNav() {
   const pathname = usePathname()
+  const isMobile = useIsMobile()
   const [profil, setProfil] = useState<Profil | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [adminOpen, setAdminOpen] = useState(false)
+  const [navOpen, setNavOpen] = useState(false)
   const [streak, setStreak] = useState(0)
 
   useEffect(() => {
@@ -32,6 +35,9 @@ export default function TopNav() {
     load()
   }, [pathname])
 
+  // Ferme le tiroir mobile quand on change de page.
+  useEffect(() => { setNavOpen(false); setAdminOpen(false) }, [pathname])
+
   const logout = async () => {
     await supabase.auth.signOut()
     window.location.href = '/login'
@@ -40,152 +46,154 @@ export default function TopNav() {
   const initiales = profil?.email ? profil.email.slice(0, 2).toUpperCase() : '?'
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
 
+  // Liens de navigation
+  const liens: { href: string; label: string }[] = [
+    { href: '/dashboard', label: 'Accueil' },
+    { href: '/espaces', label: 'Espaces' },
+    { href: '/actualites', label: 'Actualités' },
+    { href: '/cours-ia', label: 'Questions de cours' },
+    ...(profil?.role === 'admin' ? [{ href: '/calendrier', label: 'Calendrier' }] : []),
+  ]
+  const liensAdmin: { href: string; label: string }[] =
+    (profil?.role === 'admin' || profil?.role === 'editeur')
+      ? [
+          { href: '/admin/editeur', label: 'Éditeur de fiches' },
+          ...(profil?.role === 'admin' ? [
+            { href: '/admin/import', label: 'Importer' },
+            { href: '/admin/corbeille', label: 'Corbeille' },
+            { href: '/admin/utilisateurs', label: 'Utilisateurs' },
+          ] : []),
+        ]
+      : []
+
   const navLink = (href: string, label: string) => (
-    <Link href={href} style={{
+    <Link key={href} href={href} style={{
       fontSize: 14, fontWeight: isActive(href) ? 700 : 600,
       color: isActive(href) ? '#2A2018' : '#8A7E68',
       background: isActive(href) ? '#FCEFD3' : 'transparent',
-      padding: '9px 16px', borderRadius: 10,
-      textDecoration: 'none',
-      transition: 'background 0.1s',
+      padding: '9px 16px', borderRadius: 10, textDecoration: 'none',
     }}>
       {label}
     </Link>
   )
 
   return (
-    <div style={{
-      background: '#fff',
-      borderBottom: '1px solid #F0E7D6',
-      position: 'sticky', top: 0, zIndex: 100,
-    }}>
+    <div style={{ background: '#fff', borderBottom: '1px solid #F0E7D6', position: 'sticky', top: 0, zIndex: 100 }}>
       <div style={{
-        maxWidth: 1100, margin: '0 auto', padding: '0 36px',
+        maxWidth: 1100, margin: '0 auto', padding: isMobile ? '0 16px' : '0 36px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
           <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
             <LogoBadge size={18} />
           </Link>
-          <nav style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-            {navLink('/dashboard', 'Accueil')}
-            {navLink('/espaces', 'Espaces')}
-            {navLink('/actualites', 'Actualités')}
-            {navLink('/cours-ia', 'Questions de cours')}
-            {profil?.role === 'admin' && navLink('/calendrier', 'Calendrier')}
 
-            {/* Dropdown Admin */}
-            {(profil?.role === 'admin' || profil?.role === 'editeur') && (
-              <div style={{ position: 'relative' }}>
-                <button
-                  onClick={() => setAdminOpen(o => !o)}
-                  style={{
+          {/* Navigation horizontale — desktop uniquement */}
+          {!isMobile && (
+            <nav style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+              {liens.map(l => navLink(l.href, l.label))}
+
+              {liensAdmin.length > 0 && (
+                <div style={{ position: 'relative' }}>
+                  <button onClick={() => setAdminOpen(o => !o)} style={{
                     fontSize: 14, fontWeight: 600,
-                    color: ['/admin/editeur','/admin/import','/admin/corbeille','/admin/utilisateurs'].some(p => pathname.startsWith(p)) ? '#2A2018' : '#8A7E68',
-                    background: ['/admin/editeur','/admin/import','/admin/corbeille','/admin/utilisateurs'].some(p => pathname.startsWith(p)) ? '#FCEFD3' : 'transparent',
+                    color: liensAdmin.some(l => pathname.startsWith(l.href)) ? '#2A2018' : '#8A7E68',
+                    background: liensAdmin.some(l => pathname.startsWith(l.href)) ? '#FCEFD3' : 'transparent',
                     padding: '9px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                    fontFamily: "'Hanken Grotesk', sans-serif",
-                    display: 'flex', alignItems: 'center', gap: 5,
-                  }}
-                >
-                  Admin
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="6 9 12 15 18 9"/>
-                  </svg>
-                </button>
-                {adminOpen && (
-                  <>
-                    <div onClick={() => setAdminOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 150 }} />
-                    <div style={{
-                      position: 'absolute', top: 44, left: 0, minWidth: 180, zIndex: 200,
-                      background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12,
-                      boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', padding: 6,
-                    }}>
-                      {[
-                        { href: '/admin/editeur', label: 'Éditeur de fiches' },
-                        ...(profil.role === 'admin' ? [
-                          { href: '/admin/import', label: 'Importer' },
-                          { href: '/admin/corbeille', label: 'Corbeille' },
-                          { href: '/admin/utilisateurs', label: 'Utilisateurs' },
-                        ] : []),
-                      ].map(({ href, label }) => (
-                        <Link key={href} href={href} onClick={() => setAdminOpen(false)} style={{
-                          display: 'block', padding: '9px 14px', borderRadius: 8,
-                          fontSize: 14, fontWeight: pathname.startsWith(href) ? 700 : 500,
-                          color: pathname.startsWith(href) ? '#2A2018' : '#555',
-                          background: pathname.startsWith(href) ? '#FCEFD3' : 'transparent',
-                          textDecoration: 'none',
-                        }}>
-                          {label}
-                        </Link>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-          </nav>
+                    fontFamily: "'Hanken Grotesk', sans-serif", display: 'flex', alignItems: 'center', gap: 5,
+                  }}>
+                    Admin
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  {adminOpen && (
+                    <>
+                      <div onClick={() => setAdminOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 150 }} />
+                      <div style={{ position: 'absolute', top: 44, left: 0, minWidth: 180, zIndex: 200, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', padding: 6 }}>
+                        {liensAdmin.map(({ href, label }) => (
+                          <Link key={href} href={href} onClick={() => setAdminOpen(false)} style={{
+                            display: 'block', padding: '9px 14px', borderRadius: 8,
+                            fontSize: 14, fontWeight: pathname.startsWith(href) ? 700 : 500,
+                            color: pathname.startsWith(href) ? '#2A2018' : '#555',
+                            background: pathname.startsWith(href) ? '#FCEFD3' : 'transparent', textDecoration: 'none',
+                          }}>{label}</Link>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </nav>
+          )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
-          {streak > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 10 : 14, position: 'relative' }}>
+          {streak > 0 && !isMobile && (
             <span title={`${streak} jour${streak > 1 ? 's' : ''} d'affilée`} style={{
               display: 'flex', alignItems: 'center', gap: 7, fontWeight: 700, fontSize: 14,
               color: '#D94A30', background: '#FCE9E3', padding: '8px 14px', borderRadius: 999,
-              fontFamily: "'Hanken Grotesk', sans-serif",
-            }}>
-              🔥 {streak} jour{streak > 1 ? 's' : ''}
-            </span>
+            }}>🔥 {streak} jour{streak > 1 ? 's' : ''}</span>
           )}
-          <button
-            onClick={() => setMenuOpen(o => !o)}
-            style={{
-              width: 38, height: 38, borderRadius: '50%',
-              background: '#DC4A2B',
-              color: '#fff', border: 'none', cursor: 'pointer',
-              fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 700, fontSize: 15,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-            aria-label="Menu utilisateur"
-          >
-            {initiales}
-          </button>
+
+          {/* Avatar + menu compte */}
+          <button onClick={() => setMenuOpen(o => !o)} style={{
+            width: 38, height: 38, borderRadius: '50%', background: '#DC4A2B', color: '#fff',
+            border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 15,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }} aria-label="Menu utilisateur">{initiales}</button>
 
           {menuOpen && (
-            <div style={{
-              position: 'absolute', top: 46, right: 0, width: 200,
-              background: '#fff', border: '1px solid #F0E7D6', borderRadius: 14,
-              boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)',
-              padding: '6px',
-              zIndex: 200,
-            }}>
+            <div style={{ position: 'absolute', top: 46, right: 0, width: 200, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 14, boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', padding: 6, zIndex: 200 }}>
               <div style={{ padding: '10px 14px', borderBottom: '1px solid #F0E7D6', marginBottom: 4 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#2A2018' }}>{profil?.email?.split('@')[0]}</div>
                 <div style={{ fontSize: 12, color: '#9A8D72', marginTop: 2 }}>
                   {profil?.role === 'admin' ? 'Administrateur' : profil?.role === 'editeur' ? 'Éditeur' : 'Étudiant'}
                 </div>
               </div>
-              <Link href="/compte" onClick={() => setMenuOpen(false)} style={{
-                display: 'block', width: '100%', textAlign: 'left',
-                padding: '9px 14px', borderRadius: 8,
-                background: 'transparent', color: '#8A7E68', fontSize: 14, fontWeight: 600,
-                textDecoration: 'none', boxSizing: 'border-box',
-              }}>
-                Mon compte
-              </Link>
-              <button onClick={logout} style={{
-                width: '100%', textAlign: 'left',
-                padding: '9px 14px', borderRadius: 8,
-                background: 'transparent', border: 'none',
-                color: '#8A7E68', fontSize: 14, fontWeight: 600,
-                cursor: 'pointer', fontFamily: "'Hanken Grotesk', sans-serif",
-              }}>
-                Déconnexion
-              </button>
+              <Link href="/compte" onClick={() => setMenuOpen(false)} style={{ display: 'block', padding: '9px 14px', borderRadius: 8, color: '#8A7E68', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Mon compte</Link>
+              <button onClick={logout} style={{ width: '100%', textAlign: 'left', padding: '9px 14px', borderRadius: 8, background: 'transparent', border: 'none', color: '#8A7E68', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'Hanken Grotesk', sans-serif" }}>Déconnexion</button>
             </div>
+          )}
+
+          {/* Hamburger — mobile uniquement */}
+          {isMobile && (
+            <button onClick={() => setNavOpen(o => !o)} aria-label="Menu" style={{
+              width: 38, height: 38, borderRadius: 10, background: '#FDF6EA', border: '1px solid #F0E7D6',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2018" strokeWidth="2.2" strokeLinecap="round">
+                {navOpen ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></> : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>}
+              </svg>
+            </button>
           )}
         </div>
       </div>
+
+      {/* Tiroir de navigation mobile */}
+      {isMobile && navOpen && (
+        <div style={{ borderTop: '1px solid #F0E7D6', background: '#fff', padding: '8px 12px 14px' }}>
+          {liens.map(l => (
+            <Link key={l.href} href={l.href} onClick={() => setNavOpen(false)} style={{
+              display: 'block', padding: '12px 14px', borderRadius: 10, marginBottom: 2,
+              fontSize: 15, fontWeight: isActive(l.href) ? 700 : 600,
+              color: isActive(l.href) ? '#2A2018' : '#6E6456',
+              background: isActive(l.href) ? '#FCEFD3' : 'transparent', textDecoration: 'none',
+            }}>{l.label}</Link>
+          ))}
+          {liensAdmin.length > 0 && (
+            <>
+              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.1em', color: '#B6A98C', padding: '12px 14px 6px' }}>ADMIN</div>
+              {liensAdmin.map(l => (
+                <Link key={l.href} href={l.href} onClick={() => setNavOpen(false)} style={{
+                  display: 'block', padding: '12px 14px', borderRadius: 10, marginBottom: 2,
+                  fontSize: 15, fontWeight: pathname.startsWith(l.href) ? 700 : 600,
+                  color: pathname.startsWith(l.href) ? '#2A2018' : '#6E6456',
+                  background: pathname.startsWith(l.href) ? '#FCEFD3' : 'transparent', textDecoration: 'none',
+                }}>{l.label}</Link>
+              ))}
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }

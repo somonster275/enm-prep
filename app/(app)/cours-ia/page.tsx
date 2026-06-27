@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import type { Espace } from '@/types'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { useIsMobile } from '@/lib/useIsMobile'
 
 type Document = { id: string; nom: string; nb_chunks: number; espace_id: string | null; created_at: string; espaces: { nom: string; couleur: string } | null }
 type Message = {
@@ -53,6 +54,7 @@ export default function CoursIAPage() {
   const [loading, setLoading] = useState(false)
   const [phase, setPhase] = useState<'idle' | 'recherche' | 'redaction'>('idle')
   const [sidebarOuverte, setSidebarOuverte] = useState(true)
+  const isMobile = useIsMobile()
   const abortRef = useRef<AbortController | null>(null)
   const [uploading, setUploading] = useState(false)
   const [espaceDoc, setEspaceDoc] = useState('')
@@ -112,6 +114,9 @@ export default function CoursIAPage() {
   useEffect(() => {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages])
+
+  // Sur mobile, la sidebar documents est repliée par défaut (elle s'ouvre via le bouton).
+  useEffect(() => { if (isMobile) setSidebarOuverte(false) }, [isMobile])
 
   const importerDoc = async () => {
     if (!fichier) return
@@ -272,10 +277,10 @@ export default function CoursIAPage() {
         paddingTop: 28,
         paddingBottom: 32,
       }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px', display: 'flex', flexDirection: 'column', height: 'calc(100vh - 58px - 60px)' }}>
+        <div className="cours-ia-wrap" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px', display: 'flex', flexDirection: 'column', height: 'calc(100vh - 58px - 60px)' }}>
 
           {/* ── En-tête page ── */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexShrink: 0, flexWrap: 'wrap', gap: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ position: 'relative', display: 'inline-block', lineHeight: 1 }}>
                 <div style={{ position: 'absolute', zIndex: 0, left: 10, right: 8, top: 4, bottom: 3, background: coral, borderRadius: 7 }} />
@@ -383,13 +388,13 @@ export default function CoursIAPage() {
             </div>
           )}
 
-          {/* ── Conteneur 2 colonnes ── */}
-          <div style={{ display: 'flex', gap: 18, flex: 1, minHeight: 0 }}>
+          {/* ── Conteneur 2 colonnes (empilées sur mobile) ── */}
+          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 12 : 18, flex: 1, minHeight: 0 }}>
 
             {/* Sidebar documents — uniquement « Mes documents » (jamais en base ENM) */}
             {mode === 'personnel' && docs.length > 0 && sidebarOuverte && (
               <aside style={{
-                width: 288, flexShrink: 0,
+                width: isMobile ? '100%' : 288, flexShrink: 0, maxHeight: isMobile ? '38vh' : undefined,
                 background: '#fff', border: `1px solid ${border}`, borderRadius: 20,
                 boxShadow: `0 1px 2px rgba(60,40,20,.05), 0 20px 44px -28px rgba(60,40,20,.22)`,
                 display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden',
