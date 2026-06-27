@@ -7,6 +7,7 @@ import { NIVEAUX, PALIER_MAX, prochaineRevision, intervalleMinutes, palierApres,
 import Link from 'next/link'
 import RichContent from '@/components/RichContent'
 import RichEditor from '@/components/RichEditor'
+import RemarqueButton from '@/components/RemarqueButton'
 import { enregistrerActivite, chargerActivite, calculerStreak } from '@/lib/streaks'
 
 // Récupère récursivement tous les IDs de modules enfants d'un module
@@ -246,12 +247,16 @@ export default function RevisionPage() {
           padding: '2rem', minHeight: 240, cursor: 'pointer', marginBottom: '1rem',
           display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative',
         }}>
-          {isAdmin && (
+          {isAdmin ? (
             <button onClick={e => { e.stopPropagation(); ouvrirEdition() }} style={{
               position: 'absolute', top: 14, right: 14, padding: '6px 12px', borderRadius: 8,
               background: '#FDF6EA', color: '#8A7E68', border: '1px solid #EADFC9',
               cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font,
             }}>✎ Éditer</button>
+          ) : (
+            <div style={{ position: 'absolute', top: 14, right: 14 }}>
+              <RemarqueButton ficheId={card.id} />
+            </div>
           )}
           {!flipped ? (
             <>

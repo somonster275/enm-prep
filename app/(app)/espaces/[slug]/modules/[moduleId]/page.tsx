@@ -7,6 +7,7 @@ import { scoreGlobal, estDue } from '@/lib/spaced-repetition'
 import Link from 'next/link'
 import RichContent from '@/components/RichContent'
 import RichEditor from '@/components/RichEditor'
+import RemarqueButton from '@/components/RemarqueButton'
 
 export default function ModulePage() {
   const { slug, moduleId } = useParams() as { slug: string; moduleId: string }
@@ -415,7 +416,7 @@ export default function ModulePage() {
                         <div style={{ height: 1, background: '#F0E7D6', marginBottom: 10 }} />
                         <RichContent html={fiche.reponse} style={{ fontSize: 13, color: '#8A7E68', lineHeight: 1.7 }} />
                       </div>
-                      {isAdmin && (
+                      {isAdmin ? (
                         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                           <button onClick={() => { setEditFiche(fiche); setQuestion(fiche.question); setReponse(fiche.reponse) }}
                             style={{ padding: '6px 12px', borderRadius: 8, background: '#fff', color: '#8A7E68', border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
@@ -425,6 +426,10 @@ export default function ModulePage() {
                             style={{ padding: '6px 12px', borderRadius: 8, background: '#FCE9E3', color: '#D94A30', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
                             Supprimer
                           </button>
+                        </div>
+                      ) : (
+                        <div style={{ flexShrink: 0 }}>
+                          <RemarqueButton ficheId={fiche.id} />
                         </div>
                       )}
                     </div>
