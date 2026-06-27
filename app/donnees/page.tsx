@@ -31,7 +31,7 @@ export default function DonneesPage() {
           <Section titre="Qui est responsable ?">
             codex est une application de préparation au concours de l&apos;ENM, éditée et administrée à titre
             personnel. Pour toute question relative à tes données, contacte le responsable via la page{' '}
-            <Link href="/contact" style={lien}>Nous contacter</Link> ou par email à codex.prepa.dev@gmail.com.
+            <Link href="/contact" style={lien}>Nous contacter</Link>.
           </Section>
 
           <Section titre="Quelles données sont collectées ?">
