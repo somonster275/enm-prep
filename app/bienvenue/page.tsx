@@ -53,16 +53,19 @@ export default function BienvenuePage() {
     return () => { sub.subscription.unsubscribe(); clearTimeout(t) }
   }, [])
 
-  // Renvoie un lien frais (email de réinitialisation Supabase). Le lien ramène
-  // sur cette page avec une session valide → l'étudiant définit son mot de passe.
+  // Renvoie un lien frais via l'API serveur (inviteUserByEmail admin SDK) —
+  // même mécanisme que l'invitation initiale, pas soumis aux limites client.
   const renvoyerLien = async () => {
     setRErreur('')
     if (!rEmail.trim()) { setRErreur('Indique ton adresse email.'); return }
     setRStatut('envoi')
-    const { error } = await supabase.auth.resetPasswordForEmail(rEmail.trim(), {
-      redirectTo: `${window.location.origin}/bienvenue`,
+    const res = await fetch('/api/acces/renvoyer-lien', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: rEmail.trim() }),
     })
-    if (error) { setRStatut(''); setRErreur(error.message); return }
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) { setRStatut(''); setRErreur(json.error || 'Une erreur est survenue.'); return }
     setRStatut('ok')
   }
 
