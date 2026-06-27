@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 11).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 12).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,17 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-06-27 (suite 12) — Audit & mise en conformité RGPD
+**Constat clé** : le RGPD s'applique même si l'app n'est PAS publique (réservée à des étudiants) — le critère c'est le traitement de données personnelles, pas la publicité. À petite échelle, DPO/ROPA/DPIA probablement non obligatoires, mais base légale + transparence + sécurité + droits + transferts licites restent dus.
+
+**Corrigé / déployé :**
+- **Politique de confidentialité complète** (`/donnees` réécrite) : responsable, données, finalités+bases légales, **sous-traitants avec pays** (Supabase, Vercel/US, Resend/US, Anthropic/US, **DeepSeek/Chine**, Voyage/US, Google), transferts hors UE, conservation, sécurité (RLS), cookies (essentiels only), tous les droits + CNIL.
+- **Droit à l'effacement** : `/api/compte/supprimer` (POST, service_role : delete app tables + `auth.admin.deleteUser`) + bouton « Supprimer mon compte » (modal confirm « SUPPRIMER ») sur `/compte`.
+- **Droit d'accès/portabilité** : `/api/compte/exporter` (GET → JSON de toutes les données du user) + bouton sur `/compte`.
+- **Transparence IA** : mentions sur les 2 assistants — Questions de cours « propulsé par Claude (Anthropic) », coach « Assistant IA », + consigne « n'y inscris pas d'informations personnelles ».
+
+**Point de fond NON réglé (choix du user — il se renseigne)** : le **coach tourne sur DeepSeek (serveurs en Chine)**. Raisonnement juridique établi : une politique de confidentialité ≠ mécanisme de transfert ; la Chine n'a pas d'adéquation et DeepSeek n'offre pas de CCT ; l'art. 49 (consentement explicite) est exceptionnel et invalide pour un usage systématique → **non conforme**. Un avertissement « ne pas saisir d'infos perso » réduit mais ne supprime pas (l'app envoie auto le prénom + progression + notes). USA gérable (DPF + CCT, Anthropic a un DPA). **Options prêtes** : (1) **Mistral UE** = le plus propre, zéro transfert (clé API Mistral à créer) ; (2) **Claude** via `CHATBOT_PROVIDER=anthropic` ; (+ minimisation : retirer prénom/notes du contexte coach — voir route `app/api/tuteur`). Réflexe conseillé : **DPO de l'université** avant diffusion large.
 
 ### 2026-06-27 (suite 11) — Fonctionnalités collaboratives (remarques + entraide)
 **1. Remarques étudiants sur les fiches (édition admin-only)**
