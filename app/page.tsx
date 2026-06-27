@@ -11,14 +11,14 @@ const CREAM = '#FDF6EA'
 const BORDER = '#F0E7D6'
 
 // Les matières du programme, autour du noyau « codex » (réseau hexagonal du hero).
-// Illustration « rangée de codes juridiques » du hero.
+// Illustration « rangée de codes juridiques » du hero — codes réels (Légifrance).
 const LIVRES: { h: number; rot: string; bg: string; kicker: string; titre: string; size: number }[] = [
-  { h: 268, rot: '-1deg',  bg: '#EE5A52', kicker: 'CODE',    titre: 'CIVIL',        size: 15 },
-  { h: 286, rot: '.6deg',  bg: '#D22F26', kicker: 'CODE',    titre: 'PÉNAL',        size: 15 },
-  { h: 260, rot: '-.4deg', bg: '#B5392A', kicker: 'CODE DE', titre: 'PROCÉ-\nDURE', size: 12 },
-  { h: 280, rot: '.8deg',  bg: '#C8412F', kicker: 'CODE',    titre: 'PUBLIC',       size: 14 },
-  { h: 266, rot: '-.7deg', bg: '#E76F45', kicker: 'DROIT',   titre: 'EURO-\nPÉEN',  size: 12 },
-  { h: 274, rot: '.5deg',  bg: '#A82C28', kicker: 'CODE DU', titre: 'SOCIAL',       size: 14 },
+  { h: 268, rot: '-1deg',  bg: '#EE5A52', kicker: 'CODE',      titre: 'CIVIL',    size: 15 },
+  { h: 286, rot: '.6deg',  bg: '#D22F26', kicker: 'CODE',      titre: 'PÉNAL',    size: 15 },
+  { h: 260, rot: '-.4deg', bg: '#B5392A', kicker: 'PROCÉDURE', titre: 'CIVILE',   size: 14 },
+  { h: 280, rot: '.8deg',  bg: '#C8412F', kicker: 'PROCÉDURE', titre: 'PÉNALE',   size: 14 },
+  { h: 266, rot: '-.7deg', bg: '#E76F45', kicker: 'CODE DE',   titre: 'COMMERCE', size: 11 },
+  { h: 274, rot: '.5deg',  bg: '#A82C28', kicker: 'CODE DU',   titre: 'TRAVAIL',  size: 13 },
 ]
 
 // Tout ce que l'étudiant peut faire dans l'app.
