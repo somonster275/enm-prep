@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 8).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 9).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,23 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-06-27 (suite 9) — Fonctionnalité « Mon Drive » (centralisation des cours)
+**Objectif** : centraliser l'accès aux cours stockés dans le cloud. Nouvel onglet **« Mon Drive »** (`/drive`, ajouté au TopNav).
+
+**Niveau 1 — Hub de liens (LIVRÉ + table créée) :**
+- L'étudiant colle le **lien partagé** de son dossier (Google Drive, iCloud, Dropbox, OneDrive, Notion, autre). Détection auto du fournisseur (icône/couleur), rangement par matière facultatif, ouverture en nouvel onglet. C'est un **lanceur/marque-pages**, pas un navigateur de fichiers.
+- Marche pour **tous** les fournisseurs (iCloud inclus, via lien partagé — iCloud n'a pas d'API web).
+- Table **`drive_liens`** (migration `0006`, RLS par user) — **EXÉCUTÉE dans Supabase**.
+- Fichiers : `app/(app)/drive/page.tsx`.
+
+**Niveau 2 — OAuth Google Drive (CODÉ + table créée, EN ATTENTE de config Google) :**
+- Vraie connexion « Se connecter avec Google » → navigation des dossiers + ouverture des fichiers **dans l'app** (fil d'Ariane, lecture seule). Uniquement Google (pas iCloud). Scope sensible `drive.readonly` → en mode Testing OK pour 100 test users (avertissement « app non vérifiée »), vérification Google requise pour public.
+- Backend : `lib/google-drive.ts` (OAuth + Drive API v3 + refresh token) ; routes `app/api/drive/google/{connect,callback,status,list,disconnect}`. Jetons dans **`google_drive_tokens`** (migration `0007`, **RLS activé SANS policy** = lisible seulement via service_role, jamais exposé au client) — **table EXÉCUTÉE dans Supabase**.
+- **RESTE À FAIRE POUR ACTIVER (côté user, "plus tard")** :
+  1. Google Cloud Console : activer **Google Drive API** ; OAuth consent screen (External, scopes `drive.readonly`+`openid`+`email`, ajouter les étudiants en **test users**) ; créer un **OAuth client ID Web** avec redirect URI **exact** `https://codexprepa.com/api/drive/google/callback`.
+  2. Ajouter sur **Vercel Production** : `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (puis redéployer).
+- Tant que les env vars manquent : la section Google affiche « Se connecter » désactivé (status renvoie `configure:false`). Le hub de liens fonctionne indépendamment.
 
 ### 2026-06-27 (suite 8) — Favicon, page d'accueil publique, robustesse auth, identité étudiant
 **Favicon (marque codex)**
