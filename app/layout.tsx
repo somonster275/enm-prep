@@ -4,9 +4,6 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'codex',
   description: 'codex — préparation au concours ENM',
-  icons: {
-    icon: '/favicon.svg',
-  },
 }
 
 export const viewport = {
