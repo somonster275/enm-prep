@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-26 (suite 2).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 8).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -35,7 +35,7 @@ suivi de la progression, des séries (streaks) et d'un objectif quotidien.
 - `Espace` { id, nom, slug, description, couleur, ordre }
 - `Module` { id, espace_id, nom, description?, ordre, parent_id? } — modules imbriquables
 - `Fiche` { id, module_id, question, reponse, tags?, created_at }
-- `Profil` { id, email, nom?, role }
+- `Profil` { id, email, nom?, prenom?, role } — `prenom` ajouté le 2026-06-27 (migration `0005`)
 - `Progression` { id, utilisateur_id, fiche_id, niveau, prochaine_revision, derniere_revision? }
 
 Tables Supabase identifiées : `activite_jours` (utilisateur_id, jour, cartes),
@@ -108,6 +108,38 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-06-27 (suite 8) — Favicon, page d'accueil publique, robustesse auth, identité étudiant
+**Favicon (marque codex)**
+- Remplacé le triangle Vercel par une icône **« c » corail** vectorielle. Méthode : convention `app/icon.svg` (et **suppression** de `app/favicon.ico` qui était servi automatiquement). Couleur fond `#E0613F`, trait `#221E1A`.
+- **Piège majeur** : le middleware `proxy.ts` interceptait `/icon.svg` et le redirigeait vers `/login` (réponse HTML au lieu du SVG). Corrigé en ajoutant `icon.svg|apple-icon` au `matcher` négatif du proxy.
+
+**Page d'accueil publique** (`app/page.tsx`, ex-redirect → vraie landing)
+- Page de découverte AVANT connexion, architecture inspirée de Galien.AI : nav sticky, hero + réseau hexagonal des matières, démo « Questions de cours », grille des 8 fonctionnalités, section méthode + carte progression, CTA. Boutons → `/login` (ou `/dashboard` si déjà connecté).
+- `proxy.ts` : `/` rendu **public** (ajouté à `estPublic`).
+
+**Robustesse auth / invitations** (le gros du travail — beaucoup de SAV)
+- `proxy.ts` : sur les routes `/api/*` non authentifiées, renvoie un **401 JSON** au lieu d'une redirection 307 vers `/login` (qui donnait un 405 sur POST et cassait les `fetch` à l'expiration de session).
+- `/bienvenue` : après définition du mot de passe, **reconnexion explicite** (`signInWithPassword`, jusqu'à 6 essais avec délais) pour absorber la latence Supabase → entrée directe sans reconnexion manuelle ; si échec → redirige vers `/login`.
+- `/bienvenue` : détecte les **erreurs de lien** Supabase (`error_code=otp_expired`, souvent lien pré-consommé par les anti-spam type SafeLinks) et propose un **renvoi de lien** self-service (`resetPasswordForEmail`).
+- `/login` : ajout **« Mot de passe oublié ? »** (panneau inline → `resetPasswordForEmail` → lien de récup ramène sur `/bienvenue`).
+- `changer-mot-de-passe` (admin) : **autorise désormais les comptes lecteur** (avant : réservé staff, ce qui empêchait de débloquer un étudiant).
+- **PKCE** : les liens de récup `@supabase/ssr` arrivent avec `?code=...` (pas de hash). Quand Supabase retombe sur la **Site URL** (`/`) au lieu de `/bienvenue`, l'accueil détecte `?code` / `type=recovery|invite` / `error_code` et **bascule vers `/bienvenue`**.
+- **Config à corriger côté user (Supabase → Auth → URL Configuration)** : la **Site URL était encore `https://codex-prepa.vercel.app`** → doit devenir **`https://codexprepa.com`**. Redirect URLs OK (`…/bienvenue`, `…/**`). Vérifier que le template email **« Reset Password »** est activé.
+- Route `/api/acces/renvoyer-lien` créée puis **supprimée** (impasse : `inviteUserByEmail` échoue sur comptes existants). Le bon canal pour un compte existant = **récupération** (`resetPasswordForEmail`).
+
+**Domaine & déploiement**
+- **`NEXT_PUBLIC_APP_URL=https://codexprepa.com`** ajoutée dans Vercel Production (avant : non définie → repli sur `codex-prepa.vercel.app`). Domaine principal = **codexprepa.com**.
+- **Vercel CLI authentifié localement** (`vercel login` + `vercel link` faits par le user) : je peux désormais `vercel ls` / `vercel inspect` / `vercel --prod`. La sortie passe par stderr (« exit 255 » trompeur mais OK).
+
+**Identité étudiant + personnalisation**
+- Migration **`0005_profil_prenom.sql`** : ajoute colonnes `nom` + `prenom` à `public.profils` (⚠️ **à exécuter dans Supabase SQL Editor**). `Profil` type → `prenom?`.
+- `/compte` refondu : section **« Mon identité »** (prénom + nom) ; écriture via route **`/api/compte/profil`** (POST) qui n'écrit QUE nom/prénom (pas le rôle → pas d'escalade). + **widget ENT Paris 1** (lien `https://ent.univ-paris1.fr/`, nouvel onglet).
+- Prénom propagé : **dashboard** « Bonjour, {prénom} », **TopNav** (initiales avatar = P+N, menu = « Prénom Nom »), **tuteur IA** (contexte + consigne de tutoyer par le prénom).
+
+**Commits poussés sur `main`** (auto-déployés) : favicon, landing, proxy public/401, bienvenue (entrée directe + lien expiré + renvoi), mot de passe oublié, accueil détecte recovery/PKCE, compte identité+ENT, perso prénom, tuteur prénom.
+
+**Restant à faire côté user** : (1) exécuter `0005_profil_prenom.sql` ; (2) passer la **Site URL** Supabase à `https://codexprepa.com` ; (3) débloquer le mot de passe admin via « Mot de passe oublié ? » ou le dashboard Supabase ; (4) nettoyer la demande de test `test-claude-demande@example.com`.
 
 ### 2026-06-26
 - Reprise du projet après connexion du dossier `enm-prep-propre`.
