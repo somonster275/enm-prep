@@ -10,6 +10,25 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // Mot de passe oublié (self-service)
+  const [modeOubli, setModeOubli] = useState(false)
+  const [oEmail, setOEmail] = useState('')
+  const [oStatut, setOStatut] = useState<'' | 'envoi' | 'ok'>('')
+  const [oErreur, setOErreur] = useState('')
+
+  const envoyerReset = async () => {
+    const mail = (oEmail || email).trim()
+    if (!mail) { setOErreur('Indique ton adresse email.'); return }
+    setOStatut('envoi'); setOErreur('')
+    // Email de récupération Supabase : le lien ramène sur /bienvenue pour
+    // définir un nouveau mot de passe (même page que les invitations).
+    const { error } = await supabase.auth.resetPasswordForEmail(mail, {
+      redirectTo: `${window.location.origin}/bienvenue`,
+    })
+    if (error) { setOStatut(''); setOErreur(error.message); return }
+    setOStatut('ok')
+  }
+
   // Demande d'accès lecteur (self-service)
   const [modeDemande, setModeDemande] = useState(false)
   const [dNom, setDNom] = useState('')
@@ -102,6 +121,10 @@ export default function LoginPage() {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#5C4A22' }}>Mot de passe</div>
+              <button onClick={() => { setModeOubli(o => !o); setOEmail(email); setOStatut(''); setOErreur('') }} style={{
+                background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                color: '#9A8D72', fontWeight: 600, fontSize: 12.5, fontFamily: "'Hanken Grotesk', sans-serif",
+              }}>Mot de passe oublié ?</button>
             </div>
             <div style={inputStyle(false)}>
               <input
@@ -133,6 +156,31 @@ export default function LoginPage() {
         }}>
           {loading ? 'Connexion…' : 'Se connecter'}
         </button>
+
+        {/* Mot de passe oublié */}
+        {modeOubli && (
+          <div style={{ marginTop: 18, background: '#FFFBF2', border: '1px solid #EFE7D7', borderRadius: 14, padding: '16px 16px' }}>
+            {oStatut === 'ok' ? (
+              <div style={{ fontSize: 13.5, color: '#0F6E56', textAlign: 'center', lineHeight: 1.5 }}>
+                ✅ Si un compte existe pour cette adresse, un lien de réinitialisation vient d&apos;être envoyé. Ouvre-le pour choisir un nouveau mot de passe.
+              </div>
+            ) : (
+              <div>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: '#2A2018', marginBottom: 4 }}>Réinitialiser le mot de passe</div>
+                <div style={{ fontSize: 12.5, color: '#8A7E68', marginBottom: 12 }}>Reçois un lien par email pour en définir un nouveau.</div>
+                <input type="email" value={oEmail} onChange={e => setOEmail(e.target.value)} placeholder="ton@email.fr"
+                  onKeyDown={e => { if (e.key === 'Enter') envoyerReset() }}
+                  style={{ width: '100%', height: 46, border: '1.5px solid #EADFC9', borderRadius: 12, padding: '0 14px', background: '#fff', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "'Hanken Grotesk', sans-serif" }} />
+                {oErreur && <div style={{ marginTop: 10, fontSize: 13, color: '#D94A30' }}>{oErreur}</div>}
+                <button onClick={envoyerReset} disabled={oStatut === 'envoi'} style={{
+                  marginTop: 12, height: 46, width: '100%', border: 'none', borderRadius: 12,
+                  background: '#DC4A2B', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                  opacity: oStatut === 'envoi' ? 0.7 : 1, fontFamily: "'Hanken Grotesk', sans-serif",
+                }}>{oStatut === 'envoi' ? 'Envoi…' : 'Envoyer le lien'}</button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Demande d'accès lecteur */}
         <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px solid #EFE7D7' }}>

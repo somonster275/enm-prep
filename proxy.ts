@@ -40,6 +40,12 @@ export async function proxy(req: NextRequest) {
   const estPublic = path === '/' || isAuthPage || path.startsWith('/auth') || path.startsWith('/api/acces') || path.startsWith('/bienvenue')
 
   if (!user && !estPublic) {
+    // Pour les routes API : renvoyer un 401 JSON propre plutôt qu'une redirection
+    // 307 vers /login (qui, sur un POST, donne un 405 et casse les fetch côté client
+    // quand la session expire en cours d'utilisation).
+    if (path.startsWith('/api/')) {
+      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+    }
     return NextResponse.redirect(new URL('/login', req.url))
   }
   if (user && isAuthPage) {
