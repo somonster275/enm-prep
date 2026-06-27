@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { streamIA, iaConfiguree, CHATBOT_PROVIDER } from '@/lib/ia'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { utilisateurCourant } from '@/lib/auth-serveur'
+import { scoreGlobal, estDue, PALIER_MAX } from '@/lib/spaced-repetition'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,6 +16,8 @@ Ton rôle est d'OPTIMISER ses révisions :
 - Organiser et ajuster son PLANNING en fonction du temps restant avant les épreuves : propose des plannings concrets (semaine par semaine, voire jour par jour), priorise les matières, équilibre apprentissage / entraînement / relecture.
 - Donner des MÉTHODES précises (cas pratique, dissertation, note de synthèse, grand oral) et des conseils de mémorisation (répétition espacée, fiches, annales).
 - Motiver l'étudiant de façon réaliste et bienveillante.
+
+Tu as accès, dans le contexte ci-dessous, à l'AVANCEMENT RÉEL de l'étudiant : score de mémorisation, nombre de fiches à réviser / maîtrisées, détail par matière, activité récente et tâches en attente. Quand il demande « où j'en suis ? », fais un bilan clair à partir de ces chiffres ; quand il demande quoi réviser, priorise les matières en retard (beaucoup de fiches dues, peu maîtrisées) et le temps restant. Ne réclame pas ces informations : tu les as déjà.
 
 Style : français, concret, structuré (listes, étapes, tableaux quand utile), encourageant. Évite le bla-bla. Quand tu donnes une règle de droit, sois exact ; en cas de doute, dis-le.
 
@@ -36,29 +39,77 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Clé IA manquante' }, { status: 500 })
   }
 
-  // Contexte temps réel : date du jour, compte à rebours, planning à venir.
+  // Contexte temps réel : date, compte à rebours, planning ET progression de l'étudiant.
   let contexte = `Date du jour : ${new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}.`
   try {
     const user = await utilisateurCourant()
     if (user) {
       const admin = getSupabaseAdmin()
       const today = new Date().toISOString().slice(0, 10)
-      const { data: evs } = await admin
-        .from('evenements')
-        .select('titre, date_debut, heure, type')
-        .gte('date_debut', today)
-        .order('date_debut')
-        .limit(15)
-      if (evs && evs.length) {
+      const il7j = new Date(); il7j.setDate(il7j.getDate() - 6)
+
+      const [evRes, espRes, fichesRes, progRes, actRes, notesRes] = await Promise.all([
+        admin.from('evenements').select('titre, date_debut, heure, type').gte('date_debut', today).order('date_debut').limit(15),
+        admin.from('espaces').select('id, nom').order('ordre'),
+        admin.from('fiches').select('id, modules(espace_id)').is('deleted_at', null),
+        admin.from('progression').select('fiche_id, palier, prochaine_revision').eq('utilisateur_id', user.id),
+        admin.from('activite_jours').select('jour, cartes').eq('utilisateur_id', user.id).gte('jour', il7j.toISOString().slice(0, 10)),
+        admin.from('notes').select('contenu').eq('user_id', user.id).eq('fait', false).limit(20),
+      ])
+
+      // --- Planning / compte à rebours ---
+      const evs = evRes.data || []
+      if (evs.length) {
         const examen = evs.find(e => e.type === 'examen')
         if (examen) {
           const jours = Math.round((new Date(examen.date_debut).getTime() - new Date(today).getTime()) / 86400000)
           contexte += `\nProchaine épreuve : « ${examen.titre} » le ${examen.date_debut} → il reste ${jours} jour(s).`
         }
-        contexte += `\nÉvénements à venir de l'étudiant :\n` + evs.map(e => `- ${e.date_debut}${e.heure ? ' ' + e.heure : ''} : ${e.titre} (${e.type})`).join('\n')
+        contexte += `\nÉvénements à venir :\n` + evs.map(e => `- ${e.date_debut}${e.heure ? ' ' + e.heure : ''} : ${e.titre} (${e.type})`).join('\n')
       } else {
-        contexte += `\n(Aucune date d'épreuve enregistrée dans le calendrier. Si l'étudiant parle de planning, demande-lui sa date d'examen pour calculer le temps restant.)`
+        contexte += `\n(Aucune date d'épreuve dans le calendrier — si l'étudiant parle de planning, demande-lui sa date d'examen.)`
       }
+
+      // --- Progression dans les révisions ---
+      type Prog = { fiche_id: string; palier: number | null; prochaine_revision: string }
+      const progs = (progRes.data || []) as Prog[]
+      const espaces = (espRes.data || []) as { id: string; nom: string }[]
+      const ficheEspace: Record<string, string> = {}
+      for (const f of (fichesRes.data || []) as { id: string; modules: { espace_id: string } | { espace_id: string }[] | null }[]) {
+        const mod = Array.isArray(f.modules) ? f.modules[0] : f.modules
+        if (mod?.espace_id) ficheEspace[f.id] = mod.espace_id
+      }
+      const totalFiches = Object.keys(ficheEspace).length
+      const due = progs.filter(p => estDue(p.prochaine_revision)).length
+      const maitrisees = progs.filter(p => (p.palier ?? 0) >= PALIER_MAX).length
+
+      contexte += `\n\nPROGRESSION DE L'ÉTUDIANT :`
+      contexte += `\n- Score de mémorisation global : ${scoreGlobal(progs as never)} %`
+      contexte += `\n- Fiches : ${totalFiches} au total, ${progs.length} déjà travaillées, ${due} à réviser maintenant, ${maitrisees} bien maîtrisées.`
+
+      if (espaces.length) {
+        const parMatiere = espaces.map(e => {
+          const fichesE = Object.keys(ficheEspace).filter(fid => ficheEspace[fid] === e.id)
+          if (fichesE.length === 0) return null
+          const progsE = progs.filter(p => ficheEspace[p.fiche_id] === e.id)
+          const dueE = progsE.filter(p => estDue(p.prochaine_revision)).length
+          const maitrE = progsE.filter(p => (p.palier ?? 0) >= PALIER_MAX).length
+          return `  - ${e.nom} : ${fichesE.length} fiches, ${dueE} à réviser, ${maitrE} maîtrisées`
+        }).filter(Boolean)
+        if (parMatiere.length) contexte += `\n- Par matière :\n${parMatiere.join('\n')}`
+      }
+
+      // --- Activité (7 derniers jours) ---
+      const act: Record<string, number> = {}
+      for (const r of (actRes.data || []) as { jour: string; cartes: number }[]) act[r.jour] = r.cartes
+      const semaine = Object.values(act).reduce((s, n) => s + n, 0)
+      contexte += `\n- Activité : ${act[today] ?? 0} carte(s) révisée(s) aujourd'hui, ${semaine} sur les 7 derniers jours.`
+
+      // --- Tâches en attente ---
+      const notes = (notesRes.data || []) as { contenu: string }[]
+      contexte += notes.length
+        ? `\n- Tâches en attente :\n${notes.map(n => `  - ${n.contenu}`).join('\n')}`
+        : `\n- Aucune tâche en attente dans sa liste.`
     }
   } catch { /* contexte best-effort */ }
 

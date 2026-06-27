@@ -164,6 +164,19 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   embed question → `match_cours_chunks` testé (4 passages, similarité 57–64 %).
   Backfill `scripts/backfill-embeddings.mjs` créé et lancé (24 passages).
 
+### 2026-06-27 (suite 5) — Coach sous DeepSeek, le reste sous Claude
+- `lib/ia.ts` : abstraction LLM, **provider par appel** (`streamIA`/`chatIA` prennent
+  `provider: 'anthropic' | 'deepseek'`). DeepSeek = API compatible OpenAI (SSE).
+  **Repli auto sur Claude** si `DEEPSEEK_API_KEY` absente → rien ne casse avant config.
+- **Coach** (`/api/tuteur`) → **DeepSeek** (`CHATBOT_PROVIDER`, défaut `deepseek`) pour
+  réduire les coûts (gros volume étudiant).
+- **Questions de cours** (`/api/cours/question`) → **Claude** forcé (rigueur juridique).
+  **Génération de fiches** → Claude (inchangée, SDK Anthropic direct).
+- **`DEEPSEEK_API_KEY` configurée et VALIDÉE** (testée en local, réponse FR correcte, le
+  modèle renvoyé est `deepseek-v4-flash`). Coach = DeepSeek confirmé OK. Optionnel :
+  `CHATBOT_PROVIDER=anthropic` pour repasser le coach sous Claude, `DEEPSEEK_MODEL`.
+  Reste à reporter `DEEPSEEK_API_KEY` (+ `CHATBOT_PROVIDER=deepseek`) dans Vercel + redeploy.
+
 ### 2026-06-27 (suite 4) — Notes/tâches + coach qui les propose + logo code civil
 - **Table `notes`** (migration `0004_notes.sql`, RLS par utilisateur) : pense-bête perso.
 - **`components/NotesWidget.tsx`** (ajouter/cocher/supprimer, scroll) placé dans le
