@@ -54,6 +54,23 @@ export default function ComptePage() {
     setMessage({ type: 'ok', texte: 'Mot de passe mis à jour ✅' })
   }
 
+  // RGPD : suppression de compte (droit à l'effacement)
+  const [suppOuvert, setSuppOuvert] = useState(false)
+  const [confirmTxt, setConfirmTxt] = useState('')
+  const [suppLoading, setSuppLoading] = useState(false)
+  const [suppErr, setSuppErr] = useState('')
+
+  const supprimerCompte = async () => {
+    setSuppErr(''); setSuppLoading(true)
+    const res = await fetch('/api/compte/supprimer', { method: 'POST' })
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}))
+      setSuppLoading(false); setSuppErr(j.error || 'La suppression a échoué.'); return
+    }
+    await supabase.auth.signOut()
+    window.location.assign('/')
+  }
+
   const champ: React.CSSProperties = {
     width: '100%', height: 46, border: '1.5px solid #EADFC9', borderRadius: 12,
     padding: '0 14px', background: '#FFFBF2', fontSize: 14, outline: 'none', boxSizing: 'border-box',
@@ -139,6 +156,51 @@ export default function ComptePage() {
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
         </a>
       </div>
+
+      {/* Mes données — RGPD */}
+      <div style={{ ...carte, marginTop: 20 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 6px' }}>Mes données</h2>
+        <div style={{ fontSize: 13.5, color: '#8A7E68', lineHeight: 1.5, marginBottom: 16 }}>
+          Tes données t&apos;appartiennent. Tu peux les exporter à tout moment ou supprimer
+          définitivement ton compte. Voir la <a href="/donnees" style={{ color: '#DC4A2B', fontWeight: 700, textDecoration: 'none' }}>politique de confidentialité</a>.
+        </div>
+
+        <a href="/api/compte/exporter" style={{
+          height: 46, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          border: '1.5px solid #EADFC9', borderRadius: 12, background: '#FFFBF2',
+          color: '#2A2018', fontSize: 14, fontWeight: 700, textDecoration: 'none',
+        }}>Exporter mes données (JSON)</a>
+
+        <button onClick={() => { setSuppOuvert(true); setConfirmTxt(''); setSuppErr('') }} style={{
+          marginTop: 10, height: 46, width: '100%', border: '1.5px solid #F3C6BC', borderRadius: 12,
+          background: '#fff', color: '#D94A30', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+          fontFamily: "'Hanken Grotesk', sans-serif",
+        }}>Supprimer mon compte</button>
+      </div>
+
+      {/* Modal de confirmation de suppression */}
+      {suppOuvert && (
+        <div onClick={() => !suppLoading && setSuppOuvert(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(40,30,20,.45)', zIndex: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 18, padding: 24, width: '100%', maxWidth: 440, fontFamily: "'Hanken Grotesk', sans-serif", color: '#2A2018' }}>
+            <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 6 }}>Supprimer mon compte</div>
+            <div style={{ fontSize: 14, color: '#8A7E68', lineHeight: 1.5, marginBottom: 14 }}>
+              Cette action est <b>irréversible</b>. Toutes tes données (progression, notes, fiche d&apos;entraide,
+              liens, remarques…) seront <b>définitivement supprimées</b>. Pour confirmer, écris <b>SUPPRIMER</b> ci-dessous.
+            </div>
+            <input value={confirmTxt} onChange={e => setConfirmTxt(e.target.value)} placeholder="SUPPRIMER"
+              style={{ width: '100%', height: 46, border: '1.5px solid #EADFC9', borderRadius: 12, padding: '0 14px', background: '#FFFBF2', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "'Hanken Grotesk', sans-serif" }} />
+            {suppErr && <div style={{ color: '#D94A30', fontSize: 13, marginTop: 8 }}>{suppErr}</div>}
+            <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+              <button onClick={() => setSuppOuvert(false)} disabled={suppLoading} style={{ flex: 1, height: 46, border: '1.5px solid #EADFC9', background: '#fff', borderRadius: 11, fontSize: 14, fontWeight: 600, color: '#6E6456', cursor: 'pointer', fontFamily: "'Hanken Grotesk', sans-serif" }}>Annuler</button>
+              <button onClick={supprimerCompte} disabled={suppLoading || confirmTxt.trim().toUpperCase() !== 'SUPPRIMER'} style={{
+                flex: 2, height: 46, border: 'none', borderRadius: 11, background: '#D94A30', color: '#fff',
+                fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Hanken Grotesk', sans-serif",
+                opacity: (suppLoading || confirmTxt.trim().toUpperCase() !== 'SUPPRIMER') ? 0.5 : 1,
+              }}>{suppLoading ? 'Suppression…' : 'Supprimer définitivement'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
