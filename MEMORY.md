@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 10).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 11).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,20 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-06-27 (suite 11) — Fonctionnalités collaboratives (remarques + entraide)
+**1. Remarques étudiants sur les fiches (édition admin-only)**
+- L'édition des fiches était DÉJÀ réservée admin/éditeur (page module + révision, gate `isAdmin`). Pas de régression à faire.
+- Nouveau composant **`components/RemarqueButton.tsx`** (bouton « 💬 Faire une remarque » + modal) affiché aux NON-admins là où l'admin voit Modifier/Éditer (page module `…/modules/[moduleId]` et carte de révision).
+- Soumission via **`/api/remarques`** (POST, auth) : insert en service_role + **notification email à l'admin via Resend** (`envoyerEmailAdmin`, contient auteur, matière/module, aperçu de la fiche, message, lien `/admin/remarques`). Non bloquant.
+- Page admin **`/admin/remarques`** (lien ajouté au menu Admin, admin-only) : liste via `/api/admin/remarques` (GET service_role + garde estAdmin), affiche fiche concernée + auteur, filtre « À traiter »/« Toutes », actions Marquer traité / Rouvrir / Supprimer.
+- Table **`remarques_fiches`** (migration `0008` — RLS : insert/select self ; admin lit via service_role).
+
+**2. Onglet « Entraide » (annuaire collaboratif par matière)**
+- Nouvel onglet **`/entraide`** dans la nav principale (tous étudiants). Chacun publie sa fiche : prénom/nom (pré-remplis du profil), contact (email/tél), matières de spécialité, mot d'intro. Annuaire visible par tous les connectés ; chacun gère/ retire la sienne.
+- Table **`entraide`** (migration `0009` — RLS : select pour tous authenticated, insert/update/delete self). Upsert client direct (clé `user_id`).
+
+**⚠️ Migrations à exécuter (Supabase SQL Editor)** : `0008_remarques_fiches.sql` + `0009_entraide.sql`.
 
 ### 2026-06-27 (suite 10) — Footer global (Contact / Données) + quadrillage de fond
 - **Footer global** `components/SiteFooter.tsx` rendu dans le **layout racine** (`app/layout.tsx`) → présent sur **toutes** les pages (connectées + publiques) : 2 mini-liens **« Nous contacter »** (`/contact`) et **« Données »** (`/donnees`).
