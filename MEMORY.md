@@ -139,7 +139,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 
 **Commits poussés sur `main`** (auto-déployés) : favicon, landing, proxy public/401, bienvenue (entrée directe + lien expiré + renvoi), mot de passe oublié, accueil détecte recovery/PKCE, compte identité+ENT, perso prénom, tuteur prénom.
 
-**Restant à faire côté user** : (1) exécuter `0005_profil_prenom.sql` ; (2) passer la **Site URL** Supabase à `https://codexprepa.com` ; (3) débloquer le mot de passe admin via « Mot de passe oublié ? » ou le dashboard Supabase ; (4) nettoyer la demande de test `test-claude-demande@example.com`.
+**Actions user — TOUTES FAITES le 2026-06-27** : ✅ `0005_profil_prenom.sql` exécutée ; ✅ Site URL Supabase = `https://codexprepa.com` ; ✅ mot de passe admin débloqué ; ✅ demande de test `test-claude-demande@example.com` nettoyée.
 
 ### 2026-06-26
 - Reprise du projet après connexion du dossier `enm-prep-propre`.
