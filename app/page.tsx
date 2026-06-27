@@ -36,7 +36,22 @@ export default function Accueil() {
   const [connecte, setConnecte] = useState(false)
 
   useEffect(() => {
+    // Un lien de récupération / d'invitation Supabase peut retomber sur l'accueil
+    // (Site URL) au lieu de /bienvenue. On détecte le jeton dans l'URL et on
+    // redirige vers /bienvenue, qui gère la définition du mot de passe.
+    const h = window.location.hash || ''
+    const q = window.location.search || ''
+    const estRecup = /type=(recovery|invite)/.test(h) || /type=(recovery|invite)/.test(q)
+    if (estRecup) {
+      window.location.replace('/bienvenue' + h + q)
+      return
+    }
+    // Filet de sécurité : l'événement PASSWORD_RECOVERY si le hash a déjà été consommé.
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') window.location.replace('/bienvenue')
+    })
     supabase.auth.getSession().then(({ data }) => setConnecte(!!data.session))
+    return () => sub.subscription.unsubscribe()
   }, [])
 
   const lienEspace = connecte ? '/dashboard' : '/login'
