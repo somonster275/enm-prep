@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 9).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 10).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,13 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-06-27 (suite 10) — Footer global (Contact / Données) + quadrillage de fond
+- **Footer global** `components/SiteFooter.tsx` rendu dans le **layout racine** (`app/layout.tsx`) → présent sur **toutes** les pages (connectées + publiques) : 2 mini-liens **« Nous contacter »** (`/contact`) et **« Données »** (`/donnees`).
+- **`/contact`** (page publique, sans TopNav) : formulaire nom/email/message → route **`/api/contact`** (publique) qui envoie un email à l'admin via **Resend** (`envoyerEmailAdmin` → `ADMIN_NOTIF_EMAIL`=titipaulin@gmail.com). ⚠️ dépend de `RESEND_API_KEY` (mode test Resend = n'écrit qu'à l'adresse du compte = l'admin, donc OK).
+- **`/donnees`** (page publique) : explique la confidentialité — données privées/cloisonnées par **RLS**, pas de revente/partage, Drive en lecture seule non recopié, suppression sur demande.
+- **Proxy** : `/contact`, `/donnees`, `/api/contact` ajoutés à `estPublic`.
+- **Quadrillage de fond** : classe utilitaire **`.bg-grille`** dans `globals.css` (le SVG subtil exact de Questions de cours, trait `rgba(150,120,80,.048)`, motif 32×32). Appliquée à : layout `(app)` (toutes pages connectées), accueil `/`, `/bienvenue`, login (panneau formulaire), `/contact`, `/donnees`. ⚠️ s'utilise avec `backgroundColor` (PAS le raccourci `background` inline qui écraserait l'image).
 
 ### 2026-06-27 (suite 9) — Fonctionnalité « Mon Drive » (centralisation des cours)
 **Objectif** : centraliser l'accès aux cours stockés dans le cloud. Nouvel onglet **« Mon Drive »** (`/drive`, ajouté au TopNav).
