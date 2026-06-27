@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
+import { streamIA, iaConfiguree, CHATBOT_PROVIDER } from '@/lib/ia'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { utilisateurCourant } from '@/lib/auth-serveur'
 
@@ -32,8 +32,8 @@ export async function POST(request: NextRequest) {
   if (!Array.isArray(messages) || messages.length === 0) {
     return NextResponse.json({ error: 'Conversation vide' }, { status: 400 })
   }
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: 'Clé Anthropic manquante' }, { status: 500 })
+  if (!iaConfiguree(CHATBOT_PROVIDER)) {
+    return NextResponse.json({ error: 'Clé IA manquante' }, { status: 500 })
   }
 
   // Contexte temps réel : date du jour, compte à rebours, planning à venir.
@@ -70,22 +70,17 @@ export async function POST(request: NextRequest) {
     }))
     .slice(-20)
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   const encoder = new TextEncoder()
-
   const readable = new ReadableStream({
     async start(controller) {
       try {
-        const stream = client.messages.stream({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 2000,
+        for await (const tok of streamIA({
+          provider: CHATBOT_PROVIDER,
           system: `${SYSTEME_BASE}\n\n--- Contexte actuel ---\n${contexte}`,
           messages: msgs,
-        })
-        for await (const event of stream) {
-          if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token: event.delta.text })}\n\n`))
-          }
+          maxTokens: 2000,
+        })) {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token: tok })}\n\n`))
         }
         controller.enqueue(encoder.encode('data: [DONE]\n\n'))
       } catch (e) {

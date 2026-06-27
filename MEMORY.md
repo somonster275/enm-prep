@@ -164,6 +164,16 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   embed question → `match_cours_chunks` testé (4 passages, similarité 57–64 %).
   Backfill `scripts/backfill-embeddings.mjs` créé et lancé (24 passages).
 
+### 2026-06-27 (suite 4) — Notes/tâches + coach qui les propose + logo code civil
+- **Table `notes`** (migration `0004_notes.sql`, RLS par utilisateur) : pense-bête perso.
+- **`components/NotesWidget.tsx`** (ajouter/cocher/supprimer, scroll) placé dans le
+  **Calendrier** (après l'en-tête) et sur l'**accueil** (colonne droite sous le mini-calendrier).
+- **Coach propose des tâches** : prompt `/api/tuteur` peut émettre un bloc
+  `<TACHES>\n- …\n</TACHES>` ; `TuteurChat` le parse (caché pendant le streaming),
+  masque le bloc et affiche chaque tâche avec « + Ajouter » → insert dans `notes`.
+- **Logo chatbot = code civil 📕** (bulle, avatars TuteurChat, onglet Coach cours-ia).
+- À faire côté user : exécuter `0004_notes.sql` dans Supabase.
+
 ### 2026-06-27 (suite 3) — Coach IA (bulle flottante)
 - Le « Tuteur IA » devient un **Coach de révision** : prompt enrichi (programme +
   épreuves ENM), et la route `/api/tuteur` injecte un **contexte temps réel** : date du

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
+import { streamIA, iaConfiguree } from '@/lib/ia'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { utilisateurCourant } from '@/lib/auth-serveur'
 import { embedQuestion, toVector } from '@/lib/embeddings'
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
   const portee = porteeBrut === 'personnel' ? 'personnel' : 'officiel'
   const document_ids_array: string[] = Array.isArray(document_ids) && document_ids.length > 0 ? document_ids : []
   if (!question?.trim()) return NextResponse.json({ error: 'Question manquante' }, { status: 400 })
-  if (!process.env.ANTHROPIC_API_KEY) return NextResponse.json({ error: 'Clé Anthropic manquante' }, { status: 500 })
+  if (!iaConfiguree('anthropic')) return NextResponse.json({ error: 'Clé IA manquante' }, { status: 500 })
 
   let admin
   try { admin = getSupabaseAdmin() } catch {
@@ -107,27 +107,17 @@ export async function POST(request: NextRequest) {
   const contexteTexte = extraits.map(e => `[Source : ${e.nom}]\n${e.contenu}`).join('\n\n---\n\n')
   const sources = [...new Set(extraits.map(e => e.nom))]
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   const userMessage = `Extraits de cours :\n\n${contexteTexte}\n\n---\n\nQuestion : ${question}`
 
-  // Streaming SSE
+  // Streaming SSE — « Questions de cours » reste sur Claude (rigueur juridique).
   const encoder = new TextEncoder()
   const readable = new ReadableStream({
     async start(controller) {
       try {
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ sources, nbPassages: extraits.length })}\n\n`))
 
-        const stream = client.messages.stream({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1500,
-          system: SYSTEME,
-          messages: [{ role: 'user', content: userMessage }],
-        })
-
-        for await (const event of stream) {
-          if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token: event.delta.text })}\n\n`))
-          }
+        for await (const tok of streamIA({ provider: 'anthropic', system: SYSTEME, maxTokens: 1500, messages: [{ role: 'user', content: userMessage }] })) {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token: tok })}\n\n`))
         }
         controller.enqueue(encoder.encode('data: [DONE]\n\n'))
       } catch (e) {
