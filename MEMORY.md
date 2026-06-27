@@ -164,6 +164,19 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   embed question → `match_cours_chunks` testé (4 passages, similarité 57–64 %).
   Backfill `scripts/backfill-embeddings.mjs` créé et lancé (24 passages).
 
+### 2026-06-27 (suite) — Responsive mobile
+- App rendue responsive. Architecture en styles inline → approche : **CSS global**
+  dans `globals.css` qui replie **toute** grille inline en 1 colonne sur mobile via le
+  sélecteur d'attribut `[style*="grid-template-columns"] { ...1fr !important }` (sûr car
+  aucune page n'utilise minmax/auto-fill). + classes `.app-main` (marges réduites),
+  `.hide-mobile`, `.login-form`, `.cours-ia-wrap` ; `overflow-x:hidden` global.
+- Hook **`lib/useIsMobile.ts`** (matchMedia 768px) pour la logique JS.
+- `TopNav` : menu **hamburger** + tiroir vertical sur mobile. `login` : poster masqué.
+  `cours-ia` : header qui s'enroule, colonnes empilées, sidebar repliée par défaut.
+- Viewport meta ajouté dans `app/layout.tsx`. Breakpoint = 768px.
+- Pages secondaires (espaces, admin, calendrier, etc.) : bénéficient du repli de grille
+  global automatiquement ; à fignoler au cas par cas selon retours.
+
 ### 2026-06-27 — Email demandeur, page Mon compte, suppression d'utilisateurs
 - **À l'approbation (OPTION B retenue le 2026-06-27)** : `inviteUserByEmail` Supabase
   → email d'invitation au demandeur (n'importe quelle adresse, sans domaine Resend),

@@ -33,6 +33,27 @@ export default function AdminUtilisateurs() {
     chargerDemandes()
   }, [])
 
+  // Modification de mot de passe (staff uniquement)
+  const [mdpEdit, setMdpEdit] = useState<{ id: string; valeur: string } | null>(null)
+  const [mdpLoading, setMdpLoading] = useState(false)
+
+  const changerMotDePasse = async (id: string) => {
+    const valeur = mdpEdit?.valeur || ''
+    if (valeur.length < 6) { setMessage('❌ Mot de passe trop court (6 caractères minimum).'); return }
+    setMdpLoading(true); setMessage('')
+    const res = await fetch('/api/admin/changer-mot-de-passe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, motDePasse: valeur }),
+    })
+    const json = await res.json().catch(() => ({}))
+    setMdpLoading(false)
+    if (!res.ok) { setMessage('❌ ' + (json.error || 'Erreur')); return }
+    setMdpEdit(null)
+    setMessage('✅ Mot de passe modifié')
+    setTimeout(() => setMessage(''), 3000)
+  }
+
   const supprimerUtilisateur = async (id: string, label: string) => {
     if (!confirm(`Supprimer définitivement le compte de « ${label} » ? Cette action est irréversible.`)) return
     setMessage('')
@@ -158,25 +179,53 @@ export default function AdminUtilisateurs() {
         <h2 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 1rem' }}>Utilisateurs ({utilisateurs.length})</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {utilisateurs.map(u => (
-            <div key={u.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#F9F9F9', borderRadius: 8 }}>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 500 }}>{u.nom || u.email}</div>
-                <div style={{ fontSize: 11, color: '#888' }}>{u.email}</div>
+            <div key={u.id} style={{ padding: '10px 12px', background: '#F9F9F9', borderRadius: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 500 }}>{u.nom || u.email}</div>
+                  <div style={{ fontSize: 11, color: '#888' }}>{u.email}</div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <select value={u.role} onChange={e => changerRole(u.id, e.target.value)}
+                    style={{ padding: '5px 10px', borderRadius: 6, border: '1px solid #E0E0E0', fontSize: 12, cursor: 'pointer', background: '#fff' }}>
+                    <option value="admin">Admin</option>
+                    <option value="editeur">Éditeur</option>
+                    <option value="lecteur">Lecteur</option>
+                  </select>
+                  {/* Mot de passe : staff uniquement (jamais les lecteurs) */}
+                  {u.role !== 'lecteur' && (
+                    <button onClick={() => setMdpEdit(mdpEdit?.id === u.id ? null : { id: u.id, valeur: '' })} title="Modifier le mot de passe"
+                      style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #D9D2F5', background: mdpEdit?.id === u.id ? '#534AB7' : '#F0EEFB', color: mdpEdit?.id === u.id ? '#fff' : '#534AB7', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                      Mot de passe
+                    </button>
+                  )}
+                  {u.id !== monId && (
+                    <button onClick={() => supprimerUtilisateur(u.id, u.nom || u.email)} title="Supprimer ce compte"
+                      style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #F3C9BE', background: '#FCE9E3', color: '#D94A30', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                      Supprimer
+                    </button>
+                  )}
+                </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <select value={u.role} onChange={e => changerRole(u.id, e.target.value)}
-                  style={{ padding: '5px 10px', borderRadius: 6, border: '1px solid #E0E0E0', fontSize: 12, cursor: 'pointer', background: '#fff' }}>
-                  <option value="admin">Admin</option>
-                  <option value="editeur">Éditeur</option>
-                  <option value="lecteur">Lecteur</option>
-                </select>
-                {u.id !== monId && (
-                  <button onClick={() => supprimerUtilisateur(u.id, u.nom || u.email)} title="Supprimer ce compte"
-                    style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #F3C9BE', background: '#FCE9E3', color: '#D94A30', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                    Supprimer
+
+              {/* Formulaire inline de changement de mot de passe */}
+              {mdpEdit?.id === u.id && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, paddingTop: 10, borderTop: '1px solid #ECECEC', flexWrap: 'wrap' }}>
+                  <input type="password" autoFocus value={mdpEdit.valeur}
+                    onChange={e => setMdpEdit({ id: u.id, valeur: e.target.value })}
+                    onKeyDown={e => { if (e.key === 'Enter') changerMotDePasse(u.id) }}
+                    placeholder="Nouveau mot de passe (min. 6)"
+                    style={{ flex: 1, minWidth: 200, padding: '8px 11px', borderRadius: 8, border: '1px solid #E0E0E0', fontSize: 13, boxSizing: 'border-box' }} />
+                  <button onClick={() => changerMotDePasse(u.id)} disabled={mdpLoading}
+                    style={{ padding: '8px 16px', borderRadius: 8, background: '#534AB7', color: '#fff', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: mdpLoading ? 0.7 : 1 }}>
+                    {mdpLoading ? '…' : 'Enregistrer'}
                   </button>
-                )}
-              </div>
+                  <button onClick={() => setMdpEdit(null)}
+                    style={{ padding: '8px 14px', borderRadius: 8, background: '#fff', color: '#6E6456', border: '1px solid #E0E0E0', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    Annuler
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
