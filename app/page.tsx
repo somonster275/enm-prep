@@ -11,7 +11,15 @@ const CREAM = '#FDF6EA'
 const BORDER = '#F0E7D6'
 
 // Les matières du programme, autour du noyau « codex » (réseau hexagonal du hero).
-const MATIERES = ['Civil', 'Pénal', 'Public', 'Procédure', 'Européen', 'Social']
+// Illustration « rangée de codes juridiques » du hero.
+const LIVRES: { h: number; rot: string; bg: string; kicker: string; titre: string; size: number }[] = [
+  { h: 268, rot: '-1deg',  bg: '#EE5A52', kicker: 'CODE',    titre: 'CIVIL',        size: 15 },
+  { h: 286, rot: '.6deg',  bg: '#D22F26', kicker: 'CODE',    titre: 'PÉNAL',        size: 15 },
+  { h: 260, rot: '-.4deg', bg: '#B5392A', kicker: 'CODE DE', titre: 'PROCÉ-\nDURE', size: 12 },
+  { h: 280, rot: '.8deg',  bg: '#C8412F', kicker: 'CODE',    titre: 'PUBLIC',       size: 14 },
+  { h: 266, rot: '-.7deg', bg: '#E76F45', kicker: 'DROIT',   titre: 'EURO-\nPÉEN',  size: 12 },
+  { h: 274, rot: '.5deg',  bg: '#A82C28', kicker: 'CODE DU', titre: 'SOCIAL',       size: 14 },
+]
 
 // Tout ce que l'étudiant peut faire dans l'app.
 const FONCTIONS = [
@@ -139,7 +147,7 @@ export default function Accueil() {
 
         {/* Réseau hexagonal des matières */}
         <div className="hide-mobile" style={{ flex: '1 1 360px', display: 'flex', justifyContent: 'center' }}>
-          <ReseauMatieres />
+          <CodexCodes />
         </div>
       </section>
 
@@ -287,30 +295,32 @@ export default function Accueil() {
   )
 }
 
-/* Réseau hexagonal des matières autour du noyau « codex », façon poster. */
-function ReseauMatieres() {
-  const cx = 200, cy = 200, r = 130
-  const noeuds = MATIERES.map((m, i) => {
-    const a = (Math.PI / 3) * i - Math.PI / 2
-    return { m, x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }
-  })
+/* Illustration du hero : une rangée de codes juridiques sur une étagère. */
+function CodexCodes() {
+  const overlay = 'linear-gradient(100deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,.05) 16%, rgba(0,0,0,.04) 78%, rgba(0,0,0,.18) 100%)'
   return (
-    <svg viewBox="0 0 400 400" width={380} height={380} aria-label="Matières du programme">
-      {noeuds.map(n => (
-        <line key={'l' + n.m} x1={cx} y1={cy} x2={n.x} y2={n.y} stroke="#EADFC9" strokeWidth={1.5} />
-      ))}
-      {/* noyau */}
-      <rect x={cx - 52} y={cy - 30} width={104} height={60} rx={12} fill={RED} />
-      <text x={cx} y={cy} fill="#fff" textAnchor="middle" dominantBaseline="central"
-        style={{ fontFamily: "'Bagel Fat One', system-ui, sans-serif" }} fontSize={30}>codex</text>
-      {/* matières */}
-      {noeuds.map(n => (
-        <g key={n.m}>
-          <circle cx={n.x} cy={n.y} r={36} fill="#fff" stroke="#EADFC9" strokeWidth={1.5} />
-          <text x={n.x} y={n.y} fill={INK} textAnchor="middle" dominantBaseline="central"
-            style={{ fontFamily: "'Hanken Grotesk', sans-serif" }} fontWeight={700} fontSize={13}>{n.m}</text>
-        </g>
-      ))}
-    </svg>
+    <div style={{ width: 480, maxWidth: '100%', padding: '8px 4px 0', fontFamily: "'Hanken Grotesk', sans-serif" }} aria-label="Illustration — codes juridiques">
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 9, height: 296 }}>
+        {LIVRES.map((l, i) => (
+          <div key={i} style={{
+            position: 'relative', width: 70, height: l.h, borderRadius: '4px 4px 3px 3px',
+            backgroundColor: l.bg, backgroundImage: overlay,
+            boxShadow: '0 22px 30px -18px rgba(120,30,20,.55)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '11px 7px 9px',
+            transform: `rotate(${l.rot})`,
+          }}>
+            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, fontWeight: 600, color: '#fff', background: 'rgba(0,0,0,.16)', borderRadius: 3, padding: '2px 7px' }}>2026</div>
+            <div style={{ flex: 1, width: '100%', margin: '9px 0', border: '1px solid rgba(255,255,255,.55)', borderRadius: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+              <span style={{ fontFamily: "'Hanken Grotesk', sans-serif", fontSize: 8, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(255,255,255,.7)' }}>{l.kicker}</span>
+              <span style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: l.size, fontWeight: 800, lineHeight: 0.98, color: '#fff', textAlign: 'center' }}>
+                {l.titre.split('\n').map((t, j) => <span key={j}>{j > 0 && <br />}{t}</span>)}
+              </span>
+            </div>
+            <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,.92)', letterSpacing: '-.01em' }}>codex</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ height: 8, margin: '0 6px', borderRadius: '0 0 5px 5px', background: 'linear-gradient(180deg,#E7CFA8,#D8BC8E)', boxShadow: '0 14px 22px -12px rgba(60,40,20,.4)' }} />
+    </div>
   )
 }
