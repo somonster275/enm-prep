@@ -164,6 +164,18 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   embed question → `match_cours_chunks` testé (4 passages, similarité 57–64 %).
   Backfill `scripts/backfill-embeddings.mjs` créé et lancé (24 passages).
 
+### 2026-06-27 (suite 2) — Nouvelles fonctionnalités IA (via Claude API, pas de modèle local)
+- Décision : pas d'IA locale (trop lourd sur mobile, qualité moindre) → tout via l'API Claude.
+- **Tuteur IA** (`/tuteur` + `/api/tuteur`) : chat libre non limité aux docs importés
+  (explications, méthodes, résumés), SSE streaming, mémoire 24h localStorage, responsive.
+  Lien « Tuteur IA » dans TopNav. Prompt = tuteur ENM.
+- **Générateur de fiches** (`/api/ia/generer-fiches` staff-only + `components/GenerateurFiches.tsx`)
+  intégré dans l'éditeur (onglet Fiches, quand un module est choisi) : Claude génère des
+  paires Q/R en JSON depuis un thème/texte → relire/éditer/décocher → insère dans `fiches`.
+- **QCM interactif** : PAS fait — le « QCM » actuel est juste un stockage de ressources
+  (OutilContenu), pas un quiz structuré. Un vrai QCM IA = chantier séparé (table options/
+  réponses + lecteur). À proposer si demandé.
+
 ### 2026-06-27 (suite) — Responsive mobile
 - App rendue responsive. Architecture en styles inline → approche : **CSS global**
   dans `globals.css` qui replie **toute** grille inline en 1 colonne sur mobile via le

@@ -5,6 +5,7 @@ import type { Espace } from '@/types'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useIsMobile } from '@/lib/useIsMobile'
+import TuteurChat from '@/components/TuteurChat'
 
 type Document = { id: string; nom: string; nb_chunks: number; espace_id: string | null; created_at: string; espaces: { nom: string; couleur: string } | null }
 type Message = {
@@ -54,6 +55,7 @@ export default function CoursIAPage() {
   const [loading, setLoading] = useState(false)
   const [phase, setPhase] = useState<'idle' | 'recherche' | 'redaction'>('idle')
   const [sidebarOuverte, setSidebarOuverte] = useState(true)
+  const [vueTuteur, setVueTuteur] = useState(false)
   const isMobile = useIsMobile()
   const abortRef = useRef<AbortController | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -291,21 +293,30 @@ export default function CoursIAPage() {
               </span>
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              {/* Sélecteur Base ENM / Mes documents */}
-              <div style={{ display: 'flex', background: '#fff', border: `1px solid ${border}`, borderRadius: 11, padding: 3, gap: 2, marginRight: 4 }}>
-                {([['officiel', 'Base ENM'], ['personnel', 'Mes documents']] as [Mode, string][]).map(([m, label]) => (
-                  <button key={m} onClick={() => setMode(m)} style={{
+              {/* Sélecteur Base ENM / Mes documents / Coach IA */}
+              <div style={{ display: 'flex', background: '#fff', border: `1px solid ${border}`, borderRadius: 11, padding: 3, gap: 2, marginRight: 4, flexWrap: 'wrap' }}>
+                {([['officiel', 'Base ENM'], ['personnel', 'Mes documents']] as [Mode, string][]).map(([m, label]) => {
+                  const actif = !vueTuteur && mode === m
+                  return (
+                  <button key={m} onClick={() => { setMode(m); setVueTuteur(false) }} style={{
                     padding: '7px 13px', borderRadius: 8, border: 'none', cursor: 'pointer',
                     fontSize: 12.5, fontWeight: 700, fontFamily: font,
-                    background: mode === m ? coral : 'transparent',
-                    color: mode === m ? '#fff' : textMid,
-                    boxShadow: mode === m ? `0 6px 14px -7px rgba(242,101,75,.8)` : 'none',
+                    background: actif ? coral : 'transparent',
+                    color: actif ? '#fff' : textMid,
+                    boxShadow: actif ? `0 6px 14px -7px rgba(242,101,75,.8)` : 'none',
                   }}>{label}</button>
-                ))}
+                )})}
+                <button onClick={() => setVueTuteur(true)} style={{
+                  padding: '7px 13px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                  fontSize: 12.5, fontWeight: 700, fontFamily: font,
+                  background: vueTuteur ? coral : 'transparent',
+                  color: vueTuteur ? '#fff' : textMid,
+                  boxShadow: vueTuteur ? `0 6px 14px -7px rgba(242,101,75,.8)` : 'none',
+                }}>🧑‍🏫 Coach IA</button>
               </div>
               {/* Sélection de documents : réservée à « Mes documents ».
                   En base ENM, les étudiants interrogent toute la base sans voir la liste. */}
-              {mode === 'personnel' && docs.length > 0 && (
+              {!vueTuteur && mode === 'personnel' && docs.length > 0 && (
                 <button onClick={() => setSidebarOuverte(o => !o)} style={{
                   display: 'flex', alignItems: 'center', gap: 7, padding: '8px 14px', borderRadius: 10,
                   background: sidebarOuverte ? coralBg : '#fff', color: sidebarOuverte ? coralDark : textMid,
@@ -318,7 +329,7 @@ export default function CoursIAPage() {
                   )}
                 </button>
               )}
-              {(mode === 'personnel' || isAdmin) && (
+              {!vueTuteur && (mode === 'personnel' || isAdmin) && (
                 <button onClick={() => setPanelOuvert(o => !o)} style={{
                   padding: '8px 14px', borderRadius: 10,
                   background: panelOuvert ? textDark : '#fff',
@@ -332,6 +343,10 @@ export default function CoursIAPage() {
             </div>
           </div>
 
+          {vueTuteur ? (
+            <div style={{ flex: 1, minHeight: 0 }}><TuteurChat variant="full" /></div>
+          ) : (
+          <>
           {/* ── Panel admin import ── */}
           {panelOuvert && (mode === 'personnel' || isAdmin) && (
             <div style={{ background: '#fff', border: `1px solid ${border}`, borderRadius: 18, padding: 20, marginBottom: 18, flexShrink: 0, boxShadow: `0 1px 2px rgba(60,40,20,.04), 0 12px 28px -18px rgba(60,40,20,.18)` }}>
@@ -682,6 +697,8 @@ export default function CoursIAPage() {
 
             </div>{/* fin colonne conversation */}
           </div>{/* fin conteneur 2 colonnes */}
+          </>
+          )}
         </div>
       </div>
     </>
