@@ -110,11 +110,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Progression globale (maîtrise · couverture · régularité) */}
-      <div style={{ marginBottom: 16 }}>
-        <ProgressionCard detail={detailProg} />
-      </div>
-
       {/* Stats : série · objectif · semaine */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
         <div style={statCard}>
@@ -246,6 +241,11 @@ export default function Dashboard() {
 
         <NotesWidget titre="Mes tâches" />
         </div>
+      </div>
+
+      {/* Progression globale — en bas de page */}
+      <div style={{ marginTop: 28 }}>
+        <ProgressionCard detail={detailProg} />
       </div>
     </div>
   )

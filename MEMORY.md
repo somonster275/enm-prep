@@ -164,6 +164,18 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   embed question → `match_cours_chunks` testé (4 passages, similarité 57–64 %).
   Backfill `scripts/backfill-embeddings.mjs` créé et lancé (24 passages).
 
+### 2026-06-27 (suite 7) — Progression repensée (score composite)
+- **`lib/progression.ts`** : `calculerProgression()` = score global pondéré sur 3
+  dimensions — **maîtrise** (scoreGlobal des paliers, 50%), **couverture** (modules
+  abordés / total, 30%), **régularité** (taux d'objectif quotidien atteint sur 7 j, 20%).
+  Poids dans `POIDS`, ajustables. (Tâches NON retenues par l'utilisateur.)
+- **`components/ProgressionCard.tsx`** : score global (anneau) + 3 barres ; affiché en
+  haut du **dashboard** (remplace l'ancien `scoreGlobal` seul ; le « Score global » du
+  hero utilise désormais le composite).
+- Le **coach** reçoit la progression composite (global + 3 dimensions) dans son contexte.
+- Couverture = niveau **module** (fiches→module_id ; modules non supprimés). QCM/mindmaps/
+  media pas encore intégrés (nécessitent du tracking ; QCM interactif = chantier à part).
+
 ### 2026-06-27 (suite 6) — Le coach connaît la progression de l'étudiant
 - `/api/tuteur` injecte dans le contexte : score `scoreGlobal`, fiches dues (`estDue`)
   et maîtrisées (`palier >= PALIER_MAX`), total + **détail par matière** (fiches→modules→
