@@ -35,9 +35,9 @@ export async function proxy(req: NextRequest) {
 
   const path = req.nextUrl.pathname
   const isAuthPage = path.startsWith('/login')
-  // Routes accessibles sans être connecté : la page de connexion, le callback
-  // d'auth Supabase, et la demande d'accès self-service (POST public).
-  const estPublic = isAuthPage || path.startsWith('/auth') || path.startsWith('/api/acces') || path.startsWith('/bienvenue')
+  // Routes accessibles sans être connecté : la page d'accueil publique, la page
+  // de connexion, le callback d'auth Supabase, et la demande d'accès self-service.
+  const estPublic = path === '/' || isAuthPage || path.startsWith('/auth') || path.startsWith('/api/acces') || path.startsWith('/bienvenue')
 
   if (!user && !estPublic) {
     return NextResponse.redirect(new URL('/login', req.url))
