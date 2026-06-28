@@ -29,6 +29,7 @@ export default function RevisionPage() {
   const moduleFilter = searchParams.get('module') // null = tout l'espace
   const mixte = searchParams.get('mixte') === '1' // révision transversale (entrelacement)
   const carnet = searchParams.get('carnet') === '1' // carnet d'erreurs : fiches mal notées
+  const favoris = searchParams.get('favoris') === '1' // révision des fiches favorites
 
   const [espace, setEspace] = useState<Espace | null>(null)
   const [moduleLabel, setModuleLabel] = useState<string | null>(null)
@@ -99,6 +100,23 @@ export default function RevisionPage() {
         return
       }
 
+      // ===== FAVORIS : révision des fiches étoilées =====
+      if (favoris) {
+        setEspace({ id: '', nom: 'Mes favoris', slug: '', description: '', couleur: '#E8A11E', ordre: 0 } as Espace)
+        setModuleLabel('Favoris')
+        const { data: fav } = await supabase.from('favoris').select('fiche_id').eq('user_id', user.id)
+        const ids = (fav || []).map((x: { fiche_id: string }) => x.fiche_id)
+        if (ids.length === 0) { setLoaded(true); return }
+        const { data: fich } = await supabase.from('fiches').select('*').in('id', ids).is('deleted_at', null)
+        const { data: prog } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id).in('fiche_id', ids)
+        const progMap: Record<string, Progression> = {}
+        ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
+        setProgressions(progMap)
+        setDeck((fich || []).sort(() => Math.random() - 0.5) as Fiche[])
+        setLoaded(true)
+        return
+      }
+
       const { data: esp } = await supabase.from('espaces').select('*').eq('slug', slug).single()
       if (!esp) return
       setEspace(esp)
@@ -136,7 +154,7 @@ export default function RevisionPage() {
       setLoaded(true)
     }
     load()
-  }, [slug, modeAlea, moduleFilter, mixte, carnet])
+  }, [slug, modeAlea, moduleFilter, mixte, carnet, favoris])
 
   // En dessous de ce seuil, la carte revient dans la session en cours (1 min, 15 min…).
   const SEUIL_REQUEUE = 30 // minutes
@@ -227,8 +245,8 @@ export default function RevisionPage() {
 
   const retourHref = carnet
     ? '/carnet'
-    : mixte
-      ? '/dashboard'
+    : (mixte || favoris)
+      ? '/espaces'
       : moduleFilter
         ? `/espaces/${slug}/modules/${moduleFilter}`
         : `/espaces/${slug}`
@@ -244,7 +262,7 @@ export default function RevisionPage() {
       <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
       <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 22, margin: '0 0 8px' }}>Aucune fiche à réviser</h2>
       <p style={{ fontSize: 14, color: '#8A7E68', margin: '0 0 2rem' }}>
-        {carnet ? 'Ton carnet est vide — tu n\'as rien raté récemment, bravo !' : mixte ? 'Rien à réviser pour le moment — reviens un peu plus tard !' : moduleFilter ? 'Ce module ne contient pas encore de fiches.' : 'Cet espace ne contient pas encore de fiches.'}
+        {carnet ? 'Ton carnet est vide — tu n\'as rien raté récemment, bravo !' : favoris ? 'Aucune fiche en favori — ajoute une ★ sur tes fiches importantes.' : mixte ? 'Rien à réviser pour le moment — reviens un peu plus tard !' : moduleFilter ? 'Ce module ne contient pas encore de fiches.' : 'Cet espace ne contient pas encore de fiches.'}
       </p>
       <Link href={retourHref} style={{
         padding: '12px 24px', borderRadius: 12, background: '#DC4A2B', color: '#fff',

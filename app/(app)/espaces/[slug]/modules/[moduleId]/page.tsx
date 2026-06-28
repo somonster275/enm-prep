@@ -9,6 +9,7 @@ import RichContent from '@/components/RichContent'
 import RichEditor from '@/components/RichEditor'
 import RemarqueButton from '@/components/RemarqueButton'
 import AstucesFiche from '@/components/AstucesFiche'
+import FavoriButton from '@/components/FavoriButton'
 
 export default function ModulePage() {
   const { slug, moduleId } = useParams() as { slug: string; moduleId: string }
@@ -20,6 +21,7 @@ export default function ModulePage() {
   const [fiches, setFiches] = useState<Fiche[]>([])
   const [progressions, setProgressions] = useState<any[]>([])
   const [profil, setProfil] = useState<Profil | null>(null)
+  const [favSet, setFavSet] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
 
   // Données pour le déplacement
@@ -84,6 +86,9 @@ export default function ModulePage() {
           .eq('utilisateur_id', user.id).in('fiche_id', fich.map((f: Fiche) => f.id))
         setProgressions(prog || [])
       }
+
+      const { data: fav } = await supabase.from('favoris').select('fiche_id').eq('user_id', user.id)
+      setFavSet(new Set((fav || []).map((x: { fiche_id: string }) => x.fiche_id)))
 
       setLoading(false)
     }
@@ -417,22 +422,23 @@ export default function ModulePage() {
                         <div style={{ height: 1, background: '#F0E7D6', marginBottom: 10 }} />
                         <RichContent html={fiche.reponse} style={{ fontSize: 13, color: '#8A7E68', lineHeight: 1.7 }} />
                       </div>
-                      {isAdmin ? (
-                        <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                          <button onClick={() => { setEditFiche(fiche); setQuestion(fiche.question); setReponse(fiche.reponse) }}
-                            style={{ padding: '6px 12px', borderRadius: 8, background: '#fff', color: '#8A7E68', border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
-                            Modifier
-                          </button>
-                          <button onClick={() => supprimerFiche(fiche.id)}
-                            style={{ padding: '6px 12px', borderRadius: 8, background: '#FCE9E3', color: '#D94A30', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
-                            Supprimer
-                          </button>
-                        </div>
-                      ) : (
-                        <div style={{ flexShrink: 0 }}>
+                      <div style={{ display: 'flex', gap: 6, flexShrink: 0, alignItems: 'center' }}>
+                        <FavoriButton ficheId={fiche.id} uid={profil?.id || ''} initial={favSet.has(fiche.id)} />
+                        {isAdmin ? (
+                          <>
+                            <button onClick={() => { setEditFiche(fiche); setQuestion(fiche.question); setReponse(fiche.reponse) }}
+                              style={{ padding: '6px 12px', borderRadius: 8, background: '#fff', color: '#8A7E68', border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
+                              Modifier
+                            </button>
+                            <button onClick={() => supprimerFiche(fiche.id)}
+                              style={{ padding: '6px 12px', borderRadius: 8, background: '#FCE9E3', color: '#D94A30', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
+                              Supprimer
+                            </button>
+                          </>
+                        ) : (
                           <RemarqueButton ficheId={fiche.id} />
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                     <AstucesFiche
                       ficheId={fiche.id}

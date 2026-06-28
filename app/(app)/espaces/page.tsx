@@ -65,6 +65,30 @@ export default function EspacesPage() {
             </div>
           </Link>
 
+          {/* Carte « Mes favoris » */}
+          <Link href="/espaces/_/revision?favoris=1" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div style={{ background: '#FDF3DD', borderRadius: 18, padding: 22, border: '1.5px solid #F0DBA6', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ width: 46, height: 46, borderRadius: 13, background: '#E8A11E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>★</div>
+              <div style={{ fontWeight: 700, fontSize: 17 }}>Mes favoris</div>
+              <div style={{ fontSize: 13, color: '#9A7B33', marginTop: 4 }}>Réviser les fiches que tu as étoilées comme importantes.</div>
+              <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#fff', background: '#E8A11E', padding: '3px 10px', borderRadius: 999 }}>Réviser →</span>
+              </div>
+            </div>
+          </Link>
+
+          {/* Carte « Recherche » */}
+          <Link href="/recherche" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div style={{ background: '#fff', borderRadius: 18, padding: 22, border: '1px solid #F0E7D6', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ width: 46, height: 46, borderRadius: 13, background: '#EFE7D7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>🔎</div>
+              <div style={{ fontWeight: 700, fontSize: 17 }}>Recherche</div>
+              <div style={{ fontSize: 13, color: '#9A8D72', marginTop: 4 }}>Retrouver une notion par mot-clé dans toutes les fiches.</div>
+              <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#8A7E68', background: '#FDF6EA', padding: '3px 10px', borderRadius: 999, border: '1px solid #EADFC9' }}>Ouvrir →</span>
+              </div>
+            </div>
+          </Link>
+
           {espaces.map(espace => (
             <Link key={espace.id} href={`/espaces/${espace.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
               <div style={{ background: '#fff', borderRadius: 18, padding: 22, border: '1px solid #F0E7D6', cursor: 'pointer' }}>

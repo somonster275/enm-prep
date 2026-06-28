@@ -16,19 +16,6 @@ function extraireTaches(txt: string): { visible: string; taches: string[] } {
 }
 
 type Message = { role: 'user' | 'assistant'; contenu: string; ts: number }
-const CLE_LS = 'tuteur-messages'
-const TTL_MS = 24 * 60 * 60 * 1000
-
-function charger(): Message[] {
-  try {
-    const raw = localStorage.getItem(CLE_LS)
-    if (!raw) return []
-    return (JSON.parse(raw) as Message[]).filter(m => m.ts > Date.now() - TTL_MS)
-  } catch { return [] }
-}
-function sauver(msgs: Message[]) {
-  try { localStorage.setItem(CLE_LS, JSON.stringify(msgs.filter(m => m.ts > Date.now() - TTL_MS))) } catch {}
-}
 
 const SUGGESTIONS = [
   'Fais-moi un planning de révision pour les semaines à venir.',
@@ -50,8 +37,24 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
   const font = "'Hanken Grotesk', sans-serif"
   const coral = '#DC4A2B'
 
-  useEffect(() => { setMessages(charger()) }, [])
-  useEffect(() => { supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id || '')) }, [])
+  // Charge l'historique depuis la base (persistant entre appareils, plus de perte 24 h).
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      const id = data.user?.id || ''
+      setUserId(id)
+      if (!id) return
+      const { data: rows } = await supabase.from('coach_messages')
+        .select('role, contenu, created_at').eq('user_id', id).order('created_at').limit(80)
+      if (rows) setMessages((rows as { role: string; contenu: string; created_at: string }[]).map(r => ({
+        role: r.role === 'assistant' ? 'assistant' : 'user', contenu: r.contenu, ts: new Date(r.created_at).getTime(),
+      })))
+    })
+  }, [])
+
+  const persister = async (role: 'user' | 'assistant', contenu: string) => {
+    if (!userId || !contenu.trim()) return
+    await supabase.from('coach_messages').insert({ user_id: userId, role, contenu })
+  }
 
   const ajouterTache = async (cle: string, contenu: string) => {
     if (!userId || tachesAjoutees[cle]) return
@@ -67,7 +70,7 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
     if (!q || loading) return
     setQuestion('')
     const base = [...messages, { role: 'user' as const, contenu: q, ts: Date.now() }]
-    setMessages(base); sauver(base)
+    setMessages(base); persister('user', q)
     setLoading(true)
     const controller = new AbortController()
     abortRef.current = controller
@@ -81,7 +84,7 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
       })
     } catch { setLoading(false); abortRef.current = null; return }
     if (!res.ok || !res.body) {
-      setMessages(m => { const n = [...m, { role: 'assistant' as const, contenu: "Erreur de connexion à l'IA.", ts: Date.now() }]; sauver(n); return n })
+      setMessages(m => [...m, { role: 'assistant' as const, contenu: "Erreur de connexion à l'IA.", ts: Date.now() }])
       setLoading(false); abortRef.current = null; return
     }
 
@@ -107,11 +110,11 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
         }
       }
     } catch {}
-    setMessages(m => { sauver(m); return m })
+    setMessages(m => { const last = m[m.length - 1]; if (last?.role === 'assistant' && last.contenu) persister('assistant', last.contenu); return m })
     setLoading(false); abortRef.current = null
   }
 
-  const effacer = () => { localStorage.removeItem(CLE_LS); setMessages([]) }
+  const effacer = async () => { setMessages([]); if (userId) await supabase.from('coach_messages').delete().eq('user_id', userId) }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, fontFamily: font, color: '#2A2018' }}>
