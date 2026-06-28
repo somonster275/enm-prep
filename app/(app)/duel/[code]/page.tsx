@@ -154,6 +154,19 @@ export default function SalleDuel() {
     await supabase.from('matchs').update({ statut: 'en_cours', started_at: new Date().toISOString() }).eq('id', match.id)
   }
 
+  const quitter = async (confirmer = false) => {
+    if (!match) return
+    if (confirmer && !confirm('Quitter le duel en cours ? Ta partie sera abandonnée.')) return
+    finiRef.current = true // stoppe l'horloge avant de partir
+    // Si l'hôte quitte le salon avant le lancement, on supprime le match entier.
+    if (match.hote_id === uid && match.statut === 'attente') {
+      await supabase.from('matchs').delete().eq('id', match.id)
+    } else {
+      await supabase.from('match_joueurs').delete().eq('match_id', match.id).eq('user_id', uid)
+    }
+    router.push('/duel')
+  }
+
   const choisir = (oi: number, multi: boolean) => {
     if (verrou) return
     setSelection(s => {
@@ -217,6 +230,10 @@ export default function SalleDuel() {
       ) : (
         <div style={{ textAlign: 'center', color: '#8A7E68', fontSize: 14, padding: '14px 0' }}>En attente du lancement par l&apos;hôte…</div>
       )}
+
+      <button onClick={() => quitter(false)} style={{ width: '100%', marginTop: 10, height: 44, border: '1px solid #EADFC9', borderRadius: 12, background: 'transparent', color: '#9A8D72', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>
+        {estHote ? 'Annuler le salon' : 'Quitter le salon'}
+      </button>
     </div>
   )
 
@@ -259,7 +276,10 @@ export default function SalleDuel() {
     <div style={{ paddingTop: 34, maxWidth: 640, margin: '0 auto', fontFamily: FONT, color: '#2A2018' }}>
       {/* Barre de temps + progression */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: '#8A7E68' }}>Question {idx + 1} / {total}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button onClick={() => quitter(true)} title="Quitter le duel" style={{ border: 'none', background: 'transparent', color: '#9A8D72', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: 0, fontFamily: FONT }}>← Quitter</button>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#8A7E68' }}>Question {idx + 1} / {total}</span>
+        </div>
         <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 18, color: reste <= 5 ? '#DC4A2B' : '#2A2018' }}>{Math.ceil(reste)}s</span>
       </div>
       <div style={{ height: 8, background: '#F0E7D6', borderRadius: 999, overflow: 'hidden', marginBottom: 18 }}>
