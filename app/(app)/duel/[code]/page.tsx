@@ -2,12 +2,13 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { reponseJuste, pointsReponse, type MatchQuestion } from '@/lib/match'
 import { enregistrerActivite } from '@/lib/streaks'
 
+// Le paquet public ne contient PAS les bonnes réponses (correction côté serveur).
+type MatchQuestionPub = { enonce: string; options: { t: string }[]; cat: 'qcm' | 'fiche'; multi: boolean }
 type Match = {
   id: string; code: string; hote_id: string; titre: string | null; statut: string
-  deck: MatchQuestion[]; secondes_par_question: number; started_at: string | null
+  deck: MatchQuestionPub[]; secondes_par_question: number; started_at: string | null
 }
 type Joueur = { user_id: string; pseudo: string; score: number; repondu: number; justes: number; termine: boolean }
 
@@ -29,8 +30,8 @@ export default function SalleDuel() {
   const [verrou, setVerrou] = useState(false)        // a validé cette question
   const [fini, setFini] = useState(false)
 
-  // Accumulateurs (refs pour rester stables dans le tick)
-  const score = useRef(0), justes = useRef(0), repondu = useRef(0)
+  // Le score est calculé par le serveur. Côté client on garde juste de quoi
+  // éviter de poster deux fois la même question.
   const traitees = useRef<Set<number>>(new Set())
   const idxRef = useRef(0)
   const finiRef = useRef(false)
@@ -65,12 +66,8 @@ export default function SalleDuel() {
         { onConflict: 'match_id,user_id', ignoreDuplicates: true },
       )
 
-      // Reprise : on amorce les accumulateurs depuis la ligne en base, sinon
-      // un rafraîchissement en cours de partie écraserait le score par 0.
-      const { data: moi } = await supabase.from('match_joueurs')
-        .select('score, justes, repondu').eq('match_id', mm.id).eq('user_id', user.id).maybeSingle()
-      if (moi) { score.current = moi.score; justes.current = moi.justes; repondu.current = moi.repondu }
-      // Les questions déjà écoulées ne doivent pas pouvoir être re-notées.
+      // Reprise : les questions déjà écoulées sont marquées traitées pour ne
+      // pas les re-poster (le serveur les rejetterait de toute façon).
       if (mm.statut === 'en_cours' && mm.started_at) {
         const cur = Math.floor((Date.now() - Date.parse(mm.started_at)) / 1000 / mm.secondes_par_question)
         for (let i = 0; i < cur; i++) traitees.current.add(i)
@@ -92,19 +89,15 @@ export default function SalleDuel() {
     return () => { if (canalMatch) supabase.removeChannel(canalMatch); if (canalJoueurs) supabase.removeChannel(canalJoueurs) }
   }, [codeStr, chargerJoueurs])
 
-  // --- Enregistre la réponse à une question (manuel ou par expiration) ---
-  const valider = useCallback(async (qIdx: number, sel: Set<number>, resteSec: number) => {
-    if (!match || traitees.current.has(qIdx) || !match.deck[qIdx]) return
+  // --- Envoie la réponse au serveur, qui corrige et met à jour le score ---
+  const valider = useCallback(async (qIdx: number, sel: Set<number>) => {
+    if (!match || traitees.current.has(qIdx) || sel.size === 0) return
     traitees.current.add(qIdx)
-    const juste = reponseJuste(match.deck[qIdx], sel)
-    const pts = pointsReponse(juste, resteSec, match.secondes_par_question)
-    score.current += pts
-    if (juste) justes.current += 1
-    if (sel.size > 0) repondu.current += 1
-    await supabase.from('match_joueurs')
-      .update({ score: score.current, justes: justes.current, repondu: repondu.current })
-      .eq('match_id', match.id).eq('user_id', uid)
-  }, [match, uid])
+    await fetch('/api/duel/repondre', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: match.code, qIndex: qIdx, choix: [...sel] }),
+    }).catch(() => { traitees.current.delete(qIdx) }) // réseau KO : on autorise une nouvelle tentative
+  }, [match])
 
   // --- Horloge synchronisée : l'index de question découle de started_at ---
   useEffect(() => {
@@ -119,14 +112,14 @@ export default function SalleDuel() {
       const cur = Math.floor(elapsed / secs)
 
       if (cur >= total) {
-        // Finalise la dernière question éventuelle puis termine.
-        if (idxRef.current < total) valider(idxRef.current, selectionRef.current, 0)
+        // Finalise la dernière question (si une réponse était sélectionnée) puis termine.
+        if (idxRef.current < total) valider(idxRef.current, selectionRef.current)
         finir()
         return
       }
       if (cur !== idxRef.current) {
-        // On a changé de question : finalise la précédente (réponse en cours ou vide).
-        valider(idxRef.current, selectionRef.current, 0)
+        // On a changé de question : envoie la réponse en cours de la précédente.
+        valider(idxRef.current, selectionRef.current)
         idxRef.current = cur
         setIdx(cur)
         setSelection(new Set()); selectionRef.current = new Set()
@@ -145,15 +138,15 @@ export default function SalleDuel() {
     finiRef.current = true
     setFini(true)
     if (match) {
-      await supabase.from('match_joueurs').update({ termine: true }).eq('match_id', match.id).eq('user_id', uid)
       enregistrerActivite(uid)
-      // L'hôte clôt officiellement le match.
-      if (match.hote_id === uid && match.statut !== 'termine') {
-        await supabase.from('matchs').update({ statut: 'termine', ended_at: new Date().toISOString() }).eq('id', match.id)
-      }
+      // N'importe quel participant peut demander la clôture : le serveur vérifie
+      // que le temps est écoulé (plus de match « fantôme » si l'hôte quitte).
+      fetch('/api/duel/terminer', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: match.code }),
+      }).catch(() => {})
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fini, match, uid])
+  }, [match, uid])
 
   // --- Actions ---
   const lancer = async () => {
@@ -173,7 +166,7 @@ export default function SalleDuel() {
   const validerManuel = () => {
     if (verrou || !match) return
     setVerrou(true)
-    valider(idx, selection, reste)
+    valider(idx, selection)
   }
 
   // ===================== RENDU =====================
@@ -259,7 +252,7 @@ export default function SalleDuel() {
   // ---- JEU (statut en_cours) ----
   const q = match.deck[idx]
   if (!q) return <div style={{ paddingTop: 40, textAlign: 'center', color: '#9A8D72', fontFamily: FONT }}>…</div>
-  const multi = q.options.filter(o => o.c).length > 1
+  const multi = q.multi
   const pctTemps = (reste / match.secondes_par_question) * 100
 
   return (

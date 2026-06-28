@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { construireDeck, genererCode } from '@/lib/match'
+import { construireDeck } from '@/lib/match'
 
 type Qcm = { id: string; titre: string; matiere: string | null }
 type Espace = { id: string; nom: string }
@@ -69,17 +69,15 @@ export default function DuelAccueil() {
       if (deck.length < 2) { setErreur('Pas assez de questions disponibles pour cette sélection.'); setCreating(false); return }
       const titre = [qcms.find(q => q.id === qcmId)?.titre, espaces.find(e => e.id === espaceId)?.nom].filter(Boolean).join(' + ') || 'Match'
 
-      // Insère le match (réessaie si collision de code, très rare).
-      let codeFinal = ''
-      for (let essai = 0; essai < 5 && !codeFinal; essai++) {
-        const c = genererCode()
-        const { error } = await supabase.from('matchs').insert({
-          code: c, hote_id: uid, titre, deck, secondes_par_question: secs, statut: 'attente',
-        })
-        if (!error) codeFinal = c
-      }
-      if (!codeFinal) { setErreur('Impossible de créer le salon, réessaie.'); setCreating(false); return }
-      router.push(`/duel/${codeFinal}`)
+      // La création passe par le serveur : il sépare le paquet public des
+      // solutions (jamais envoyées aux clients) et génère le code.
+      const res = await fetch('/api/duel/creer', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ titre, deck, secondes: secs }),
+      })
+      const j = await res.json().catch(() => ({}))
+      if (!res.ok || !j.code) { setErreur(j.error || 'Impossible de créer le salon, réessaie.'); setCreating(false); return }
+      router.push(`/duel/${j.code}`)
     } catch {
       setErreur('Erreur lors de la création.'); setCreating(false)
     }
