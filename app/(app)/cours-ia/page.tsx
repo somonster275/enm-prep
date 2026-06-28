@@ -269,7 +269,6 @@ export default function CoursIAPage() {
   return (
     <>
       {/* Fonts Codex */}
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Space+Grotesk:wght@400;500;600&display=swap');`}</style>
 
       <div style={{
         minHeight: 'calc(100vh - 58px)',
