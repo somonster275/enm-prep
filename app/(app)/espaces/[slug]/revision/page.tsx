@@ -27,6 +27,7 @@ export default function RevisionPage() {
   const searchParams = useSearchParams()
   const modeAlea = searchParams.get('mode') === 'tout'
   const moduleFilter = searchParams.get('module') // null = tout l'espace
+  const mixte = searchParams.get('mixte') === '1' // révision transversale (entrelacement)
 
   const [espace, setEspace] = useState<Espace | null>(null)
   const [moduleLabel, setModuleLabel] = useState<string | null>(null)
@@ -59,6 +60,24 @@ export default function RevisionPage() {
       setUserId(user.id)
       const { data: prof } = await supabase.from('profils').select('role').eq('id', user.id).single()
       setIsAdmin(prof?.role === 'admin' || prof?.role === 'editeur')
+
+      // ===== Révision MIXTE (entrelacement) : cartes dues, toutes matières confondues =====
+      if (mixte) {
+        setEspace({ id: '', nom: 'Révision mixte', slug: '', description: '', couleur: '#DC4A2B', ordre: 0 } as Espace)
+        setModuleLabel('Toutes matières')
+        const { data: fich } = await supabase.from('fiches').select('*').is('deleted_at', null)
+        const fichList = (fich || []) as Fiche[]
+        const { data: prog } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id)
+        const progMap: Record<string, Progression> = {}
+        ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
+        setProgressions(progMap)
+        const dues = fichList.filter((f: Fiche) => { const p = progMap[f.id]; return !p || estDue(p.prochaine_revision) })
+        // Mélange + plafond à 40 cartes pour garder une session raisonnable.
+        const d = dues.sort(() => Math.random() - 0.5).slice(0, 40)
+        setDeck(d)
+        setLoaded(true)
+        return
+      }
 
       const { data: esp } = await supabase.from('espaces').select('*').eq('slug', slug).single()
       if (!esp) return
@@ -97,7 +116,7 @@ export default function RevisionPage() {
       setLoaded(true)
     }
     load()
-  }, [slug, modeAlea, moduleFilter])
+  }, [slug, modeAlea, moduleFilter, mixte])
 
   // En dessous de ce seuil, la carte revient dans la session en cours (1 min, 15 min…).
   const SEUIL_REQUEUE = 30 // minutes
@@ -153,9 +172,11 @@ export default function RevisionPage() {
     }
   }, [done, userId])
 
-  const retourHref = moduleFilter
-    ? `/espaces/${slug}/modules/${moduleFilter}`
-    : `/espaces/${slug}`
+  const retourHref = mixte
+    ? '/dashboard'
+    : moduleFilter
+      ? `/espaces/${slug}/modules/${moduleFilter}`
+      : `/espaces/${slug}`
 
   const font = "'Hanken Grotesk', sans-serif"
 
@@ -168,7 +189,7 @@ export default function RevisionPage() {
       <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
       <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 22, margin: '0 0 8px' }}>Aucune fiche à réviser</h2>
       <p style={{ fontSize: 14, color: '#8A7E68', margin: '0 0 2rem' }}>
-        {moduleFilter ? 'Ce module ne contient pas encore de fiches.' : 'Cet espace ne contient pas encore de fiches.'}
+        {mixte ? 'Rien à réviser pour le moment — reviens un peu plus tard !' : moduleFilter ? 'Ce module ne contient pas encore de fiches.' : 'Cet espace ne contient pas encore de fiches.'}
       </p>
       <Link href={retourHref} style={{
         padding: '12px 24px', borderRadius: 12, background: '#DC4A2B', color: '#fff',

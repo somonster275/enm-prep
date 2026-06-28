@@ -154,6 +154,10 @@ export default function Dashboard() {
                 color: '#fff', background: '#2A2018', borderRadius: 12, padding: '13px 24px', textDecoration: 'none',
               }}>Choisir un espace →</Link>
             )}
+            <Link href="/espaces/_/revision?mixte=1" title="Mélange des cartes dues de toutes les matières (entrelacement)" style={{
+              display: 'inline-block', marginTop: 12, marginLeft: 14, fontFamily: font, fontWeight: 700, fontSize: 13.5,
+              color: '#7A5E14', textDecoration: 'none', borderBottom: '1.5px solid rgba(122,94,20,.3)',
+            }}>🔀 Révision mixte</Link>
           </div>
         </div>
 
