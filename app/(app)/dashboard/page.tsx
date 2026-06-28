@@ -38,6 +38,7 @@ export default function Dashboard() {
   const [profil, setProfil] = useState<Profil | null>(null)
   const [activite, setActivite] = useState<Record<string, number>>({})
   const [evenements, setEvenements] = useState<Evenement[]>([])
+  const [dateExamen, setDateExamen] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [message] = useState(() => MESSAGES[Math.floor(Math.random() * MESSAGES.length)])
 
@@ -54,6 +55,9 @@ export default function Dashboard() {
         supabase.from('evenements').select('id,titre,date_debut,heure,type,couleur').gte('date_debut', new Date().toISOString().slice(0,10)).order('date_debut').limit(4),
         supabase.from('modules').select('id').is('deleted_at', null),
       ])
+      // Prochain examen (toutes dates), pour le compte à rebours — indépendant des 4 events affichés.
+      const { data: exam } = await supabase.from('evenements').select('date_debut').eq('type', 'examen').gte('date_debut', new Date().toISOString().slice(0,10)).order('date_debut').limit(1).maybeSingle()
+      setDateExamen((exam as { date_debut: string } | null)?.date_debut ?? null)
       setEspaces(esp || [])
       setProgressions(prog || [])
       setModulesTotal((mods || []).length)
@@ -99,10 +103,9 @@ export default function Dashboard() {
     return { espace: e, dues }
   }).filter(x => x.dues > 0).sort((a, b) => b.dues - a.dues)[0] ?? null
 
-  // Compte à rebours ENM : cherche un événement de type "examen"
-  const prochainExamen = evenements.find(ev => ev.type === 'examen')
-  const joursRestants = prochainExamen
-    ? Math.max(0, Math.round((new Date(prochainExamen.date_debut + 'T12:00:00').getTime() - Date.now()) / 86400000))
+  // Compte à rebours ENM : prochain examen (récupéré séparément, toutes dates)
+  const joursRestants = dateExamen
+    ? Math.max(0, Math.round((new Date(dateExamen + 'T12:00:00').getTime() - Date.now()) / 86400000))
     : null
   const totalFiches = fiches.length
   const fichesVues = new Set(progressions.map(p => p.fiche_id)).size

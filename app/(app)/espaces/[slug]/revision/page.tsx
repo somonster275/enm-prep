@@ -49,7 +49,7 @@ export default function RevisionPage() {
   const [editR, setEditR] = useState('')
 
   // Pour « annuler la dernière note » (raccourci Z / bouton).
-  const [lastAction, setLastAction] = useState<{ ficheId: string; prevProg: Progression | null; idxBefore: number; requeued: boolean } | null>(null)
+  const [lastAction, setLastAction] = useState<{ ficheId: string; prevProg: Progression | null; idxBefore: number; requeued: boolean; bouton: number } | null>(null)
 
   // Toast affiché brièvement après avoir noté une carte.
   const [toast, setToast] = useState<string | null>(null)
@@ -196,7 +196,7 @@ export default function RevisionPage() {
     // Intervalle court → la carte est remise en fin de session pour être revue tout de suite.
     const requeue = minutes < SEUIL_REQUEUE
     if (requeue) setDeck(d => [...d, fiche])
-    setLastAction({ ficheId: fiche.id, prevProg, idxBefore, requeued: requeue })
+    setLastAction({ ficheId: fiche.id, prevProg, idxBefore, requeued: requeue, bouton })
     setFlipped(false)
     if (idx + 1 < deck.length + (requeue ? 1 : 0)) setIdx(i => i + 1)
     else setDone(true)
@@ -205,10 +205,11 @@ export default function RevisionPage() {
   // Annule la dernière note : restaure la progression et revient à la carte.
   const annuler = async () => {
     if (!lastAction || !userId) return
-    const { ficheId, prevProg, idxBefore, requeued } = lastAction
+    const { ficheId, prevProg, idxBefore, requeued, bouton } = lastAction
     if (prevProg) await supabase.from('progression').upsert(prevProg, { onConflict: 'utilisateur_id,fiche_id' })
     else await supabase.from('progression').delete().eq('utilisateur_id', userId).eq('fiche_id', ficheId)
     setProgressions(prev => { const c = { ...prev }; if (prevProg) c[ficheId] = prevProg; else delete c[ficheId]; return c })
+    setSessionStats(s => { const n = [...s]; if (n[bouton] > 0) n[bouton]--; return n })
     setDeck(d => {
       const newDeck = requeued ? d.slice(0, -1) : d
       // idxBefore peut dépasser le nouveau deck si la carte a été supprimée entre-temps
