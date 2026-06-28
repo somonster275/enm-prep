@@ -53,6 +53,18 @@ export default function EspacesPage() {
             </div>
           </Link>
 
+          {/* Carte « Carnet d'erreurs » — fiches mal notées à revoir */}
+          <Link href="/carnet" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div style={{ background: '#FCEEEA', borderRadius: 18, padding: 22, border: '1.5px solid #F3C6BC', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ width: 46, height: 46, borderRadius: 13, background: '#C0392B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>📕</div>
+              <div style={{ fontWeight: 700, fontSize: 17 }}>Carnet d&apos;erreurs</div>
+              <div style={{ fontSize: 13, color: '#A8705F', marginTop: 4 }}>Tes fiches difficiles (mal notées) rassemblées pour les revoir en priorité.</div>
+              <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#fff', background: '#C0392B', padding: '3px 10px', borderRadius: 999 }}>Ouvrir →</span>
+              </div>
+            </div>
+          </Link>
+
           {espaces.map(espace => (
             <Link key={espace.id} href={`/espaces/${espace.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
               <div style={{ background: '#fff', borderRadius: 18, padding: 22, border: '1px solid #F0E7D6', cursor: 'pointer' }}>

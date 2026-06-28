@@ -28,6 +28,7 @@ export default function RevisionPage() {
   const modeAlea = searchParams.get('mode') === 'tout'
   const moduleFilter = searchParams.get('module') // null = tout l'espace
   const mixte = searchParams.get('mixte') === '1' // révision transversale (entrelacement)
+  const carnet = searchParams.get('carnet') === '1' // carnet d'erreurs : fiches mal notées
 
   const [espace, setEspace] = useState<Espace | null>(null)
   const [moduleLabel, setModuleLabel] = useState<string | null>(null)
@@ -45,6 +46,9 @@ export default function RevisionPage() {
   const [editing, setEditing] = useState(false)
   const [editQ, setEditQ] = useState('')
   const [editR, setEditR] = useState('')
+
+  // Pour « annuler la dernière note » (raccourci Z / bouton).
+  const [lastAction, setLastAction] = useState<{ ficheId: string; prevProg: Progression | null; idxBefore: number; requeued: boolean } | null>(null)
 
   // Brouillon libre : l'étudiant rédige sa réponse avant de retourner la carte.
   const [brouillon, setBrouillon] = useState('')
@@ -75,6 +79,22 @@ export default function RevisionPage() {
         // Mélange + plafond à 40 cartes pour garder une session raisonnable.
         const d = dues.sort(() => Math.random() - 0.5).slice(0, 40)
         setDeck(d)
+        setLoaded(true)
+        return
+      }
+
+      // ===== CARNET D'ERREURS : fiches mal notées (niveau ≤ 1), toutes matières =====
+      if (carnet) {
+        setEspace({ id: '', nom: "Carnet d'erreurs", slug: '', description: '', couleur: '#C0392B', ordre: 0 } as Espace)
+        setModuleLabel('À revoir')
+        const { data: prog } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id).lte('niveau', 1)
+        const ids = (prog || []).map((p: Progression) => p.fiche_id)
+        if (ids.length === 0) { setLoaded(true); return }
+        const { data: fich } = await supabase.from('fiches').select('*').in('id', ids).is('deleted_at', null)
+        const progMap: Record<string, Progression> = {}
+        ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
+        setProgressions(progMap)
+        setDeck((fich || []).sort(() => Math.random() - 0.5) as Fiche[])
         setLoaded(true)
         return
       }
@@ -116,7 +136,7 @@ export default function RevisionPage() {
       setLoaded(true)
     }
     load()
-  }, [slug, modeAlea, moduleFilter, mixte])
+  }, [slug, modeAlea, moduleFilter, mixte, carnet])
 
   // En dessous de ce seuil, la carte revient dans la session en cours (1 min, 15 min…).
   const SEUIL_REQUEUE = 30 // minutes
@@ -124,6 +144,9 @@ export default function RevisionPage() {
   const rateCard = async (bouton: number) => {
     if (!userId || !deck[idx]) return
     const fiche = deck[idx]
+    // Mémorise l'état d'avant pour pouvoir annuler.
+    const prevProg = progressions[fiche.id] ?? null
+    const idxBefore = idx
     const palierActuel = progressions[fiche.id]?.palier ?? 0
     const minutes = intervalleMinutes(bouton, palierActuel)
     const nouveauPalier = palierApres(bouton, palierActuel)
@@ -143,10 +166,40 @@ export default function RevisionPage() {
     // Intervalle court → la carte est remise en fin de session pour être revue tout de suite.
     const requeue = minutes < SEUIL_REQUEUE
     if (requeue) setDeck(d => [...d, fiche])
+    setLastAction({ ficheId: fiche.id, prevProg, idxBefore, requeued: requeue })
     setFlipped(false)
     if (idx + 1 < deck.length + (requeue ? 1 : 0)) setIdx(i => i + 1)
     else setDone(true)
   }
+
+  // Annule la dernière note : restaure la progression et revient à la carte.
+  const annuler = async () => {
+    if (!lastAction || !userId) return
+    const { ficheId, prevProg, idxBefore, requeued } = lastAction
+    if (prevProg) await supabase.from('progression').upsert(prevProg, { onConflict: 'utilisateur_id,fiche_id' })
+    else await supabase.from('progression').delete().eq('utilisateur_id', userId).eq('fiche_id', ficheId)
+    setProgressions(prev => { const c = { ...prev }; if (prevProg) c[ficheId] = prevProg; else delete c[ficheId]; return c })
+    if (requeued) setDeck(d => d.slice(0, -1))
+    setDone(false)
+    setIdx(idxBefore)
+    setFlipped(true)
+    setLastAction(null)
+  }
+
+  // Raccourcis clavier : Espace/Entrée = retourner, 1-4 = noter, Z = annuler.
+  useEffect(() => {
+    if (editing) return
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null
+      if (t && (t.tagName === 'TEXTAREA' || t.tagName === 'INPUT' || t.isContentEditable)) return
+      if (done) return
+      if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); setFlipped(f => !f); return }
+      if ((e.key === 'z' || e.key === 'Z' || e.code === 'Backspace') && lastAction) { e.preventDefault(); annuler(); return }
+      if (flipped && ['1', '2', '3', '4'].includes(e.key)) { e.preventDefault(); rateCard(parseInt(e.key, 10) - 1) }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  })
 
   const ouvrirEdition = () => {
     const c = deck[idx]
@@ -172,11 +225,13 @@ export default function RevisionPage() {
     }
   }, [done, userId])
 
-  const retourHref = mixte
-    ? '/dashboard'
-    : moduleFilter
-      ? `/espaces/${slug}/modules/${moduleFilter}`
-      : `/espaces/${slug}`
+  const retourHref = carnet
+    ? '/carnet'
+    : mixte
+      ? '/dashboard'
+      : moduleFilter
+        ? `/espaces/${slug}/modules/${moduleFilter}`
+        : `/espaces/${slug}`
 
   const font = "'Hanken Grotesk', sans-serif"
 
@@ -189,7 +244,7 @@ export default function RevisionPage() {
       <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
       <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 22, margin: '0 0 8px' }}>Aucune fiche à réviser</h2>
       <p style={{ fontSize: 14, color: '#8A7E68', margin: '0 0 2rem' }}>
-        {mixte ? 'Rien à réviser pour le moment — reviens un peu plus tard !' : moduleFilter ? 'Ce module ne contient pas encore de fiches.' : 'Cet espace ne contient pas encore de fiches.'}
+        {carnet ? 'Ton carnet est vide — tu n\'as rien raté récemment, bravo !' : mixte ? 'Rien à réviser pour le moment — reviens un peu plus tard !' : moduleFilter ? 'Ce module ne contient pas encore de fiches.' : 'Cet espace ne contient pas encore de fiches.'}
       </p>
       <Link href={retourHref} style={{
         padding: '12px 24px', borderRadius: 12, background: '#DC4A2B', color: '#fff',
@@ -355,6 +410,22 @@ export default function RevisionPage() {
         }}>
           Voir la réponse
         </button>
+      )}
+
+      {/* Raccourcis clavier + annulation */}
+      {!editing && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, gap: 10, flexWrap: 'wrap' }}>
+          {!isMobile && (
+            <span style={{ fontSize: 11.5, color: '#B6A98C' }}>
+              Raccourcis : <b style={{ color: '#8A7E68' }}>Espace</b> retourner · <b style={{ color: '#8A7E68' }}>1-4</b> noter · <b style={{ color: '#8A7E68' }}>Z</b> annuler
+            </span>
+          )}
+          {lastAction && (
+            <button onClick={annuler} style={{ marginLeft: 'auto', fontSize: 12.5, fontWeight: 700, color: '#8A7E68', background: '#FDF6EA', border: '1px solid #EADFC9', borderRadius: 9, padding: '7px 14px', cursor: 'pointer', fontFamily: font }}>
+              ↶ Annuler la dernière note
+            </button>
+          )}
+        </div>
       )}
 
       {/* ===== Widget brouillon (latéral, optionnel) — DESKTOP ===== */}
