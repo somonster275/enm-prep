@@ -46,6 +46,7 @@ export default function RevisionPage() {
 
   // Brouillon libre : l'étudiant rédige sa réponse avant de retourner la carte.
   const [brouillon, setBrouillon] = useState('')
+  const [brouillonOuvert, setBrouillonOuvert] = useState(false)
   // Repart à vide à chaque changement de carte.
   useEffect(() => { setBrouillon('') }, [idx])
 
@@ -277,27 +278,6 @@ export default function RevisionPage() {
         </div>
       )}
 
-      {/* Brouillon libre — pour rédiger sa réponse puis la comparer */}
-      {!editing && (
-        <div style={{ marginBottom: '1rem' }}>
-          <div style={{ fontSize: 11, color: '#9A8D72', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: 6 }}>
-            ✏️ Brouillon
-            {flipped && <span style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 400, color: '#B6A98C' }}>— compare avec la réponse ci-dessus</span>}
-          </div>
-          <textarea
-            value={brouillon}
-            onChange={e => setBrouillon(e.target.value)}
-            placeholder="Écris ta réponse ici avant de retourner la carte, puis compare…"
-            rows={3}
-            style={{
-              width: '100%', boxSizing: 'border-box', border: '1px dashed #E3D6BE', borderRadius: 12,
-              background: '#FFFDF8', padding: '10px 12px', fontSize: 12.5, lineHeight: 1.55, color: '#5C5448',
-              fontFamily: font, outline: 'none', resize: 'vertical',
-            }}
-          />
-        </div>
-      )}
-
       {editing ? null : flipped ? (
         <div>
           <div style={{ fontSize: 13, color: '#8A7E68', marginBottom: 12, textAlign: 'center' }}>Comment évaluez-vous votre réponse ?</div>
@@ -327,6 +307,46 @@ export default function RevisionPage() {
         }}>
           Voir la réponse
         </button>
+      )}
+
+      {/* ===== Widget brouillon (latéral, optionnel) ===== */}
+      {!editing && !brouillonOuvert && (
+        <button onClick={() => setBrouillonOuvert(true)} title="Ouvrir le brouillon"
+          style={{
+            position: 'fixed', right: 0, top: '42%', transform: 'translateY(-50%)', zIndex: 120,
+            background: '#fff', border: '1px solid #F0E7D6', borderRight: 'none', borderRadius: '12px 0 0 12px',
+            padding: '12px 9px', cursor: 'pointer', boxShadow: '0 8px 24px -12px rgba(60,40,20,.3)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
+            fontFamily: font, color: '#8A7E68', fontSize: 12, fontWeight: 700,
+          }}>
+          <span style={{ fontSize: 16 }}>✏️</span>
+          <span style={{ writingMode: 'vertical-rl', letterSpacing: '.08em' }}>Brouillon</span>
+        </button>
+      )}
+
+      {!editing && brouillonOuvert && (
+        <div style={{
+          position: 'fixed', right: 16, top: '50%', transform: 'translateY(-50%)', zIndex: 120,
+          width: 'min(320px, 92vw)', maxHeight: '78vh', background: '#fff',
+          border: '1px solid #F0E7D6', borderRadius: 16, boxShadow: '0 20px 50px -20px rgba(60,40,20,.4)',
+          display: 'flex', flexDirection: 'column', padding: 14, fontFamily: font,
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#8A7E68', textTransform: 'uppercase', letterSpacing: '.06em' }}>✏️ Brouillon</span>
+            <button onClick={() => setBrouillonOuvert(false)} title="Fermer" style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#C0B7A4', fontSize: 16, lineHeight: 1, padding: 0 }}>✕</button>
+          </div>
+          <textarea
+            value={brouillon}
+            onChange={e => setBrouillon(e.target.value)}
+            placeholder="Écris ta réponse ici, puis retourne la carte pour comparer…"
+            style={{
+              flex: 1, minHeight: 200, width: '100%', boxSizing: 'border-box', border: '1px dashed #E3D6BE',
+              borderRadius: 12, background: '#FFFDF8', padding: '10px 12px', fontSize: 13, lineHeight: 1.55,
+              color: '#5C5448', fontFamily: font, outline: 'none', resize: 'none',
+            }}
+          />
+          <div style={{ fontSize: 10.5, color: '#B6A98C', marginTop: 6 }}>Non enregistré — se vide à la carte suivante.</div>
+        </div>
       )}
     </div>
   )
