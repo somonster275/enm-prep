@@ -8,6 +8,7 @@ import Link from 'next/link'
 import RichContent from '@/components/RichContent'
 import RichEditor from '@/components/RichEditor'
 import RemarqueButton from '@/components/RemarqueButton'
+import AstucesFiche from '@/components/AstucesFiche'
 
 export default function ModulePage() {
   const { slug, moduleId } = useParams() as { slug: string; moduleId: string }
@@ -433,6 +434,12 @@ export default function ModulePage() {
                         </div>
                       )}
                     </div>
+                    <AstucesFiche
+                      ficheId={fiche.id}
+                      uid={profil?.id || ''}
+                      auteur={[profil?.prenom, profil?.nom].filter(Boolean).join(' ') || 'Étudiant'}
+                      isAdmin={profil?.role === 'admin'}
+                    />
                   </div>
                 )}
               </div>
