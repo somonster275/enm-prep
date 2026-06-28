@@ -6,20 +6,19 @@ export const dynamic = 'force-dynamic'
 
 // Droit d'accès / portabilité (RGPD art. 15 & 20) : l'utilisateur télécharge
 // l'ensemble de ses données personnelles au format JSON.
-const exportMap = new Map<string, number>() // userId → timestamp dernier export
-
 export async function GET() {
   const user = await utilisateurCourant()
   if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 
-  // Rate-limit : 1 export par 24 h.
-  const lastExport = exportMap.get(user.id) ?? 0
-  if (Date.now() - lastExport < 86_400_000) {
+  const admin = getSupabaseAdmin()
+
+  // Rate-limit persistant : 1 export par 24 h.
+  const { data: ok } = await admin.rpc('consommer_quota', {
+    p_user: user.id, p_action: 'export', p_max: 1, p_fenetre: '24 hours',
+  })
+  if (ok === false) {
     return NextResponse.json({ error: 'Export déjà effectué dans les dernières 24 h. Réessaie demain.' }, { status: 429 })
   }
-  exportMap.set(user.id, Date.now())
-
-  const admin = getSupabaseAdmin()
 
   // Best-effort : on ignore les tables éventuellement absentes (migrations non jouées).
   const tryTable = async (table: string, col: string, val: string) => {

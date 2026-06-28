@@ -31,9 +31,6 @@ N'utilise ce bloc que pour des tâches courtes et concrètes. N'y mets pas de ph
 
 type Msg = { role: 'user' | 'assistant'; content: string }
 
-// Fenêtre glissante simple : max 20 messages par tranche de 60 s par user.
-const ratemap = new Map<string, { count: number; reset: number }>()
-
 export async function POST(request: NextRequest) {
   const { messages } = await request.json().catch(() => ({}))
   if (!Array.isArray(messages) || messages.length === 0) {
@@ -43,15 +40,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Clé IA manquante' }, { status: 500 })
   }
 
-  // Rate-limiting basique côté Edge mémoire (repart à 0 si le processus redémarre).
+  // Rate-limiting persistant (partagé entre instances) : max 20 messages / minute.
   const user0 = await utilisateurCourant()
   if (user0) {
-    const now = Date.now()
-    const entry = ratemap.get(user0.id) ?? { count: 0, reset: now + 60_000 }
-    if (now > entry.reset) { entry.count = 0; entry.reset = now + 60_000 }
-    entry.count++
-    ratemap.set(user0.id, entry)
-    if (entry.count > 20) {
+    const { data: ok } = await getSupabaseAdmin().rpc('consommer_quota', {
+      p_user: user0.id, p_action: 'coach', p_max: 20, p_fenetre: '1 minute',
+    })
+    if (ok === false) {
       return NextResponse.json({ error: 'Trop de messages — attends une minute avant de continuer.' }, { status: 429 })
     }
   }
