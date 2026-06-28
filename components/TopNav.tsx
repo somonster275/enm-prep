@@ -78,6 +78,7 @@ export default function TopNav() {
           { href: '/admin/editeur', label: 'Éditeur de fiches' },
           ...(profil?.role === 'admin' ? [
             { href: '/admin/defi', label: 'Défi de la semaine' },
+            { href: '/admin/qcm', label: 'QCM' },
             { href: '/admin/remarques', label: 'Remarques' },
             { href: '/admin/import', label: 'Importer' },
             { href: '/admin/corbeille', label: 'Corbeille' },
