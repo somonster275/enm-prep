@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import type { Profil } from '@/types'
 import { chargerActivite, calculerStreak } from '@/lib/streaks'
 import { LogoBadge } from '@/components/Logo'
+import NotifCloche from '@/components/NotifCloche'
 import { useIsMobile } from '@/lib/useIsMobile'
 
 export default function TopNav() {
@@ -184,6 +185,9 @@ export default function TopNav() {
               color: '#D94A30', background: '#FCE9E3', padding: '8px 14px', borderRadius: 999,
             }}>🔥 {streak} jour{streak > 1 ? 's' : ''}</span>
           )}
+
+          {/* Cloche de notifications */}
+          <NotifCloche />
 
           {/* Avatar + menu compte */}
           <button onClick={() => setMenuOpen(o => !o)} style={{

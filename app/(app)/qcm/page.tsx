@@ -4,28 +4,52 @@ import { supabase } from '@/lib/supabase'
 import { enregistrerActivite } from '@/lib/streaks'
 
 type Qcm = { id: string; titre: string; matiere: string | null }
-type Question = { id: string; enonce: string; options: { t: string; c: boolean }[]; explication: string | null; ordre: number }
+type Question = { id: string; qcm_id: string; enonce: string; options: { t: string; c: boolean }[]; explication: string | null; ordre: number }
 
 export default function QcmPage() {
   const [uid, setUid] = useState('')
   const [qcms, setQcms] = useState<Qcm[]>([])
   const [loading, setLoading] = useState(true)
   const [filtre, setFiltre] = useState('')
+  const [nbErreurs, setNbErreurs] = useState(0)
 
   const [actif, setActif] = useState<Qcm | null>(null)
+  const [modeErreurs, setModeErreurs] = useState(false)
   const [questions, setQuestions] = useState<Question[]>([])
   const [reponses, setReponses] = useState<Record<string, Set<number>>>({})
   const [corrige, setCorrige] = useState(false)
 
+  const chargerErreurs = async (userId: string) => {
+    const { count } = await supabase.from('qcm_reponses')
+      .select('*', { count: 'exact', head: true }).eq('user_id', userId).eq('juste', false)
+    setNbErreurs(count || 0)
+  }
+
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUid(data.user?.id || ''))
+    supabase.auth.getUser().then(({ data }) => {
+      const id = data.user?.id || ''
+      setUid(id)
+      if (id) chargerErreurs(id)
+    })
     supabase.from('qcm').select('id, titre, matiere').order('created_at', { ascending: false })
       .then(({ data }) => { setQcms((data || []) as Qcm[]); setLoading(false) })
   }, [])
 
   const jouer = async (q: Qcm) => {
     const { data } = await supabase.from('qcm_questions').select('*').eq('qcm_id', q.id).order('ordre')
-    setQuestions((data || []) as Question[]); setReponses({}); setCorrige(false); setActif(q)
+    setQuestions((data || []) as Question[]); setReponses({}); setCorrige(false); setModeErreurs(false); setActif(q)
+    window.scrollTo({ top: 0 })
+  }
+
+  // Mode « réviser mes erreurs » : rejoue les questions déjà ratées (tous QCM confondus).
+  const jouerErreurs = async () => {
+    if (!uid) return
+    const { data: rep } = await supabase.from('qcm_reponses').select('question_id').eq('user_id', uid).eq('juste', false)
+    const ids = (rep || []).map((r: { question_id: string }) => r.question_id)
+    if (ids.length === 0) return
+    const { data } = await supabase.from('qcm_questions').select('*').in('id', ids)
+    const melange = ((data || []) as Question[]).sort(() => Math.random() - 0.5)
+    setQuestions(melange); setReponses({}); setCorrige(false); setActif(null); setModeErreurs(true)
     window.scrollTo({ top: 0 })
   }
 
@@ -51,23 +75,31 @@ export default function QcmPage() {
   const valider = async () => {
     setCorrige(true)
     window.scrollTo({ top: 0 })
-    if (uid && actif) {
+    if (!uid) return
+    // Enregistre le résultat par question (pour les stats et « réviser mes erreurs »).
+    const rows = questions.map(q => ({ user_id: uid, question_id: q.id, qcm_id: q.qcm_id, juste: estBonne(q) }))
+    if (rows.length) await supabase.from('qcm_reponses').upsert(rows, { onConflict: 'user_id,question_id' })
+    if (actif) {
       await supabase.from('qcm_resultats').insert({ user_id: uid, qcm_id: actif.id, score, total: questions.length })
-      enregistrerActivite(uid) // compte dans l'activité / la série
     }
+    enregistrerActivite(uid) // compte dans l'activité / la série
+    chargerErreurs(uid)
   }
 
   const font = "'Hanken Grotesk', sans-serif"
   const matieres = [...new Set(qcms.map(q => q.matiere).filter(Boolean))] as string[]
   const visibles = filtre ? qcms.filter(q => q.matiere === filtre) : qcms
+  const retour = () => { setActif(null); setModeErreurs(false) }
+  const recommencer = () => { setReponses({}); setCorrige(false); window.scrollTo({ top: 0 }) }
 
   // ---------- Vue : jeu / résultat ----------
-  if (actif) {
+  if (actif || modeErreurs) {
     return (
       <div style={{ paddingTop: 34, maxWidth: 720, margin: '0 auto', fontFamily: font, color: '#2A2018' }}>
-        <button onClick={() => setActif(null)} style={{ background: 'none', border: 'none', color: '#9A8D72', fontSize: 13, cursor: 'pointer', padding: 0, marginBottom: 12 }}>← Tous les QCM</button>
-        <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 24, margin: '0 0 4px' }}>{actif.titre}</h1>
-        {actif.matiere && <div style={{ fontSize: 13, color: '#8A7E68', marginBottom: 16 }}>{actif.matiere}</div>}
+        <button onClick={retour} style={{ background: 'none', border: 'none', color: '#9A8D72', fontSize: 13, cursor: 'pointer', padding: 0, marginBottom: 12 }}>← Tous les QCM</button>
+        <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 24, margin: '0 0 4px' }}>{actif ? actif.titre : '🎯 Mes erreurs'}</h1>
+        {actif?.matiere && <div style={{ fontSize: 13, color: '#8A7E68', marginBottom: 16 }}>{actif.matiere}</div>}
+        {modeErreurs && <div style={{ fontSize: 13, color: '#8A7E68', marginBottom: 16 }}>Rejoue les questions que tu as déjà ratées. Une bonne réponse les retire de ta liste.</div>}
 
         {corrige && (
           <div style={{ background: score === questions.length ? '#ECF7F0' : '#FFF8EE', border: `1px solid ${score === questions.length ? '#BFE6CF' : '#F2D9A0'}`, borderRadius: 16, padding: 18, marginBottom: 18, textAlign: 'center' }}>
@@ -118,8 +150,8 @@ export default function QcmPage() {
           </button>
         ) : (
           <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
-            <button onClick={() => jouer(actif)} style={{ flex: 1, height: 48, border: '1.5px solid #EADFC9', borderRadius: 12, background: '#fff', color: '#6E6456', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>Recommencer</button>
-            <button onClick={() => setActif(null)} style={{ flex: 1, height: 48, border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>Autres QCM</button>
+            <button onClick={recommencer} style={{ flex: 1, height: 48, border: '1.5px solid #EADFC9', borderRadius: 12, background: '#fff', color: '#6E6456', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>Recommencer</button>
+            <button onClick={retour} style={{ flex: 1, height: 48, border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>Autres QCM</button>
           </div>
         )}
       </div>
@@ -131,6 +163,17 @@ export default function QcmPage() {
     <div style={{ paddingTop: 34, maxWidth: 820, margin: '0 auto', fontFamily: font, color: '#2A2018' }}>
       <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 28, margin: 0 }}>QCM</h1>
       <p style={{ fontSize: 15, color: '#8A7E68', margin: '8px 0 20px' }}>Entraîne-toi avec des QCM auto-corrigés. Chaque QCM terminé compte dans ton activité.</p>
+
+      {nbErreurs > 0 && (
+        <button onClick={jouerErreurs} style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 14, background: '#FCE9E3', border: '1px solid #F3C6BC', borderRadius: 14, padding: '14px 18px', marginBottom: 18, cursor: 'pointer', fontFamily: font }}>
+          <span style={{ fontSize: 26 }}>🎯</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#C0392B' }}>Réviser mes erreurs</div>
+            <div style={{ fontSize: 12.5, color: '#8A7E68' }}>{nbErreurs} question{nbErreurs > 1 ? 's' : ''} ratée{nbErreurs > 1 ? 's' : ''} à revoir, tous QCM confondus.</div>
+          </div>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#C0392B' }}>Commencer →</span>
+        </button>
+      )}
 
       {matieres.length > 0 && (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>

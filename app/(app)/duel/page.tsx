@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { construireDeck } from '@/lib/match'
@@ -93,7 +94,10 @@ export default function DuelAccueil() {
 
   return (
     <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: FONT, color: '#2A2018' }}>
-      <h1 style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 28, margin: 0 }}>Duel</h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <h1 style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 28, margin: 0 }}>Duel</h1>
+        <Link href="/duel/historique" style={{ fontSize: 13.5, fontWeight: 600, color: '#9A8D72', textDecoration: 'none' }}>Mes duels →</Link>
+      </div>
       <p style={{ fontSize: 15, color: '#8A7E68', margin: '8px 0 24px', maxWidth: 560 }}>
         Affronte d&apos;autres candidats en temps réel sur les mêmes questions — QCM et fiches mélangés, chrono et classement live. À deux ou en groupe.
       </p>

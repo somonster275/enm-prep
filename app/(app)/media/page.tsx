@@ -37,9 +37,11 @@ function youtubeId(url: string): string | null {
 const estAudio = (url: string) => /\.(mp3|m4a|wav|ogg|aac)(\?|$)/i.test(url)
 
 export default function MediaPage() {
+  const [uid, setUid] = useState('')
   const [isAdmin, setIsAdmin] = useState(false)
   const [espaces, setEspaces] = useState<Espace[]>([])
   const [items, setItems] = useState<Media[]>([])
+  const [vues, setVues] = useState<Set<string>>(new Set())
   const [tableManquante, setTableManquante] = useState(false)
   const [loading, setLoading] = useState(true)
   const [filtre, setFiltre] = useState('')
@@ -75,14 +77,26 @@ export default function MediaPage() {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setLoading(false); return }
+      setUid(user.id)
       const { data: prof } = await supabase.from('profils').select('role').eq('id', user.id).single()
       setIsAdmin(prof?.role === 'admin' || prof?.role === 'editeur')
-      const { data: esp } = await supabase.from('espaces').select('*').order('ordre')
+      const [{ data: esp }, { data: vu }] = await Promise.all([
+        supabase.from('espaces').select('*').order('ordre'),
+        supabase.from('media_vues').select('media_id').eq('user_id', user.id),
+      ])
       setEspaces(esp || [])
+      setVues(new Set((vu || []).map((v: { media_id: string }) => v.media_id)))
       await charger()
     }
     init()
   }, [])
+
+  const toggleVu = async (mediaId: string) => {
+    const dejaVu = vues.has(mediaId)
+    setVues(s => { const n = new Set(s); dejaVu ? n.delete(mediaId) : n.add(mediaId); return n })
+    if (dejaVu) await supabase.from('media_vues').delete().eq('user_id', uid).eq('media_id', mediaId)
+    else await supabase.from('media_vues').upsert({ user_id: uid, media_id: mediaId }, { onConflict: 'user_id,media_id' })
+  }
 
   const ajouter = async () => {
     if (!titre.trim() || !espaceId || !url.trim()) return
@@ -176,8 +190,9 @@ export default function MediaPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 18 }}>
           {visibles.map(it => {
             const yid = it.url ? youtubeId(it.url) : null
+            const vu = vues.has(it.id)
             return (
-              <div key={it.id} style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div key={it.id} style={{ background: '#fff', border: `1px solid ${vu ? '#BFE6CF' : '#F0E7D6'}`, borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 {/* Lecteur */}
                 {yid ? (
                   <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', background: '#000' }}>
@@ -208,6 +223,10 @@ export default function MediaPage() {
                   {!yid && it.url && !estAudio(it.url) && (
                     <a href={it.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: ACCENT, fontWeight: 600, textDecoration: 'none', marginTop: 2 }}>Ouvrir le lien →</a>
                   )}
+                  <button onClick={() => toggleVu(it.id)} style={{
+                    alignSelf: 'flex-start', marginTop: 6, padding: '5px 12px', borderRadius: 9, cursor: 'pointer', fontSize: 12.5, fontWeight: 700, fontFamily: FONT,
+                    border: `1.5px solid ${vu ? '#2DAE83' : '#EADFC9'}`, background: vu ? '#ECF7F0' : '#fff', color: vu ? '#0F6E56' : '#9A8D72',
+                  }}>{vu ? '✓ Vu' : 'Marquer comme vu'}</button>
                 </div>
               </div>
             )
