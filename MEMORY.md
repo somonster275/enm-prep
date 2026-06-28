@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 13).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 14).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,11 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-06-27 (suite 14) — Brouillon de révision + mode « Révision mixte »
+Tout dans `app/(app)/espaces/[slug]/revision/page.tsx`.
+- **Brouillon libre** : pendant la révision, l'étudiant rédige sa réponse avant de retourner la carte puis compare. Éphémère (state, se vide à chaque carte via `useEffect([idx])`, non enregistré). **Responsive** via `useIsMobile()` : desktop = **widget latéral** flottant (onglet « ✏️ Brouillon » sur le bord droit, `position:fixed`, ouvre un panneau) ; mobile = **bloc dépliable sous la carte** (bouton → textarea en dessous, garde la carte visible pour comparer).
+- **Révision mixte (entrelacement)** : inspiré de la vidéo ScienceÉtonnante « Mieux apprendre ». Paramètre **`?mixte=1`** sur la page de révision (URL `/espaces/_/revision?mixte=1`, slug ignoré). Construit un deck des cartes **dues toutes matières confondues**, mélangées, plafond **40**. Réutilise toute la logique existante (notation, répétition espacée, brouillon). Espace synthétique (couleur corail, label « Toutes matières »), `retourHref` → `/dashboard`. **Entrée** : lien « 🔀 Révision mixte » sous « Réviser maintenant » dans le bloc « Révisions du jour » du dashboard.
 
 ### 2026-06-27 (suite 13) — Bascule de l'email admin
 - Adresse admin passée de `titipaulin@gmail.com` à **`codex.prepa.dev@gmail.com`** (adresse dédiée au projet).
