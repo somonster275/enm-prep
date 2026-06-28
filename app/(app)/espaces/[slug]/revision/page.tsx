@@ -9,6 +9,7 @@ import RichContent from '@/components/RichContent'
 import RichEditor from '@/components/RichEditor'
 import RemarqueButton from '@/components/RemarqueButton'
 import { enregistrerActivite, chargerActivite, calculerStreak } from '@/lib/streaks'
+import { useIsMobile } from '@/lib/useIsMobile'
 
 // Récupère récursivement tous les IDs de modules enfants d'un module
 async function getAllModuleIds(rootId: string): Promise<string[]> {
@@ -47,6 +48,7 @@ export default function RevisionPage() {
   // Brouillon libre : l'étudiant rédige sa réponse avant de retourner la carte.
   const [brouillon, setBrouillon] = useState('')
   const [brouillonOuvert, setBrouillonOuvert] = useState(false)
+  const isMobile = useIsMobile()
   // Repart à vide à chaque changement de carte.
   useEffect(() => { setBrouillon('') }, [idx])
 
@@ -278,6 +280,31 @@ export default function RevisionPage() {
         </div>
       )}
 
+      {/* Brouillon — version MOBILE : bloc dépliable sous la carte */}
+      {!editing && isMobile && (
+        <div style={{ marginBottom: '1rem' }}>
+          {!brouillonOuvert ? (
+            <button onClick={() => setBrouillonOuvert(true)} style={{
+              width: '100%', padding: '11px', borderRadius: 12, border: '1px dashed #E3D6BE',
+              background: '#FFFDF8', color: '#8A7E68', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: font,
+            }}>✏️ Ouvrir un brouillon</button>
+          ) : (
+            <div style={{ border: '1px solid #F0E7D6', borderRadius: 12, background: '#fff', padding: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#8A7E68', textTransform: 'uppercase', letterSpacing: '.06em' }}>
+                  ✏️ Brouillon {flipped && <span style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 400, color: '#B6A98C' }}>— compare avec la réponse</span>}
+                </span>
+                <button onClick={() => setBrouillonOuvert(false)} title="Fermer" style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#C0B7A4', fontSize: 16, lineHeight: 1, padding: 0 }}>✕</button>
+              </div>
+              <textarea value={brouillon} onChange={e => setBrouillon(e.target.value)} rows={4}
+                placeholder="Écris ta réponse ici, puis retourne la carte pour comparer…"
+                style={{ width: '100%', boxSizing: 'border-box', border: '1px dashed #E3D6BE', borderRadius: 10, background: '#FFFDF8', padding: '10px 12px', fontSize: 12.5, lineHeight: 1.55, color: '#5C5448', fontFamily: font, outline: 'none', resize: 'vertical' }} />
+              <div style={{ fontSize: 10.5, color: '#B6A98C', marginTop: 6 }}>Non enregistré — se vide à la carte suivante.</div>
+            </div>
+          )}
+        </div>
+      )}
+
       {editing ? null : flipped ? (
         <div>
           <div style={{ fontSize: 13, color: '#8A7E68', marginBottom: 12, textAlign: 'center' }}>Comment évaluez-vous votre réponse ?</div>
@@ -309,8 +336,8 @@ export default function RevisionPage() {
         </button>
       )}
 
-      {/* ===== Widget brouillon (latéral, optionnel) ===== */}
-      {!editing && !brouillonOuvert && (
+      {/* ===== Widget brouillon (latéral, optionnel) — DESKTOP ===== */}
+      {!editing && !isMobile && !brouillonOuvert && (
         <button onClick={() => setBrouillonOuvert(true)} title="Ouvrir le brouillon"
           style={{
             position: 'fixed', right: 0, top: '42%', transform: 'translateY(-50%)', zIndex: 120,
@@ -324,7 +351,7 @@ export default function RevisionPage() {
         </button>
       )}
 
-      {!editing && brouillonOuvert && (
+      {!editing && !isMobile && brouillonOuvert && (
         <div style={{
           position: 'fixed', right: 16, top: '50%', transform: 'translateY(-50%)', zIndex: 120,
           width: 'min(320px, 92vw)', maxHeight: '78vh', background: '#fff',
