@@ -20,19 +20,32 @@ export default function NotifCloche() {
   }
 
   useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUid(data.user?.id || ''))
+  }, [])
+
+  // Abonnement Realtime « économe » : on ne tient une connexion ouverte que
+  // lorsque l'onglet est visible. Dès qu'il passe en arrière-plan, on relâche
+  // la connexion (pour ne pas saturer le quota Realtime gratuit), et on la
+  // rouvre au retour en rechargeant les notifications manquées.
+  useEffect(() => {
+    if (!uid) return
     let canal: ReturnType<typeof supabase.channel> | null = null
-    supabase.auth.getUser().then(({ data }) => {
-      const id = data.user?.id || ''
-      if (!id) return
-      setUid(id)
-      charger(id)
-      canal = supabase.channel(`notifs-${id}`)
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${id}` },
+
+    const sabonner = () => {
+      if (canal) return
+      charger(uid) // rattrape ce qui est arrivé pendant l'absence
+      canal = supabase.channel(`notifs-${uid}`)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${uid}` },
           payload => setItems(prev => [payload.new as Notif, ...prev].slice(0, 20)))
         .subscribe()
-    })
-    return () => { if (canal) supabase.removeChannel(canal) }
-  }, [])
+    }
+    const desabonner = () => { if (canal) { supabase.removeChannel(canal); canal = null } }
+    const onVis = () => { document.visibilityState === 'visible' ? sabonner() : desabonner() }
+
+    if (document.visibilityState === 'visible') sabonner()
+    document.addEventListener('visibilitychange', onVis)
+    return () => { document.removeEventListener('visibilitychange', onVis); desabonner() }
+  }, [uid])
 
   // Ferme au clic extérieur.
   useEffect(() => {
