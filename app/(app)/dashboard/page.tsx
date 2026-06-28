@@ -15,7 +15,7 @@ import OnboardingModal from '@/components/OnboardingModal'
 const OUTILS = [
   { href: '/espaces', icone: '🗂️', couleur: '#DC4A2B', titre: 'Fiches', desc: 'Réviser vos fiches par matière, en répétition espacée.' },
   { href: '/mind-maps', icone: '🧠', couleur: '#2DAE83', titre: 'Mind maps', desc: 'Cartes mentales et schémas par sujet.' },
-  { href: '/media', icone: '🎧', couleur: '#3B82D9', titre: 'Audio & Vidéo', desc: 'Écouter et regarder les ressources importées.' },
+  { href: '/media', icone: '🎬', couleur: '#3B82D9', titre: 'Audio & Vidéo', desc: 'Vidéos et podcasts à regarder par matière.' },
   { href: '/qcm', icone: '✅', couleur: '#E8A11E', titre: 'QCM', desc: "S'entraîner avec des questions à choix multiples." },
 ]
 
