@@ -67,6 +67,7 @@ export default function TopNav() {
   ]
   // Outils collaboratifs (regroupés sous « Communauté »).
   const liensCommunaute: { href: string; label: string }[] = [
+    { href: '/duel', label: 'Duel' },
     { href: '/entraide', label: 'Entraide' },
     { href: '/forum', label: 'Forum' },
     { href: '/annales', label: 'Annales' },
