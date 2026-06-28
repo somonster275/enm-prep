@@ -44,6 +44,11 @@ export default function RevisionPage() {
   const [editQ, setEditQ] = useState('')
   const [editR, setEditR] = useState('')
 
+  // Brouillon libre : l'étudiant rédige sa réponse avant de retourner la carte.
+  const [brouillon, setBrouillon] = useState('')
+  // Repart à vide à chaque changement de carte.
+  useEffect(() => { setBrouillon('') }, [idx])
+
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
@@ -269,6 +274,27 @@ export default function RevisionPage() {
               <RichContent html={card.reponse} style={{ fontSize: 15, lineHeight: 1.8, color: '#2A2018' }} />
             </>
           )}
+        </div>
+      )}
+
+      {/* Brouillon libre — pour rédiger sa réponse puis la comparer */}
+      {!editing && (
+        <div style={{ marginBottom: '1rem' }}>
+          <div style={{ fontSize: 11, color: '#9A8D72', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: 6 }}>
+            ✏️ Brouillon
+            {flipped && <span style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 400, color: '#B6A98C' }}>— compare avec la réponse ci-dessus</span>}
+          </div>
+          <textarea
+            value={brouillon}
+            onChange={e => setBrouillon(e.target.value)}
+            placeholder="Écris ta réponse ici avant de retourner la carte, puis compare…"
+            rows={3}
+            style={{
+              width: '100%', boxSizing: 'border-box', border: '1px dashed #E3D6BE', borderRadius: 12,
+              background: '#FFFDF8', padding: '10px 12px', fontSize: 12.5, lineHeight: 1.55, color: '#5C5448',
+              fontFamily: font, outline: 'none', resize: 'vertical',
+            }}
+          />
         </div>
       )}
 
