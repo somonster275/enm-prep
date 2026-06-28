@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 14).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 15).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,17 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-06-27 (suite 15) — Onboarding « Méthode » + auto-hébergement des polices
+**Fenêtre d'accueil + onglet Méthode**
+- Composant partagé **`components/MethodeContenu.tsx`** : outils de codex + « ✅ ce qui marche » (répétition espacée, récupération active, entrelacement, reformulation/Feynman, mind maps) + « ❌ ce qui ne marche pas » (relire/surligner, recopier, bûcher en bloc, bachotage, mythe des styles d'apprentissage).
+- **`components/OnboardingModal.tsx`** : fenêtre affichée **une seule fois** à la 1re arrivée sur le dashboard, mémorisée par user en localStorage (`codex-onboarding-vu-<uid>`). Montée dans `app/(app)/dashboard/page.tsx`.
+- Page publique **`/methode`** (même contenu) + lien **« Méthode »** ajouté à `SiteFooter` (entre Contact et Données) + `/methode` ajouté à `estPublic` du proxy.
+
+**Auto-hébergement des polices (RGPD — plus d'appel à Google)**
+- Les 5 polices (Hanken Grotesk, Bricolage Grotesque, Bagel Fat One, Baloo 2, Space Grotesk) sont **servies en local** : 14 fichiers woff2 (latin + latin-ext) dans **`public/fonts/`**, déclarés dans **`app/fonts.css`** (importé dans `layout.tsx` avant globals) avec les **noms exacts** → aucun changement de code ailleurs. Le `<link>` Google + l'`@import` dans cours-ia ont été retirés.
+- ⚠️ **Piège (même que favicon)** : `/fonts` était intercepté par `proxy.ts` → ajouté `fonts/` au `matcher` négatif. Vérifié : `/fonts/*.woff2` renvoie `font/woff2`, et la home ne fait **aucun appel à fonts.googleapis/gstatic**.
+- **Confidentialité = clean** : cookies essentiels uniquement (session Supabase + `g_oauth_state` éphémère), aucun traceur/analytics, aucune fuite Google.
 
 ### 2026-06-27 (suite 14) — Brouillon de révision + mode « Révision mixte »
 Tout dans `app/(app)/espaces/[slug]/revision/page.tsx`.
