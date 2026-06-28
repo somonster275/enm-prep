@@ -86,11 +86,16 @@ export default function ClassementPage() {
               <span style={{ fontSize: 14.5, fontWeight: 700 }}>{l.cartes} <span style={{ color: '#9A8D72', fontWeight: 400, fontSize: 13 }}>cartes</span></span>
             </div>
           ))}
-          {data.moi.rang > 15 && (
+          {data.moi.rang > 15 && data.moi.rang > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', borderRadius: 12, background: '#FCE9E3', border: '1px solid #F3C6BC', marginTop: 6 }}>
               <span style={{ fontSize: 14, fontWeight: 800, width: 34, textAlign: 'center', color: '#9A8D72' }}>#{data.moi.rang}</span>
               <span style={{ flex: 1, fontSize: 14.5, fontWeight: 700, color: '#C0392B' }}>Toi</span>
               <span style={{ fontSize: 14.5, fontWeight: 700 }}>{data.moi.cartes} <span style={{ color: '#9A8D72', fontWeight: 400, fontSize: 13 }}>cartes</span></span>
+            </div>
+          )}
+          {data.moi.rang === 0 && (
+            <div style={{ textAlign: 'center', fontSize: 13, color: '#9A8D72', padding: '12px 0' }}>
+              Tu n&apos;as pas encore révisé cette semaine — commence une session pour apparaître ici !
             </div>
           )}
         </div>

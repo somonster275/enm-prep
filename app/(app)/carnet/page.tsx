@@ -64,7 +64,17 @@ export default function CarnetPage() {
                     {it.modules.espaces.nom}{it.modules?.nom ? ` › ${it.modules.nom}` : ''}
                   </div>
                 )}
-                <RichContent html={it.question} style={{ fontSize: 14, fontWeight: 600, color: '#2A2018', lineHeight: 1.5 }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+                  <RichContent html={it.question} style={{ fontSize: 14, fontWeight: 600, color: '#2A2018', lineHeight: 1.5, flex: 1 }} />
+                  <a
+                    href={`/dashboard#coach`}
+                    onClick={() => {
+                      const q = it.question.replace(/<[^>]+>/g, '').slice(0, 120)
+                      localStorage.setItem('codex-coach-question', `Peux-tu m'expliquer : ${q}`)
+                    }}
+                    style={{ flexShrink: 0, fontSize: 11.5, fontWeight: 600, color: '#7C5CBF', textDecoration: 'none', whiteSpace: 'nowrap', marginTop: 2 }}
+                  >Poser au coach →</a>
+                </div>
               </div>
             ))}
           </div>

@@ -51,7 +51,11 @@ export default function ComptePage() {
     setLoading(false)
     if (error) { setMessage({ type: 'err', texte: error.message }); return }
     setMdp(''); setMdp2('')
-    setMessage({ type: 'ok', texte: 'Mot de passe mis à jour ✅' })
+    setMessage({ type: 'ok', texte: 'Mot de passe modifié ✅ — tu vas être déconnecté pour des raisons de sécurité.' })
+    setTimeout(async () => {
+      await supabase.auth.signOut()
+      window.location.href = '/login'
+    }, 2500)
   }
 
   // RGPD : suppression de compte (droit à l'effacement)

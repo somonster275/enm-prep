@@ -48,6 +48,11 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
       if (rows) setMessages((rows as { role: string; contenu: string; created_at: string }[]).map(r => ({
         role: r.role === 'assistant' ? 'assistant' : 'user', contenu: r.contenu, ts: new Date(r.created_at).getTime(),
       })))
+      // Question pré-remplie depuis le carnet d'erreurs.
+      try {
+        const q = localStorage.getItem('codex-coach-question')
+        if (q) { localStorage.removeItem('codex-coach-question'); setQuestion(q) }
+      } catch {}
     })
   }, [])
 
@@ -114,7 +119,11 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
     setLoading(false); abortRef.current = null
   }
 
-  const effacer = async () => { setMessages([]); if (userId) await supabase.from('coach_messages').delete().eq('user_id', userId) }
+  const effacer = async () => {
+    if (!confirm('Effacer tout l\'historique du coach ? Cette action est irréversible.')) return
+    setMessages([])
+    if (userId) await supabase.from('coach_messages').delete().eq('user_id', userId)
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, fontFamily: font, color: '#2A2018' }}>

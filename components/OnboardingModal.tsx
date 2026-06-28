@@ -46,7 +46,10 @@ export default function OnboardingModal() {
         </div>
 
         <div style={{ padding: '14px 26px', borderTop: '1px solid #F0E7D6', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 12.5, color: '#A89880' }}>Tu retrouveras ce guide en bas de page, onglet « Méthode ».</span>
+          <button onClick={fermer} style={{
+            height: 40, padding: '0 18px', border: '1px solid #EADFC9', borderRadius: 10, background: 'transparent', color: '#A89880',
+            fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: FONT,
+          }}>Passer</button>
           <button onClick={fermer} style={{
             height: 46, padding: '0 26px', border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff',
             fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: FONT,

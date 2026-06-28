@@ -33,7 +33,8 @@ export async function GET() {
 
   const tries = [...totaux.entries()].map(([uid, cartes]) => ({ uid, cartes })).sort((a, b) => b.cartes - a.cartes)
   const monTotal = totaux.get(user.id) || 0
-  const monRang = tries.findIndex(t => t.uid === user.id) + 1 // 0 si absent
+  const monIdx = tries.findIndex(t => t.uid === user.id)
+  const monRang = monIdx >= 0 ? monIdx + 1 : 0 // 0 = pas encore dans le classement
 
   const classement = tries.slice(0, 15).map((t, i) => ({ rang: i + 1, cartes: t.cartes, moi: t.uid === user.id }))
 

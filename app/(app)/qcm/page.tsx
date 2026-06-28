@@ -86,7 +86,7 @@ export default function QcmPage() {
                 <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>
                   {qi + 1}. {q.enonce} {corrige && <span style={{ fontSize: 13 }}>{bonne ? '✅' : '❌'}</span>}
                 </div>
-                {multi && !corrige && <div style={{ fontSize: 12, color: '#9A8D72', marginBottom: 8 }}>Plusieurs réponses possibles</div>}
+                {multi && <div style={{ fontSize: 12, color: corrige ? '#9A8D72' : '#0F6E56', fontWeight: 600, marginBottom: 8 }}>☑ Plusieurs réponses possibles</div>}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginTop: 8 }}>
                   {q.options.map((o, oi) => {
                     const sel = choisi.has(oi)

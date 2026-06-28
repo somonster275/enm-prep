@@ -51,6 +51,11 @@ export default function RevisionPage() {
   // Pour « annuler la dernière note » (raccourci Z / bouton).
   const [lastAction, setLastAction] = useState<{ ficheId: string; prevProg: Progression | null; idxBefore: number; requeued: boolean } | null>(null)
 
+  // Toast affiché brièvement après avoir noté une carte.
+  const [toast, setToast] = useState<string | null>(null)
+  // Stats de session : taux de réussite par bouton.
+  const [sessionStats, setSessionStats] = useState<number[]>([0, 0, 0, 0]) // [oublie, difficile, bien, parfait]
+
   // Brouillon libre : l'étudiant rédige sa réponse avant de retourner la carte.
   const [brouillon, setBrouillon] = useState('')
   const [brouillonOuvert, setBrouillonOuvert] = useState(false)
@@ -180,6 +185,13 @@ export default function RevisionPage() {
     await supabase.from('progression').upsert(prog, { onConflict: 'utilisateur_id,fiche_id' })
     enregistrerActivite(userId) // alimente la série / le momentum
     setProgressions(prev => ({ ...prev, [fiche.id]: prog as Progression }))
+    setSessionStats(s => { const n = [...s]; n[bouton]++; return n })
+
+    // Toast bref : libellé du bouton + intervalle de révision.
+    const label = NIVEAUX[bouton].label
+    const msg = minutes < SEUIL_REQUEUE ? `${label} — révision dans cette session` : `${label} — révision dans ${formatIntervalle(minutes)}`
+    setToast(msg)
+    setTimeout(() => setToast(null), 2200)
 
     // Intervalle court → la carte est remise en fin de session pour être revue tout de suite.
     const requeue = minutes < SEUIL_REQUEUE
@@ -197,9 +209,14 @@ export default function RevisionPage() {
     if (prevProg) await supabase.from('progression').upsert(prevProg, { onConflict: 'utilisateur_id,fiche_id' })
     else await supabase.from('progression').delete().eq('utilisateur_id', userId).eq('fiche_id', ficheId)
     setProgressions(prev => { const c = { ...prev }; if (prevProg) c[ficheId] = prevProg; else delete c[ficheId]; return c })
-    if (requeued) setDeck(d => d.slice(0, -1))
+    setDeck(d => {
+      const newDeck = requeued ? d.slice(0, -1) : d
+      // idxBefore peut dépasser le nouveau deck si la carte a été supprimée entre-temps
+      const safeIdx = Math.min(idxBefore, Math.max(0, newDeck.length - 1))
+      setIdx(safeIdx)
+      return newDeck
+    })
     setDone(false)
-    setIdx(idxBefore)
     setFlipped(true)
     setLastAction(null)
   }
@@ -271,11 +288,30 @@ export default function RevisionPage() {
     </div>
   )
 
-  if (done) return (
+  if (done) {
+    const totalNotes = sessionStats.reduce((s, n) => s + n, 0)
+    const reussies = sessionStats[2] + sessionStats[3]
+    const tauxReussite = totalNotes > 0 ? Math.round((reussies / totalNotes) * 100) : 0
+    return (
     <div style={{ padding: '3rem', textAlign: 'center', maxWidth: 500, margin: '0 auto', fontFamily: font }}>
       <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
       <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 26, marginBottom: 8 }}>Session terminée</div>
-      <p style={{ fontSize: 14, color: '#8A7E68', margin: '0 0 1.25rem' }}>{deck.length} fiches révisées</p>
+      <p style={{ fontSize: 14, color: '#8A7E68', margin: '0 0 1.25rem' }}>{deck.length} fiche{deck.length > 1 ? 's' : ''} révisée{deck.length > 1 ? 's' : ''}</p>
+      {/* Recap par bouton */}
+      {totalNotes > 0 && (
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+          {NIVEAUX.map((n, i) => sessionStats[i] > 0 && (
+            <div key={i} style={{ background: n.bg, color: n.couleur, borderRadius: 10, padding: '6px 14px', fontSize: 13, fontWeight: 700 }}>
+              {n.label} × {sessionStats[i]}
+            </div>
+          ))}
+        </div>
+      )}
+      {totalNotes > 0 && (
+        <div style={{ fontSize: 15, color: tauxReussite >= 70 ? '#0F6E56' : '#BA7517', fontWeight: 700, marginBottom: '1rem' }}>
+          {tauxReussite}% de réussite
+        </div>
+      )}
       {streak !== null && streak > 0 && (
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: 8, margin: '0 0 2rem',
@@ -286,7 +322,7 @@ export default function RevisionPage() {
         </div>
       )}
       <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-        <button onClick={() => { setIdx(0); setFlipped(false); setDone(false) }} style={{
+        <button onClick={() => { setIdx(0); setFlipped(false); setDone(false); setSessionStats([0,0,0,0]) }} style={{
           padding: '12px 22px', borderRadius: 10, background: espace.couleur, color: '#fff',
           border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: font,
         }}>Recommencer</button>
@@ -296,13 +332,23 @@ export default function RevisionPage() {
         }}>Retour</Link>
       </div>
     </div>
-  )
+    )
+  }
 
   const card = deck[idx]
   const prog = progressions[card.id]
 
   return (
     <div style={{ paddingTop: '34px', maxWidth: 640, margin: '0 auto', fontFamily: font }}>
+      {/* Toast après avoir noté une carte */}
+      {toast && (
+        <div style={{
+          position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
+          background: '#2A2018', color: '#fff', borderRadius: 12, padding: '10px 20px',
+          fontSize: 14, fontWeight: 600, zIndex: 999, whiteSpace: 'nowrap',
+          pointerEvents: 'none', opacity: 0.92, boxShadow: '0 4px 16px rgba(0,0,0,.25)',
+        }}>{toast}</div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
         <Link href={retourHref} style={{ fontSize: 13, color: '#9A8D72', textDecoration: 'none' }}>← Retour</Link>
         <div style={{ textAlign: 'right' }}>

@@ -31,6 +31,9 @@ N'utilise ce bloc que pour des tâches courtes et concrètes. N'y mets pas de ph
 
 type Msg = { role: 'user' | 'assistant'; content: string }
 
+// Fenêtre glissante simple : max 20 messages par tranche de 60 s par user.
+const ratemap = new Map<string, { count: number; reset: number }>()
+
 export async function POST(request: NextRequest) {
   const { messages } = await request.json().catch(() => ({}))
   if (!Array.isArray(messages) || messages.length === 0) {
@@ -38,6 +41,19 @@ export async function POST(request: NextRequest) {
   }
   if (!iaConfiguree(CHATBOT_PROVIDER)) {
     return NextResponse.json({ error: 'Clé IA manquante' }, { status: 500 })
+  }
+
+  // Rate-limiting basique côté Edge mémoire (repart à 0 si le processus redémarre).
+  const user0 = await utilisateurCourant()
+  if (user0) {
+    const now = Date.now()
+    const entry = ratemap.get(user0.id) ?? { count: 0, reset: now + 60_000 }
+    if (now > entry.reset) { entry.count = 0; entry.reset = now + 60_000 }
+    entry.count++
+    ratemap.set(user0.id, entry)
+    if (entry.count > 20) {
+      return NextResponse.json({ error: 'Trop de messages — attends une minute avant de continuer.' }, { status: 429 })
+    }
   }
 
   // Contexte temps réel : date, compte à rebours, planning ET progression de l'étudiant.

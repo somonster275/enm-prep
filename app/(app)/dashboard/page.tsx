@@ -92,6 +92,24 @@ export default function Dashboard() {
     return progsE.some(p => estDue(p.prochaine_revision))
   })
 
+  // Matière avec le plus de fiches dues → suggestion prioritaire
+  const priorite = espaces.map(e => {
+    const fichesE = fiches.filter(f => f.espace_id === e.id)
+    const dues = progressions.filter(p => fichesE.find(f => f.id === p.fiche_id) && estDue(p.prochaine_revision)).length
+    return { espace: e, dues }
+  }).filter(x => x.dues > 0).sort((a, b) => b.dues - a.dues)[0] ?? null
+
+  // Compte à rebours ENM : cherche un événement de type "examen"
+  const prochainExamen = evenements.find(ev => ev.type === 'examen')
+  const joursRestants = prochainExamen
+    ? Math.max(0, Math.round((new Date(prochainExamen.date_debut + 'T12:00:00').getTime() - Date.now()) / 86400000))
+    : null
+  const totalFiches = fiches.length
+  const fichesVues = new Set(progressions.map(p => p.fiche_id)).size
+  const fichesPourSuivre = totalFiches > 0 && joursRestants && joursRestants > 0
+    ? Math.ceil((totalFiches - fichesVues) / joursRestants)
+    : null
+
   const statCard: React.CSSProperties = { background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18, padding: 22 }
   const statHead: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 10 }
   const statIcon = (bg: string): React.CSSProperties => ({ width: 38, height: 38, borderRadius: 11, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19 })
@@ -182,6 +200,32 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Bandeaux d'insight (priorité matière + objectif J-X) */}
+      {(priorite || fichesPourSuivre) && (
+        <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
+          {priorite && (
+            <Link href={`/espaces/${priorite.espace.slug}/revision`} style={{ textDecoration: 'none', flex: '1 1 260px' }}>
+              <div style={{ background: '#FFF7E8', border: '1px solid #F5DFB1', borderRadius: 14, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center' }}>
+                <span style={{ fontSize: 22 }}>⚡</span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#2A2018' }}>{priorite.dues} fiche{priorite.dues > 1 ? 's' : ''} due{priorite.dues > 1 ? 's' : ''} en <span style={{ color: '#DC4A2B' }}>{priorite.espace.nom}</span></div>
+                  <div style={{ fontSize: 11.5, color: '#8A7E68', marginTop: 1 }}>Commencer par cette matière →</div>
+                </div>
+              </div>
+            </Link>
+          )}
+          {fichesPourSuivre && fichesPourSuivre > 0 && (
+            <div style={{ flex: '1 1 260px', background: '#F0F8F5', border: '1px solid #BFE6CF', borderRadius: 14, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center' }}>
+              <span style={{ fontSize: 22 }}>🎯</span>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#2A2018' }}><span style={{ color: '#0F6E56' }}>{fichesPourSuivre} fiche{fichesPourSuivre > 1 ? 's' : ''}/jour</span> pour finir à J-{joursRestants}</div>
+                <div style={{ fontSize: 11.5, color: '#8A7E68', marginTop: 1 }}>{totalFiches - fichesVues} fiches non encore abordées</div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Outils + Calendrier côte à côte */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 20, alignItems: 'start' }}>
