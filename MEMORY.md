@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-27 (suite 15).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-28 (suite 16).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,24 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-06-28 (suite 16) — Outils collaboratifs, défi configurable, et 5 améliorations « solo »
+**Toutes les migrations 0010→0016 ont été exécutées par le user.** Modération des contenus collaboratifs : policy RLS de DELETE = auteur OU admin (`(select role from profils where id=auth.uid())='admin'`).
+
+**Outils collaboratifs (menu déroulant « Communauté » dans TopNav : Entraide, Forum, Annales, Classement) :**
+- **Forum Q&R** (`/forum`, tables `forum_questions`+`forum_reponses`, mig `0010`) : questions par matière, réponses en fil, filtre. Auteur dénormalisé (`auteur`).
+- **Astuces sous les fiches** (`components/AstucesFiche.tsx`, table `astuces`, mig `0011`) : volet sous chaque fiche (page module), mnémo partagés.
+- **Annales & corrigés partagés** (`/annales`, table `annales`, mig `0012`) : bibliothèque de liens (type sujet/corrigé/fiche + matière).
+- **Défi + classement anonyme** (`/classement`, API `/api/classement` agrège `activite_jours` de la semaine en service_role, **anonyme** : rangs + totaux + « Toi »).
+
+**Défi de la semaine CONFIGURABLE par l'admin** (table `defi_config` 1 ligne, mig `0013`) : écran **Admin → Défi de la semaine** (`/admin/defi`) + API `/api/admin/defi`. Type **`fiches`** (objectif chiffré mesuré + barre + classement) OU **`libre`** (annonce texte libre). La page `/classement` lit la config (repli 150).
+
+**Les 5 améliorations « solo » (les incohérences relevées) :**
+1. **QCM interactif** (remplace l'ancien `/qcm` OutilContenu) — tables `qcm`/`qcm_questions`/`qcm_resultats` (mig `0016`). **Import texte OU HTML** (`lib/qcm-parse.ts` : `parseTexte` format `Q:`/`-`/`*`/`>`, `parseHtml` via DOMParser listes+radios) → **prévisualisation éditable** admin (`/admin/qcm`, API `/api/admin/qcm`) où on coche les bonnes réponses. Jeu étudiant auto-corrigé (radio/multi), score+explications, **`enregistrerActivite` à la fin** (compte dans série/momentum/classement). Le user fait souvent ses QCM en **HTML** → compat assurée via la prévisualisation.
+2. **Raccourcis clavier en révision** : Espace/Entrée=retourner, 1-4=noter, **Z/Backspace=annuler** (restaure la progression précédente via `lastAction`). Bouton « ↶ Annuler » aussi.
+3. **Carnet d'erreurs** (`/carnet` + mode révision `?carnet=1`) : fiches notées niveau ≤ 1, dérivé de `progression` (pas de table). Carte dans Espaces.
+4. **Coach persistant** : `TuteurChat` stocke l'historique en base (table `coach_messages`, mig `0014`, RLS self) au lieu du localStorage 24 h → conservé entre appareils.
+5. **Recherche** (`/recherche`, ILIKE sur question/réponse) + **Favoris** (étoile `components/FavoriButton.tsx`, table `favoris` mig `0015`, RLS self ; mode révision `?favoris=1`). Cartes « Mes favoris » et « Recherche » dans Espaces (avec « Révision mixte » et « Carnet d'erreurs »).
 
 ### 2026-06-27 (suite 15) — Onboarding « Méthode » + auto-hébergement des polices
 **Fenêtre d'accueil + onglet Méthode**
