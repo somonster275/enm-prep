@@ -64,6 +64,18 @@ export default function SalleDuel() {
         { match_id: mm.id, user_id: user.id, pseudo: '' },
         { onConflict: 'match_id,user_id', ignoreDuplicates: true },
       )
+
+      // Reprise : on amorce les accumulateurs depuis la ligne en base, sinon
+      // un rafraîchissement en cours de partie écraserait le score par 0.
+      const { data: moi } = await supabase.from('match_joueurs')
+        .select('score, justes, repondu').eq('match_id', mm.id).eq('user_id', user.id).maybeSingle()
+      if (moi) { score.current = moi.score; justes.current = moi.justes; repondu.current = moi.repondu }
+      // Les questions déjà écoulées ne doivent pas pouvoir être re-notées.
+      if (mm.statut === 'en_cours' && mm.started_at) {
+        const cur = Math.floor((Date.now() - Date.parse(mm.started_at)) / 1000 / mm.secondes_par_question)
+        for (let i = 0; i < cur; i++) traitees.current.add(i)
+        idxRef.current = Math.max(0, cur)
+      }
       chargerJoueurs(mm.id)
 
       canalMatch = supabase.channel(`match-${mm.id}`)
