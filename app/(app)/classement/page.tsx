@@ -1,23 +1,27 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
 
 type Ligne = { rang: number; cartes: number; moi: boolean }
 type Data = { semaineDebut: string; participants: number; moi: { rang: number; cartes: number }; classement: Ligne[] }
-
-const DEFI_HEBDO = 150 // objectif de cartes pour le défi de la semaine
+type Config = { type: 'fiches' | 'libre'; titre: string | null; description: string | null; objectif: number | null; matiere: string | null }
 
 export default function ClassementPage() {
   const [data, setData] = useState<Data | null>(null)
+  const [config, setConfig] = useState<Config | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetch('/api/classement').then(r => r.json()).then(d => { setData(d); setLoading(false) }).catch(() => setLoading(false))
+    supabase.from('defi_config').select('*').eq('id', 1).maybeSingle().then(({ data: c }) => { if (c) setConfig(c as Config) })
   }, [])
 
   const font = "'Hanken Grotesk', sans-serif"
   const display = "'Bricolage Grotesque', sans-serif"
   const mes = data?.moi.cartes ?? 0
-  const pct = Math.min(100, Math.round((mes / DEFI_HEBDO) * 100))
+  const libre = config?.type === 'libre'
+  const objectif = config?.objectif || 150
+  const pct = Math.min(100, Math.round((mes / objectif) * 100))
 
   const medaille = (rang: number) => rang === 1 ? '🥇' : rang === 2 ? '🥈' : rang === 3 ? '🥉' : `#${rang}`
 
@@ -28,20 +32,32 @@ export default function ClassementPage() {
         Un classement <b>anonyme</b> entre candidats, basé sur le nombre de fiches révisées cette semaine. La régularité paie !
       </p>
 
-      {/* Défi personnel */}
+      {/* Défi (piloté par l'admin) */}
       <div style={{ background: '#FFC02E', borderRadius: 20, padding: 26, color: '#2A2018', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', width: 150, height: 150, borderRadius: '50%', background: '#FFCE54', right: -40, top: -50 }} />
         <div style={{ position: 'relative' }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: '#7A5E14' }}>Ton défi</div>
-          <div style={{ fontFamily: display, fontWeight: 800, fontSize: 26, marginTop: 8 }}>
-            {mes} <span style={{ fontSize: 18, color: '#5C4A22' }}>/ {DEFI_HEBDO} cartes</span>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: '#7A5E14' }}>
+            {config?.titre || (libre ? 'Défi de la semaine' : 'Ton défi')}
+            {config?.matiere && <span> · {config.matiere}</span>}
           </div>
-          <div style={{ height: 10, background: 'rgba(0,0,0,.12)', borderRadius: 999, overflow: 'hidden', marginTop: 14, maxWidth: 360 }}>
-            <div style={{ width: `${pct}%`, height: '100%', background: '#DC4A2B', borderRadius: 999 }} />
-          </div>
-          <div style={{ fontSize: 13, color: '#5C4A22', marginTop: 10, fontWeight: 600 }}>
-            {pct >= 100 ? '🎉 Défi accompli, bravo !' : `Plus que ${DEFI_HEBDO - mes} cartes pour relever le défi.`}
-          </div>
+
+          {libre ? (
+            <div style={{ fontSize: 16, lineHeight: 1.55, marginTop: 10, color: '#3A2E0E', fontWeight: 600, whiteSpace: 'pre-wrap', maxWidth: 460 }}>
+              {config?.description || 'Un défi spécial cette semaine — à toi de jouer !'}
+            </div>
+          ) : (
+            <>
+              <div style={{ fontFamily: display, fontWeight: 800, fontSize: 26, marginTop: 8 }}>
+                {mes} <span style={{ fontSize: 18, color: '#5C4A22' }}>/ {objectif} cartes</span>
+              </div>
+              <div style={{ height: 10, background: 'rgba(0,0,0,.12)', borderRadius: 999, overflow: 'hidden', marginTop: 14, maxWidth: 360 }}>
+                <div style={{ width: `${pct}%`, height: '100%', background: '#DC4A2B', borderRadius: 999 }} />
+              </div>
+              <div style={{ fontSize: 13, color: '#5C4A22', marginTop: 10, fontWeight: 600 }}>
+                {pct >= 100 ? '🎉 Défi accompli, bravo !' : `Plus que ${Math.max(0, objectif - mes)} cartes pour relever le défi.`}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
