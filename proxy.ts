@@ -39,7 +39,7 @@ export async function proxy(req: NextRequest) {
   // de connexion, le callback d'auth Supabase, et la demande d'accès self-service.
   const estPublic = path === '/' || isAuthPage || path.startsWith('/auth')
     || path.startsWith('/api/acces') || path.startsWith('/api/contact')
-    || path.startsWith('/bienvenue') || path.startsWith('/contact') || path.startsWith('/donnees')
+    || path.startsWith('/bienvenue') || path.startsWith('/contact') || path.startsWith('/donnees') || path.startsWith('/methode')
 
   if (!user && !estPublic) {
     // Pour les routes API : renvoyer un 401 JSON propre plutôt qu'une redirection

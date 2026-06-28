@@ -10,6 +10,7 @@ import { calculerProgression } from '@/lib/progression'
 import Link from 'next/link'
 import NotesWidget from '@/components/NotesWidget'
 import ProgressionCard from '@/components/ProgressionCard'
+import OnboardingModal from '@/components/OnboardingModal'
 
 const OUTILS = [
   { href: '/espaces', icone: '🗂️', couleur: '#DC4A2B', titre: 'Fiches', desc: 'Réviser vos fiches par matière, en répétition espacée.' },
@@ -99,6 +100,7 @@ export default function Dashboard() {
 
   return (
     <div style={{ paddingTop: '34px', fontFamily: font, color: '#2A2018' }}>
+      <OnboardingModal />
 
       {/* Salutation */}
       <div style={{ marginBottom: 24 }}>

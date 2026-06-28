@@ -14,6 +14,8 @@ export default function SiteFooter() {
     }}>
       <Link href="/contact" style={lien}>Nous contacter</Link>
       <span style={{ color: '#E0D6C2' }}>·</span>
+      <Link href="/methode" style={lien}>Méthode</Link>
+      <span style={{ color: '#E0D6C2' }}>·</span>
       <Link href="/donnees" style={lien}>Données</Link>
     </footer>
   )
