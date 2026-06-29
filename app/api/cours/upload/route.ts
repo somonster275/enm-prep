@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 import { utilisateurCourant, estAdmin } from '@/lib/auth-serveur'
 import { embed, toVector } from '@/lib/embeddings'
 
-const LOT_EMBED = 64 // passages par appel d'embeddings
+const LOT_EMBED = 16 // passages par appel (réduit pour respecter le rate-limit Voyage free tier)
 
 function chunker(texte: string, taille = 800, chevauchement = 100): string[] {
   const paragraphes = texte.split(/\n{2,}/)

@@ -24,6 +24,26 @@ interface VoyageResponse {
  * @param textes  Liste de passages (ou une seule question).
  * @param type    'document' à l'ingestion, 'query' pour une question utilisateur.
  */
+async function fetchEmbeddings(textes: string[], type: VoyageInputType): Promise<number[][]> {
+  const res = await fetch('https://api.voyageai.com/v1/embeddings', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${VOYAGE_API_KEY}`,
+    },
+    body: JSON.stringify({ model: VOYAGE_MODEL, input: textes, input_type: type }),
+  })
+  if (res.status === 429) {
+    // Renvoie null pour signaler un rate-limit
+    return null as unknown as number[][]
+  }
+  if (!res.ok) {
+    throw new Error(`Erreur Voyage (${res.status}) : ${await res.text()}`)
+  }
+  const json = (await res.json()) as VoyageResponse
+  return json.data.sort((a, b) => a.index - b.index).map((d) => d.embedding)
+}
+
 export async function embed(
   textes: string[],
   type: VoyageInputType = 'document',
@@ -33,22 +53,18 @@ export async function embed(
   }
   if (textes.length === 0) return []
 
-  const res = await fetch('https://api.voyageai.com/v1/embeddings', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${VOYAGE_API_KEY}`,
-    },
-    body: JSON.stringify({ model: VOYAGE_MODEL, input: textes, input_type: type }),
-  })
-
-  if (!res.ok) {
-    throw new Error(`Erreur Voyage (${res.status}) : ${await res.text()}`)
+  // Retry avec backoff exponentiel sur 429 (free tier : 3 RPM)
+  const MAX_TENTATIVES = 6
+  let attente = 20_000 // 20 s pour passer sous la fenêtre de 1 min
+  for (let i = 0; i < MAX_TENTATIVES; i++) {
+    const result = await fetchEmbeddings(textes, type)
+    if (result !== null) return result
+    if (i < MAX_TENTATIVES - 1) {
+      await new Promise(r => setTimeout(r, attente))
+      attente = Math.min(attente * 1.5, 60_000)
+    }
   }
-
-  const json = (await res.json()) as VoyageResponse
-  // Réordonne par index pour garantir l'alignement avec l'entrée.
-  return json.data.sort((a, b) => a.index - b.index).map((d) => d.embedding)
+  throw new Error('Voyage AI : limite de taux dépassée après plusieurs tentatives. Ajoute un moyen de paiement sur dashboard.voyageai.com pour débloquer les limites standard.')
 }
 
 /** Embedding d'une seule question (raccourci, input_type = 'query'). */
