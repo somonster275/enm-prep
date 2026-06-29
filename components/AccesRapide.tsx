@@ -28,14 +28,14 @@ export default function AccesRapide({ matieres }: { matieres: Matiere[] }) {
     <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18, padding: 22 }}>
       <div style={{ fontFamily: display, fontWeight: 800, fontSize: 15, marginBottom: 14 }}>Accès rapide</div>
 
-      <div className="raccourcis-grille" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(86px, 1fr))', gap: 10 }}>
+      <div className="raccourcis-grille no-collapse" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))', gap: 10 }}>
         {FONCTIONS.map(f => (
           <Link key={f.href} href={f.href} className="raccourci" style={{
             textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
-            padding: '13px 6px', borderRadius: 13, border: '1px solid #F0E7D6', background: '#FFFDF9',
+            padding: '13px 6px', borderRadius: 13, border: '1px solid #F0E7D6', background: '#FFFDF9', minWidth: 0,
           }}>
-            <span style={{ width: 36, height: 36, borderRadius: 10, background: f.couleur + '1F', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19 }}>{f.icone}</span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#5C5345', textAlign: 'center' }}>{f.label}</span>
+            <span style={{ width: 36, height: 36, borderRadius: 10, background: f.couleur + '1F', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19, flexShrink: 0 }}>{f.icone}</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#5C5345', textAlign: 'center', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.label}</span>
           </Link>
         ))}
       </div>
