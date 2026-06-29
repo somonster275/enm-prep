@@ -16,6 +16,7 @@ export default function TopNav() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [adminOpen, setAdminOpen] = useState(false)
   const [communauteOpen, setCommunauteOpen] = useState(false)
+  const [ressourcesOpen, setRessourcesOpen] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const [streak, setStreak] = useState(0)
 
@@ -38,7 +39,7 @@ export default function TopNav() {
   }, [pathname])
 
   // Ferme le tiroir mobile quand on change de page.
-  useEffect(() => { setNavOpen(false); setAdminOpen(false); setCommunauteOpen(false) }, [pathname])
+  useEffect(() => { setNavOpen(false); setAdminOpen(false); setCommunauteOpen(false); setRessourcesOpen(false) }, [pathname])
 
   const logout = async () => {
     await supabase.auth.signOut()
@@ -57,12 +58,15 @@ export default function TopNav() {
     || profil?.email?.split('@')[0] || ''
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
 
-  // Liens de navigation
+  // Liens de premier niveau (l'essentiel, pour ne pas surcharger la barre).
   const liens: { href: string; label: string }[] = [
     { href: '/dashboard', label: 'Accueil' },
     { href: '/espaces', label: 'Espaces' },
-    { href: '/cours', label: 'Cours' },
     { href: '/actualites', label: 'Actualités' },
+  ]
+  // Ressources pédagogiques (regroupées sous « Ressources »).
+  const liensRessources: { href: string; label: string }[] = [
+    { href: '/cours', label: 'Cours' },
     { href: '/cours-ia', label: 'Questions de cours' },
     { href: '/drive', label: 'Mon Drive' },
     ...(profil?.role === 'admin' ? [{ href: '/calendrier', label: 'Calendrier' }] : []),
@@ -101,6 +105,46 @@ export default function TopNav() {
     </Link>
   )
 
+  // Menu déroulant générique (Ressources, Communauté, Admin) — factorisé pour
+  // garder la barre lisible et aérée.
+  const menuDeroulant = (
+    label: string,
+    items: { href: string; label: string }[],
+    open: boolean,
+    setOpen: (v: boolean) => void,
+  ) => {
+    const actif = items.some(l => pathname.startsWith(l.href))
+    return (
+      <div style={{ position: 'relative' }}>
+        <button onClick={() => setOpen(!open)} style={{
+          fontSize: 14, fontWeight: 600,
+          color: actif ? '#2A2018' : '#8A7E68',
+          background: actif ? '#FCEFD3' : 'transparent',
+          padding: '9px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
+          fontFamily: "'Hanken Grotesk', sans-serif", display: 'flex', alignItems: 'center', gap: 5,
+        }}>
+          {label}
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }}><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        {open && (
+          <>
+            <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 150 }} />
+            <div style={{ position: 'absolute', top: 44, left: 0, minWidth: 190, zIndex: 200, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', padding: 6 }}>
+              {items.map(({ href, label }) => (
+                <Link key={href} href={href} onClick={() => setOpen(false)} style={{
+                  display: 'block', padding: '9px 14px', borderRadius: 8,
+                  fontSize: 14, fontWeight: pathname.startsWith(href) ? 700 : 500,
+                  color: pathname.startsWith(href) ? '#2A2018' : '#555',
+                  background: pathname.startsWith(href) ? '#FCEFD3' : 'transparent', textDecoration: 'none',
+                }}>{label}</Link>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div style={{ background: '#fff', borderBottom: '1px solid #F0E7D6', position: 'sticky', top: 0, zIndex: 100 }}>
       <div style={{
@@ -114,67 +158,11 @@ export default function TopNav() {
 
           {/* Navigation horizontale — desktop uniquement */}
           {!isMobile && (
-            <nav style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+            <nav style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
               {liens.map(l => navLink(l.href, l.label))}
-
-              {/* Menu Communauté */}
-              <div style={{ position: 'relative' }}>
-                <button onClick={() => setCommunauteOpen(o => !o)} style={{
-                  fontSize: 14, fontWeight: 600,
-                  color: liensCommunaute.some(l => pathname.startsWith(l.href)) ? '#2A2018' : '#8A7E68',
-                  background: liensCommunaute.some(l => pathname.startsWith(l.href)) ? '#FCEFD3' : 'transparent',
-                  padding: '9px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                  fontFamily: "'Hanken Grotesk', sans-serif", display: 'flex', alignItems: 'center', gap: 5,
-                }}>
-                  Communauté
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
-                {communauteOpen && (
-                  <>
-                    <div onClick={() => setCommunauteOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 150 }} />
-                    <div style={{ position: 'absolute', top: 44, left: 0, minWidth: 170, zIndex: 200, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', padding: 6 }}>
-                      {liensCommunaute.map(({ href, label }) => (
-                        <Link key={href} href={href} onClick={() => setCommunauteOpen(false)} style={{
-                          display: 'block', padding: '9px 14px', borderRadius: 8,
-                          fontSize: 14, fontWeight: pathname.startsWith(href) ? 700 : 500,
-                          color: pathname.startsWith(href) ? '#2A2018' : '#555',
-                          background: pathname.startsWith(href) ? '#FCEFD3' : 'transparent', textDecoration: 'none',
-                        }}>{label}</Link>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {liensAdmin.length > 0 && (
-                <div style={{ position: 'relative' }}>
-                  <button onClick={() => setAdminOpen(o => !o)} style={{
-                    fontSize: 14, fontWeight: 600,
-                    color: liensAdmin.some(l => pathname.startsWith(l.href)) ? '#2A2018' : '#8A7E68',
-                    background: liensAdmin.some(l => pathname.startsWith(l.href)) ? '#FCEFD3' : 'transparent',
-                    padding: '9px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                    fontFamily: "'Hanken Grotesk', sans-serif", display: 'flex', alignItems: 'center', gap: 5,
-                  }}>
-                    Admin
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                  </button>
-                  {adminOpen && (
-                    <>
-                      <div onClick={() => setAdminOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 150 }} />
-                      <div style={{ position: 'absolute', top: 44, left: 0, minWidth: 180, zIndex: 200, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', padding: 6 }}>
-                        {liensAdmin.map(({ href, label }) => (
-                          <Link key={href} href={href} onClick={() => setAdminOpen(false)} style={{
-                            display: 'block', padding: '9px 14px', borderRadius: 8,
-                            fontSize: 14, fontWeight: pathname.startsWith(href) ? 700 : 500,
-                            color: pathname.startsWith(href) ? '#2A2018' : '#555',
-                            background: pathname.startsWith(href) ? '#FCEFD3' : 'transparent', textDecoration: 'none',
-                          }}>{label}</Link>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
+              {menuDeroulant('Ressources', liensRessources, ressourcesOpen, setRessourcesOpen)}
+              {menuDeroulant('Communauté', liensCommunaute, communauteOpen, setCommunauteOpen)}
+              {liensAdmin.length > 0 && menuDeroulant('Admin', liensAdmin, adminOpen, setAdminOpen)}
             </nav>
           )}
         </div>
@@ -228,6 +216,15 @@ export default function TopNav() {
       {isMobile && navOpen && (
         <div style={{ borderTop: '1px solid #F0E7D6', background: '#fff', padding: '8px 12px 14px' }}>
           {liens.map(l => (
+            <Link key={l.href} href={l.href} onClick={() => setNavOpen(false)} style={{
+              display: 'block', padding: '12px 14px', borderRadius: 10, marginBottom: 2,
+              fontSize: 15, fontWeight: isActive(l.href) ? 700 : 600,
+              color: isActive(l.href) ? '#2A2018' : '#6E6456',
+              background: isActive(l.href) ? '#FCEFD3' : 'transparent', textDecoration: 'none',
+            }}>{l.label}</Link>
+          ))}
+          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.1em', color: '#B6A98C', padding: '12px 14px 6px' }}>RESSOURCES</div>
+          {liensRessources.map(l => (
             <Link key={l.href} href={l.href} onClick={() => setNavOpen(false)} style={{
               display: 'block', padding: '12px 14px', borderRadius: 10, marginBottom: 2,
               fontSize: 15, fontWeight: isActive(l.href) ? 700 : 600,
