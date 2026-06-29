@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Paramètres manquants' }, { status: 400 })
   }
   // Seuls les buckets applicatifs connus sont autorisés (pas de cible arbitraire).
-  if (!['mindmaps', 'medias', 'qcm'].includes(bucket)) {
+  if (!['mindmaps', 'medias', 'qcm', 'cours'].includes(bucket)) {
     return NextResponse.json({ error: 'Bucket non autorisé' }, { status: 400 })
   }
   if (fichier.size > TAILLE_MAX) {

@@ -61,6 +61,7 @@ export default function TopNav() {
   const liens: { href: string; label: string }[] = [
     { href: '/dashboard', label: 'Accueil' },
     { href: '/espaces', label: 'Espaces' },
+    { href: '/cours', label: 'Cours' },
     { href: '/actualites', label: 'Actualités' },
     { href: '/cours-ia', label: 'Questions de cours' },
     { href: '/drive', label: 'Mon Drive' },
