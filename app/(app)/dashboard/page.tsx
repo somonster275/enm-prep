@@ -11,13 +11,8 @@ import Link from 'next/link'
 import NotesWidget from '@/components/NotesWidget'
 import ProgressionCard from '@/components/ProgressionCard'
 import OnboardingModal from '@/components/OnboardingModal'
-
-const OUTILS = [
-  { href: '/espaces', icone: '🗂️', couleur: '#DC4A2B', titre: 'Fiches', desc: 'Réviser vos fiches par matière, en répétition espacée.' },
-  { href: '/mind-maps', icone: '🧠', couleur: '#2DAE83', titre: 'Mind maps', desc: 'Cartes mentales et schémas par sujet.' },
-  { href: '/media', icone: '🎬', couleur: '#3B82D9', titre: 'Audio & Vidéo', desc: 'Vidéos et podcasts à regarder par matière.' },
-  { href: '/qcm', icone: '✅', couleur: '#E8A11E', titre: 'QCM', desc: "S'entraîner avec des questions à choix multiples." },
-]
+import StatRotatif, { type StatItem } from '@/components/StatRotatif'
+import AccesRapide from '@/components/AccesRapide'
 
 type Evenement = { id: string; titre: string; date_debut: string; heure: string | null; type: string; couleur: string }
 const TYPE_LABELS: Record<string, string> = { cours: 'Cours', examen: 'Examen', deadline: 'Deadline', autre: 'Autre' }
@@ -96,12 +91,23 @@ export default function Dashboard() {
     return progsE.some(p => estDue(p.prochaine_revision))
   })
 
-  // Matière avec le plus de fiches dues → suggestion prioritaire
-  const priorite = espaces.map(e => {
+  // Fiches dues par matière → utilisé pour la priorité ET le widget d'accès rapide.
+  const matieresAvecDues = espaces.map(e => {
     const fichesE = fiches.filter(f => f.espace_id === e.id)
     const dues = progressions.filter(p => fichesE.find(f => f.id === p.fiche_id) && estDue(p.prochaine_revision)).length
-    return { espace: e, dues }
-  }).filter(x => x.dues > 0).sort((a, b) => b.dues - a.dues)[0] ?? null
+    return { slug: e.slug, nom: e.nom, dues }
+  })
+  // Matières triées : les plus urgentes d'abord (pour les raccourcis).
+  const matieres = [...matieresAvecDues].sort((a, b) => b.dues - a.dues)
+  // Matière avec le plus de fiches dues → suggestion prioritaire
+  const priorite = matieres.filter(x => x.dues > 0)[0] ?? null
+
+  // Statistiques regroupées dans un widget rotatif unique.
+  const statItems: StatItem[] = [
+    { cle: 'serie', icone: '🔥', iconeBg: '#FCE9E3', label: 'Série en cours', valeur: <>{streak} <span style={{ fontSize: 16, color: '#9A8D72', fontWeight: 700 }}>jour{streak > 1 ? 's' : ''}</span></> },
+    { cle: 'objectif', icone: '🎯', iconeBg: '#FCEFD3', label: 'Objectif du jour', valeur: <>{cartesJour}<span style={{ color: '#9A8D72' }}>/{OBJECTIF_QUOTIDIEN}</span></>, barPct: objectifPct },
+    { cle: 'semaine', icone: '✨', iconeBg: '#DDF3EE', label: 'Cette semaine', valeur: <>{totalSemaine} <span style={{ fontSize: 16, color: '#9A8D72', fontWeight: 700 }}>cartes</span></> },
+  ]
 
   // Compte à rebours ENM : prochain examen (récupéré séparément, toutes dates)
   const joursRestants = dateExamen
@@ -112,12 +118,6 @@ export default function Dashboard() {
   const fichesPourSuivre = totalFiches > 0 && joursRestants && joursRestants > 0
     ? Math.ceil((totalFiches - fichesVues) / joursRestants)
     : null
-
-  const statCard: React.CSSProperties = { background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18, padding: 22 }
-  const statHead: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 10 }
-  const statIcon = (bg: string): React.CSSProperties => ({ width: 38, height: 38, borderRadius: 11, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19 })
-  const statLabel: React.CSSProperties = { fontSize: 13, fontWeight: 600, color: '#8A7E68' }
-  const statBig: React.CSSProperties = { fontFamily: display, fontWeight: 800, fontSize: 30, marginTop: 14 }
 
   return (
     <div style={{ paddingTop: '34px', fontFamily: font, color: '#2A2018' }}>
@@ -133,23 +133,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Stats : série · objectif · semaine */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
-        <div style={statCard}>
-          <div style={statHead}><div style={statIcon('#FCE9E3')}>🔥</div><span style={statLabel}>Série en cours</span></div>
-          <div style={statBig}>{streak} <span style={{ fontSize: 16, color: '#9A8D72', fontWeight: 700 }}>jour{streak > 1 ? 's' : ''}</span></div>
-        </div>
-        <div style={statCard}>
-          <div style={statHead}><div style={statIcon('#FCEFD3')}>🎯</div><span style={statLabel}>Objectif du jour</span></div>
-          <div style={statBig}>{cartesJour}<span style={{ color: '#9A8D72' }}>/{OBJECTIF_QUOTIDIEN}</span></div>
-          <div style={{ height: 6, background: '#F1E4CE', borderRadius: 999, overflow: 'hidden', marginTop: 12 }}>
-            <div style={{ width: `${objectifPct}%`, height: '100%', background: '#DC4A2B', borderRadius: 999 }} />
-          </div>
-        </div>
-        <div style={statCard}>
-          <div style={statHead}><div style={statIcon('#DDF3EE')}>✨</div><span style={statLabel}>Cette semaine</span></div>
-          <div style={statBig}>{totalSemaine} <span style={{ fontSize: 16, color: '#9A8D72', fontWeight: 700 }}>cartes</span></div>
-        </div>
+      {/* Rangée de widgets : stat rotative + accès rapide (extensible) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 2fr', gap: 16, marginBottom: 16, alignItems: 'stretch' }}>
+        <StatRotatif items={statItems} />
+        <AccesRapide matieres={matieres} />
       </div>
 
       {/* Hero : révisions du jour + momentum */}
@@ -208,11 +195,11 @@ export default function Dashboard() {
       {(priorite || fichesPourSuivre) && (
         <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
           {priorite && (
-            <Link href={`/espaces/${priorite.espace.slug}/revision`} style={{ textDecoration: 'none', flex: '1 1 260px' }}>
+            <Link href={`/espaces/${priorite.slug}/revision`} style={{ textDecoration: 'none', flex: '1 1 260px' }}>
               <div style={{ background: '#FFF7E8', border: '1px solid #F5DFB1', borderRadius: 14, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center' }}>
                 <span style={{ fontSize: 22 }}>⚡</span>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#2A2018' }}>{priorite.dues} fiche{priorite.dues > 1 ? 's' : ''} due{priorite.dues > 1 ? 's' : ''} en <span style={{ color: '#DC4A2B' }}>{priorite.espace.nom}</span></div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#2A2018' }}>{priorite.dues} fiche{priorite.dues > 1 ? 's' : ''} due{priorite.dues > 1 ? 's' : ''} en <span style={{ color: '#DC4A2B' }}>{priorite.nom}</span></div>
                   <div style={{ fontSize: 11.5, color: '#8A7E68', marginTop: 1 }}>Commencer par cette matière →</div>
                 </div>
               </div>
@@ -230,28 +217,9 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Outils + Calendrier côte à côte */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 20, alignItems: 'start' }}>
+      {/* Calendrier + tâches côte à côte */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
 
-        <div>
-          <div style={{ fontFamily: display, fontWeight: 800, fontSize: 20, marginBottom: 16 }}>Vos outils</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
-            {OUTILS.map(o => (
-              <Link key={o.href} href={o.href} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div style={{ background: '#fff', borderRadius: 16, padding: 20, border: '1px solid #F0E7D6', cursor: 'pointer', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 12, background: o.couleur + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{o.icone}</div>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: 15 }}>{o.titre}</div>
-                    <div style={{ fontSize: 12, color: '#8A7E68', marginTop: 3, lineHeight: 1.5 }}>{o.desc}</div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Colonne droite : à venir + tâches */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Mini calendrier — événements à venir */}
         <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 18 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
@@ -289,7 +257,6 @@ export default function Dashboard() {
         </div>
 
         <NotesWidget titre="Mes tâches" />
-        </div>
       </div>
 
       {/* Progression globale — en bas de page */}
