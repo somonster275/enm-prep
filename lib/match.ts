@@ -109,6 +109,7 @@ function ficheVersQuestion(
 export async function construireDeck(opts: {
   qcmId?: string | null
   espaceId?: string | null
+  moduleId?: string | null   // restreint les fiches à un module/chapitre précis
   nb: number
 }): Promise<MatchQuestion[]> {
   const lots: MatchQuestion[] = []
@@ -124,10 +125,18 @@ export async function construireDeck(opts: {
     }
   }
 
-  // --- Source 2 : fiches d'un espace, converties en QCM ---
-  if (opts.espaceId) {
-    const { data: mods } = await supabase.from('modules').select('id').eq('espace_id', opts.espaceId).is('deleted_at', null)
-    const modIds = (mods || []).map((m: { id: string }) => m.id)
+  // --- Source 2 : fiches d'un espace (ou d'un module précis), converties en QCM ---
+  if (opts.espaceId || opts.moduleId) {
+    // Si un module est choisi, on ne prend que celui-ci (+ ses sous-modules) ;
+    // sinon tous les modules de la matière.
+    let modIds: string[]
+    if (opts.moduleId) {
+      const { data: enfants } = await supabase.from('modules').select('id').eq('parent_id', opts.moduleId).is('deleted_at', null)
+      modIds = [opts.moduleId, ...(enfants || []).map((m: { id: string }) => m.id)]
+    } else {
+      const { data: mods } = await supabase.from('modules').select('id').eq('espace_id', opts.espaceId).is('deleted_at', null)
+      modIds = (mods || []).map((m: { id: string }) => m.id)
+    }
     if (modIds.length > 0) {
       const { data: fiches } = await supabase.from('fiches')
         .select('id, question, reponse, module_id').in('module_id', modIds).is('deleted_at', null).eq('suspendu', false)

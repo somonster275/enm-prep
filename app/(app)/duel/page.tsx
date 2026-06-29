@@ -7,6 +7,7 @@ import { construireDeck } from '@/lib/match'
 
 type Qcm = { id: string; titre: string; matiere: string | null }
 type Espace = { id: string; nom: string }
+type ModuleItem = { id: string; nom: string }
 type MatchOuvert = { code: string; titre: string | null; hote: string; n: number }
 
 const FONT = "'Hanken Grotesk', sans-serif"
@@ -22,6 +23,8 @@ export default function DuelAccueil() {
   // Formulaire de création
   const [qcmId, setQcmId] = useState('')
   const [espaceId, setEspaceId] = useState('')
+  const [modules, setModules] = useState<ModuleItem[]>([])
+  const [moduleId, setModuleId] = useState('')
   const [nb, setNb] = useState(10)
   const [secs, setSecs] = useState(20)
   const [creating, setCreating] = useState(false)
@@ -61,14 +64,26 @@ export default function DuelAccueil() {
     return () => { supabase.removeChannel(canal) }
   }, [])
 
+  // Charge les modules (chapitres) de la matière choisie, pour pouvoir cibler un
+  // chapitre précis. Réinitialise la sélection quand on change de matière.
+  useEffect(() => {
+    setModuleId('')
+    if (!espaceId) { setModules([]); return }
+    supabase.from('modules')
+      .select('id, nom').eq('espace_id', espaceId).is('parent_id', null).is('deleted_at', null).order('ordre')
+      .then(({ data }) => setModules((data || []) as ModuleItem[]))
+  }, [espaceId])
+
   const creer = async () => {
     setErreur('')
     if (!qcmId && !espaceId) { setErreur('Choisis au moins un QCM ou une matière.'); return }
     setCreating(true)
     try {
-      const deck = await construireDeck({ qcmId: qcmId || null, espaceId: espaceId || null, nb })
+      const deck = await construireDeck({ qcmId: qcmId || null, espaceId: espaceId || null, moduleId: moduleId || null, nb })
       if (deck.length < 2) { setErreur('Pas assez de questions disponibles pour cette sélection.'); setCreating(false); return }
-      const titre = [qcms.find(q => q.id === qcmId)?.titre, espaces.find(e => e.id === espaceId)?.nom].filter(Boolean).join(' + ') || 'Match'
+      const nomModule = modules.find(m => m.id === moduleId)?.nom
+      const nomMatiere = espaces.find(e => e.id === espaceId)?.nom
+      const titre = [qcms.find(q => q.id === qcmId)?.titre, nomModule || nomMatiere].filter(Boolean).join(' + ') || 'Match'
 
       // La création passe par le serveur : il sépare le paquet public des
       // solutions (jamais envoyées aux clients) et génère le code.
@@ -133,6 +148,16 @@ export default function DuelAccueil() {
                 {espaces.map(e => <option key={e.id} value={e.id}>{e.nom}</option>)}
               </select>
             </label>
+            {/* Module/chapitre — visible une fois une matière choisie */}
+            {espaceId && modules.length > 0 && (
+              <label style={{ flex: '1 1 220px', fontSize: 13, color: '#8A7E68' }}>
+                Chapitre précis (facultatif)
+                <select value={moduleId} onChange={e => setModuleId(e.target.value)} style={{ ...champ, marginTop: 5 }}>
+                  <option value="">Toute la matière</option>
+                  {modules.map(m => <option key={m.id} value={m.id}>{m.nom}</option>)}
+                </select>
+              </label>
+            )}
           </div>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <label style={{ flex: '1 1 160px', fontSize: 13, color: '#8A7E68' }}>
