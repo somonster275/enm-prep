@@ -32,10 +32,15 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 // Cache mémoire simple (par URL) pour ne pas solliciter le planning à chaque chargement.
 const cache = new Map<string, { t: number; evs: Ev[] }>()
 
+// Décode les entités HTML : numériques (&#201; → É, &#xE9; → é) + nommées
+// courantes. Les numériques sont traitées en premier, et &amp; en dernier
+// pour éviter les double-décodages (&amp;#39; → &#39;).
 const decode = (s: string) =>
   (s || '')
-    .replace(/&amp;/g, '&').replace(/&#0?39;/g, "'").replace(/&apos;/g, "'")
-    .replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(parseInt(n, 10)))
+    .replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
 const clean = (s: string) => decode(s || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
 
 function champCache(html: string, name: string): string {
