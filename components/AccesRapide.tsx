@@ -28,7 +28,7 @@ export default function AccesRapide({ matieres }: { matieres: Matiere[] }) {
     <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18, padding: 22 }}>
       <div style={{ fontFamily: display, fontWeight: 800, fontSize: 15, marginBottom: 14 }}>Accès rapide</div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(86px, 1fr))', gap: 10 }}>
+      <div className="raccourcis-grille" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(86px, 1fr))', gap: 10 }}>
         {FONCTIONS.map(f => (
           <Link key={f.href} href={f.href} className="raccourci" style={{
             textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
@@ -63,6 +63,11 @@ export default function AccesRapide({ matieres }: { matieres: Matiere[] }) {
         .matieres-scroll::-webkit-scrollbar{height:6px}
         .matieres-scroll::-webkit-scrollbar-track{background:transparent}
         .matieres-scroll::-webkit-scrollbar-thumb{background:#E4D8C2; border-radius:999px}
+        @media(max-width:768px){
+          .raccourci{padding:10px 4px !important}
+          .raccourci span:first-child{width:30px !important; height:30px !important; font-size:16px !important}
+          .raccourci span:last-child{font-size:10.5px !important}
+        }
       `}</style>
     </div>
   )
