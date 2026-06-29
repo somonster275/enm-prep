@@ -15,6 +15,43 @@ const POINTS_VITESSE = 50      // bonus max pour la rapidité (proportionnel au 
 const melange = <T,>(arr: T[]): T[] => [...arr].sort(() => Math.random() - 0.5)
 const sansHtml = (s: string) => (s || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
 
+// Convertit le HTML en texte en préservant les ruptures de blocs (paragraphes,
+// listes, sauts de ligne) sous forme de '\n' — pour pouvoir couper proprement.
+const htmlVersTexte = (s: string): string => (s || '')
+  .replace(/<\/(p|div|li|tr|h[1-6]|blockquote)>/gi, '\n')
+  .replace(/<br\s*\/?>/gi, '\n')
+  .replace(/<[^>]*>/g, ' ')
+  .replace(/[ \t]+/g, ' ')
+  .split('\n').map(l => l.trim()).filter(Boolean).join('\n')
+
+// Découpe un texte en phrases (fin de phrase OU saut de ligne / paragraphe).
+const decouperPhrases = (texte: string): string[] =>
+  texte.split(/(?<=[.!?…»])\s+|\n+/).map(s => s.trim()).filter(Boolean)
+
+// Produit une proposition lisible : des PHRASES ENTIÈRES jusqu'à ~maxLen, jamais
+// coupées en plein milieu. Ajoute « […] » s'il reste du texte ensuite. Une seule
+// phrase trop longue est, en dernier recours, coupée au dernier mot.
+const extraitLisible = (brut: string, maxLen = 280): string => {
+  const texte = htmlVersTexte(brut)
+  if (texte.length <= maxLen) return texte
+
+  const phrases = decouperPhrases(texte)
+  let out = ''
+  for (const p of phrases) {
+    if (!out) { out = p; continue }
+    if ((out + ' ' + p).length > maxLen) break
+    out += ' ' + p
+  }
+  // Cas limite : la première phrase dépasse déjà maxLen → coupe au dernier mot.
+  if (out.length > maxLen) {
+    const coupe = out.slice(0, maxLen)
+    const dernierEspace = coupe.lastIndexOf(' ')
+    out = (dernierEspace > 60 ? coupe.slice(0, dernierEspace) : coupe).trim()
+  }
+  // Indique qu'il y a une suite (toute la fiche n'est pas affichée).
+  return out.replace(/[.,;:\s]+$/, '') + ' […]'
+}
+
 // ---- Similarité lexicale (pour des leurres crédibles, sans appel IA) ----
 // Mots vides ignorés : ils n'apportent pas de signal de proximité thématique.
 const STOP = new Set([
@@ -66,8 +103,8 @@ function ficheVersQuestion(
   fiche: { id: string; question: string; reponse: string; moduleId: string },
   pool: PoolItem[],
 ): MatchQuestion | null {
-  const bonne = sansHtml(fiche.reponse).slice(0, 220)
-  const enonce = sansHtml(fiche.question).slice(0, 280)
+  const bonne = extraitLisible(fiche.reponse, 280)
+  const enonce = extraitLisible(fiche.question, 320)
   if (!bonne || !enonce) return null
 
   const tokBonne = tokeniser(bonne)
@@ -144,7 +181,7 @@ export async function construireDeck(opts: {
       // Réservoir de leurres : chaque réponse avec son module et ses mots-clés
       // (pré-tokenisés une seule fois pour ne pas recalculer à chaque question).
       const pool: PoolItem[] = fl
-        .map(f => ({ rep: sansHtml(f.reponse).slice(0, 220), moduleId: f.module_id }))
+        .map(f => ({ rep: extraitLisible(f.reponse, 280), moduleId: f.module_id }))
         .filter(p => p.rep)
         .map(p => ({ ...p, tokens: tokeniser(p.rep) }))
       for (const f of melange(fl)) {
