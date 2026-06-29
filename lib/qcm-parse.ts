@@ -64,6 +64,9 @@ function enonceAvant(group: Element): string {
 export function parseHtml(input: string): QQuestion[] {
   if (typeof window === 'undefined' || typeof DOMParser === 'undefined') return []
   const doc = new DOMParser().parseFromString(input, 'text/html')
+  // On retire le code (script/style) : son contenu n'est PAS un QCM et pollue
+  // sinon la détection (règles CSS, lignes de JS prises pour des options).
+  doc.querySelectorAll('script, style, noscript, svg').forEach(n => n.remove())
   const out: QQuestion[] = []
 
   // 1) Listes <ol>/<ul> : chaque liste = options, l'énoncé est juste avant.
@@ -97,12 +100,65 @@ function inp0Closest(el: Element): Element | null {
   return el.closest('fieldset, form, div, p, li') || el.parentElement
 }
 
+// ---------- QCM stocké dans du JavaScript ----------
+// Beaucoup de quiz « interactifs » (souvent générés par IA) embarquent leurs
+// questions dans un tableau JS. On n'extrait QUE les vrais choix multiples :
+// un énoncé + un tableau d'options + l'indication de la bonne réponse.
+// Les quiz à réponse libre (champ « ok »/« display » sans options) ne sont PAS
+// des QCM : on les ignore (retour vide) pour ne pas fabriquer de faux QCM.
+function parseDonneesJs(input: string): QQuestion[] {
+  // On isole le contenu des <script> (sinon on parse le HTML visible).
+  const scripts = [...input.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)].map(m => m[1])
+  const source = scripts.length ? scripts.join('\n') : input
+  const out: QQuestion[] = []
+
+  // Repère les objets contenant un tableau d'options et une bonne réponse.
+  const champEnonce = /(?:question|enonce|énoncé|intitule|intitulé|q|hint|titre)\s*:\s*(["'`])((?:\\.|(?!\1).)*)\1/i
+  const champOptions = /(?:options|choices|choix|reponses|réponses|answers|propositions)\s*:\s*\[([\s\S]*?)\]/i
+  const champCorrect = /(?:correct|bonne|answer|correctIndex|bonneReponse|reponse|solution)\s*:\s*(\d+|true|["'`][^"'`]*["'`])/i
+
+  // Découpe grossièrement en objets { ... }.
+  const blocs = source.split(/\}\s*,\s*\{/).map((b, i, arr) =>
+    (i > 0 ? '{' : '') + b + (i < arr.length - 1 ? '}' : ''))
+
+  for (const bloc of blocs) {
+    const mOpt = bloc.match(champOptions)
+    if (!mOpt) continue
+    const mEn = bloc.match(champEnonce)
+    if (!mEn) continue
+    const enonce = mEn[2].replace(/\\(["'`])/g, '$1').trim()
+
+    // Extrait les chaînes du tableau d'options.
+    const textes = [...mOpt[1].matchAll(/(["'`])((?:\\.|(?!\1).)*)\1/g)].map(m => m[2].replace(/\\(["'`])/g, '$1').trim()).filter(Boolean)
+    if (textes.length < 2) continue
+
+    // Détermine la bonne réponse (index numérique ou texte).
+    const mCor = bloc.match(champCorrect)
+    let bonneIdx = -1
+    if (mCor) {
+      const v = mCor[1]
+      if (/^\d+$/.test(v)) bonneIdx = parseInt(v, 10)
+      else { const t = v.replace(/^["'`]|["'`]$/g, ''); bonneIdx = textes.findIndex(o => o === t) }
+    }
+    const options = textes.map((t, i) => ({ t, c: i === bonneIdx }))
+    out.push({ enonce, options })
+  }
+  return out
+}
+
 export function parseQcm(input: string): QQuestion[] {
   if (looksHtml(input)) {
+    // 1) QCM « interactif » : données stockées dans un tableau JavaScript.
+    const js = parseDonneesJs(input)
+    if (js.length) return js
+    // 2) QCM HTML classique (listes, boutons radio).
     const h = parseHtml(input)
     if (h.length) return h
-    // Repli : on retire les balises et on tente le format texte.
-    const txt = input.replace(/<br\s*\/?>(?=)/gi, '\n').replace(/<\/(p|li|div|tr|h\d)>/gi, '\n').replace(/<[^>]+>/g, '')
+    // 3) Repli : on retire code + balises, et on tente le format texte.
+    const sansCode = input
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+    const txt = sansCode.replace(/<br\s*\/?>(?=)/gi, '\n').replace(/<\/(p|li|div|tr|h\d)>/gi, '\n').replace(/<[^>]+>/g, '')
     return parseTexte(txt)
   }
   return parseTexte(input)
