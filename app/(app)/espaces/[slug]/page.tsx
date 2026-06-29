@@ -22,6 +22,7 @@ export default function EspacePage() {
   const [progressions, setProgressions] = useState<Progression[]>([])
   const [isAdmin, setIsAdmin] = useState(false)
   const [tools, setTools] = useState<Record<string, ToolItem[]>>({ mindmaps: [], medias: [], qcm: [] })
+  const [cours, setCours] = useState<{ id: string; titre: string; type: string | null; module_id: string | null }[]>([])
 
   useEffect(() => {
     const load = async () => {
@@ -50,6 +51,10 @@ export default function EspacePage() {
       }
       const [mm, md, qc] = await Promise.all([fetchTool('mindmaps'), fetchTool('medias'), fetchTool('qcm')])
       setTools({ mindmaps: mm, medias: md, qcm: qc })
+
+      // Cours rattachés à cette matière.
+      const { data: cs } = await supabase.from('cours').select('id, titre, type, module_id').eq('espace_id', esp.id).order('created_at', { ascending: false })
+      setCours((cs || []) as { id: string; titre: string; type: string | null; module_id: string | null }[])
     }
     load()
   }, [slug])
@@ -134,6 +139,33 @@ export default function EspacePage() {
         {modules.length === 0 && (
           <div style={{ fontSize: 14, color: '#9A8D72', padding: '1rem 0' }}>
             Aucun module dans cette matière. Créez-en depuis l'éditeur.
+          </div>
+        )}
+      </div>
+
+      {/* ===== COURS (rattachés à cette matière) ===== */}
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 20 }}>📘</span>
+            <h2 style={{ fontFamily: display, fontWeight: 800, fontSize: 20, margin: 0 }}>Cours</h2>
+          </div>
+          {isAdmin && <Link href="/cours" style={{ fontSize: 13, fontWeight: 600, color: '#3B82D9', textDecoration: 'none' }}>+ Ajouter</Link>}
+        </div>
+        {cours.length === 0 ? (
+          <div style={{ fontSize: 13, color: '#9A8D72', padding: '0.5rem 0' }}>Aucun cours dans cette matière pour l&apos;instant.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {cours.map(c => (
+              <Link key={c.id} href={`/cours?c=${c.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, fontWeight: 600 }}>
+                    <span>{c.type === 'pdf' ? '📕' : '📘'}</span>{c.titre}
+                  </div>
+                  <span style={{ fontSize: 12, color: '#3B82D9', fontWeight: 600, flexShrink: 0 }}>Consulter →</span>
+                </div>
+              </Link>
+            ))}
           </div>
         )}
       </div>

@@ -1,11 +1,15 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 type Cours = {
   id: string; titre: string; description: string | null; matiere: string | null
+  espace_id: string | null; module_id: string | null
   fichier_url: string; fichier_nom: string | null; type: string | null; created_at: string
 }
+type EspaceItem = { id: string; nom: string }
+type ModuleItem = { id: string; nom: string }
 
 const FONT = "'Hanken Grotesk', sans-serif"
 const DISPLAY = "'Bricolage Grotesque', sans-serif"
@@ -18,13 +22,16 @@ function urlVisionneuse(c: Cours): string {
   return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(c.fichier_url)}`
 }
 
-export default function CoursPage() {
+function CoursContenu() {
   const [uid, setUid] = useState('')
   const [isAdmin, setIsAdmin] = useState(false)
+  const [espaces, setEspaces] = useState<EspaceItem[]>([])
   const [matieres, setMatieres] = useState<string[]>([])
   const [liste, setListe] = useState<Cours[]>([])
   const [loading, setLoading] = useState(true)
   const [filtre, setFiltre] = useState('')
+
+  const params = useSearchParams()
 
   // Cours ouvert (visionneuse)
   const [actif, setActif] = useState<Cours | null>(null)
@@ -36,7 +43,9 @@ export default function CoursPage() {
   const [formOuvert, setFormOuvert] = useState(false)
   const [titre, setTitre] = useState('')
   const [description, setDescription] = useState('')
-  const [matiere, setMatiere] = useState('')
+  const [espaceId, setEspaceId] = useState('')
+  const [moduleId, setModuleId] = useState('')
+  const [modules, setModules] = useState<ModuleItem[]>([])
   const [fichier, setFichier] = useState<File | null>(null)
   const [saving, setSaving] = useState(false)
   const [erreur, setErreur] = useState('')
@@ -48,15 +57,34 @@ export default function CoursPage() {
     setUid(user.id)
     const [{ data: prof }, { data: esp }, { data: cs }] = await Promise.all([
       supabase.from('profils').select('role').eq('id', user.id).single(),
-      supabase.from('espaces').select('nom').order('ordre'),
+      supabase.from('espaces').select('id, nom').order('ordre'),
       supabase.from('cours').select('*').order('created_at', { ascending: false }),
     ])
     setIsAdmin(prof?.role === 'admin')
+    setEspaces((esp || []) as EspaceItem[])
     setMatieres((esp || []).map((e: { nom: string }) => e.nom))
     setListe((cs || []) as Cours[])
     setLoading(false)
   }
   useEffect(() => { charger() }, [])
+
+  // Ouvre automatiquement un cours si ?c=<id> est présent (lien depuis un espace/module).
+  useEffect(() => {
+    const id = params.get('c')
+    if (!id || actif || liste.length === 0) return
+    const c = liste.find(x => x.id === id)
+    if (c) { setActif(c); setRemarque(''); setRemarqueOk(false) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params, liste])
+
+  // Modules de l'espace choisi (pour ranger le cours dans un chapitre précis).
+  useEffect(() => {
+    setModuleId('')
+    if (!espaceId) { setModules([]); return }
+    supabase.from('modules')
+      .select('id, nom').eq('espace_id', espaceId).is('parent_id', null).is('deleted_at', null).order('ordre')
+      .then(({ data }) => setModules((data || []) as ModuleItem[]))
+  }, [espaceId])
 
   const televerser = async () => {
     setErreur('')
@@ -75,12 +103,14 @@ export default function CoursPage() {
       // 2) Enregistrement du cours.
       const nom = fichier.name
       const type = /\.pdf$/i.test(nom) ? 'pdf' : 'doc'
+      const nomMatiere = espaces.find(e => e.id === espaceId)?.nom || null
       const { error } = await supabase.from('cours').insert({
         titre: titre.trim().slice(0, 160), description: description.trim() || null,
-        matiere: matiere || null, fichier_url: uj.url, fichier_nom: nom, type, created_by: uid,
+        matiere: nomMatiere, espace_id: espaceId || null, module_id: moduleId || null,
+        fichier_url: uj.url, fichier_nom: nom, type, created_by: uid,
       })
       if (error) { setErreur(error.message); setSaving(false); return }
-      setTitre(''); setDescription(''); setMatiere(''); setFichier(null); setFormOuvert(false)
+      setTitre(''); setDescription(''); setEspaceId(''); setModuleId(''); setFichier(null); setFormOuvert(false)
       if (fileRef.current) fileRef.current.value = ''
       charger()
     } catch {
@@ -179,16 +209,22 @@ export default function CoursPage() {
           <input value={titre} onChange={e => setTitre(e.target.value)} placeholder="Titre du cours" style={champ} />
           <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} placeholder="Description (facultatif)" style={{ ...champ, resize: 'vertical' }} />
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <select value={matiere} onChange={e => setMatiere(e.target.value)} style={{ ...champ, flex: '1 1 180px' }}>
+            <select value={espaceId} onChange={e => setEspaceId(e.target.value)} style={{ ...champ, flex: '1 1 180px' }}>
               <option value="">Matière (facultatif)</option>
-              {matieres.map(m => <option key={m} value={m}>{m}</option>)}
+              {espaces.map(e => <option key={e.id} value={e.id}>{e.nom}</option>)}
             </select>
-            <label style={{ flex: '2 1 240px', display: 'flex', alignItems: 'center', padding: '10px 14px', borderRadius: 12, border: `1.5px dashed ${fichier ? '#DC4A2B' : '#EADFC9'}`, background: fichier ? '#FFF4F2' : '#FFFBF2', color: fichier ? '#DC4A2B' : '#8A7E68', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}>
-              {fichier ? `📎 ${fichier.name}` : 'Choisir un fichier (PDF ou Word)…'}
-              <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style={{ display: 'none' }}
-                onChange={e => setFichier(e.target.files?.[0] || null)} />
-            </label>
+            {espaceId && modules.length > 0 && (
+              <select value={moduleId} onChange={e => setModuleId(e.target.value)} style={{ ...champ, flex: '1 1 180px' }}>
+                <option value="">Tout le module (chapitre facultatif)</option>
+                {modules.map(m => <option key={m.id} value={m.id}>{m.nom}</option>)}
+              </select>
+            )}
           </div>
+          <label style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', borderRadius: 12, border: `1.5px dashed ${fichier ? '#DC4A2B' : '#EADFC9'}`, background: fichier ? '#FFF4F2' : '#FFFBF2', color: fichier ? '#DC4A2B' : '#8A7E68', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}>
+            {fichier ? `📎 ${fichier.name}` : 'Choisir un fichier (PDF ou Word)…'}
+            <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style={{ display: 'none' }}
+              onChange={e => setFichier(e.target.files?.[0] || null)} />
+          </label>
           {erreur && <div style={{ fontSize: 13, color: '#D94A30' }}>{erreur}</div>}
           <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={televerser} disabled={saving} style={{ height: 44, padding: '0 22px', border: 'none', borderRadius: 11, background: '#DC4A2B', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.6 : 1, fontFamily: FONT }}>{saving ? 'Envoi…' : 'Publier le cours'}</button>
@@ -232,5 +268,13 @@ export default function CoursPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function CoursPage() {
+  return (
+    <Suspense fallback={<div style={{ paddingTop: 40, textAlign: 'center', color: '#9A8D72', fontFamily: FONT }}>Chargement…</div>}>
+      <CoursContenu />
+    </Suspense>
   )
 }

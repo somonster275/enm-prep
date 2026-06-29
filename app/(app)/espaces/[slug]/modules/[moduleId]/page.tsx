@@ -19,6 +19,7 @@ export default function ModulePage() {
   const [module, setModule] = useState<Module | null>(null)
   const [sousModules, setSousModules] = useState<Module[]>([])
   const [fiches, setFiches] = useState<Fiche[]>([])
+  const [cours, setCours] = useState<{ id: string; titre: string; type: string | null }[]>([])
   const [progressions, setProgressions] = useState<any[]>([])
   const [profil, setProfil] = useState<Profil | null>(null)
   const [favSet, setFavSet] = useState<Set<string>>(new Set())
@@ -93,6 +94,10 @@ export default function ModulePage() {
 
       const { data: fav } = await supabase.from('favoris').select('fiche_id').eq('user_id', user.id)
       setFavSet(new Set((fav || []).map((x: { fiche_id: string }) => x.fiche_id)))
+
+      // Cours rattachés à ce module précis.
+      const { data: cs } = await supabase.from('cours').select('id, titre, type').eq('module_id', moduleId).order('created_at', { ascending: false })
+      setCours((cs || []) as { id: string; titre: string; type: string | null }[])
 
       setLoading(false)
     }
@@ -399,6 +404,32 @@ export default function ModulePage() {
           </div>
         )}
       </div>
+
+      {/* ===== COURS DU MODULE ===== */}
+      {(cours.length > 0 || isAdmin) && (
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 18 }}>📘 Cours</div>
+            {isAdmin && <Link href="/cours" style={{ fontSize: 13, fontWeight: 600, color: '#3B82D9', textDecoration: 'none' }}>+ Ajouter</Link>}
+          </div>
+          {cours.length === 0 ? (
+            <div style={{ fontSize: 13, color: '#9A8D72', padding: '0.25rem 0' }}>Aucun cours rattaché à ce module.</div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {cours.map(c => (
+                <Link key={c.id} href={`/cours?c=${c.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, fontWeight: 600 }}>
+                      <span>{c.type === 'pdf' ? '📕' : '📘'}</span>{c.titre}
+                    </div>
+                    <span style={{ fontSize: 12, color: '#3B82D9', fontWeight: 600, flexShrink: 0 }}>Consulter →</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ===== FICHES DIRECTES ===== */}
       <div>

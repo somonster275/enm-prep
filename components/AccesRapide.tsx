@@ -10,6 +10,7 @@ const display = "'Bricolage Grotesque', sans-serif"
 
 const FONCTIONS: { href: string; icone: string; label: string; couleur: string }[] = [
   { href: '/espaces', icone: '🗂️', label: 'Fiches', couleur: '#DC4A2B' },
+  { href: '/cours', icone: '📘', label: 'Cours', couleur: '#3B82D9' },
   { href: '/qcm', icone: '✅', label: 'QCM', couleur: '#E8A11E' },
   { href: '/duel', icone: '⚔️', label: 'Duel', couleur: '#C0392B' },
   { href: '/mind-maps', icone: '🧠', label: 'Mind maps', couleur: '#2DAE83' },
