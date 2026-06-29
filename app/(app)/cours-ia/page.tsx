@@ -372,7 +372,7 @@ export default function CoursIAPage() {
                 </label>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontSize: 12, color: textMuted }}>PDF et TXT · découpés en passages et indexés</div>
+                <div style={{ fontSize: 12, color: textMuted }}>PDF, Word et TXT · découpés en passages et indexés</div>
                 <button onClick={importerDoc} disabled={!fichier || uploading} style={{
                   padding: '10px 22px', borderRadius: 10, background: coral, color: '#fff', border: 'none',
                   cursor: fichier && !uploading ? 'pointer' : 'default', fontSize: 13, fontWeight: 700, fontFamily: font,
