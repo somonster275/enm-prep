@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   const { titre, deck, secondes } = await req.json().catch(() => ({}))
   if (!Array.isArray(deck)) return NextResponse.json({ error: 'Paquet invalide' }, { status: 400 })
 
-  const pub: { enonce: string; options: { t: string }[]; cat: string; multi: boolean }[] = []
+  const pub: { enonce: string; options: { t: string; full?: string }[]; cat: string; multi: boolean }[] = []
   const sols: number[][] = []
   const origines: Origine[] = []
   // Texte INTÉGRAL des options, conservé côté serveur pour le débrief (afficher
@@ -32,15 +32,21 @@ export async function POST(req: NextRequest) {
     const correct = q.options.map((o, i) => (o.c ? i : -1)).filter(i => i >= 0)
     if (correct.length < 1) continue
     const cat = q.cat === 'qcm' ? 'qcm' : 'fiche'
+    const optsFull = q.options.map(o => texteComplet(String(o.t), 4000))
     pub.push({
       // Deck de jeu : tronqué proprement (phrases entières) pour l'affichage live.
+      // `full` = texte intégral pour le dépliage « voir toute la carte » (ne révèle
+      // PAS la bonne réponse : la solution reste cachée côté serveur).
       enonce: extraitLisible(String(q.enonce), 320),
-      options: q.options.map(o => ({ t: extraitLisible(String(o.t), 280) })),
+      options: q.options.map((o, i) => {
+        const t = extraitLisible(String(o.t), 280)
+        return optsFull[i].length > t.length ? { t, full: optsFull[i] } : { t }
+      }),
       cat,
       multi: correct.length > 1, // indique qu'il y a plusieurs bonnes réponses (sans dire lesquelles)
     })
     sols.push(correct)
-    optionsFull.push(q.options.map(o => texteComplet(String(o.t), 4000)))
+    optionsFull.push(optsFull)
     // Origine conservée côté serveur (jamais dans le deck public) pour le débrief
     // et le rangement des erreurs en révision.
     origines.push(cat === 'qcm'

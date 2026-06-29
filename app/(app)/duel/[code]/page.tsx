@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { enregistrerActivite } from '@/lib/streaks'
 
 // Le paquet public ne contient PAS les bonnes réponses (correction côté serveur).
-type MatchQuestionPub = { enonce: string; options: { t: string }[]; cat: 'qcm' | 'fiche'; multi: boolean }
+type MatchQuestionPub = { enonce: string; options: { t: string; full?: string }[]; cat: 'qcm' | 'fiche'; multi: boolean }
 type Match = {
   id: string; code: string; hote_id: string; titre: string | null; statut: string
   deck: MatchQuestionPub[]; secondes_par_question: number; started_at: string | null
@@ -32,6 +32,8 @@ export default function SalleDuel() {
   const [selection, setSelection] = useState<Set<number>>(new Set())
   const [verrou, setVerrou] = useState(false)        // a validé cette question
   const [fini, setFini] = useState(false)
+  // Options dépliées (texte intégral) pendant le jeu, par index d'option.
+  const [deplieJeu, setDeplieJeu] = useState<Set<number>>(new Set())
 
   // Débrief de fin de match (cartes interrogées + rangement des erreurs).
   const [correction, setCorrection] = useState<Correction | null>(null)
@@ -137,6 +139,7 @@ export default function SalleDuel() {
         setIdx(cur)
         setSelection(new Set()); selectionRef.current = new Set()
         setVerrou(false)
+        setDeplieJeu(new Set())
       }
       setReste(Math.max(0, secs - (elapsed % secs)))
     }
@@ -405,14 +408,27 @@ export default function SalleDuel() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 18 }}>
         {q.options.map((o, oi) => {
           const sel = selection.has(oi)
+          const ouvert = deplieJeu.has(oi)
           return (
             <button key={oi} onClick={() => choisir(oi, multi)} disabled={verrou} style={{
-              display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', cursor: verrou ? 'default' : 'pointer',
+              display: 'flex', alignItems: 'flex-start', gap: 12, textAlign: 'left', cursor: verrou ? 'default' : 'pointer',
               border: `1.5px solid ${sel ? '#E8A11E' : '#EADFC9'}`, background: sel ? '#FCEFD3' : '#FFFBF2',
               borderRadius: 12, padding: '13px 16px', fontSize: 15, fontFamily: FONT, color: '#2A2018', opacity: verrou && !sel ? 0.6 : 1,
             }}>
-              <span style={{ flexShrink: 0, width: 20, height: 20, borderRadius: multi ? 5 : '50%', border: `2px solid ${sel ? '#E8A11E' : '#C0B7A4'}`, background: sel ? '#E8A11E' : '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12 }}>{sel ? '✓' : ''}</span>
-              <span style={{ flex: 1 }}>{o.t}</span>
+              <span style={{ flexShrink: 0, width: 20, height: 20, marginTop: 1, borderRadius: multi ? 5 : '50%', border: `2px solid ${sel ? '#E8A11E' : '#C0B7A4'}`, background: sel ? '#E8A11E' : '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12 }}>{sel ? '✓' : ''}</span>
+              <span style={{ flex: 1 }}>
+                <span style={{ whiteSpace: 'pre-wrap', lineHeight: 1.45 }}>{ouvert ? o.full : o.t}</span>
+                {o.full && (
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={e => { e.stopPropagation(); setDeplieJeu(s => { const n = new Set(s); n.has(oi) ? n.delete(oi) : n.add(oi); return n }) }}
+                    style={{ display: 'inline-block', marginTop: 6, fontSize: 12, fontWeight: 700, color: '#B8860B', cursor: 'pointer' }}
+                  >
+                    {ouvert ? '  ▲ Réduire' : '  ▼ Voir toute la carte'}
+                  </span>
+                )}
+              </span>
             </button>
           )
         })}
