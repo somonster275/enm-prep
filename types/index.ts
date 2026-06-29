@@ -25,6 +25,7 @@ export interface Fiche {
   question: string
   reponse: string
   tags?: string[]
+  suspendu?: boolean
   created_at: string
 }
 

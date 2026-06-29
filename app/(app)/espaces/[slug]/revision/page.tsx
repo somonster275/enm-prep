@@ -75,7 +75,7 @@ export default function RevisionPage() {
       if (mixte) {
         setEspace({ id: '', nom: 'Révision mixte', slug: '', description: '', couleur: '#DC4A2B', ordre: 0 } as Espace)
         setModuleLabel('Toutes matières')
-        const { data: fich } = await supabase.from('fiches').select('*').is('deleted_at', null)
+        const { data: fich } = await supabase.from('fiches').select('*').is('deleted_at', null).eq('suspendu', false)
         const fichList = (fich || []) as Fiche[]
         const { data: prog } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id)
         const progMap: Record<string, Progression> = {}
@@ -96,7 +96,7 @@ export default function RevisionPage() {
         const { data: prog } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id).lte('niveau', 1)
         const ids = (prog || []).map((p: Progression) => p.fiche_id)
         if (ids.length === 0) { setLoaded(true); return }
-        const { data: fich } = await supabase.from('fiches').select('*').in('id', ids).is('deleted_at', null)
+        const { data: fich } = await supabase.from('fiches').select('*').in('id', ids).is('deleted_at', null).eq('suspendu', false)
         const progMap: Record<string, Progression> = {}
         ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
         setProgressions(progMap)
@@ -112,7 +112,7 @@ export default function RevisionPage() {
         const { data: fav } = await supabase.from('favoris').select('fiche_id').eq('user_id', user.id)
         const ids = (fav || []).map((x: { fiche_id: string }) => x.fiche_id)
         if (ids.length === 0) { setLoaded(true); return }
-        const { data: fich } = await supabase.from('fiches').select('*').in('id', ids).is('deleted_at', null)
+        const { data: fich } = await supabase.from('fiches').select('*').in('id', ids).is('deleted_at', null).eq('suspendu', false)
         const { data: prog } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id).in('fiche_id', ids)
         const progMap: Record<string, Progression> = {}
         ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
@@ -141,7 +141,7 @@ export default function RevisionPage() {
 
       if (modIds.length === 0) { setLoaded(true); return }
 
-      const { data: fich } = await supabase.from('fiches').select('*').in('module_id', modIds).is('deleted_at', null)
+      const { data: fich } = await supabase.from('fiches').select('*').in('module_id', modIds).is('deleted_at', null).eq('suspendu', false)
       const fichList = fich || []
 
       const { data: prog } = await supabase.from('progression').select('*')

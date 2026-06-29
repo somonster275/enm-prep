@@ -58,7 +58,6 @@ export default function ModulePage() {
         { data: esp },
         { data: mod },
         { data: sousMods },
-        { data: fich },
         { data: prof },
         { data: esps },
         { data: mods },
@@ -66,11 +65,16 @@ export default function ModulePage() {
         supabase.from('espaces').select('*').eq('slug', slug).single(),
         supabase.from('modules').select('*').eq('id', moduleId).single(),
         supabase.from('modules').select('*').eq('parent_id', moduleId).is('deleted_at', null).order('ordre'),
-        supabase.from('fiches').select('*').eq('module_id', moduleId).is('deleted_at', null).order('created_at'),
         supabase.from('profils').select('*').eq('id', user.id).single(),
         supabase.from('espaces').select('*').order('ordre'),
         supabase.from('modules').select('*').is('deleted_at', null).order('nom'),
       ])
+
+      // Les fiches suspendues ne sont visibles que du staff ; les étudiants ne les reçoivent pas.
+      const staff = prof?.role === 'admin' || prof?.role === 'editeur'
+      let reqFiches = supabase.from('fiches').select('*').eq('module_id', moduleId).is('deleted_at', null).order('created_at')
+      if (!staff) reqFiches = reqFiches.eq('suspendu', false)
+      const { data: fich } = await reqFiches
 
       setEspace(esp)
       setModule(mod)
@@ -169,6 +173,16 @@ export default function ModulePage() {
     if (!confirm('Mettre cette fiche à la corbeille ?')) return
     await supabase.from('fiches').update({ deleted_at: new Date().toISOString() }).eq('id', id)
     setFiches(f => f.filter(fc => fc.id !== id))
+  }
+
+  // Suspend / réactive une fiche : la retire de la circulation (révisions,
+  // recherche, comptes…) sans la supprimer. Réversible.
+  const basculerSuspension = async (fiche: Fiche) => {
+    const nouveau = !fiche.suspendu
+    const { error } = await supabase.from('fiches').update({ suspendu: nouveau }).eq('id', fiche.id)
+    if (error) { afficherMsg('❌ Erreur : ' + error.message); return }
+    setFiches(f => f.map(fc => fc.id === fiche.id ? { ...fc, suspendu: nouveau } : fc))
+    afficherMsg(nouveau ? '⏸️ Fiche suspendue (retirée des révisions)' : '▶️ Fiche réactivée')
   }
 
   const supprimerModule = async () => {
@@ -397,7 +411,11 @@ export default function ModulePage() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {fiches.map((fiche, i) => (
-              <div key={fiche.id} style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 14 }}>
+              <div key={fiche.id} style={{
+                background: fiche.suspendu ? '#FBF6EE' : '#fff',
+                border: fiche.suspendu ? '1px dashed #E0A93B' : '1px solid #F0E7D6',
+                borderRadius: 14, opacity: fiche.suspendu ? 0.85 : 1,
+              }}>
                 {isAdmin && editFiche?.id === fiche.id ? (
                   <div style={{ padding: '16px' }}>
                     <div style={{ marginBottom: 10 }}>
@@ -417,7 +435,10 @@ export default function ModulePage() {
                   <div style={{ padding: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: '#9A8D72', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fiche {i + 1}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: '#9A8D72', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fiche {i + 1}</span>
+                          {fiche.suspendu && <span style={{ fontSize: 10, fontWeight: 700, color: '#9A6A12', background: '#FBEAC6', padding: '2px 8px', borderRadius: 999 }}>⏸️ Suspendue</span>}
+                        </div>
                         <RichContent html={fiche.question} style={{ fontSize: 14, fontWeight: 600, color: '#2A2018', lineHeight: 1.5, marginBottom: 10 }} />
                         <div style={{ height: 1, background: '#F0E7D6', marginBottom: 10 }} />
                         <RichContent html={fiche.reponse} style={{ fontSize: 13, color: '#8A7E68', lineHeight: 1.7 }} />
@@ -429,6 +450,11 @@ export default function ModulePage() {
                             <button onClick={() => { setEditFiche(fiche); setQuestion(fiche.question); setReponse(fiche.reponse) }}
                               style={{ padding: '6px 12px', borderRadius: 8, background: '#fff', color: '#8A7E68', border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
                               Modifier
+                            </button>
+                            <button onClick={() => basculerSuspension(fiche)}
+                              title={fiche.suspendu ? 'Réactiver cette fiche' : 'Retirer cette fiche des révisions (réversible)'}
+                              style={{ padding: '6px 12px', borderRadius: 8, background: fiche.suspendu ? '#E6F7F2' : '#FBF1DD', color: fiche.suspendu ? '#0E7C63' : '#9A6A12', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
+                              {fiche.suspendu ? 'Reprendre' : 'Suspendre'}
                             </button>
                             <button onClick={() => supprimerFiche(fiche.id)}
                               style={{ padding: '6px 12px', borderRadius: 8, background: '#FCE9E3', color: '#D94A30', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>

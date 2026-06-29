@@ -22,7 +22,7 @@ export default function RecherchePage() {
 
     const [fiches, qcms, medias, annales, forum] = await Promise.all([
       supabase.from('fiches').select('id, question, reponse, module_id, modules(nom, espaces(nom, slug))')
-        .or(`question.ilike.${like},reponse.ilike.${like}`).is('deleted_at', null).limit(30),
+        .or(`question.ilike.${like},reponse.ilike.${like}`).is('deleted_at', null).eq('suspendu', false).limit(30),
       supabase.from('qcm').select('id, titre, matiere').or(`titre.ilike.${like},matiere.ilike.${like}`).limit(15),
       supabase.from('medias').select('id, titre, description, espaces(nom)')
         .or(`titre.ilike.${like},description.ilike.${like}`).is('deleted_at', null).limit(15),

@@ -24,7 +24,7 @@ export default function CarnetPage() {
       const { data: fich } = await supabase
         .from('fiches')
         .select('id, question, modules(nom, espaces(nom))')
-        .in('id', ids).is('deleted_at', null)
+        .in('id', ids).is('deleted_at', null).eq('suspendu', false)
       setItems((fich || []) as unknown as Item[])
       setLoading(false)
     }

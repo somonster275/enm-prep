@@ -44,7 +44,7 @@ export default function Dashboard() {
       const [{ data: esp }, { data: prog }, { data: fich }, { data: prof }, act, evs, { data: mods }] = await Promise.all([
         supabase.from('espaces').select('*').order('ordre'),
         supabase.from('progression').select('*').eq('utilisateur_id', user.id),
-        supabase.from('fiches').select('id, module_id, modules(espace_id)').is('deleted_at', null),
+        supabase.from('fiches').select('id, module_id, modules(espace_id)').is('deleted_at', null).eq('suspendu', false),
         supabase.from('profils').select('*').eq('id', user.id).single(),
         chargerActivite(user.id),
         supabase.from('evenements').select('id,titre,date_debut,heure,type,couleur').gte('date_debut', new Date().toISOString().slice(0,10)).order('date_debut').limit(4),

@@ -37,7 +37,7 @@ export default function EspacePage() {
       const { data: mods } = await supabase.from('modules').select('*').eq('espace_id', esp.id).is('parent_id', null).is('deleted_at', null).order('ordre')
       setModules(mods || [])
       const modIds = (mods || []).map((m: Module) => m.id)
-      const { data: fich } = await supabase.from('fiches').select('*').in('module_id', modIds).is('deleted_at', null)
+      const { data: fich } = await supabase.from('fiches').select('*').in('module_id', modIds).is('deleted_at', null).eq('suspendu', false)
       setFiches(fich || [])
       const fichIds = (fich || []).map((f: Fiche) => f.id)
       const { data: prog } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id).in('fiche_id', fichIds)
