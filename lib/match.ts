@@ -15,6 +15,31 @@ const POINTS_VITESSE = 50      // bonus max pour la rapidité (proportionnel au 
 const melange = <T,>(arr: T[]): T[] => [...arr].sort(() => Math.random() - 0.5)
 const sansHtml = (s: string) => (s || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
 
+// ---- Similarité lexicale (pour des leurres crédibles, sans appel IA) ----
+// Mots vides ignorés : ils n'apportent pas de signal de proximité thématique.
+const STOP = new Set([
+  'le', 'la', 'les', 'un', 'une', 'des', 'de', 'du', 'au', 'aux', 'et', 'ou', 'en',
+  'dans', 'par', 'pour', 'sur', 'que', 'qui', 'quoi', 'dont', 'est', 'sont', 'etre',
+  'ce', 'cet', 'cette', 'ces', 'son', 'sa', 'ses', 'leur', 'leurs', 'il', 'elle',
+  'ils', 'elles', 'on', 'se', 'ne', 'pas', 'plus', 'avec', 'sans', 'mais', 'donc',
+  'a', 'as', 'ai', 'ont', 'fait', 'faire', 'tout', 'tous', 'toute', 'toutes',
+])
+const tokeniser = (s: string): Set<string> => new Set(
+  (s || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 2 && !STOP.has(w)),
+)
+// Indice de Jaccard pondéré : proportion de mots significatifs partagés.
+const similariteTokens = (a: Set<string>, b: Set<string>): number => {
+  if (a.size === 0 || b.size === 0) return 0
+  let inter = 0
+  for (const w of a) if (b.has(w)) inter++
+  return inter / (a.size + b.size - inter)
+}
+
 // Points gagnés pour une réponse, avec bonus de rapidité si elle est juste.
 export function pointsReponse(juste: boolean, resteSecondes: number, totalSecondes: number): number {
   if (!juste) return 0
@@ -30,17 +55,51 @@ export function reponseJuste(q: MatchQuestion, choisi: Set<number>): boolean {
   return true
 }
 
-// Convertit une fiche (question/réponse libre) en QCM « trouve la bonne réponse » :
-// la vraie réponse + 3 leurres tirés d'autres fiches de la même matière.
+// Une entrée du « réservoir » de réponses servant à fabriquer des leurres.
+type PoolItem = { rep: string; moduleId: string; tokens: Set<string> }
+
+// Convertit une fiche (question/réponse libre) en QCM « trouve la bonne réponse ».
+// Les 3 leurres sont choisis pour RESSEMBLER à la bonne réponse (similarité
+// lexicale + bonus même module), afin que le choix soit réellement difficile —
+// plutôt que des réponses sans rapport, faciles à éliminer.
 function ficheVersQuestion(
-  fiche: { id: string; question: string; reponse: string },
-  pool: string[],
+  fiche: { id: string; question: string; reponse: string; moduleId: string },
+  pool: PoolItem[],
 ): MatchQuestion | null {
   const bonne = sansHtml(fiche.reponse).slice(0, 220)
   const enonce = sansHtml(fiche.question).slice(0, 280)
   if (!bonne || !enonce) return null
-  const leurres = melange(pool.filter(r => r && r !== bonne)).slice(0, 3)
-  if (leurres.length < 2) return null // pas assez de matière pour des leurres crédibles
+
+  const tokBonne = tokeniser(bonne)
+  // Score chaque réponse candidate par sa proximité avec la bonne réponse.
+  const candidats = pool
+    .filter(p => p.rep && p.rep !== bonne)
+    .map(p => {
+      const sim = similariteTokens(tokBonne, p.tokens)
+      const bonusModule = p.moduleId === fiche.moduleId ? 0.15 : 0 // même chapitre = plus proche
+      return { rep: p.rep, score: sim + bonusModule }
+    })
+    .sort((a, b) => b.score - a.score)
+
+  if (candidats.length < 2) return null // pas assez de matière pour des leurres crédibles
+
+  // On pioche dans une fenêtre des plus proches (un peu de hasard pour varier les
+  // duels), en évitant les doublons de texte.
+  const fenetre = candidats.slice(0, Math.min(8, candidats.length))
+  const vus = new Set<string>()
+  const leurres: string[] = []
+  for (const c of melange(fenetre)) {
+    if (vus.has(c.rep)) continue
+    vus.add(c.rep); leurres.push(c.rep)
+    if (leurres.length >= 3) break
+  }
+  // Complète si besoin avec les meilleurs scores restants (hors fenêtre).
+  for (const c of candidats) {
+    if (leurres.length >= 3) break
+    if (!vus.has(c.rep)) { vus.add(c.rep); leurres.push(c.rep) }
+  }
+  if (leurres.length < 2) return null
+
   const options = melange([{ t: bonne, c: true }, ...leurres.map(t => ({ t, c: false }))])
   return { enonce, options, cat: 'fiche', ficheId: fiche.id }
 }
@@ -71,11 +130,16 @@ export async function construireDeck(opts: {
     const modIds = (mods || []).map((m: { id: string }) => m.id)
     if (modIds.length > 0) {
       const { data: fiches } = await supabase.from('fiches')
-        .select('id, question, reponse').in('module_id', modIds).is('deleted_at', null).eq('suspendu', false)
-      const fl = (fiches || []) as { id: string; question: string; reponse: string }[]
-      const pool = fl.map(f => sansHtml(f.reponse).slice(0, 220)).filter(Boolean)
+        .select('id, question, reponse, module_id').in('module_id', modIds).is('deleted_at', null).eq('suspendu', false)
+      const fl = (fiches || []) as { id: string; question: string; reponse: string; module_id: string }[]
+      // Réservoir de leurres : chaque réponse avec son module et ses mots-clés
+      // (pré-tokenisés une seule fois pour ne pas recalculer à chaque question).
+      const pool: PoolItem[] = fl
+        .map(f => ({ rep: sansHtml(f.reponse).slice(0, 220), moduleId: f.module_id }))
+        .filter(p => p.rep)
+        .map(p => ({ ...p, tokens: tokeniser(p.rep) }))
       for (const f of melange(fl)) {
-        const q = ficheVersQuestion(f, pool)
+        const q = ficheVersQuestion({ id: f.id, question: f.question, reponse: f.reponse, moduleId: f.module_id }, pool)
         if (q) lots.push(q)
       }
     }
