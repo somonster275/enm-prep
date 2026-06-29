@@ -4,6 +4,18 @@
 -- Sécurité : s'assure que la colonne matiere existe (selon l'historique de la base).
 alter table public.qcm add column if not exists matiere text;
 
+-- Selon l'historique, certaines bases ont une colonne espace_id NOT NULL que
+-- l'app ne renseigne pas (la matière est stockée en texte). On la rend optionnelle.
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'qcm' and column_name = 'espace_id'
+  ) then
+    alter table public.qcm alter column espace_id drop not null;
+  end if;
+end $$;
+
 -- Type de QCM : 'choix' (choix multiples, défaut) ou 'libre' (réponse tapée).
 alter table public.qcm add column if not exists type text not null default 'choix';
 
