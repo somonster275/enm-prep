@@ -444,10 +444,10 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
                 <div key={i}
                   onClick={() => setJourSelectionne(isSelected ? null : key)}
                   style={{
-                    minHeight: 56, borderRadius: 10, padding: '6px 4px 4px',
+                    minHeight: 56, minWidth: 0, borderRadius: 10, padding: '6px 4px 4px',
                     background: isSelected ? '#FCEFD3' : isToday ? '#FFF4E6' : '#FAFAF8',
                     border: isToday ? '2px solid #DC4A2B' : isSelected ? '1.5px solid #EADFC9' : '1.5px solid transparent',
-                    cursor: 'pointer', position: 'relative',
+                    cursor: 'pointer', position: 'relative', overflow: 'hidden',
                     opacity: hasPast ? 0.65 : 1,
                   }}
                 >
@@ -455,7 +455,7 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
                     fontSize: 13, fontWeight: isToday ? 800 : 500,
                     color: isToday ? '#DC4A2B' : '#2A2018', textAlign: 'center', marginBottom: 4,
                   }}>{jour}</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
                     {evs.slice(0, 3).map(ev => (
                       <div key={ev.id} style={{
                         fontSize: 9, fontWeight: 700, lineHeight: 1.3,
