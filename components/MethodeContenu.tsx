@@ -78,7 +78,6 @@ export default function MethodeContenu() {
         <span style={{ fontSize: 22, flexShrink: 0 }}>🎓</span>
         <div style={{ fontSize: 13.5, color: '#5C5448', lineHeight: 1.55 }}>
           <b>Conçu par un étudiant en classe préparatoire à l&apos;ENM</b>, pour les candidats au concours.
-          codex est né d&apos;une conviction simple : ce qui m&apos;aide vraiment à réviser peut aider les autres candidats — et on progresse mieux ensemble.
         </div>
       </div>
 
