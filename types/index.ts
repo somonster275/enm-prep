@@ -7,6 +7,7 @@ export interface Espace {
   slug: string
   description: string
   couleur: string
+  icone: string
   ordre: number
 }
 
