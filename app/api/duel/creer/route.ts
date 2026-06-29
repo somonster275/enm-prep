@@ -54,7 +54,12 @@ export async function POST(req: NextRequest) {
       deck: pub, secondes_par_question: secs, statut: 'attente',
     }).select('id').single()
     if (!error && data) {
-      await admin.from('match_solutions').insert({ match_id: data.id, solutions: sols, origines })
+      // Les solutions DOIVENT être stockées (sinon impossible de corriger).
+      await admin.from('match_solutions').insert({ match_id: data.id, solutions: sols })
+      // Les origines (pour le débrief / rangement des erreurs) sont best-effort :
+      // si la colonne n'existe pas encore (migration 0026 non passée), on n'échoue pas.
+      await admin.from('match_solutions').update({ origines }).eq('match_id', data.id)
+        .then(({ error: e }) => { if (e) console.warn('origines non stockées (migration 0026 ?):', e.message) })
       code = c
     }
   }

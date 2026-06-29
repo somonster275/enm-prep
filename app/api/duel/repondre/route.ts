@@ -43,8 +43,13 @@ export async function POST(req: NextRequest) {
 
   // Enregistre la réponse ; un doublon (déjà répondu) est rejeté par la clé primaire.
   const { error: insErr } = await admin.from('match_reponses')
-    .insert({ match_id: m.id, user_id: user.id, q_index: qi, juste, points, choix: choixArr })
+    .insert({ match_id: m.id, user_id: user.id, q_index: qi, juste, points })
   if (insErr) return NextResponse.json({ ok: true, deja: true })
+  // Mémorise les choix pour le débrief (best-effort : la colonne peut ne pas
+  // exister si la migration 0026 n'est pas encore passée).
+  await admin.from('match_reponses').update({ choix: choixArr })
+    .eq('match_id', m.id).eq('user_id', user.id).eq('q_index', qi)
+    .then(({ error: e }) => { if (e) console.warn('choix non stockés (migration 0026 ?):', e.message) })
 
   // Recalcule le score agrégé du joueur depuis ses réponses (robuste).
   const { data: reps } = await admin.from('match_reponses')

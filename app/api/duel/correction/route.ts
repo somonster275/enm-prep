@@ -30,9 +30,11 @@ export async function POST(req: NextRequest) {
   const fini = m.statut === 'termine' || (m.started_at && elapsed >= total * secs)
   if (!fini) return NextResponse.json({ error: 'Match non terminé' }, { status: 409 })
 
+  // On sélectionne « * » pour ne pas échouer si « origines » / « choix » n'existent
+  // pas encore (migration 0026) : les champs optionnels sont lus défensivement.
   const [{ data: sol }, { data: reps }] = await Promise.all([
-    admin.from('match_solutions').select('solutions, origines').eq('match_id', m.id).maybeSingle(),
-    admin.from('match_reponses').select('q_index, juste, choix').eq('match_id', m.id).eq('user_id', user.id),
+    admin.from('match_solutions').select('*').eq('match_id', m.id).maybeSingle(),
+    admin.from('match_reponses').select('*').eq('match_id', m.id).eq('user_id', user.id),
   ])
   const solutions: number[][] = sol?.solutions || []
   const origines: Origine[] = sol?.origines || []
