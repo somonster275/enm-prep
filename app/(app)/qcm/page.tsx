@@ -2,9 +2,13 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { enregistrerActivite } from '@/lib/streaks'
+import { reponseCorrecte } from '@/lib/qcm-parse'
 
-type Qcm = { id: string; titre: string; matiere: string | null }
-type Question = { id: string; qcm_id: string; enonce: string; options: { t: string; c: boolean }[]; explication: string | null; ordre: number }
+type Qcm = { id: string; titre: string; matiere: string | null; type?: string }
+type Question = {
+  id: string; qcm_id: string; enonce: string; options: { t: string; c: boolean }[]; explication: string | null; ordre: number
+  cas?: string | null; reponses_ok?: string[] | null; reponse_affichee?: string | null
+}
 
 export default function QcmPage() {
   const [uid, setUid] = useState('')
@@ -17,7 +21,11 @@ export default function QcmPage() {
   const [modeErreurs, setModeErreurs] = useState(false)
   const [questions, setQuestions] = useState<Question[]>([])
   const [reponses, setReponses] = useState<Record<string, Set<number>>>({})
+  const [saisies, setSaisies] = useState<Record<string, string>>({}) // réponses libres tapées
   const [corrige, setCorrige] = useState(false)
+
+  // Un QCM est « à réponse libre » si ses questions portent une liste reponses_ok.
+  const estLibre = questions.length > 0 && Array.isArray(questions[0].reponses_ok)
 
   const chargerErreurs = async (userId: string) => {
     const { count } = await supabase.from('qcm_reponses')
@@ -31,13 +39,13 @@ export default function QcmPage() {
       setUid(id)
       if (id) chargerErreurs(id)
     })
-    supabase.from('qcm').select('id, titre, matiere').order('created_at', { ascending: false })
+    supabase.from('qcm').select('id, titre, matiere, type').order('created_at', { ascending: false })
       .then(({ data }) => { setQcms((data || []) as Qcm[]); setLoading(false) })
   }, [])
 
   const jouer = async (q: Qcm) => {
     const { data } = await supabase.from('qcm_questions').select('*').eq('qcm_id', q.id).order('ordre')
-    setQuestions((data || []) as Question[]); setReponses({}); setCorrige(false); setModeErreurs(false); setActif(q)
+    setQuestions((data || []) as Question[]); setReponses({}); setSaisies({}); setCorrige(false); setModeErreurs(false); setActif(q)
     window.scrollTo({ top: 0 })
   }
 
@@ -49,7 +57,7 @@ export default function QcmPage() {
     if (ids.length === 0) return
     const { data } = await supabase.from('qcm_questions').select('*').in('id', ids)
     const melange = ((data || []) as Question[]).sort(() => Math.random() - 0.5)
-    setQuestions(melange); setReponses({}); setCorrige(false); setActif(null); setModeErreurs(true)
+    setQuestions(melange); setReponses({}); setSaisies({}); setCorrige(false); setActif(null); setModeErreurs(true)
     window.scrollTo({ top: 0 })
   }
 
@@ -64,6 +72,8 @@ export default function QcmPage() {
   }
 
   const estBonne = (q: Question) => {
+    // Réponse libre : on compare la saisie aux réponses acceptées.
+    if (Array.isArray(q.reponses_ok)) return reponseCorrecte(saisies[q.id] || '', q.reponses_ok)
     const choisi = reponses[q.id] || new Set<number>()
     const bonnes = new Set(q.options.map((o, i) => o.c ? i : -1).filter(i => i >= 0))
     if (choisi.size !== bonnes.size) return false
@@ -71,6 +81,10 @@ export default function QcmPage() {
     return true
   }
   const score = questions.filter(estBonne).length
+  // Nombre de questions auxquelles l'étudiant a répondu (pour activer « Valider »).
+  const nbRepondu = estLibre
+    ? questions.filter(q => (saisies[q.id] || '').trim()).length
+    : Object.keys(reponses).length
 
   const valider = async () => {
     setCorrige(true)
@@ -90,7 +104,7 @@ export default function QcmPage() {
   const matieres = [...new Set(qcms.map(q => q.matiere).filter(Boolean))] as string[]
   const visibles = filtre ? qcms.filter(q => q.matiere === filtre) : qcms
   const retour = () => { setActif(null); setModeErreurs(false) }
-  const recommencer = () => { setReponses({}); setCorrige(false); window.scrollTo({ top: 0 }) }
+  const recommencer = () => { setReponses({}); setSaisies({}); setCorrige(false); window.scrollTo({ top: 0 }) }
 
   // ---------- Vue : jeu / résultat ----------
   if (actif || modeErreurs) {
@@ -110,9 +124,39 @@ export default function QcmPage() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {questions.map((q, qi) => {
+            const bonne = estBonne(q)
+            // ----- Question à réponse libre -----
+            if (Array.isArray(q.reponses_ok)) {
+              return (
+                <div key={q.id} style={{ background: '#fff', border: `1px solid ${corrige ? (bonne ? '#BFE6CF' : '#F3C6BC') : '#F0E7D6'}`, borderRadius: 16, padding: 18 }}>
+                  {q.cas && <div style={{ fontSize: 13.5, color: '#6E6456', marginBottom: 10, background: '#FFFBF2', borderRadius: 10, padding: '10px 12px', lineHeight: 1.5, borderLeft: '3px solid #EADFC9' }}>{q.cas}</div>}
+                  <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 10 }}>
+                    {qi + 1}. {q.enonce} {corrige && <span style={{ fontSize: 13 }}>{bonne ? '✅' : '❌'}</span>}
+                  </div>
+                  <input
+                    value={saisies[q.id] || ''}
+                    onChange={e => { if (!corrige) setSaisies(s => ({ ...s, [q.id]: e.target.value })) }}
+                    onKeyDown={e => { if (e.key === 'Enter' && !corrige && nbRepondu >= questions.length) valider() }}
+                    disabled={corrige}
+                    placeholder="Tape ta réponse…"
+                    style={{
+                      width: '100%', boxSizing: 'border-box', padding: '11px 14px', fontSize: 14, fontFamily: font,
+                      borderRadius: 11, outline: 'none',
+                      border: `1.5px solid ${corrige ? (bonne ? '#BFE6CF' : '#F3C6BC') : '#EADFC9'}`,
+                      background: corrige ? (bonne ? '#ECF7F0' : '#FCEEEA') : '#FFFBF2', color: '#2A2018',
+                    }} />
+                  {corrige && (
+                    <div style={{ marginTop: 10, fontSize: 13.5, color: '#0E5A47', background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 10, padding: '9px 12px', lineHeight: 1.5 }}>
+                      <b>Réponse :</b> {q.reponse_affichee || q.reponses_ok[0]}
+                    </div>
+                  )}
+                  {corrige && q.explication && <div style={{ fontSize: 13, color: '#6E6456', marginTop: 8, background: '#FFFBF2', borderRadius: 10, padding: '8px 12px', lineHeight: 1.5 }}>💡 {q.explication}</div>}
+                </div>
+              )
+            }
+            // ----- Question à choix multiples -----
             const multi = q.options.filter(o => o.c).length > 1
             const choisi = reponses[q.id] || new Set<number>()
-            const bonne = estBonne(q)
             return (
               <div key={q.id} style={{ background: '#fff', border: `1px solid ${corrige ? (bonne ? '#BFE6CF' : '#F3C6BC') : '#F0E7D6'}`, borderRadius: 16, padding: 18 }}>
                 <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>
@@ -145,7 +189,7 @@ export default function QcmPage() {
         </div>
 
         {!corrige ? (
-          <button onClick={valider} disabled={Object.keys(reponses).length < questions.length} style={{ marginTop: 18, height: 50, width: '100%', border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: Object.keys(reponses).length < questions.length ? 0.6 : 1, fontFamily: font }}>
+          <button onClick={valider} disabled={nbRepondu < questions.length} style={{ marginTop: 18, height: 50, width: '100%', border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: nbRepondu < questions.length ? 0.6 : 1, fontFamily: font }}>
             Valider mes réponses
           </button>
         ) : (
@@ -192,9 +236,12 @@ export default function QcmPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
           {visibles.map(q => (
             <button key={q.id} onClick={() => jouer(q)} style={{ textAlign: 'left', background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 18, cursor: 'pointer', fontFamily: font }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#FCEFD3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 12 }}>✅</div>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: q.type === 'libre' ? '#FBEAF0' : '#FCEFD3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 12 }}>{q.type === 'libre' ? '✍️' : '✅'}</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: '#2A2018' }}>{q.titre}</div>
-              {q.matiere && <div style={{ fontSize: 12.5, color: '#9A8D72', marginTop: 3 }}>{q.matiere}</div>}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, flexWrap: 'wrap' }}>
+                {q.matiere && <span style={{ fontSize: 12.5, color: '#9A8D72' }}>{q.matiere}</span>}
+                {q.type === 'libre' && <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.03em', color: '#7A1A3E', background: '#FBEAF0', borderRadius: 999, padding: '2px 8px' }}>RÉPONSE LIBRE</span>}
+              </div>
               <div style={{ marginTop: 12, fontSize: 12.5, fontWeight: 700, color: '#E8A11E' }}>Commencer →</div>
             </button>
           ))}

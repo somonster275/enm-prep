@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { parseQcm, type QQuestion } from '@/lib/qcm-parse'
+import { parseQcm, parseQcmLibre, type QQuestion, type QLibre } from '@/lib/qcm-parse'
 
 const EXEMPLE = `Q: Quel est le délai de prescription de droit commun en matière civile ?
 - 2 ans
@@ -15,7 +15,7 @@ Q: Le dol suppose…
 - des manœuvres frauduleuses *
 - un déséquilibre économique`
 
-type Qcm = { id: string; titre: string; matiere: string | null; nb: number }
+type Qcm = { id: string; titre: string; matiere: string | null; type?: string; nb: number }
 
 export default function AdminQcmPage() {
   const [titre, setTitre] = useState('')
@@ -23,6 +23,8 @@ export default function AdminQcmPage() {
   const [matieres, setMatieres] = useState<string[]>([])
   const [brut, setBrut] = useState('')
   const [questions, setQuestions] = useState<QQuestion[]>([])
+  const [questionsLibre, setQuestionsLibre] = useState<QLibre[]>([])
+  const [typeImport, setTypeImport] = useState<'choix' | 'libre'>('choix')
   const [msg, setMsg] = useState<{ type: 'ok' | 'err'; texte: string } | null>(null)
   const [saving, setSaving] = useState(false)
   const [liste, setListe] = useState<Qcm[]>([])
@@ -38,16 +40,29 @@ export default function AdminQcmPage() {
     chargerListe()
   }, [])
 
-  const analyser = () => {
-    setMsg(null)
-    const q = parseQcm(brut)
-    if (q.length === 0) { setMsg({ type: 'err', texte: 'Aucune question détectée. Vérifie le format (voir l\'exemple).' }); return }
-    // Si aucune bonne réponse détectée (ex. import HTML), on laisse l'admin cocher.
-    setQuestions(q)
+  // Traitement commun : on tente d'abord le format « réponse libre » (QCM avancé,
+  // données JS), puis on retombe sur le QCM à choix multiples.
+  const traiter = (contenu: string, source: string): boolean => {
+    const libres = parseQcmLibre(contenu)
+    if (libres.length > 0) {
+      setTypeImport('libre'); setQuestionsLibre(libres); setQuestions([])
+      setMsg({ type: 'ok', texte: `${libres.length} question${libres.length > 1 ? 's' : ''} à réponse libre détectée${libres.length > 1 ? 's' : ''}${source ? ` depuis ${source}` : ''} — vérifie les réponses acceptées.` })
+      return true
+    }
+    const q = parseQcm(contenu)
+    if (q.length > 0) {
+      setTypeImport('choix'); setQuestions(q); setQuestionsLibre([])
+      setMsg({ type: 'ok', texte: `${q.length} question${q.length > 1 ? 's' : ''} à choix multiples détectée${q.length > 1 ? 's' : ''}${source ? ` depuis ${source}` : ''} — vérifie les bonnes réponses.` })
+      return true
+    }
+    setMsg({ type: 'err', texte: `Aucune question détectée${source ? ` depuis ${source}` : ''}. Vérifie le format ou ajuste le contenu ci-dessous.` })
+    return false
   }
 
+  const analyser = () => { setMsg(null); traiter(brut, '') }
+
   // Importe depuis un lien : récupère le HTML côté serveur, le place dans la zone
-  // de texte, puis l'analyse directement.
+  // de texte, puis l'analyse.
   const importerLien = async () => {
     setMsg(null)
     const url = lien.trim()
@@ -60,13 +75,7 @@ export default function AdminQcmPage() {
       const j = await res.json().catch(() => ({}))
       if (!res.ok) { setMsg({ type: 'err', texte: j.error || 'Échec du chargement du lien.' }); return }
       setBrut(j.html)
-      const q = parseQcm(j.html)
-      if (q.length === 0) {
-        setMsg({ type: 'err', texte: 'Lien chargé, mais aucune question détectée automatiquement. Vérifie le HTML ci-dessous ou ajuste manuellement.' })
-        return
-      }
-      setQuestions(q)
-      setMsg({ type: 'ok', texte: `${q.length} question${q.length > 1 ? 's' : ''} détectée${q.length > 1 ? 's' : ''} depuis le lien — vérifie les bonnes réponses.` })
+      traiter(j.html, 'le lien')
     } catch {
       setMsg({ type: 'err', texte: 'Erreur réseau lors du chargement du lien.' })
     } finally {
@@ -74,21 +83,14 @@ export default function AdminQcmPage() {
     }
   }
 
-  // Importe un fichier HTML (ou texte) depuis l'ordinateur : on lit son contenu,
-  // on le place dans la zone de texte, puis on l'analyse.
+  // Importe un fichier HTML (ou texte) depuis l'ordinateur.
   const importerFichier = async (file: File | null) => {
     if (!file) return
     setMsg(null)
     try {
       const contenu = await file.text()
       setBrut(contenu)
-      const q = parseQcm(contenu)
-      if (q.length === 0) {
-        setMsg({ type: 'err', texte: `« ${file.name} » chargé, mais aucune question détectée automatiquement. Vérifie le contenu ci-dessous ou ajuste manuellement.` })
-        return
-      }
-      setQuestions(q)
-      setMsg({ type: 'ok', texte: `${q.length} question${q.length > 1 ? 's' : ''} détectée${q.length > 1 ? 's' : ''} depuis « ${file.name} » — vérifie les bonnes réponses.` })
+      traiter(contenu, `« ${file.name} »`)
     } catch {
       setMsg({ type: 'err', texte: 'Impossible de lire ce fichier.' })
     } finally {
@@ -103,18 +105,35 @@ export default function AdminQcmPage() {
   const ajoutOption = (qi: number) => setQuestions(qs => qs.map((q, i) => i === qi ? { ...q, options: [...q.options, { t: '', c: false }] } : q))
   const supprOption = (qi: number, oi: number) => setQuestions(qs => qs.map((q, i) => i === qi ? { ...q, options: q.options.filter((_, j) => j !== oi) } : q))
 
+  // Éditeurs pour le format libre.
+  const majLibre = (qi: number, patch: Partial<QLibre>) =>
+    setQuestionsLibre(qs => qs.map((q, i) => i === qi ? { ...q, ...patch } : q))
+  const supprLibre = (qi: number) => setQuestionsLibre(qs => qs.filter((_, i) => i !== qi))
+
   const enregistrer = async () => {
     setMsg(null)
     if (!titre.trim()) { setMsg({ type: 'err', texte: 'Donne un titre au QCM.' }); return }
-    if (!questions.length) { setMsg({ type: 'err', texte: 'Analyse d\'abord ton texte.' }); return }
-    if (questions.some(q => !q.options.some(o => o.c))) { setMsg({ type: 'err', texte: 'Chaque question doit avoir au moins une bonne réponse cochée.' }); return }
+
+    let body: Record<string, unknown>
+    if (typeImport === 'libre') {
+      if (!questionsLibre.length) { setMsg({ type: 'err', texte: 'Analyse d\'abord ton contenu.' }); return }
+      if (questionsLibre.some(q => !q.enonce.trim() || q.reponsesOk.filter(r => r.trim()).length === 0)) {
+        setMsg({ type: 'err', texte: 'Chaque question doit avoir un énoncé et au moins une réponse acceptée.' }); return
+      }
+      body = { titre, matiere, type: 'libre', questions: questionsLibre }
+    } else {
+      if (!questions.length) { setMsg({ type: 'err', texte: 'Analyse d\'abord ton texte.' }); return }
+      if (questions.some(q => !q.options.some(o => o.c))) { setMsg({ type: 'err', texte: 'Chaque question doit avoir au moins une bonne réponse cochée.' }); return }
+      body = { titre, matiere, type: 'choix', questions }
+    }
+
     setSaving(true)
-    const res = await fetch('/api/admin/qcm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ titre, matiere, questions }) })
+    const res = await fetch('/api/admin/qcm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     setSaving(false)
     const j = await res.json().catch(() => ({}))
     if (!res.ok) { setMsg({ type: 'err', texte: j.error || 'Erreur' }); return }
     setMsg({ type: 'ok', texte: `QCM enregistré (${j.nb} questions) ✅` })
-    setTitre(''); setMatiere(''); setBrut(''); setQuestions([]); chargerListe()
+    setTitre(''); setMatiere(''); setBrut(''); setQuestions([]); setQuestionsLibre([]); setTypeImport('choix'); chargerListe()
   }
 
   const supprimer = async (id: string) => {
@@ -166,7 +185,7 @@ export default function AdminQcmPage() {
         <textarea value={brut} onChange={e => setBrut(e.target.value)} rows={8} placeholder={EXEMPLE}
           style={{ ...champ, resize: 'vertical', lineHeight: 1.5, fontFamily: 'monospace', fontSize: 13 }} />
         <div style={{ fontSize: 12, color: '#9A8D72' }}>
-          Format texte : <code>Q:</code> pour une question, <code>-</code> pour une option, <code>*</code> en fin de ligne pour la bonne réponse, <code>&gt;</code> pour une explication. Le HTML (listes, boutons radio) est aussi accepté.
+          Format texte : <code>Q:</code> pour une question, <code>-</code> pour une option, <code>*</code> en fin de ligne pour la bonne réponse, <code>&gt;</code> pour une explication. Sont aussi acceptés : le HTML (listes, boutons radio) et les <b>quiz à réponse libre</b> (fichier interactif où l&apos;étudiant tape sa réponse).
         </div>
         <div>
           <button onClick={analyser} style={{ height: 44, padding: '0 22px', border: 'none', borderRadius: 11, background: '#2A2018', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>Analyser</button>
@@ -202,7 +221,39 @@ export default function AdminQcmPage() {
           <button onClick={enregistrer} disabled={saving} style={{ marginTop: 14, height: 48, padding: '0 26px', border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: font }}>{saving ? 'Enregistrement…' : 'Enregistrer le QCM'}</button>
         </div>
       )}
-      {questions.length === 0 && msg && <div style={{ fontSize: 13.5, color: msg.type === 'ok' ? '#0F6E56' : '#D94A30', marginBottom: 16 }}>{msg.texte}</div>}
+      {/* Prévisualisation éditable — QCM avancé (réponse libre) */}
+      {questionsLibre.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <span style={{ fontWeight: 700, fontSize: 16 }}>Prévisualisation ({questionsLibre.length} questions)</span>
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.04em', color: '#7A1A3E', background: '#FBEAF0', borderRadius: 999, padding: '3px 10px' }}>QCM AVANCÉ · RÉPONSE LIBRE</span>
+          </div>
+          <div style={{ fontSize: 13, color: '#8A7E68', marginBottom: 12 }}>L&apos;étudiant tapera sa réponse. Elle sera comparée aux <b>réponses acceptées</b> (une par ligne) — accents, casse et ponctuation sont ignorés.</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {questionsLibre.map((q, qi) => (
+              <div key={qi} style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 14, padding: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#9A8D72' }}>Question {qi + 1}</span>
+                  <button onClick={() => supprLibre(qi)} title="Supprimer" style={{ border: 'none', background: 'transparent', color: '#C0B7A4', cursor: 'pointer', fontSize: 16 }}>✕</button>
+                </div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#9A8D72' }}>Cas / contexte (facultatif)</label>
+                <textarea value={q.cas || ''} onChange={e => majLibre(qi, { cas: e.target.value })} rows={2} placeholder="Énoncé du cas pratique…" style={{ ...champ, marginTop: 4, marginBottom: 8, resize: 'vertical', fontSize: 13 }} />
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#9A8D72' }}>Question</label>
+                <textarea value={q.enonce} onChange={e => majLibre(qi, { enonce: e.target.value })} rows={2} style={{ ...champ, marginTop: 4, marginBottom: 8, resize: 'vertical', fontWeight: 600 }} />
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#9A8D72' }}>Réponses acceptées (une par ligne)</label>
+                <textarea value={q.reponsesOk.join('\n')} onChange={e => majLibre(qi, { reponsesOk: e.target.value.split('\n') })} rows={3} placeholder={'agression sexuelle\n222-22'} style={{ ...champ, marginTop: 4, marginBottom: 8, resize: 'vertical', fontSize: 13, background: '#ECF7F0' }} />
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#9A8D72' }}>Bonne réponse affichée</label>
+                <input value={q.reponseAffichee} onChange={e => majLibre(qi, { reponseAffichee: e.target.value })} placeholder="Réponse complète montrée après correction" style={{ ...champ, marginTop: 4, marginBottom: 8, fontSize: 13 }} />
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#9A8D72' }}>Explication (facultatif)</label>
+                <textarea value={q.explication || ''} onChange={e => majLibre(qi, { explication: e.target.value })} rows={2} style={{ ...champ, marginTop: 4, resize: 'vertical', fontSize: 13 }} />
+              </div>
+            ))}
+          </div>
+          {msg && <div style={{ fontSize: 13.5, color: msg.type === 'ok' ? '#0F6E56' : '#D94A30', marginTop: 12 }}>{msg.texte}</div>}
+          <button onClick={enregistrer} disabled={saving} style={{ marginTop: 14, height: 48, padding: '0 26px', border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: font }}>{saving ? 'Enregistrement…' : 'Enregistrer le QCM avancé'}</button>
+        </div>
+      )}
+      {questions.length === 0 && questionsLibre.length === 0 && msg && <div style={{ fontSize: 13.5, color: msg.type === 'ok' ? '#0F6E56' : '#D94A30', marginBottom: 16 }}>{msg.texte}</div>}
 
       {/* QCM existants */}
       <div style={{ fontWeight: 700, fontSize: 16, margin: '8px 0 10px' }}>QCM existants</div>
@@ -213,7 +264,10 @@ export default function AdminQcmPage() {
           {liste.map(q => (
             <div key={q.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: '12px 14px' }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>{q.titre}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {q.titre}
+                  {q.type === 'libre' && <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.04em', color: '#7A1A3E', background: '#FBEAF0', borderRadius: 999, padding: '2px 8px' }}>AVANCÉ</span>}
+                </div>
                 <div style={{ fontSize: 12, color: '#9A8D72' }}>{q.nb} question{q.nb > 1 ? 's' : ''}{q.matiere ? ` · ${q.matiere}` : ''}</div>
               </div>
               <button onClick={() => supprimer(q.id)} style={{ border: 'none', background: '#FCE9E3', color: '#D94A30', borderRadius: 8, padding: '6px 12px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>Supprimer</button>

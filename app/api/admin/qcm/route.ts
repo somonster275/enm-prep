@@ -13,13 +13,14 @@ async function garde() {
 
 type QOption = { t: string; c: boolean }
 type QQuestion = { enonce: string; options: QOption[]; explication?: string }
+type QLibre = { cas?: string; enonce: string; reponsesOk: string[]; reponseAffichee: string; explication?: string }
 
 // Liste les QCM existants (avec le nombre de questions).
 export async function GET() {
   const g = await garde()
   if ('erreur' in g) return NextResponse.json({ error: g.erreur }, { status: g.status })
   const admin = getSupabaseAdmin()
-  const { data: qcms } = await admin.from('qcm').select('id, titre, matiere, created_at').order('created_at', { ascending: false })
+  const { data: qcms } = await admin.from('qcm').select('id, titre, matiere, type, created_at').order('created_at', { ascending: false })
   const { data: qs } = await admin.from('qcm_questions').select('qcm_id')
   const counts: Record<string, number> = {}
   for (const q of (qs || []) as { qcm_id: string }[]) counts[q.qcm_id] = (counts[q.qcm_id] || 0) + 1
@@ -31,30 +32,58 @@ export async function POST(request: NextRequest) {
   const g = await garde()
   if ('erreur' in g) return NextResponse.json({ error: g.erreur }, { status: g.status })
 
-  const { titre, matiere, questions } = await request.json().catch(() => ({}))
-  if (!titre?.trim() || !Array.isArray(questions) || questions.length === 0) {
-    return NextResponse.json({ error: 'Titre et au moins une question requis.' }, { status: 400 })
-  }
-  const valides = (questions as QQuestion[]).filter(q =>
-    q.enonce?.trim() && Array.isArray(q.options) && q.options.length >= 2 && q.options.some(o => o.c))
-  if (valides.length === 0) {
-    return NextResponse.json({ error: 'Chaque question doit avoir ≥ 2 options et au moins une bonne réponse.' }, { status: 400 })
-  }
+  const body = await request.json().catch(() => ({}))
+  const { titre, matiere } = body
+  const type = body.type === 'libre' ? 'libre' : 'choix'
+  if (!titre?.trim()) return NextResponse.json({ error: 'Titre requis.' }, { status: 400 })
 
   const admin = getSupabaseAdmin()
+
+  // --- Construction des lignes selon le type ---
+  let rows: Record<string, unknown>[]
+  if (type === 'libre') {
+    const questions = body.questions as QLibre[]
+    if (!Array.isArray(questions) || questions.length === 0) {
+      return NextResponse.json({ error: 'Au moins une question requise.' }, { status: 400 })
+    }
+    const valides = questions.filter(q =>
+      q.enonce?.trim() && Array.isArray(q.reponsesOk) && q.reponsesOk.some(r => String(r).trim()))
+    if (valides.length === 0) {
+      return NextResponse.json({ error: 'Chaque question doit avoir un énoncé et au moins une réponse acceptée.' }, { status: 400 })
+    }
+    rows = valides.map((q, i) => ({
+      enonce: q.enonce.trim(),
+      options: [],
+      cas: q.cas?.trim() || null,
+      reponses_ok: q.reponsesOk.map(r => String(r).trim()).filter(Boolean),
+      reponse_affichee: q.reponseAffichee?.trim() || q.reponsesOk[0] || '',
+      explication: q.explication?.trim() || null,
+      ordre: i,
+    }))
+  } else {
+    const questions = body.questions as QQuestion[]
+    if (!Array.isArray(questions) || questions.length === 0) {
+      return NextResponse.json({ error: 'Au moins une question requise.' }, { status: 400 })
+    }
+    const valides = questions.filter(q =>
+      q.enonce?.trim() && Array.isArray(q.options) && q.options.length >= 2 && q.options.some(o => o.c))
+    if (valides.length === 0) {
+      return NextResponse.json({ error: 'Chaque question doit avoir ≥ 2 options et au moins une bonne réponse.' }, { status: 400 })
+    }
+    rows = valides.map((q, i) => ({
+      enonce: q.enonce.trim(),
+      options: q.options.map(o => ({ t: String(o.t).trim(), c: !!o.c })),
+      explication: q.explication?.trim() || null,
+      ordre: i,
+    }))
+  }
+
   const { data: qcm, error } = await admin.from('qcm')
-    .insert({ titre: titre.trim().slice(0, 160), matiere: matiere?.trim()?.slice(0, 60) || null })
+    .insert({ titre: titre.trim().slice(0, 160), matiere: matiere?.trim()?.slice(0, 60) || null, type })
     .select().single()
   if (error || !qcm) return NextResponse.json({ error: error?.message || 'Échec création' }, { status: 500 })
 
-  const rows = valides.map((q, i) => ({
-    qcm_id: qcm.id,
-    enonce: q.enonce.trim(),
-    options: q.options.map(o => ({ t: String(o.t).trim(), c: !!o.c })),
-    explication: q.explication?.trim() || null,
-    ordre: i,
-  }))
-  const { error: errQ } = await admin.from('qcm_questions').insert(rows)
+  const { error: errQ } = await admin.from('qcm_questions').insert(rows.map(r => ({ ...r, qcm_id: qcm.id })))
   if (errQ) { await admin.from('qcm').delete().eq('id', qcm.id); return NextResponse.json({ error: errQ.message }, { status: 500 }) }
 
   return NextResponse.json({ ok: true, id: qcm.id, nb: rows.length })

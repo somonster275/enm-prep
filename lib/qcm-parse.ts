@@ -3,6 +3,8 @@
 
 export type QOption = { t: string; c: boolean }
 export type QQuestion = { enonce: string; options: QOption[]; explication?: string }
+// Question à réponse libre (« QCM avancé »).
+export type QLibre = { cas?: string; enonce: string; reponsesOk: string[]; reponseAffichee: string; explication?: string }
 
 const looksHtml = (s: string) => /<[a-z!][\s\S]*>/i.test(s)
 
@@ -144,6 +146,70 @@ function parseDonneesJs(input: string): QQuestion[] {
     out.push({ enonce, options })
   }
   return out
+}
+
+// ---------- QCM avancé (réponse libre) stocké en JavaScript ----------
+// Extrait des objets du type :
+//   { cas:"…", hint:"Question ?", ok:['rép1','rép2'], display:"Bonne réponse", exp:"…" }
+// Champs reconnus (souples) : cas/contexte · hint/question/enonce/q · ok/reponses/
+// accept/answers · display/reponse/solution/correct · exp/explication.
+function champStr(bloc: string, noms: string): string | null {
+  const re = new RegExp(`(?:${noms})\\s*:\\s*(["'\`])((?:\\\\.|(?!\\1).)*)\\1`, 'i')
+  const m = bloc.match(re)
+  return m ? m[2].replace(/\\(["'`])/g, '$1').replace(/\\n/g, '\n').trim() : null
+}
+function champArr(bloc: string, noms: string): string[] {
+  const re = new RegExp(`(?:${noms})\\s*:\\s*\\[([\\s\\S]*?)\\]`, 'i')
+  const m = bloc.match(re)
+  if (!m) return []
+  return [...m[1].matchAll(/(["'`])((?:\\.|(?!\1).)*)\1/g)]
+    .map(x => x[2].replace(/\\(["'`])/g, '$1').trim()).filter(Boolean)
+}
+
+export function parseQcmLibre(input: string): QLibre[] {
+  const scripts = [...input.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)].map(m => m[1])
+  const source = scripts.length ? scripts.join('\n') : input
+  const blocs = source.split(/\}\s*,\s*\{/).map((b, i, arr) =>
+    (i > 0 ? '{' : '') + b + (i < arr.length - 1 ? '}' : ''))
+
+  const out: QLibre[] = []
+  for (const bloc of blocs) {
+    const enonce = champStr(bloc, 'hint|question|enonce|énoncé|q|intitule|intitulé')
+    const reponsesOk = champArr(bloc, 'ok|reponses|réponses|accept|acceptees|acceptées|answers|solutions')
+    const reponseAffichee = champStr(bloc, 'display|reponse|réponse|solution|correct|bonne') || reponsesOk[0] || ''
+    // Une question à réponse libre = un énoncé + au moins une réponse acceptée.
+    if (!enonce || reponsesOk.length === 0) continue
+    const cas = champStr(bloc, 'cas|contexte|scenario|scénario|situation') || undefined
+    const explication = champStr(bloc, 'exp|explication|explanation|justification') || undefined
+    out.push({ cas, enonce, reponsesOk, reponseAffichee, explication })
+  }
+  return out
+}
+
+// Normalise une réponse pour comparaison : minuscules, sans accents/ponctuation,
+// espaces compactés.
+export function normaliserReponse(s: string): string {
+  return (s || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+// Vrai si la saisie correspond à l'une des réponses acceptées (égalité après
+// normalisation, ou la réponse acceptée est contenue dans la saisie).
+export function reponseCorrecte(saisie: string, reponsesOk: string[]): boolean {
+  const s = normaliserReponse(saisie)
+  if (!s) return false
+  return reponsesOk.some(r => {
+    const n = normaliserReponse(r)
+    if (!n) return false
+    if (s === n) return true
+    // Tolérance : la bonne réponse (≥ 3 caractères) apparaît dans la saisie.
+    if (n.length >= 3 && s.includes(n)) return true
+    return false
+  })
 }
 
 export function parseQcm(input: string): QQuestion[] {
