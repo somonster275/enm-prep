@@ -24,7 +24,7 @@ const LIVRES: { h: number; rot: string; bg: string; kicker: string; titre: strin
 // Tout ce que l'étudiant peut faire dans l'app.
 const FONCTIONS = [
   { icone: '🗂️', couleur: '#DC4A2B', titre: 'Fiches de révision', desc: 'Vos fiches par matière, servies en répétition espacée pour ancrer durablement.' },
-  { icone: '💬', couleur: '#534AB7', titre: 'Questions de cours', desc: 'Une question, une réponse sourcée sur la base de cours validée par l\'équipe.' },
+  { icone: '💬', couleur: '#534AB7', titre: 'Questions de cours', desc: 'Une question, une réponse sourcée sur une base de cours sélectionnée avec soin.' },
   { icone: '✅', couleur: '#E8A11E', titre: 'QCM', desc: 'Tester ses connaissances avec des questions à choix multiples corrigées.' },
   { icone: '🧠', couleur: '#2DAE83', titre: 'Mind maps', desc: 'Visualiser les notions clés en cartes mentales et schémas par sujet.' },
   { icone: '🎧', couleur: '#3B82D9', titre: 'Audio & vidéo', desc: 'Réviser en écoutant ou en regardant les ressources importées.' },
@@ -136,7 +136,7 @@ export default function Accueil() {
 
           {/* Statistiques */}
           <div style={{ display: 'flex', gap: 40, marginTop: 38 }}>
-            {[['9', 'Matières au programme'], ['100%', 'Cours validés par l\'équipe'], ['1', 'Espace pour tout réviser']].map(([n, l]) => (
+            {[['9', 'Matières au programme'], ['100%', 'Conçu par un candidat à l\'ENM'], ['1', 'Espace pour tout réviser']].map(([n, l]) => (
               <div key={l}>
                 <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 30, color: INK }}>{n}</div>
                 <div style={{ fontSize: 13, color: MUTED, marginTop: 2, maxWidth: 130 }}>{l}</div>
@@ -276,7 +276,7 @@ export default function Accueil() {
           Prêt à réviser autrement ?
         </h2>
         <p style={{ fontSize: 17, color: MUTED, margin: '14px auto 0', maxWidth: 500 }}>
-          Connectez-vous pour retrouver vos fiches, ou demandez un accès à l'équipe.
+          Connectez-vous pour retrouver vos fiches, ou demandez un accès.
         </p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', marginTop: 28, flexWrap: 'wrap' }}>
           <Link href={lienEspace} style={btnPlein}>{labelEspace}</Link>
@@ -288,7 +288,10 @@ export default function Accueil() {
       <footer style={{ borderTop: `1px solid ${BORDER}`, padding: '28px 24px' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <Logo size={20} color={INK} />
-          <div style={{ fontSize: 13, color: MUTED }}>Préparation au concours de l'ENM · {new Date().getFullYear()}</div>
+          <div style={{ fontSize: 13, color: MUTED, textAlign: 'right' }}>
+            Conçu par un étudiant en classe préparatoire à l&apos;ENM<br />
+            Préparation au concours de l&apos;ENM · {new Date().getFullYear()}
+          </div>
         </div>
       </footer>
     </div>

@@ -68,10 +68,19 @@ function GrilleOutils({ items }: { items: { emoji: string; titre: string; desc: 
 export default function MethodeContenu() {
   return (
     <div style={{ fontFamily: FONT, color: '#2A2018' }}>
-      <p style={{ fontSize: 15, lineHeight: 1.6, color: '#5C5448', margin: '0 0 24px' }}>
+      <p style={{ fontSize: 15, lineHeight: 1.6, color: '#5C5448', margin: '0 0 18px' }}>
         codex réunit, au même endroit, des outils pour <b>réviser efficacement</b>, une <b>communauté de candidats</b> pour ne pas avancer seul·e,
         et un accompagnement au quotidien — le tout fondé sur les méthodes <b>validées par la science de l&apos;apprentissage</b>.
       </p>
+
+      {/* Origine : un projet d'étudiant, entre pairs. */}
+      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: '#FFFBF2', border: '1px solid #F0E7D6', borderRadius: 14, padding: '14px 16px', margin: '0 0 24px' }}>
+        <span style={{ fontSize: 22, flexShrink: 0 }}>🎓</span>
+        <div style={{ fontSize: 13.5, color: '#5C5448', lineHeight: 1.55 }}>
+          <b>Conçu par un étudiant en classe préparatoire à l&apos;ENM</b>, pour les candidats au concours.
+          codex est né d&apos;une conviction simple : ce qui m&apos;aide vraiment à réviser peut aider les autres candidats — et on progresse mieux ensemble.
+        </div>
+      </div>
 
       {/* Réviser (solo) */}
       <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 17, margin: '0 0 12px' }}>📖 Réviser, efficacement</div>
