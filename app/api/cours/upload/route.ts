@@ -32,6 +32,14 @@ async function extraireTexte(fichier: File): Promise<string> {
     const buf = new Uint8Array(await fichier.arrayBuffer())
     return await extractText(buf, { mergePages: true }).then(r => r.text)
   }
+  const isDocx = type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || fichier.name.endsWith('.docx')
+  const isDoc = type === 'application/msword' || fichier.name.endsWith('.doc')
+  if (isDocx || isDoc) {
+    const mammoth = await import('mammoth')
+    const buf = Buffer.from(await fichier.arrayBuffer())
+    const result = await mammoth.extractRawText({ buffer: buf })
+    return result.value
+  }
   throw new Error(`Format non supporté : ${type || fichier.name}`)
 }
 

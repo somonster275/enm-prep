@@ -366,8 +366,8 @@ export default function CoursIAPage() {
                   flex: 2, padding: '10px 14px', borderRadius: 10, border: `1.5px dashed ${coral}66`,
                   fontSize: 13, fontWeight: 600, color: coral, cursor: 'pointer', background: fichier ? coralBg : sand,
                 }}>
-                  {fichier ? `📎 ${fichier.name}` : 'Choisir un PDF ou fichier texte…'}
-                  <input ref={fileRef} type="file" accept=".pdf,.txt,text/plain,application/pdf" style={{ display: 'none' }}
+                  {fichier ? `📎 ${fichier.name}` : 'Choisir un fichier (PDF, Word, TXT)…'}
+                  <input ref={fileRef} type="file" accept=".pdf,.txt,.doc,.docx,text/plain,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style={{ display: 'none' }}
                     onChange={e => setFichier(e.target.files?.[0] || null)} />
                 </label>
               </div>
