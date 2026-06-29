@@ -8,7 +8,8 @@ const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 const genCode = () => Array.from({ length: 6 }, () => ALPHA[Math.floor(Math.random() * ALPHA.length)]).join('')
 
 type OptIn = { t: string; c?: boolean }
-type QIn = { enonce: string; options: OptIn[]; cat?: string }
+type QIn = { enonce: string; options: OptIn[]; cat?: string; ficheId?: string; qcmId?: string; qId?: string }
+type Origine = { cat: 'qcm' | 'fiche'; ficheId?: string; qcmId?: string; qId?: string }
 
 // Crée un match : reçoit le paquet construit côté client (avec bonnes réponses),
 // stocke un paquet PUBLIC sans les bonnes réponses + les solutions à part.
@@ -21,17 +22,24 @@ export async function POST(req: NextRequest) {
 
   const pub: { enonce: string; options: { t: string }[]; cat: string; multi: boolean }[] = []
   const sols: number[][] = []
+  const origines: Origine[] = []
   for (const q of deck as QIn[]) {
     if (!q?.enonce || !Array.isArray(q.options) || q.options.length < 2) continue
     const correct = q.options.map((o, i) => (o.c ? i : -1)).filter(i => i >= 0)
     if (correct.length < 1) continue
+    const cat = q.cat === 'qcm' ? 'qcm' : 'fiche'
     pub.push({
       enonce: String(q.enonce).slice(0, 400),
       options: q.options.map(o => ({ t: String(o.t).slice(0, 300) })),
-      cat: q.cat === 'qcm' ? 'qcm' : 'fiche',
+      cat,
       multi: correct.length > 1, // indique qu'il y a plusieurs bonnes réponses (sans dire lesquelles)
     })
     sols.push(correct)
+    // Origine conservée côté serveur (jamais dans le deck public) pour le débrief
+    // et le rangement des erreurs en révision.
+    origines.push(cat === 'qcm'
+      ? { cat, qcmId: q.qcmId, qId: q.qId }
+      : { cat, ficheId: q.ficheId })
   }
   if (pub.length < 2) return NextResponse.json({ error: 'Pas assez de questions valides.' }, { status: 400 })
 
@@ -46,7 +54,7 @@ export async function POST(req: NextRequest) {
       deck: pub, secondes_par_question: secs, statut: 'attente',
     }).select('id').single()
     if (!error && data) {
-      await admin.from('match_solutions').insert({ match_id: data.id, solutions: sols })
+      await admin.from('match_solutions').insert({ match_id: data.id, solutions: sols, origines })
       code = c
     }
   }

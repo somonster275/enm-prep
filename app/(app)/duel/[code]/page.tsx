@@ -11,6 +11,9 @@ type Match = {
   deck: MatchQuestionPub[]; secondes_par_question: number; started_at: string | null
 }
 type Joueur = { user_id: string; pseudo: string; score: number; repondu: number; justes: number; termine: boolean }
+// Débrief de fin : une entrée par question interrogée.
+type CorrectionQ = { enonce: string; cat: string; options: string[]; correct: number[]; choix: number[]; repondu: boolean; juste: boolean }
+type Correction = { correction: CorrectionQ[]; nbErreurs: number; nbFichesRangees: number; nbQcmRangees: number }
 
 const FONT = "'Hanken Grotesk', sans-serif"
 const DISPLAY = "'Bricolage Grotesque', sans-serif"
@@ -29,6 +32,11 @@ export default function SalleDuel() {
   const [selection, setSelection] = useState<Set<number>>(new Set())
   const [verrou, setVerrou] = useState(false)        // a validé cette question
   const [fini, setFini] = useState(false)
+
+  // Débrief de fin de match (cartes interrogées + rangement des erreurs).
+  const [correction, setCorrection] = useState<Correction | null>(null)
+  const [chargeCorrection, setChargeCorrection] = useState(false)
+  const correctionDemandee = useRef(false)
 
   // Le score est calculé par le serveur. Côté client on garde juste de quoi
   // éviter de poster deux fois la même question.
@@ -132,6 +140,33 @@ export default function SalleDuel() {
     return () => clearInterval(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [match?.statut, match?.started_at])
+
+  // Récupère le débrief une fois le match terminé (côté serveur, qui range aussi
+  // les erreurs dans les cartes à réviser). Réessaie brièvement si le serveur
+  // n'a pas encore basculé le match en « terminé ».
+  useEffect(() => {
+    const termine = fini || match?.statut === 'termine'
+    if (!termine || !match || correctionDemandee.current) return
+    correctionDemandee.current = true
+    setChargeCorrection(true)
+    let annule = false
+    const tenter = async (essai: number) => {
+      try {
+        const res = await fetch('/api/duel/correction', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: match.code }),
+        })
+        if (res.status === 409 && essai < 5) { setTimeout(() => tenter(essai + 1), 1200); return }
+        const j = await res.json().catch(() => null)
+        if (!annule && res.ok && j) setCorrection(j as Correction)
+      } finally {
+        if (!annule) setChargeCorrection(false)
+      }
+    }
+    tenter(0)
+    return () => { annule = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fini, match?.statut])
 
   const finir = useCallback(async () => {
     if (finiRef.current) return
@@ -260,6 +295,61 @@ export default function SalleDuel() {
           </div>
         ))}
       </div>
+      {/* Débrief : les cartes interrogées + rangement des erreurs */}
+      <div style={{ marginTop: 30 }}>
+        <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 19, marginBottom: 4 }}>Revois tes questions</div>
+        {chargeCorrection && !correction && (
+          <div style={{ color: '#9A8D72', fontSize: 14, padding: '14px 0' }}>Préparation du débrief…</div>
+        )}
+        {correction && (
+          <>
+            {/* Bandeau : erreurs rangées en révision */}
+            {(correction.nbFichesRangees > 0 || correction.nbQcmRangees > 0) ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#FCE9E3', border: '1px solid #F3C6BC', borderRadius: 12, padding: '12px 16px', marginBottom: 16 }}>
+                <span style={{ fontSize: 22 }}>📌</span>
+                <div style={{ fontSize: 13.5, color: '#A8453B', lineHeight: 1.45 }}>
+                  <b>{correction.nbErreurs} erreur{correction.nbErreurs > 1 ? 's' : ''}</b> rangée{correction.nbErreurs > 1 ? 's' : ''} dans tes cartes à réviser
+                  {correction.nbFichesRangees > 0 && <> · <a href="/carnet" style={{ color: '#C0392B', fontWeight: 700 }}>voir mon carnet →</a></>}
+                  {correction.nbQcmRangees > 0 && <> · <a href="/qcm" style={{ color: '#C0392B', fontWeight: 700 }}>réviser mes erreurs QCM →</a></>}
+                </div>
+              </div>
+            ) : (
+              <div style={{ background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 12, padding: '12px 16px', marginBottom: 16, fontSize: 13.5, color: '#0E5A47' }}>
+                🎉 Aucune erreur — rien à ranger en révision, bravo !
+              </div>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {correction.correction.map((c, i) => (
+                <div key={i} style={{ background: '#fff', border: `1px solid ${c.juste ? '#BFE6CF' : '#F3C6BC'}`, borderRadius: 14, padding: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
+                    <div style={{ fontSize: 14.5, fontWeight: 700, lineHeight: 1.4 }}>{i + 1}. {c.enonce}</div>
+                    <span style={{ flexShrink: 0, fontSize: 13 }}>{c.juste ? '✅' : '❌'}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {c.options.map((t, oi) => {
+                      const estCorrect = c.correct.includes(oi)
+                      const choisi = c.choix.includes(oi)
+                      let bg = '#FFFBF2', bd = '#EADFC9', col = '#2A2018'
+                      if (estCorrect) { bg = '#ECF7F0'; bd = '#BFE6CF'; col = '#0E5A47' }
+                      else if (choisi) { bg = '#FCEEEA'; bd = '#F3C6BC'; col = '#A8453B' }
+                      return (
+                        <div key={oi} style={{ display: 'flex', alignItems: 'center', gap: 9, border: `1.5px solid ${bd}`, background: bg, borderRadius: 10, padding: '9px 12px', fontSize: 13.5, color: col }}>
+                          <span style={{ flex: 1 }}>{t}</span>
+                          {estCorrect && <span style={{ fontSize: 11, fontWeight: 800, color: '#0F6E56' }}>BONNE RÉPONSE</span>}
+                          {!estCorrect && choisi && <span style={{ fontSize: 11, fontWeight: 800, color: '#C0392B' }}>TON CHOIX</span>}
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {!c.repondu && <div style={{ fontSize: 12, color: '#B0855A', marginTop: 8 }}>⏱️ Pas de réponse à temps</div>}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
       <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
         <button onClick={() => router.push('/duel')} style={{ flex: 1, height: 48, border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>Nouveau duel</button>
       </div>

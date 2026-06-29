@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
   // Enregistre la réponse ; un doublon (déjà répondu) est rejeté par la clé primaire.
   const { error: insErr } = await admin.from('match_reponses')
-    .insert({ match_id: m.id, user_id: user.id, q_index: qi, juste, points })
+    .insert({ match_id: m.id, user_id: user.id, q_index: qi, juste, points, choix: choixArr })
   if (insErr) return NextResponse.json({ ok: true, deja: true })
 
   // Recalcule le score agrégé du joueur depuis ses réponses (robuste).

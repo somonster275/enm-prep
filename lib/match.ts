@@ -2,7 +2,12 @@ import { supabase } from '@/lib/supabase'
 
 // Une question de match, format unifié (QCM existant OU fiche convertie).
 export type MatchOption = { t: string; c: boolean }
-export type MatchQuestion = { enonce: string; options: MatchOption[]; cat: 'qcm' | 'fiche' }
+// `ficheId` / `qcmId`+`qId` : origine de la question, conservée pour le débrief
+// et pour ranger les erreurs dans les cartes à réviser (jamais envoyée au client).
+export type MatchQuestion = {
+  enonce: string; options: MatchOption[]; cat: 'qcm' | 'fiche'
+  ficheId?: string; qcmId?: string; qId?: string
+}
 
 const POINTS_BASE = 100        // points d'une bonne réponse
 const POINTS_VITESSE = 50      // bonus max pour la rapidité (proportionnel au temps restant)
@@ -28,7 +33,7 @@ export function reponseJuste(q: MatchQuestion, choisi: Set<number>): boolean {
 // Convertit une fiche (question/réponse libre) en QCM « trouve la bonne réponse » :
 // la vraie réponse + 3 leurres tirés d'autres fiches de la même matière.
 function ficheVersQuestion(
-  fiche: { question: string; reponse: string },
+  fiche: { id: string; question: string; reponse: string },
   pool: string[],
 ): MatchQuestion | null {
   const bonne = sansHtml(fiche.reponse).slice(0, 220)
@@ -37,7 +42,7 @@ function ficheVersQuestion(
   const leurres = melange(pool.filter(r => r && r !== bonne)).slice(0, 3)
   if (leurres.length < 2) return null // pas assez de matière pour des leurres crédibles
   const options = melange([{ t: bonne, c: true }, ...leurres.map(t => ({ t, c: false }))])
-  return { enonce, options, cat: 'fiche' }
+  return { enonce, options, cat: 'fiche', ficheId: fiche.id }
 }
 
 // Construit le paquet figé du match à partir d'un QCM et/ou d'un espace de fiches.
@@ -52,10 +57,10 @@ export async function construireDeck(opts: {
   // --- Source 1 : QCM existant ---
   if (opts.qcmId) {
     const { data } = await supabase.from('qcm_questions')
-      .select('enonce, options').eq('qcm_id', opts.qcmId)
-    for (const q of (data || []) as { enonce: string; options: MatchOption[] }[]) {
+      .select('id, enonce, options').eq('qcm_id', opts.qcmId)
+    for (const q of (data || []) as { id: string; enonce: string; options: MatchOption[] }[]) {
       if (q.enonce && Array.isArray(q.options) && q.options.length >= 2 && q.options.some(o => o.c)) {
-        lots.push({ enonce: sansHtml(q.enonce), options: q.options, cat: 'qcm' })
+        lots.push({ enonce: sansHtml(q.enonce), options: q.options, cat: 'qcm', qcmId: opts.qcmId, qId: q.id })
       }
     }
   }
@@ -66,8 +71,8 @@ export async function construireDeck(opts: {
     const modIds = (mods || []).map((m: { id: string }) => m.id)
     if (modIds.length > 0) {
       const { data: fiches } = await supabase.from('fiches')
-        .select('question, reponse').in('module_id', modIds).is('deleted_at', null)
-      const fl = (fiches || []) as { question: string; reponse: string }[]
+        .select('id, question, reponse').in('module_id', modIds).is('deleted_at', null).eq('suspendu', false)
+      const fl = (fiches || []) as { id: string; question: string; reponse: string }[]
       const pool = fl.map(f => sansHtml(f.reponse).slice(0, 220)).filter(Boolean)
       for (const f of melange(fl)) {
         const q = ficheVersQuestion(f, pool)
