@@ -28,15 +28,12 @@ async function extraireTexte(fichier: File): Promise<string> {
     return fichier.text()
   }
   if (type === 'application/pdf' || fichier.name.endsWith('.pdf')) {
-    const data = new Uint8Array(await fichier.arrayBuffer())
-    const { PDFParse } = await import('pdf-parse')
-    const parser = new PDFParse({ data })
-    try {
-      const result = await parser.getText()
-      return result.text
-    } finally {
-      await parser.destroy()
-    }
+    const buf = Buffer.from(await fichier.arrayBuffer())
+    // Importé depuis le chemin interne pour éviter l'erreur DOMMatrix de Turbopack
+    // (pdf-parse/lib/pdf-parse.js bypasse l'init browser de pdfjs-dist)
+    const pdfParse = (await import('pdf-parse/lib/pdf-parse.js')).default
+    const result = await pdfParse(buf)
+    return result.text
   }
   throw new Error(`Format non supporté : ${type || fichier.name}`)
 }
