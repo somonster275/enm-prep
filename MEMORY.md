@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-28 (suite 16).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-29 (suite 17).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,58 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-06-29 (suite 17) — Imports docs, QCM avancés, refonte duels, rubrique Cours
+**Migrations à exécuter par le user (Supabase SQL Editor) : 0023→0029.** Plusieurs ont
+servi à corriger le schéma réel de `qcm` (différent des migrations d'origine) :
+`matiere` ajoutée, `espace_id` rendue **nullable**, + `notify pgrst, 'reload schema'`
+systématique pour vider le cache PostgREST (cause des erreurs « column not found »).
+
+**Imports de documents :**
+- « Questions de cours » accepte désormais **PDF (via `unpdf`)** et **Word .doc/.docx
+  (via `mammoth`)**. `pdf-parse` abandonné (erreur `DOMMatrix is not defined` sous
+  Node/Turbopack). `next.config.ts` : `serverExternalPackages: ['unpdf','pdfjs-dist','mammoth']`.
+
+**Espaces (admin) :** création d'un espace de révision via modal (icône/couleur/slug/
+description) — migration 0023 (`espaces.icone`) + 0024 (policies RLS admin insert/update/delete).
+
+**QCM :**
+- Import depuis un **lien (URL)** : route serveur `/api/admin/qcm/fetch` (anti-SSRF) +
+  import d'un **fichier HTML** local. Parseur `lib/qcm-parse.ts` : ignore `<script>/<style>`,
+  extrait les QCM stockés en **JS**.
+- **QCM avancés à réponse libre** (« QCM AVANCÉ ») : l'étudiant **tape** sa réponse,
+  comparée à `reponses_ok` (normalisée : sans accents/casse/ponctuation, via `reponseCorrecte`).
+  Migration 0025 : `qcm.type` ('choix'|'libre') + `qcm_questions.cas/reponses_ok/reponse_affichee`.
+  Admin détecte le format auto (`parseQcmLibre`) ; étudiant joue dans `/qcm`.
+
+**Duels (`lib/match.ts` + `/api/duel/*`) :**
+- **Débrief de fin** (`/api/duel/correction`) : revoir chaque question avec bonne réponse,
+  ton choix, ✅/❌ ; **range les erreurs en révision** (fiches → carnet/progression « À revoir » ;
+  QCM → `qcm_reponses`). Migration 0026 (`match_solutions.origines`, `match_reponses.choix`).
+- **Leurres « ressemblants »** : distracteurs choisis par **similarité lexicale** (Jaccard sur
+  mots-clés, bonus même module) au lieu d'aléatoire → duels plus difficiles.
+- **Choix d'un chapitre/module** précis (pas que la matière) à la création.
+- **Propositions coupées sur des phrases entières** (plus de coupure en plein mot) — helpers
+  centralisés dans **`lib/texte.ts`** (`extraitLisible`, `texteComplet`, partagés client/serveur).
+- **Dépliage « voir toute la carte »** au clic, en **jeu** ET au débrief (texte intégral stocké :
+  `match_solutions.options_full` migration 0029 + `options[].full` dans le deck public — ne révèle
+  PAS la bonne réponse). Toutes ces colonnes (0026/0029) sont **best-effort** : le code stocke
+  solutions/réponses même sans la migration (corrige le débrief qui ne marchait pas).
+
+**Rubrique « Cours » (NOUVELLE) :** supports **PDF/Word** envoyés par l'admin, consultés en
+ligne (PDF en iframe, Word via visionneuse Office), **remarques étudiants** comme les fiches
+(`/api/cours/remarque` → email admin). Migration 0027 (tables `cours` + `cours_remarques`) +
+**bucket Storage PUBLIC `cours`** à créer (Storage, pas SQL) ; bucket ajouté à l'allowlist de
+`/api/storage/upload`. Migration 0028 : `cours.espace_id` + `cours.module_id` → un cours se
+**répertorie dans un espace/module** et s'affiche sur ces pages + raccourci dans l'AccesRapide.
+
+**UI/UX :** AccesRapide rendu **vraiment adaptatif** (grille `auto-fill minmax(72px)` + classe
+`.no-collapse` pour échapper à la règle globale `[style*="grid-template-columns"]:not(.no-collapse)`
+qui replie les grilles en 1 colonne < 768px). **TopNav désengorgé** : 1er niveau =
+Accueil/Espaces/Actualités ; menu **« Ressources »** (Cours, Questions de cours, Drive, Calendrier)
++ Communauté + Admin, via un helper `menuDeroulant` factorisé. Modal espaces rendu scrollable
+(`maxHeight:90vh`). **Tout le travail de ce soir vérifié adaptatif** (grilles repliables, flex-wrap,
+iframes en %/vh) — `tsc --noEmit` OK à chaque étape, commit+push auto sur main.
 
 ### 2026-06-28 (suite 16) — Outils collaboratifs, défi configurable, et 5 améliorations « solo »
 **Toutes les migrations 0010→0016 ont été exécutées par le user.** Modération des contenus collaboratifs : policy RLS de DELETE = auteur OU admin (`(select role from profils where id=auth.uid())='admin'`).
