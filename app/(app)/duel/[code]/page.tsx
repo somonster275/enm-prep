@@ -12,7 +12,7 @@ type Match = {
 }
 type Joueur = { user_id: string; pseudo: string; score: number; repondu: number; justes: number; termine: boolean }
 // Débrief de fin : une entrée par question interrogée.
-type CorrectionQ = { enonce: string; cat: string; options: string[]; correct: number[]; choix: number[]; repondu: boolean; juste: boolean }
+type CorrectionQ = { enonce: string; cat: string; options: string[]; optionsCompletes?: string[]; correct: number[]; choix: number[]; repondu: boolean; juste: boolean }
 type Correction = { correction: CorrectionQ[]; nbErreurs: number; nbFichesRangees: number; nbQcmRangees: number }
 
 const FONT = "'Hanken Grotesk', sans-serif"
@@ -37,6 +37,11 @@ export default function SalleDuel() {
   const [correction, setCorrection] = useState<Correction | null>(null)
   const [chargeCorrection, setChargeCorrection] = useState(false)
   const correctionDemandee = useRef(false)
+  // Options dépliées (texte intégral) dans le débrief, clé « questionIdx-optionIdx ».
+  const [deplie, setDeplie] = useState<Set<string>>(new Set())
+  const basculerDeplie = (cle: string) => setDeplie(s => {
+    const n = new Set(s); n.has(cle) ? n.delete(cle) : n.add(cle); return n
+  })
 
   // Le score est calculé par le serveur. Côté client on garde juste de quoi
   // éviter de poster deux fois la même question.
@@ -333,11 +338,26 @@ export default function SalleDuel() {
                       let bg = '#FFFBF2', bd = '#EADFC9', col = '#2A2018'
                       if (estCorrect) { bg = '#ECF7F0'; bd = '#BFE6CF'; col = '#0E5A47' }
                       else if (choisi) { bg = '#FCEEEA'; bd = '#F3C6BC'; col = '#A8453B' }
+                      const complet = c.optionsCompletes?.[oi] || t
+                      const tronquee = / \[…\]$/.test(t) || complet.length > t.length
+                      const cle = `${i}-${oi}`
+                      const ouvert = deplie.has(cle)
                       return (
-                        <div key={oi} style={{ display: 'flex', alignItems: 'center', gap: 9, border: `1.5px solid ${bd}`, background: bg, borderRadius: 10, padding: '9px 12px', fontSize: 13.5, color: col }}>
-                          <span style={{ flex: 1 }}>{t}</span>
-                          {estCorrect && <span style={{ fontSize: 11, fontWeight: 800, color: '#0F6E56' }}>BONNE RÉPONSE</span>}
-                          {!estCorrect && choisi && <span style={{ fontSize: 11, fontWeight: 800, color: '#C0392B' }}>TON CHOIX</span>}
+                        <div
+                          key={oi}
+                          onClick={() => tronquee && basculerDeplie(cle)}
+                          style={{ border: `1.5px solid ${bd}`, background: bg, borderRadius: 10, padding: '9px 12px', fontSize: 13.5, color: col, cursor: tronquee ? 'pointer' : 'default' }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+                            <span style={{ flex: 1, whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{ouvert ? complet : t}</span>
+                            {estCorrect && <span style={{ fontSize: 11, fontWeight: 800, color: '#0F6E56', flexShrink: 0 }}>BONNE RÉPONSE</span>}
+                            {!estCorrect && choisi && <span style={{ fontSize: 11, fontWeight: 800, color: '#C0392B', flexShrink: 0 }}>TON CHOIX</span>}
+                          </div>
+                          {tronquee && (
+                            <div style={{ fontSize: 11.5, fontWeight: 700, color: '#8A7E68', marginTop: 5 }}>
+                              {ouvert ? '▲ Réduire' : '▼ Voir toute la carte'}
+                            </div>
+                          )}
                         </div>
                       )
                     })}

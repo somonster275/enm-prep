@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { utilisateurCourant } from '@/lib/auth-serveur'
+import { extraitLisible, texteComplet } from '@/lib/texte'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,18 +24,23 @@ export async function POST(req: NextRequest) {
   const pub: { enonce: string; options: { t: string }[]; cat: string; multi: boolean }[] = []
   const sols: number[][] = []
   const origines: Origine[] = []
+  // Texte INTÉGRAL des options, conservé côté serveur pour le débrief (afficher
+  // toute la carte au clic). Jamais envoyé dans le deck public de jeu.
+  const optionsFull: string[][] = []
   for (const q of deck as QIn[]) {
     if (!q?.enonce || !Array.isArray(q.options) || q.options.length < 2) continue
     const correct = q.options.map((o, i) => (o.c ? i : -1)).filter(i => i >= 0)
     if (correct.length < 1) continue
     const cat = q.cat === 'qcm' ? 'qcm' : 'fiche'
     pub.push({
-      enonce: String(q.enonce).slice(0, 400),
-      options: q.options.map(o => ({ t: String(o.t).slice(0, 300) })),
+      // Deck de jeu : tronqué proprement (phrases entières) pour l'affichage live.
+      enonce: extraitLisible(String(q.enonce), 320),
+      options: q.options.map(o => ({ t: extraitLisible(String(o.t), 280) })),
       cat,
       multi: correct.length > 1, // indique qu'il y a plusieurs bonnes réponses (sans dire lesquelles)
     })
     sols.push(correct)
+    optionsFull.push(q.options.map(o => texteComplet(String(o.t), 4000)))
     // Origine conservée côté serveur (jamais dans le deck public) pour le débrief
     // et le rangement des erreurs en révision.
     origines.push(cat === 'qcm'
@@ -56,10 +62,10 @@ export async function POST(req: NextRequest) {
     if (!error && data) {
       // Les solutions DOIVENT être stockées (sinon impossible de corriger).
       await admin.from('match_solutions').insert({ match_id: data.id, solutions: sols })
-      // Les origines (pour le débrief / rangement des erreurs) sont best-effort :
-      // si la colonne n'existe pas encore (migration 0026 non passée), on n'échoue pas.
-      await admin.from('match_solutions').update({ origines }).eq('match_id', data.id)
-        .then(({ error: e }) => { if (e) console.warn('origines non stockées (migration 0026 ?):', e.message) })
+      // Les origines + options complètes (pour le débrief) sont best-effort :
+      // si les colonnes n'existent pas encore, on n'échoue pas.
+      await admin.from('match_solutions').update({ origines, options_full: optionsFull }).eq('match_id', data.id)
+        .then(({ error: e }) => { if (e) console.warn('origines/options_full non stockées (migrations 0026/0029 ?):', e.message) })
       code = c
     }
   }

@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
   ])
   const solutions: number[][] = sol?.solutions || []
   const origines: Origine[] = sol?.origines || []
+  const optionsFull: string[][] = sol?.options_full || []
   const repByIdx = new Map<number, { juste: boolean; choix: number[] }>()
   for (const r of (reps || []) as { q_index: number; juste: boolean; choix: number[] | null }[]) {
     repByIdx.set(r.q_index, { juste: !!r.juste, choix: Array.isArray(r.choix) ? r.choix : [] })
@@ -53,6 +54,8 @@ export async function POST(req: NextRequest) {
       enonce: q.enonce,
       cat: q.cat,
       options: q.options.map(o => o.t),
+      // Texte intégral aligné sur options (vide si migration 0029 non passée).
+      optionsCompletes: optionsFull[i] || [],
       correct,
       choix: rep?.choix ?? [],
       repondu: !!rep,
