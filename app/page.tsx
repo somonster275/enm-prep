@@ -21,16 +21,25 @@ const LIVRES: { h: number; rot: string; bg: string; kicker: string; titre: strin
   { h: 274, rot: '.5deg',  bg: '#A82C28', kicker: 'CODE DU',   titre: 'TRAVAIL',  size: 13 },
 ]
 
-// Tout ce que l'étudiant peut faire dans l'app.
+// Tout ce que l'étudiant peut faire dans l'app (outils individuels).
 const FONCTIONS = [
   { icone: '🗂️', couleur: '#DC4A2B', titre: 'Fiches de révision', desc: 'Vos fiches par matière, servies en répétition espacée pour ancrer durablement.' },
+  { icone: '✅', couleur: '#E8A11E', titre: 'QCM & erreurs', desc: 'Des QCM auto-corrigés, et un mode qui vous fait rejouer vos erreurs jusqu\'à les maîtriser.' },
   { icone: '💬', couleur: '#534AB7', titre: 'Questions de cours', desc: 'Une question, une réponse sourcée sur une base de cours sélectionnée avec soin.' },
-  { icone: '✅', couleur: '#E8A11E', titre: 'QCM', desc: 'Tester ses connaissances avec des questions à choix multiples corrigées.' },
+  { icone: '🤖', couleur: '#0F766E', titre: 'Coach IA', desc: 'Un coach qui connaît votre progression et vous propose la prochaine étape.' },
   { icone: '🧠', couleur: '#2DAE83', titre: 'Mind maps', desc: 'Visualiser les notions clés en cartes mentales et schémas par sujet.' },
-  { icone: '🎧', couleur: '#3B82D9', titre: 'Audio & vidéo', desc: 'Réviser en écoutant ou en regardant les ressources importées.' },
-  { icone: '📰', couleur: '#C2410C', titre: 'Actualités', desc: 'Suivre l\'actualité juridique utile au concours, sélectionnée pour vous.' },
-  { icone: '🤖', couleur: '#0F766E', titre: 'Tuteur IA', desc: 'Un coach qui connaît votre progression et vous propose la prochaine étape.' },
+  { icone: '🎬', couleur: '#3B82D9', titre: 'Vidéos', desc: 'Des vidéos sélectionnées par matière, à regarder directement dans codex.' },
+  { icone: '📅', couleur: '#C2410C', titre: 'Calendrier', desc: 'Vos cours de la fac et les événements de la prépa réunis et synchronisés.' },
   { icone: '🔥', couleur: '#D94A30', titre: 'Progression', desc: 'Régularité, maîtrise et couverture suivies jour après jour pour rester motivé.' },
+]
+
+// Outils collaboratifs — mis en avant dans une bande dédiée.
+const COLLAB = [
+  { icone: '⚔️', couleur: '#C0392B', titre: 'Duel', desc: 'Affrontez d\'autres candidats en temps réel : mêmes questions, chrono, classement live et historique de vos matchs.' },
+  { icone: '🤝', couleur: '#2DAE83', titre: 'Entraide', desc: 'Un annuaire entre candidats pour trouver de l\'aide sur une matière, ou en proposer.' },
+  { icone: '💬', couleur: '#534AB7', titre: 'Forum Q&R', desc: 'Posez vos questions à la communauté, répondez à celles des autres — avec notifications.' },
+  { icone: '📚', couleur: '#0F766E', titre: 'Annales partagées', desc: 'Sujets et corrigés mis en commun par les candidats, classés par matière.' },
+  { icone: '🏆', couleur: '#E8A11E', titre: 'Classement & défi', desc: 'Un défi de la semaine et un classement anonyme pour garder la motivation, ensemble.' },
 ]
 
 // Les trois exemples « ce que vous pouvez demander » (façon comptoir).
@@ -100,6 +109,7 @@ export default function Accueil() {
 
           <nav className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
             <a href="#fonctions" style={{ fontSize: 14.5, fontWeight: 600, color: MUTED, textDecoration: 'none' }}>Fonctionnalités</a>
+            <a href="#communaute" style={{ fontSize: 14.5, fontWeight: 600, color: MUTED, textDecoration: 'none' }}>Communauté</a>
             <a href="#apercu" style={{ fontSize: 14.5, fontWeight: 600, color: MUTED, textDecoration: 'none' }}>Aperçu</a>
             <a href="#methode" style={{ fontSize: 14.5, fontWeight: 600, color: MUTED, textDecoration: 'none' }}>Méthode</a>
           </nav>
@@ -206,6 +216,33 @@ export default function Accueil() {
               <div style={{ fontSize: 13.5, lineHeight: 1.55, color: MUTED, marginTop: 7 }}>{f.desc}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ───────────── Collaboratif (mis en avant) ───────────── */}
+      <section id="communaute" style={{ background: 'linear-gradient(135deg, #FFF4E6 0%, #FCE9E3 100%)', borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}`, marginTop: 30 }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto', padding: '56px 24px' }}>
+          <div style={{ textAlign: 'center', maxWidth: 620, margin: '0 auto' }}>
+            <div style={{ display: 'inline-block', fontSize: 11.5, fontWeight: 800, letterSpacing: '.09em', textTransform: 'uppercase', color: '#fff', background: RED, borderRadius: 999, padding: '5px 13px' }}>
+              Le cœur de codex
+            </div>
+            <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 34, letterSpacing: '-.01em', margin: '14px 0 0', lineHeight: 1.12 }}>
+              Réviser <span style={{ color: RED }}>ensemble</span>, pas chacun dans son coin
+            </h2>
+            <p style={{ fontSize: 16.5, color: '#6E5A50', margin: '12px auto 0', maxWidth: 540, lineHeight: 1.55 }}>
+              Préparer le concours seul, c&apos;est dur. codex met les candidats en relation : on se challenge, on s&apos;entraide et on partage ses ressources — la motivation tient mieux à plusieurs.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18, marginTop: 36 }}>
+            {COLLAB.map(f => (
+              <div key={f.titre} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 18, padding: 22, boxShadow: '0 18px 44px -34px rgba(60,40,20,.4)' }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: `${f.couleur}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{f.icone}</div>
+                <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 700, fontSize: 17, marginTop: 14 }}>{f.titre}</div>
+                <div style={{ fontSize: 13.5, lineHeight: 1.55, color: MUTED, marginTop: 7 }}>{f.desc}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
