@@ -26,6 +26,8 @@ export default function AdminQcmPage() {
   const [msg, setMsg] = useState<{ type: 'ok' | 'err'; texte: string } | null>(null)
   const [saving, setSaving] = useState(false)
   const [liste, setListe] = useState<Qcm[]>([])
+  const [lien, setLien] = useState('')
+  const [chargementLien, setChargementLien] = useState(false)
 
   const chargerListe = async () => {
     const res = await fetch('/api/admin/qcm'); const j = await res.json().catch(() => ({ qcms: [] })); setListe(j.qcms || [])
@@ -41,6 +43,34 @@ export default function AdminQcmPage() {
     if (q.length === 0) { setMsg({ type: 'err', texte: 'Aucune question détectée. Vérifie le format (voir l\'exemple).' }); return }
     // Si aucune bonne réponse détectée (ex. import HTML), on laisse l'admin cocher.
     setQuestions(q)
+  }
+
+  // Importe depuis un lien : récupère le HTML côté serveur, le place dans la zone
+  // de texte, puis l'analyse directement.
+  const importerLien = async () => {
+    setMsg(null)
+    const url = lien.trim()
+    if (!url) { setMsg({ type: 'err', texte: 'Colle d\'abord un lien.' }); return }
+    setChargementLien(true)
+    try {
+      const res = await fetch('/api/admin/qcm/fetch', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }),
+      })
+      const j = await res.json().catch(() => ({}))
+      if (!res.ok) { setMsg({ type: 'err', texte: j.error || 'Échec du chargement du lien.' }); return }
+      setBrut(j.html)
+      const q = parseQcm(j.html)
+      if (q.length === 0) {
+        setMsg({ type: 'err', texte: 'Lien chargé, mais aucune question détectée automatiquement. Vérifie le HTML ci-dessous ou ajuste manuellement.' })
+        return
+      }
+      setQuestions(q)
+      setMsg({ type: 'ok', texte: `${q.length} question${q.length > 1 ? 's' : ''} détectée${q.length > 1 ? 's' : ''} depuis le lien — vérifie les bonnes réponses.` })
+    } catch {
+      setMsg({ type: 'err', texte: 'Erreur réseau lors du chargement du lien.' })
+    } finally {
+      setChargementLien(false)
+    }
   }
 
   const majOption = (qi: number, oi: number, patch: Partial<{ t: string; c: boolean }>) =>
@@ -77,7 +107,7 @@ export default function AdminQcmPage() {
     <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: font, color: '#2A2018' }}>
       <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 26, margin: 0 }}>Créer un QCM</h1>
       <p style={{ fontSize: 14.5, color: '#8A7E68', margin: '8px 0 18px' }}>
-        Colle ton QCM en <b>texte</b> ou en <b>HTML</b>, analyse-le, vérifie les bonnes réponses, puis enregistre.
+        Importe ton QCM depuis un <b>lien</b>, ou colle-le en <b>texte</b> ou en <b>HTML</b>, puis vérifie les bonnes réponses avant d&apos;enregistrer.
       </p>
 
       <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 18, display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
@@ -87,6 +117,22 @@ export default function AdminQcmPage() {
             <option value="">Matière (facultatif)</option>
             {matieres.map(m => <option key={m} value={m}>{m}</option>)}
           </select>
+        </div>
+        {/* Import depuis un lien (URL d'une page HTML de QCM) */}
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+          <input value={lien} onChange={e => setLien(e.target.value)} placeholder="https://… (lien d'une page de QCM)"
+            onKeyDown={e => { if (e.key === 'Enter') importerLien() }}
+            style={{ ...champ, flex: '3 1 240px' }} />
+          <button onClick={importerLien} disabled={chargementLien} style={{
+            height: 44, padding: '0 20px', border: '1px solid #EADFC9', borderRadius: 11, background: '#FDF6EA',
+            color: '#5C4A22', fontSize: 14, fontWeight: 700, cursor: chargementLien ? 'wait' : 'pointer',
+            fontFamily: font, opacity: chargementLien ? 0.7 : 1, whiteSpace: 'nowrap',
+          }}>{chargementLien ? 'Chargement…' : '↓ Importer le lien'}</button>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#C7BBA2', fontSize: 12 }}>
+          <div style={{ flex: 1, height: 1, background: '#F0E7D6' }} />
+          ou colle directement ci-dessous
+          <div style={{ flex: 1, height: 1, background: '#F0E7D6' }} />
         </div>
         <textarea value={brut} onChange={e => setBrut(e.target.value)} rows={8} placeholder={EXEMPLE}
           style={{ ...champ, resize: 'vertical', lineHeight: 1.5, fontFamily: 'monospace', fontSize: 13 }} />
