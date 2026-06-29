@@ -68,7 +68,7 @@ function ModalAjoutEspace({ onFermer, onAjoute }: { onFermer: () => void; onAjou
       <div onClick={e => e.stopPropagation()} style={{
         background: '#fff', borderRadius: 20, width: '100%', maxWidth: 520,
         fontFamily: font, color: '#2A2018', boxShadow: '0 30px 80px -30px rgba(40,30,20,.5)',
-        overflow: 'hidden',
+        maxHeight: '90vh', overflowY: 'auto',
       }}>
         {/* Header */}
         <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid #F0E7D6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
