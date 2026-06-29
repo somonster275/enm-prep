@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { parseQcm, type QQuestion } from '@/lib/qcm-parse'
 
@@ -28,6 +28,7 @@ export default function AdminQcmPage() {
   const [liste, setListe] = useState<Qcm[]>([])
   const [lien, setLien] = useState('')
   const [chargementLien, setChargementLien] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
 
   const chargerListe = async () => {
     const res = await fetch('/api/admin/qcm'); const j = await res.json().catch(() => ({ qcms: [] })); setListe(j.qcms || [])
@@ -70,6 +71,28 @@ export default function AdminQcmPage() {
       setMsg({ type: 'err', texte: 'Erreur réseau lors du chargement du lien.' })
     } finally {
       setChargementLien(false)
+    }
+  }
+
+  // Importe un fichier HTML (ou texte) depuis l'ordinateur : on lit son contenu,
+  // on le place dans la zone de texte, puis on l'analyse.
+  const importerFichier = async (file: File | null) => {
+    if (!file) return
+    setMsg(null)
+    try {
+      const contenu = await file.text()
+      setBrut(contenu)
+      const q = parseQcm(contenu)
+      if (q.length === 0) {
+        setMsg({ type: 'err', texte: `« ${file.name} » chargé, mais aucune question détectée automatiquement. Vérifie le contenu ci-dessous ou ajuste manuellement.` })
+        return
+      }
+      setQuestions(q)
+      setMsg({ type: 'ok', texte: `${q.length} question${q.length > 1 ? 's' : ''} détectée${q.length > 1 ? 's' : ''} depuis « ${file.name} » — vérifie les bonnes réponses.` })
+    } catch {
+      setMsg({ type: 'err', texte: 'Impossible de lire ce fichier.' })
+    } finally {
+      if (fileRef.current) fileRef.current.value = ''
     }
   }
 
@@ -128,6 +151,12 @@ export default function AdminQcmPage() {
             color: '#5C4A22', fontSize: 14, fontWeight: 700, cursor: chargementLien ? 'wait' : 'pointer',
             fontFamily: font, opacity: chargementLien ? 0.7 : 1, whiteSpace: 'nowrap',
           }}>{chargementLien ? 'Chargement…' : '↓ Importer le lien'}</button>
+          <button onClick={() => fileRef.current?.click()} style={{
+            height: 44, padding: '0 20px', border: '1px solid #EADFC9', borderRadius: 11, background: '#FDF6EA',
+            color: '#5C4A22', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: font, whiteSpace: 'nowrap',
+          }}>📄 Importer un fichier HTML</button>
+          <input ref={fileRef} type="file" accept=".html,.htm,.txt,text/html,text/plain" style={{ display: 'none' }}
+            onChange={e => importerFichier(e.target.files?.[0] || null)} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#C7BBA2', fontSize: 12 }}>
           <div style={{ flex: 1, height: 1, background: '#F0E7D6' }} />
