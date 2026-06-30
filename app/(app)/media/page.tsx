@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Espace } from '@/types'
 import TagsInput from '@/components/TagsInput'
+import TagsEditeur from '@/components/TagsEditeur'
 
 type Media = {
   id: string
@@ -11,6 +12,7 @@ type Media = {
   url: string | null
   type: string | null
   description: string | null
+  tags?: string[]
   espaces: { nom: string; slug: string; couleur: string } | null
 }
 
@@ -226,6 +228,7 @@ export default function MediaPage() {
                     <span style={{ alignSelf: 'flex-start', fontSize: 11, fontWeight: 600, color: it.espaces.couleur, background: it.espaces.couleur + '1A', padding: '2px 9px', borderRadius: 999 }}>#{it.espaces.nom}</span>
                   )}
                   {it.description && <p style={{ fontSize: 13.5, color: '#6E6456', lineHeight: 1.55, margin: '2px 0 0', whiteSpace: 'pre-wrap' }}>{it.description}</p>}
+                  <TagsEditeur table="medias" id={it.id} initial={it.tags} accent={ACCENT} canEdit={isAdmin} />
                   {!yid && it.url && !estAudio(it.url) && (
                     <a href={it.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: ACCENT, fontWeight: 600, textDecoration: 'none', marginTop: 2 }}>Ouvrir le lien →</a>
                   )}

@@ -20,7 +20,7 @@ export async function GET() {
   const g = await garde()
   if ('erreur' in g) return NextResponse.json({ error: g.erreur }, { status: g.status })
   const admin = getSupabaseAdmin()
-  const { data: qcms } = await admin.from('qcm').select('id, titre, matiere, type, created_at').order('created_at', { ascending: false })
+  const { data: qcms } = await admin.from('qcm').select('id, titre, matiere, type, tags, created_at').order('created_at', { ascending: false })
   const { data: qs } = await admin.from('qcm_questions').select('qcm_id')
   const counts: Record<string, number> = {}
   for (const q of (qs || []) as { qcm_id: string }[]) counts[q.qcm_id] = (counts[q.qcm_id] || 0) + 1

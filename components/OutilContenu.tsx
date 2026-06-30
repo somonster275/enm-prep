@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Espace } from '@/types'
 import TagsInput from '@/components/TagsInput'
+import TagsEditeur from '@/components/TagsEditeur'
 
 type Props = {
   table: string            // 'mindmaps' | 'medias' | 'qcm'
@@ -23,6 +24,7 @@ type Item = {
   titre: string
   url: string | null
   type?: string | null
+  tags?: string[]
   espaces: { nom: string; slug: string; couleur: string } | null
 }
 
@@ -230,6 +232,7 @@ export default function OutilContenu({ table, accent, icone, titre, description,
                   )}
                   {it.url && <a href={it.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: accent, textDecoration: 'none', fontWeight: 600 }}>Ouvrir →</a>}
                 </div>
+                <TagsEditeur table={table} id={it.id} initial={it.tags} accent={accent} canEdit={isAdmin} />
               </div>
               {isAdmin && (
                 <button onClick={() => supprimer(it.id)} style={{

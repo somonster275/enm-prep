@@ -3,11 +3,12 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import TagsInput from '@/components/TagsInput'
+import TagsEditeur from '@/components/TagsEditeur'
 
 type Cours = {
   id: string; titre: string; description: string | null; matiere: string | null
   espace_id: string | null; module_id: string | null
-  fichier_url: string; fichier_nom: string | null; type: string | null; created_at: string
+  fichier_url: string; fichier_nom: string | null; type: string | null; tags?: string[]; created_at: string
 }
 type EspaceItem = { id: string; nom: string }
 type ModuleItem = { id: string; nom: string }
@@ -266,6 +267,7 @@ function CoursContenu() {
               </div>
               <div style={{ fontSize: 15.5, fontWeight: 700 }}>{c.titre}</div>
               {c.description && <div style={{ fontSize: 12.5, color: '#9A8D72', marginTop: 3, lineHeight: 1.45 }}>{c.description}</div>}
+              <TagsEditeur table="cours" id={c.id} initial={c.tags} accent="#3B82D9" canEdit={isAdmin} />
               <button onClick={() => ouvrir(c)} style={{ marginTop: 14, height: 40, border: 'none', borderRadius: 11, background: '#FCEFD3', color: '#8A5A10', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
                 Consulter →
               </button>

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { parseQcm, parseQcmLibre, type QQuestion, type QLibre } from '@/lib/qcm-parse'
 import TagsInput from '@/components/TagsInput'
+import TagsEditeur from '@/components/TagsEditeur'
 
 const EXEMPLE = `Q: Quel est le délai de prescription de droit commun en matière civile ?
 - 2 ans
@@ -16,7 +17,7 @@ Q: Le dol suppose…
 - des manœuvres frauduleuses *
 - un déséquilibre économique`
 
-type Qcm = { id: string; titre: string; matiere: string | null; type?: string; nb: number }
+type Qcm = { id: string; titre: string; matiere: string | null; type?: string; tags?: string[]; nb: number }
 
 export default function AdminQcmPage() {
   const [titre, setTitre] = useState('')
@@ -275,8 +276,9 @@ export default function AdminQcmPage() {
                   {q.type === 'libre' && <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.04em', color: '#7A1A3E', background: '#FBEAF0', borderRadius: 999, padding: '2px 8px' }}>AVANCÉ</span>}
                 </div>
                 <div style={{ fontSize: 12, color: '#9A8D72' }}>{q.nb} question{q.nb > 1 ? 's' : ''}{q.matiere ? ` · ${q.matiere}` : ''}</div>
+                <TagsEditeur table="qcm" id={q.id} initial={q.tags} accent="#E8A11E" canEdit={true} />
               </div>
-              <button onClick={() => supprimer(q.id)} style={{ border: 'none', background: '#FCE9E3', color: '#D94A30', borderRadius: 8, padding: '6px 12px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>Supprimer</button>
+              <button onClick={() => supprimer(q.id)} style={{ border: 'none', background: '#FCE9E3', color: '#D94A30', borderRadius: 8, padding: '6px 12px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: font, flexShrink: 0 }}>Supprimer</button>
             </div>
           ))}
         </div>
