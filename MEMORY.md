@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-29 (suite 17).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-29 (suite 18).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,24 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-06-29 (suite 18) — Système de tags (#) transversal + onglet « Approfondir »
+**Migration à exécuter par le user : 0030** (`tags text[]` + index GIN sur fiches/medias/
+mindmaps/qcm/cours + `notify pgrst`).
+
+- **Tags `#`** : `lib/tags.ts` (`normaliserTag`/`parseTags`/`nettoyerTags` → slug minuscules
+  sans accents) + composant **`components/TagsInput.tsx`** (pastilles, Entrée/espace/virgule
+  pour valider). Branché dans : éditeur de fiche (page module — chips affichées sous la fiche),
+  cours, médias (`media/page.tsx`), mind-maps (`OutilContenu.tsx`), QCM (admin + API `tags`).
+- **`components/Approfondir.tsx`** : en révision, quand la **réponse est révélée**, requête
+  `.overlaps('tags', tags)` sur medias/mindmaps/cours/qcm → panneau dépliable « 🔎 Approfondir »
+  listant les ressources du même tag, **ouvertes en nouvel onglet** (vidéo/mindmap = url directe,
+  cours = `/cours?c=id`, QCM = `/qcm` liste — pas encore de lien profond QCM). N'apparaît que
+  s'il y a des ressources liées. Inséré dans `revision/page.tsx` (deck charge déjà `select('*')`).
+- **Recherche par `#tag`** (`recherche/page.tsx`) : si la requête contient des `#tags`, bascule
+  en `chercherParTags` (chevauchement sur fiches/QCM/médias/cours) au lieu du texte.
+- `tsc --noEmit` OK ; commits+push auto sur main. Tags resilients (si migration 0030 absente,
+  les requêtes `overlaps` renvoient juste rien, pas d'erreur bloquante).
 
 ### 2026-06-29 (suite 17) — Imports docs, QCM avancés, refonte duels, rubrique Cours
 **Migrations à exécuter par le user (Supabase SQL Editor) : 0023→0029.** Plusieurs ont
