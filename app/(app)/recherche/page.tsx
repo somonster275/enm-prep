@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import { parseTags } from '@/lib/tags'
 
 type Res = { id: string; titre: string; sous: string; href: string }
 type Groupe = { cle: string; label: string; icone: string; couleur: string; items: Res[] }
@@ -15,6 +16,11 @@ export default function RecherchePage() {
   const [cherche, setCherche] = useState(false)
 
   const lancer = async () => {
+    // Mode TAG : si la requête contient des #tags, on cherche par chevauchement
+    // de tags à travers toutes les ressources (relie les contenus entre eux).
+    const tags = parseTags((q.match(/#[^\s,]+/g) || []).join(' '))
+    if (tags.length > 0) { await chercherParTags(tags); return }
+
     const terme = q.trim().replace(/[,()%*]/g, ' ').trim()
     if (terme.length < 2) return
     setLoading(true); setCherche(true)
@@ -54,17 +60,44 @@ export default function RecherchePage() {
     setLoading(false)
   }
 
+  // Recherche par tags : chevauchement (&&) sur fiches, QCM, vidéos/audios, cours.
+  const chercherParTags = async (tags: string[]) => {
+    setLoading(true); setCherche(true)
+    const [fiches, qcms, medias, cours] = await Promise.all([
+      supabase.from('fiches').select('id, question, reponse, module_id, modules(nom, espaces(nom, slug))')
+        .overlaps('tags', tags).is('deleted_at', null).eq('suspendu', false).limit(30),
+      supabase.from('qcm').select('id, titre, matiere').overlaps('tags', tags).limit(15),
+      supabase.from('medias').select('id, titre, description, type, url, espaces(nom)').overlaps('tags', tags).is('deleted_at', null).limit(15),
+      supabase.from('cours').select('id, titre, matiere, type').overlaps('tags', tags).limit(15),
+    ])
+    const g: Groupe[] = []
+    const ff = (fiches.data || []).map((r: any) => ({
+      id: r.id, titre: stripHtml(r.question).slice(0, 140),
+      sous: [r.modules?.espaces?.nom, r.modules?.nom].filter(Boolean).join(' › ') || stripHtml(r.reponse).slice(0, 90),
+      href: r.modules?.espaces ? `/espaces/${r.modules.espaces.slug}/modules/${r.module_id}` : '#',
+    }))
+    if (ff.length) g.push({ cle: 'fiches', label: 'Fiches', icone: '🗂️', couleur: '#DC4A2B', items: ff })
+    const qq = (qcms.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'QCM', href: '/qcm' }))
+    if (qq.length) g.push({ cle: 'qcm', label: 'QCM', icone: '✅', couleur: '#E8A11E', items: qq })
+    const mm = (medias.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.espaces?.nom || 'Vidéo / audio', href: r.url || '/media' }))
+    if (mm.length) g.push({ cle: 'media', label: 'Audio & Vidéo', icone: '🎬', couleur: '#3B82D9', items: mm })
+    const cc = (cours.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'Cours', href: `/cours?c=${r.id}` }))
+    if (cc.length) g.push({ cle: 'cours', label: 'Cours', icone: '📘', couleur: '#3B82D9', items: cc })
+    setGroupes(g)
+    setLoading(false)
+  }
+
   const total = groupes.reduce((s, g) => s + g.items.length, 0)
   const font = "'Hanken Grotesk', sans-serif"
 
   return (
     <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: font, color: '#2A2018' }}>
       <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 28, margin: 0 }}>Rechercher</h1>
-      <p style={{ fontSize: 15, color: '#8A7E68', margin: '8px 0 20px' }}>Dans tes fiches, QCM, vidéos, annales et le forum — par mot-clé.</p>
+      <p style={{ fontSize: 15, color: '#8A7E68', margin: '8px 0 20px' }}>Dans tes fiches, QCM, vidéos, annales et le forum — par mot-clé, ou par <b style={{ color: '#7C5CBF' }}>#tag</b> pour relier les ressources d&apos;un même thème.</p>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
         <input value={q} onChange={e => setQ(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') lancer() }} autoFocus
-          placeholder="Ex. « prescription », « dol », « légitime défense »…"
+          placeholder="Ex. « prescription », « dol », ou « #droit-penal »…"
           style={{ flex: 1, border: '1.5px solid #EADFC9', borderRadius: 12, padding: '12px 16px', background: '#FFFBF2', fontSize: 15, outline: 'none', fontFamily: font }} />
         <button onClick={lancer} disabled={q.trim().length < 2} style={{ padding: '0 22px', borderRadius: 12, background: '#DC4A2B', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14.5, fontWeight: 700, opacity: q.trim().length < 2 ? 0.5 : 1, fontFamily: font }}>Chercher</button>
       </div>
