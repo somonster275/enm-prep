@@ -124,6 +124,10 @@ mindmaps/qcm/cours + `notify pgrst`).
   s'il y a des ressources liées. Inséré dans `revision/page.tsx` (deck charge déjà `select('*')`).
 - **Recherche par `#tag`** (`recherche/page.tsx`) : si la requête contient des `#tags`, bascule
   en `chercherParTags` (chevauchement sur fiches/QCM/médias/cours) au lieu du texte.
+- **Édition des tags sur le contenu DÉJÀ existant** : composant **`components/TagsEditeur.tsx`**
+  (pastilles + édition inline + `update({tags})` sur la table), branché dans les listes de
+  cours, médias, mind-maps (`OutilContenu`), QCM (admin ; le GET `/api/admin/qcm` renvoie `tags`).
+  Permet de taguer rétroactivement sans recréer. Étudiants = pastilles en lecture seule.
 - `tsc --noEmit` OK ; commits+push auto sur main. Tags resilients (si migration 0030 absente,
   les requêtes `overlaps` renvoient juste rien, pas d'erreur bloquante).
 
