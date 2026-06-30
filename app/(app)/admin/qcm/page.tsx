@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { parseQcm, parseQcmLibre, type QQuestion, type QLibre } from '@/lib/qcm-parse'
+import TagsInput from '@/components/TagsInput'
 
 const EXEMPLE = `Q: Quel est le délai de prescription de droit commun en matière civile ?
 - 2 ans
@@ -20,6 +21,7 @@ type Qcm = { id: string; titre: string; matiere: string | null; type?: string; n
 export default function AdminQcmPage() {
   const [titre, setTitre] = useState('')
   const [matiere, setMatiere] = useState('')
+  const [tags, setTags] = useState<string[]>([])
   const [matieres, setMatieres] = useState<string[]>([])
   const [brut, setBrut] = useState('')
   const [questions, setQuestions] = useState<QQuestion[]>([])
@@ -120,11 +122,11 @@ export default function AdminQcmPage() {
       if (questionsLibre.some(q => !q.enonce.trim() || q.reponsesOk.filter(r => r.trim()).length === 0)) {
         setMsg({ type: 'err', texte: 'Chaque question doit avoir un énoncé et au moins une réponse acceptée.' }); return
       }
-      body = { titre, matiere, type: 'libre', questions: questionsLibre }
+      body = { titre, matiere, tags, type: 'libre', questions: questionsLibre }
     } else {
       if (!questions.length) { setMsg({ type: 'err', texte: 'Analyse d\'abord ton texte.' }); return }
       if (questions.some(q => !q.options.some(o => o.c))) { setMsg({ type: 'err', texte: 'Chaque question doit avoir au moins une bonne réponse cochée.' }); return }
-      body = { titre, matiere, type: 'choix', questions }
+      body = { titre, matiere, tags, type: 'choix', questions }
     }
 
     setSaving(true)
@@ -133,7 +135,7 @@ export default function AdminQcmPage() {
     const j = await res.json().catch(() => ({}))
     if (!res.ok) { setMsg({ type: 'err', texte: j.error || 'Erreur' }); return }
     setMsg({ type: 'ok', texte: `QCM enregistré (${j.nb} questions) ✅` })
-    setTitre(''); setMatiere(''); setBrut(''); setQuestions([]); setQuestionsLibre([]); setTypeImport('choix'); chargerListe()
+    setTitre(''); setMatiere(''); setTags([]); setBrut(''); setQuestions([]); setQuestionsLibre([]); setTypeImport('choix'); chargerListe()
   }
 
   const supprimer = async (id: string) => {
@@ -159,6 +161,10 @@ export default function AdminQcmPage() {
             <option value="">Matière (facultatif)</option>
             {matieres.map(m => <option key={m} value={m}>{m}</option>)}
           </select>
+        </div>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: '#5C4A22', marginBottom: 5 }}># Tags <span style={{ fontWeight: 400, color: '#9A8D72' }}>(relient ce QCM aux fiches, vidéos, cours… du même thème)</span></div>
+          <TagsInput value={tags} onChange={setTags} accent="#E8A11E" />
         </div>
         {/* Import depuis un lien (URL d'une page HTML de QCM) */}
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>

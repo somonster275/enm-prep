@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Espace } from '@/types'
+import TagsInput from '@/components/TagsInput'
 
 type Props = {
   table: string            // 'mindmaps' | 'medias' | 'qcm'
@@ -36,6 +37,7 @@ export default function OutilContenu({ table, accent, icone, titre, description,
   const [espaceId, setEspaceId] = useState('')
   const [url, setUrl] = useState('')
   const [type, setType] = useState('audio')
+  const [tags, setTags] = useState<string[]>([])
   const [fichier, setFichier] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
   const [msg, setMsg] = useState('')
@@ -99,12 +101,12 @@ export default function OutilContenu({ table, accent, icone, titre, description,
       finalUrl = await uploadFichier()
       if (!finalUrl && fichier) { setUploading(false); return }
     }
-    const payload: Record<string, unknown> = { titre: nom.trim(), espace_id: espaceId, url: finalUrl }
+    const payload: Record<string, unknown> = { titre: nom.trim(), espace_id: espaceId, url: finalUrl, tags }
     if (withType) payload.type = type
     const { error } = await supabase.from(table).insert(payload)
     setUploading(false)
     if (error) { afficherMsg('❌ ' + error.message); return }
-    setNom(''); setUrl(''); setFichier(null)
+    setNom(''); setUrl(''); setTags([]); setFichier(null)
     if (fileRef.current) fileRef.current.value = ''
     afficherMsg('✅ Ajouté')
     charger()
@@ -188,6 +190,10 @@ export default function OutilContenu({ table, accent, icone, titre, description,
             )}
           </div>
 
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#5C4A22', marginBottom: 5 }}># Tags <span style={{ fontWeight: 400, color: '#9A8D72' }}>(relient ce contenu aux fiches du même thème)</span></div>
+            <TagsInput value={tags} onChange={setTags} accent={accent} />
+          </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <button onClick={ajouter} disabled={!canAdd} style={{
               padding: '10px 22px', borderRadius: 10, background: accent, color: '#fff',

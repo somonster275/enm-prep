@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json().catch(() => ({}))
   const { titre, matiere } = body
+  const tags: string[] = Array.isArray(body.tags) ? body.tags.map((t: unknown) => String(t)).filter(Boolean).slice(0, 30) : []
   const type = body.type === 'libre' ? 'libre' : 'choix'
   if (!titre?.trim()) return NextResponse.json({ error: 'Titre requis.' }, { status: 400 })
 
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { data: qcm, error } = await admin.from('qcm')
-    .insert({ titre: titre.trim().slice(0, 160), matiere: matiere?.trim()?.slice(0, 60) || null, type })
+    .insert({ titre: titre.trim().slice(0, 160), matiere: matiere?.trim()?.slice(0, 60) || null, type, tags })
     .select().single()
   if (error || !qcm) return NextResponse.json({ error: error?.message || 'Échec création' }, { status: 500 })
 

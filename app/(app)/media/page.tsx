@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Espace } from '@/types'
+import TagsInput from '@/components/TagsInput'
 
 type Media = {
   id: string
@@ -51,6 +52,7 @@ export default function MediaPage() {
   const [espaceId, setEspaceId] = useState('')
   const [url, setUrl] = useState('')
   const [description, setDescription] = useState('')
+  const [tags, setTags] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
   const [formOuvert, setFormOuvert] = useState(false)
@@ -105,11 +107,11 @@ export default function MediaPage() {
     const { error } = await supabase.from('medias').insert({
       titre: titre.trim(), espace_id: espaceId, url: url.trim(),
       type: yid ? 'video' : (estAudio(url.trim()) ? 'audio' : 'lien'),
-      description: description.trim() || null,
+      description: description.trim() || null, tags,
     })
     setSaving(false)
     if (error) { afficherMsg('❌ ' + error.message); return }
-    setTitre(''); setUrl(''); setDescription(''); setFormOuvert(false)
+    setTitre(''); setUrl(''); setDescription(''); setTags([]); setFormOuvert(false)
     afficherMsg('✅ Ajouté')
     charger()
   }
@@ -162,6 +164,10 @@ export default function MediaPage() {
           </div>
           <input value={url} onChange={e => setUrl(e.target.value)} placeholder="Lien YouTube (https://youtu.be/… ou …/watch?v=…)" style={inp} />
           <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} placeholder="Description pour l'étudiant (ce qu'il va apprendre, points clés…)" style={{ ...inp, resize: 'vertical', lineHeight: 1.5 }} />
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#5C4A22', marginBottom: 5 }}># Tags <span style={{ fontWeight: 400, color: '#9A8D72' }}>(relient cette ressource aux fiches du même thème)</span></div>
+            <TagsInput value={tags} onChange={setTags} accent={ACCENT} />
+          </div>
           <div style={{ fontSize: 12, color: '#9A8D72' }}>
             💡 Sur YouTube, mets la vidéo en <strong>« Non répertoriée »</strong> (pas « Privée » : une vidéo privée ne peut pas être lue ici). Seuls ceux qui ont le lien y accèdent.
           </div>

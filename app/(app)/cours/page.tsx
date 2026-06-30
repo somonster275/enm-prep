@@ -2,6 +2,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import TagsInput from '@/components/TagsInput'
 
 type Cours = {
   id: string; titre: string; description: string | null; matiere: string | null
@@ -46,6 +47,7 @@ function CoursContenu() {
   const [espaceId, setEspaceId] = useState('')
   const [moduleId, setModuleId] = useState('')
   const [modules, setModules] = useState<ModuleItem[]>([])
+  const [tags, setTags] = useState<string[]>([])
   const [fichier, setFichier] = useState<File | null>(null)
   const [saving, setSaving] = useState(false)
   const [erreur, setErreur] = useState('')
@@ -107,10 +109,10 @@ function CoursContenu() {
       const { error } = await supabase.from('cours').insert({
         titre: titre.trim().slice(0, 160), description: description.trim() || null,
         matiere: nomMatiere, espace_id: espaceId || null, module_id: moduleId || null,
-        fichier_url: uj.url, fichier_nom: nom, type, created_by: uid,
+        tags, fichier_url: uj.url, fichier_nom: nom, type, created_by: uid,
       })
       if (error) { setErreur(error.message); setSaving(false); return }
-      setTitre(''); setDescription(''); setEspaceId(''); setModuleId(''); setFichier(null); setFormOuvert(false)
+      setTitre(''); setDescription(''); setEspaceId(''); setModuleId(''); setTags([]); setFichier(null); setFormOuvert(false)
       if (fileRef.current) fileRef.current.value = ''
       charger()
     } catch {
@@ -225,6 +227,10 @@ function CoursContenu() {
             <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style={{ display: 'none' }}
               onChange={e => setFichier(e.target.files?.[0] || null)} />
           </label>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#5C4A22', marginBottom: 5 }}># Tags <span style={{ fontWeight: 400, color: '#9A8D72' }}>(relient ce cours aux fiches, vidéos, QCM… du même thème)</span></div>
+            <TagsInput value={tags} onChange={setTags} accent="#3B82D9" />
+          </div>
           {erreur && <div style={{ fontSize: 13, color: '#D94A30' }}>{erreur}</div>}
           <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={televerser} disabled={saving} style={{ height: 44, padding: '0 22px', border: 'none', borderRadius: 11, background: '#DC4A2B', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.6 : 1, fontFamily: FONT }}>{saving ? 'Envoi…' : 'Publier le cours'}</button>

@@ -7,6 +7,8 @@ import { scoreGlobal, estDue } from '@/lib/spaced-repetition'
 import Link from 'next/link'
 import RichContent from '@/components/RichContent'
 import RichEditor from '@/components/RichEditor'
+import TagsInput from '@/components/TagsInput'
+import { nettoyerTags } from '@/lib/tags'
 import RemarqueButton from '@/components/RemarqueButton'
 import AstucesFiche from '@/components/AstucesFiche'
 import FavoriButton from '@/components/FavoriButton'
@@ -37,6 +39,7 @@ export default function ModulePage() {
   const [editFiche, setEditFiche] = useState<Fiche | null>(null)
   const [question, setQuestion] = useState('')
   const [reponse, setReponse] = useState('')
+  const [tagsFiche, setTagsFiche] = useState<string[]>([])
   const [msg, setMsg] = useState('')
 
   // Suppression module
@@ -167,10 +170,10 @@ export default function ModulePage() {
 
   const sauvegarderFiche = async () => {
     if (!editFiche || !question || !reponse) return
-    const { error } = await supabase.from('fiches').update({ question, reponse }).eq('id', editFiche.id)
+    const { error } = await supabase.from('fiches').update({ question, reponse, tags: tagsFiche }).eq('id', editFiche.id)
     if (error) { afficherMsg('❌ Erreur : ' + error.message); return }
-    setFiches(f => f.map(fc => fc.id === editFiche.id ? { ...fc, question, reponse } : fc))
-    setEditFiche(null); setQuestion(''); setReponse('')
+    setFiches(f => f.map(fc => fc.id === editFiche.id ? { ...fc, question, reponse, tags: tagsFiche } : fc))
+    setEditFiche(null); setQuestion(''); setReponse(''); setTagsFiche([])
     afficherMsg('✅ Fiche modifiée')
   }
 
@@ -457,6 +460,10 @@ export default function ModulePage() {
                       <label style={{ fontSize: 11, fontWeight: 600, color: '#8A7E68', display: 'block', marginBottom: 4 }}>Réponse</label>
                       <RichEditor value={reponse} onChange={setReponse} placeholder="Réponse…" minHeight={120} />
                     </div>
+                    <div style={{ marginBottom: 12 }}>
+                      <label style={{ fontSize: 11, fontWeight: 600, color: '#8A7E68', display: 'block', marginBottom: 4 }}># Tags <span style={{ fontWeight: 400, textTransform: 'none' }}>(relient cette fiche aux vidéos, cours, QCM… du même thème → onglet « Approfondir » en révision)</span></label>
+                      <TagsInput value={tagsFiche} onChange={setTagsFiche} accent="#DC4A2B" />
+                    </div>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button onClick={sauvegarderFiche} style={{ padding: '9px 20px', borderRadius: 8, background: '#DC4A2B', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: font }}>Enregistrer</button>
                       <button onClick={() => { setEditFiche(null); setQuestion(''); setReponse('') }} style={{ padding: '9px 14px', borderRadius: 8, background: '#FDF6EA', color: '#8A7E68', border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 13, fontFamily: font }}>Annuler</button>
@@ -473,12 +480,19 @@ export default function ModulePage() {
                         <RichContent html={fiche.question} style={{ fontSize: 14, fontWeight: 600, color: '#2A2018', lineHeight: 1.5, marginBottom: 10 }} />
                         <div style={{ height: 1, background: '#F0E7D6', marginBottom: 10 }} />
                         <RichContent html={fiche.reponse} style={{ fontSize: 13, color: '#8A7E68', lineHeight: 1.7 }} />
+                        {nettoyerTags(fiche.tags).length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 10 }}>
+                            {nettoyerTags(fiche.tags).map(t => (
+                              <span key={t} style={{ fontSize: 11, fontWeight: 700, color: '#DC4A2B', background: '#FCEEEA', borderRadius: 999, padding: '2px 9px' }}>#{t}</span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                       <div style={{ display: 'flex', gap: 6, flexShrink: 0, alignItems: 'center' }}>
                         <FavoriButton ficheId={fiche.id} uid={profil?.id || ''} initial={favSet.has(fiche.id)} />
                         {isAdmin ? (
                           <>
-                            <button onClick={() => { setEditFiche(fiche); setQuestion(fiche.question); setReponse(fiche.reponse) }}
+                            <button onClick={() => { setEditFiche(fiche); setQuestion(fiche.question); setReponse(fiche.reponse); setTagsFiche(nettoyerTags(fiche.tags)) }}
                               style={{ padding: '6px 12px', borderRadius: 8, background: '#fff', color: '#8A7E68', border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
                               Modifier
                             </button>

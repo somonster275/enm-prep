@@ -8,6 +8,8 @@ import Link from 'next/link'
 import RichContent from '@/components/RichContent'
 import RichEditor from '@/components/RichEditor'
 import RemarqueButton from '@/components/RemarqueButton'
+import Approfondir from '@/components/Approfondir'
+import { nettoyerTags } from '@/lib/tags'
 import { enregistrerActivite, chargerActivite, calculerStreak } from '@/lib/streaks'
 import { useIsMobile } from '@/lib/useIsMobile'
 
@@ -391,6 +393,7 @@ export default function RevisionPage() {
           </div>
         </div>
       ) : (
+        <>
         <div onClick={() => setFlipped(f => !f)} style={{
           background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18,
           padding: '2rem', minHeight: 240, cursor: 'pointer', marginBottom: '1rem',
@@ -419,6 +422,10 @@ export default function RevisionPage() {
             </>
           )}
         </div>
+        {/* Approfondir : autres supports (vidéo, audio, cours, QCM…) du même tag.
+            Apparaît une fois la réponse révélée pour varier les supports. */}
+        {flipped && <Approfondir tags={nettoyerTags(card.tags)} />}
+        </>
       )}
 
       {/* Brouillon — version MOBILE : bloc dépliable sous la carte */}
