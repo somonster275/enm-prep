@@ -42,6 +42,7 @@ export default function RevisionPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [done, setDone] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const [fichesExistent, setFichesExistent] = useState(false) // des fiches existent dans ce périmètre (distingue « à jour » de « vide »)
   const [isAdmin, setIsAdmin] = useState(false)
   const [streak, setStreak] = useState<number | null>(null)
 
@@ -86,6 +87,7 @@ export default function RevisionPage() {
         const dues = fichList.filter((f: Fiche) => { const p = progMap[f.id]; return !p || estDue(p.prochaine_revision) })
         // Mélange + plafond à 40 cartes pour garder une session raisonnable.
         const d = dues.sort(() => Math.random() - 0.5).slice(0, 40)
+        setFichesExistent(fichList.length > 0)
         setDeck(d)
         setLoaded(true)
         return
@@ -153,10 +155,14 @@ export default function RevisionPage() {
       ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
       setProgressions(progMap)
 
-      let d = modeAlea
+      setFichesExistent(fichList.length > 0)
+      const d = modeAlea
         ? [...fichList].sort(() => Math.random() - 0.5)
         : fichList.filter((f: Fiche) => { const p = progMap[f.id]; return !p || estDue(p.prochaine_revision) }).sort(() => Math.random() - 0.5)
-      if (d.length === 0) d = [...fichList].sort(() => Math.random() - 0.5)
+      // On ne ressert PAS tout le deck quand plus rien n'est dû : reproposer des cartes
+      // non dues ferait re-noter l'étudiant et écraserait ses intervalles (= bachotage,
+      // exactement ce que la méthode dénonce). Deck vide → écran « Tu es à jour ✅ », avec
+      // une option explicite « Réviser quand même » (mode=tout) si l'étudiant le souhaite.
       setDeck(d)
       setLoaded(true)
     }
@@ -277,19 +283,36 @@ export default function RevisionPage() {
     <div style={{ padding: '2rem', color: '#9A8D72', textAlign: 'center', fontFamily: font }}>Chargement…</div>
   )
 
-  if (loaded && deck.length === 0) return (
+  if (loaded && deck.length === 0) {
+    // « À jour » = des fiches existent dans ce périmètre mais aucune n'est due
+    // maintenant. C'est un état DÉSIRABLE (≠ espace vide) : on félicite au lieu de
+    // resservir tout le deck, et on propose de réviser quand même en option.
+    const aJour = fichesExistent && !carnet && !favoris && !modeAlea
+    const reviseToutHref = `/espaces/${slug}/revision?mode=tout${moduleFilter ? `&module=${moduleFilter}` : ''}`
+    return (
     <div style={{ padding: '3rem', textAlign: 'center', maxWidth: 480, margin: '0 auto', fontFamily: font }}>
-      <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
-      <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 22, margin: '0 0 8px' }}>Aucune fiche à réviser</h2>
+      <div style={{ fontSize: 40, marginBottom: 12 }}>{aJour ? '✅' : '📭'}</div>
+      <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 22, margin: '0 0 8px' }}>{aJour ? 'Tu es à jour !' : 'Aucune fiche à réviser'}</h2>
       <p style={{ fontSize: 14, color: '#8A7E68', margin: '0 0 2rem' }}>
-        {carnet ? 'Ton carnet est vide — tu n\'as rien raté récemment, bravo !' : favoris ? 'Aucune fiche en favori — ajoute une ★ sur tes fiches importantes.' : mixte ? 'Rien à réviser pour le moment — reviens un peu plus tard !' : moduleFilter ? 'Ce module ne contient pas encore de fiches.' : 'Cet espace ne contient pas encore de fiches.'}
+        {aJour
+          ? 'Plus rien à réviser ici pour le moment — tes cartes reviendront automatiquement au bon moment pour ancrer ta mémoire. Reviens un peu plus tard.'
+          : carnet ? 'Ton carnet est vide — tu n\'as rien raté récemment, bravo !' : favoris ? 'Aucune fiche en favori — ajoute une ★ sur tes fiches importantes.' : mixte ? 'Rien à réviser pour le moment — reviens un peu plus tard !' : moduleFilter ? 'Ce module ne contient pas encore de fiches.' : 'Cet espace ne contient pas encore de fiches.'}
       </p>
-      <Link href={retourHref} style={{
-        padding: '12px 24px', borderRadius: 12, background: '#DC4A2B', color: '#fff',
-        textDecoration: 'none', fontSize: 14, fontWeight: 700, fontFamily: font,
-      }}>Retour</Link>
+      <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+        {aJour && !mixte && (
+          <Link href={reviseToutHref} style={{
+            padding: '12px 24px', borderRadius: 12, background: '#FDF6EA', color: '#8A7E68',
+            textDecoration: 'none', fontSize: 14, fontWeight: 700, fontFamily: font, border: '1px solid #EADFC9',
+          }}>Réviser quand même</Link>
+        )}
+        <Link href={retourHref} style={{
+          padding: '12px 24px', borderRadius: 12, background: '#DC4A2B', color: '#fff',
+          textDecoration: 'none', fontSize: 14, fontWeight: 700, fontFamily: font,
+        }}>Retour</Link>
+      </div>
     </div>
-  )
+    )
+  }
 
   if (done) {
     const totalNotes = sessionStats.reduce((s, n) => s + n, 0)
