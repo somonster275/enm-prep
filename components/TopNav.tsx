@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useEffect, useState } from 'react'
 import type { Profil } from '@/types'
-import { chargerActivite, calculerStreak } from '@/lib/streaks'
+import { chargerActivite, calculerStreak, chargerPauses } from '@/lib/streaks'
 import { LogoBadge } from '@/components/Logo'
 import NotifCloche from '@/components/NotifCloche'
 import { useIsMobile } from '@/lib/useIsMobile'
@@ -32,8 +32,8 @@ export default function TopNav() {
         prof = newProf
       }
       setProfil(prof)
-      const activite = await chargerActivite(user.id)
-      setStreak(calculerStreak(activite))
+      const [activite, pauses] = await Promise.all([chargerActivite(user.id), chargerPauses(user.id)])
+      setStreak(calculerStreak(activite, pauses))
     }
     load()
   }, [pathname])

@@ -10,7 +10,8 @@ import RichEditor from '@/components/RichEditor'
 import RemarqueButton from '@/components/RemarqueButton'
 import Approfondir from '@/components/Approfondir'
 import { nettoyerTags } from '@/lib/tags'
-import { enregistrerActivite, chargerActivite, calculerStreak } from '@/lib/streaks'
+import { enregistrerActivite, chargerActivite, calculerStreak, chargerPauses } from '@/lib/streaks'
+import { nouvellesRestantes, marquerNouvellesVues } from '@/lib/nouvelles-cartes'
 import { useIsMobile } from '@/lib/useIsMobile'
 
 // Récupère récursivement tous les IDs de modules enfants d'un module
@@ -43,6 +44,7 @@ export default function RevisionPage() {
   const [done, setDone] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [fichesExistent, setFichesExistent] = useState(false) // des fiches existent dans ce périmètre (distingue « à jour » de « vide »)
+  const [nouvellesEnAttente, setNouvellesEnAttente] = useState(0) // nouvelles cartes retenues par le plafond quotidien
   const [isAdmin, setIsAdmin] = useState(false)
   const [streak, setStreak] = useState<number | null>(null)
 
@@ -52,7 +54,7 @@ export default function RevisionPage() {
   const [editR, setEditR] = useState('')
 
   // Pour « annuler la dernière note » (raccourci Z / bouton).
-  const [lastAction, setLastAction] = useState<{ ficheId: string; prevProg: Progression | null; idxBefore: number; requeued: boolean; bouton: number } | null>(null)
+  const [lastAction, setLastAction] = useState<{ ficheId: string; prevProg: Progression | null; idxBefore: number; requeued: boolean; bouton: number; etaitNouvelle: boolean } | null>(null)
 
   // Toast affiché brièvement après avoir noté une carte.
   const [toast, setToast] = useState<string | null>(null)
@@ -156,9 +158,20 @@ export default function RevisionPage() {
       setProgressions(progMap)
 
       setFichesExistent(fichList.length > 0)
-      const d = modeAlea
-        ? [...fichList].sort(() => Math.random() - 0.5)
-        : fichList.filter((f: Fiche) => { const p = progMap[f.id]; return !p || estDue(p.prochaine_revision) }).sort(() => Math.random() - 0.5)
+      let d: Fiche[]
+      if (modeAlea) {
+        // « Réviser quand même » : tout le deck, sans filtre ni plafond (choix explicite).
+        d = [...fichList].sort(() => Math.random() - 0.5)
+      } else {
+        // Cartes DUES (déjà vues, à réviser) : jamais plafonnées — il faut pouvoir rattraper.
+        const revues = fichList.filter((f: Fiche) => { const p = progMap[f.id]; return p && estDue(p.prochaine_revision) })
+        // NOUVELLES cartes (jamais vues) : plafonnées à la limite quotidienne restante,
+        // pour éviter l'avalanche démotivante et respecter l'étalement de l'apprentissage.
+        const nouvelles = fichList.filter((f: Fiche) => !progMap[f.id]).sort(() => Math.random() - 0.5)
+        const restantes = nouvellesRestantes(user.id)
+        setNouvellesEnAttente(Math.max(0, nouvelles.length - restantes))
+        d = [...revues, ...nouvelles.slice(0, restantes)].sort(() => Math.random() - 0.5)
+      }
       // On ne ressert PAS tout le deck quand plus rien n'est dû : reproposer des cartes
       // non dues ferait re-noter l'étudiant et écraserait ses intervalles (= bachotage,
       // exactement ce que la méthode dénonce). Deck vide → écran « Tu es à jour ✅ », avec
@@ -177,6 +190,7 @@ export default function RevisionPage() {
     const fiche = deck[idx]
     // Mémorise l'état d'avant pour pouvoir annuler.
     const prevProg = progressions[fiche.id] ?? null
+    const etaitNouvelle = prevProg === null // carte jamais vue : compte dans le plafond quotidien
     const idxBefore = idx
     const palierActuel = progressions[fiche.id]?.palier ?? 0
     const minutes = intervalleMinutes(bouton, palierActuel)
@@ -192,6 +206,7 @@ export default function RevisionPage() {
     }
     await supabase.from('progression').upsert(prog, { onConflict: 'utilisateur_id,fiche_id' })
     enregistrerActivite(userId) // alimente la série / le momentum
+    if (etaitNouvelle) marquerNouvellesVues(userId, 1) // décompte une nouvelle carte du jour
     setProgressions(prev => ({ ...prev, [fiche.id]: prog as Progression }))
     setSessionStats(s => { const n = [...s]; n[bouton]++; return n })
 
@@ -204,7 +219,7 @@ export default function RevisionPage() {
     // Intervalle court → la carte est remise en fin de session pour être revue tout de suite.
     const requeue = minutes < SEUIL_REQUEUE
     if (requeue) setDeck(d => [...d, fiche])
-    setLastAction({ ficheId: fiche.id, prevProg, idxBefore, requeued: requeue, bouton })
+    setLastAction({ ficheId: fiche.id, prevProg, idxBefore, requeued: requeue, bouton, etaitNouvelle })
     setFlipped(false)
     if (idx + 1 < deck.length + (requeue ? 1 : 0)) setIdx(i => i + 1)
     else setDone(true)
@@ -213,9 +228,10 @@ export default function RevisionPage() {
   // Annule la dernière note : restaure la progression et revient à la carte.
   const annuler = async () => {
     if (!lastAction || !userId) return
-    const { ficheId, prevProg, idxBefore, requeued, bouton } = lastAction
+    const { ficheId, prevProg, idxBefore, requeued, bouton, etaitNouvelle } = lastAction
     if (prevProg) await supabase.from('progression').upsert(prevProg, { onConflict: 'utilisateur_id,fiche_id' })
     else await supabase.from('progression').delete().eq('utilisateur_id', userId).eq('fiche_id', ficheId)
+    if (etaitNouvelle) marquerNouvellesVues(userId, -1) // recrédite la nouvelle carte annulée
     setProgressions(prev => { const c = { ...prev }; if (prevProg) c[ficheId] = prevProg; else delete c[ficheId]; return c })
     setSessionStats(s => { const n = [...s]; if (n[bouton] > 0) n[bouton]--; return n })
     setDeck(d => {
@@ -265,7 +281,7 @@ export default function RevisionPage() {
   // À la fin de la session, recalcule la série pour l'afficher
   useEffect(() => {
     if (done && userId) {
-      chargerActivite(userId).then(a => setStreak(calculerStreak(a)))
+      Promise.all([chargerActivite(userId), chargerPauses(userId)]).then(([a, p]) => setStreak(calculerStreak(a, p)))
     }
   }, [done, userId])
 
@@ -298,6 +314,11 @@ export default function RevisionPage() {
           ? 'Plus rien à réviser ici pour le moment — tes cartes reviendront automatiquement au bon moment pour ancrer ta mémoire. Reviens un peu plus tard.'
           : carnet ? 'Ton carnet est vide — tu n\'as rien raté récemment, bravo !' : favoris ? 'Aucune fiche en favori — ajoute une ★ sur tes fiches importantes.' : mixte ? 'Rien à réviser pour le moment — reviens un peu plus tard !' : moduleFilter ? 'Ce module ne contient pas encore de fiches.' : 'Cet espace ne contient pas encore de fiches.'}
       </p>
+      {aJour && nouvellesEnAttente > 0 && (
+        <p style={{ fontSize: 12.5, color: '#7C5CBF', margin: '-1.25rem 0 2rem', fontWeight: 600 }}>
+          🌱 {nouvellesEnAttente} nouvelle{nouvellesEnAttente > 1 ? 's' : ''} carte{nouvellesEnAttente > 1 ? 's' : ''} en réserve — tu as atteint ta limite du jour. Elles arriveront les prochains jours pour ne pas te surcharger.
+        </p>
+      )}
       <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
         {aJour && !mixte && (
           <Link href={reviseToutHref} style={{
@@ -323,6 +344,11 @@ export default function RevisionPage() {
       <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
       <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 26, marginBottom: 8 }}>Session terminée</div>
       <p style={{ fontSize: 14, color: '#8A7E68', margin: '0 0 1.25rem' }}>{deck.length} fiche{deck.length > 1 ? 's' : ''} révisée{deck.length > 1 ? 's' : ''}</p>
+      {nouvellesEnAttente > 0 && (
+        <p style={{ fontSize: 12.5, color: '#7C5CBF', margin: '-0.75rem 0 1.25rem', fontWeight: 600 }}>
+          🌱 {nouvellesEnAttente} nouvelle{nouvellesEnAttente > 1 ? 's' : ''} carte{nouvellesEnAttente > 1 ? 's' : ''} en réserve pour les prochains jours.
+        </p>
+      )}
       {/* Recap par bouton */}
       {totalNotes > 0 && (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: '1.25rem' }}>

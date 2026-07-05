@@ -5,10 +5,12 @@ import type { Espace, Progression, Profil } from '@/types'
 import { estDue } from '@/lib/spaced-repetition'
 import {
   chargerActivite, calculerStreak, derniers7Jours, cartesAujourdhui, OBJECTIF_QUOTIDIEN,
+  chargerPauses, type Pause,
 } from '@/lib/streaks'
 import { calculerProgression } from '@/lib/progression'
 import Link from 'next/link'
 import NotesWidget from '@/components/NotesWidget'
+import ModeVacances from '@/components/ModeVacances'
 import ProgressionCard from '@/components/ProgressionCard'
 import OnboardingModal from '@/components/OnboardingModal'
 import StatRotatif, { type StatItem } from '@/components/StatRotatif'
@@ -32,6 +34,7 @@ export default function Dashboard() {
   const [modulesTotal, setModulesTotal] = useState(0)
   const [profil, setProfil] = useState<Profil | null>(null)
   const [activite, setActivite] = useState<Record<string, number>>({})
+  const [pauses, setPauses] = useState<Pause[]>([])
   const [evenements, setEvenements] = useState<Evenement[]>([])
   const [dateExamen, setDateExamen] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -41,7 +44,7 @@ export default function Dashboard() {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const [{ data: esp }, { data: prog }, { data: fich }, { data: prof }, act, evs, { data: mods }] = await Promise.all([
+      const [{ data: esp }, { data: prog }, { data: fich }, { data: prof }, act, evs, { data: mods }, pz] = await Promise.all([
         supabase.from('espaces').select('*').order('ordre'),
         supabase.from('progression').select('*').eq('utilisateur_id', user.id),
         supabase.from('fiches').select('id, module_id, modules(espace_id)').is('deleted_at', null).eq('suspendu', false),
@@ -49,6 +52,7 @@ export default function Dashboard() {
         chargerActivite(user.id),
         supabase.from('evenements').select('id,titre,date_debut,heure,type,couleur').gte('date_debut', new Date().toISOString().slice(0,10)).order('date_debut').limit(4),
         supabase.from('modules').select('id').is('deleted_at', null),
+        chargerPauses(user.id),
       ])
       // Prochain examen (toutes dates), pour le compte à rebours — indépendant des 4 events affichés.
       const { data: exam } = await supabase.from('evenements').select('date_debut').eq('type', 'examen').gte('date_debut', new Date().toISOString().slice(0,10)).order('date_debut').limit(1).maybeSingle()
@@ -59,11 +63,19 @@ export default function Dashboard() {
       setFiches((fich || []).map((f: any) => ({ id: f.id, espace_id: f.modules?.espace_id, module_id: f.module_id })))
       setProfil(prof)
       setActivite(act)
+      setPauses(pz)
       setEvenements((evs as any)?.data || [])
       setLoading(false)
     }
     load()
   }, [])
+
+  // Recharge les pauses après un changement (planification / annulation) pour
+  // recalculer immédiatement la série protégée.
+  const rechargerPauses = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) setPauses(await chargerPauses(user.id))
+  }
 
   const font = "'Hanken Grotesk', sans-serif"
   const display = "'Bricolage Grotesque', sans-serif"
@@ -78,7 +90,7 @@ export default function Dashboard() {
   const totalDue = progressions.filter(p => estDue(p.prochaine_revision)).length
   const prenom = profil?.prenom?.trim() || profil?.email?.split('@')[0] || 'vous'
 
-  const streak = calculerStreak(activite)
+  const streak = calculerStreak(activite, pauses)
   const semaine = derniers7Jours(activite)
   const cartesJour = cartesAujourdhui(activite)
   const totalSemaine = semaine.reduce((s, j) => s + j.cartes, 0)
@@ -138,6 +150,9 @@ export default function Dashboard() {
         <StatRotatif items={statItems} />
         <AccesRapide matieres={matieres} />
       </div>
+
+      {/* Mode vacances : mettre sa série en pause sans perdre ses flammes */}
+      <ModeVacances onChange={rechargerPauses} />
 
       {/* Hero : révisions du jour + momentum */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.55fr 1fr', gap: 18, marginBottom: 34 }}>

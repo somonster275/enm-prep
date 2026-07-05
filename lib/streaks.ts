@@ -28,6 +28,29 @@ export async function enregistrerActivite(userId: string, n = 1): Promise<void> 
   }
 }
 
+/** Période de pause (mode vacances) : les jours entre `debut` et `fin` (inclus) ne cassent pas la série. */
+export type Pause = { debut: string; fin: string }
+
+/**
+ * Charge les périodes de pause de l'utilisateur (mode vacances).
+ * Résilient : si la table `pauses` n'existe pas encore (migration 0031 non exécutée),
+ * renvoie un tableau vide au lieu de planter — la série se calcule alors sans pause.
+ */
+export async function chargerPauses(userId: string): Promise<Pause[]> {
+  try {
+    const { data, error } = await supabase.from('pauses').select('debut, fin').eq('user_id', userId)
+    if (error) return []
+    return (data || []) as Pause[]
+  } catch {
+    return []
+  }
+}
+
+/** Un jour (YYYY-MM-DD) est-il couvert par une pause déclarée ? */
+export function estEnPause(jour: string, pauses: Pause[]): boolean {
+  return pauses.some(p => jour >= p.debut && jour <= p.fin)
+}
+
 /** Charge l'activité des 60 derniers jours → map { 'YYYY-MM-DD': nbCartes }. */
 export async function chargerActivite(userId: string): Promise<Record<string, number>> {
   const since = new Date()
@@ -46,18 +69,26 @@ export async function chargerActivite(userId: string): Promise<Record<string, nu
  * Calcule la série en cours (jours consécutifs travaillés).
  * La série reste valide si l'utilisateur a travaillé aujourd'hui OU hier
  * (il a encore la journée pour la prolonger).
+ *
+ * Mode vacances : un jour couvert par une pause n'interrompt PAS la série (il est
+ * simplement sauté — il ne casse pas la chaîne, mais ne compte pas non plus comme
+ * un jour travaillé). L'étudiant peut ainsi prendre une pause sans perdre ses flammes.
  */
-export function calculerStreak(activite: Record<string, number>): number {
+export function calculerStreak(activite: Record<string, number>, pauses: Pause[] = []): number {
   const actif = (d: Date) => (activite[ymd(d)] ?? 0) > 0
+  const enPause = (d: Date) => estEnPause(ymd(d), pauses)
   const d = new Date()
-  if (!actif(d)) {
+  // Tolérance : si rien aujourd'hui (et pas en pause), on peut encore compter depuis hier.
+  if (!actif(d) && !enPause(d)) {
     d.setDate(d.getDate() - 1)
-    if (!actif(d)) return 0
+    if (!actif(d) && !enPause(d)) return 0
   }
   let streak = 0
-  while (actif(d)) {
-    streak++
-    d.setDate(d.getDate() - 1)
+  let garde = 0 // garde-fou anti-boucle (une pause très longue ne fige pas le calcul)
+  while (garde++ < 4000) {
+    if (actif(d)) { streak++; d.setDate(d.getDate() - 1); continue }
+    if (enPause(d)) { d.setDate(d.getDate() - 1); continue } // jour en pause : sauté, la chaîne continue
+    break
   }
   return streak
 }
