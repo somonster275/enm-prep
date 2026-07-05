@@ -19,15 +19,17 @@ export async function POST(req: NextRequest) {
   const admin = getSupabaseAdmin()
 
   const { data: m } = await admin.from('matchs')
-    .select('id, statut, deck, secondes_par_question, started_at')
+    .select('*')
     .eq('code', String(code || '').toUpperCase()).maybeSingle()
   if (!m) return NextResponse.json({ error: 'Match introuvable' }, { status: 404 })
 
   // On ne livre le débrief qu'une fois le match réellement terminé (ou son temps écoulé).
+  // En async, chacun finit à son rythme : le débrief est dispo dès que le joueur a joué
+  // (le client ne l'appelle qu'à la fin de SA partie).
   const total = (m.deck as DeckQ[]).length
   const secs = m.secondes_par_question as number
   const elapsed = m.started_at ? (Date.now() - Date.parse(m.started_at as string)) / 1000 : 0
-  const fini = m.statut === 'termine' || (m.started_at && elapsed >= total * secs)
+  const fini = m.mode === 'async' || m.statut === 'termine' || (m.started_at && elapsed >= total * secs)
   if (!fini) return NextResponse.json({ error: 'Match non terminé' }, { status: 409 })
 
   // On sélectionne « * » pour ne pas échouer si « origines » / « choix » n'existent

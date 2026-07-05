@@ -18,8 +18,9 @@ export async function POST(req: NextRequest) {
   const user = await utilisateurCourant()
   if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 
-  const { titre, deck, secondes } = await req.json().catch(() => ({}))
+  const { titre, deck, secondes, mode } = await req.json().catch(() => ({}))
   if (!Array.isArray(deck)) return NextResponse.json({ error: 'Paquet invalide' }, { status: 400 })
+  const async = mode === 'async'
 
   const pub: { enonce: string; options: { t: string; full?: string }[]; cat: string; multi: boolean }[] = []
   const sols: number[][] = []
@@ -58,13 +59,21 @@ export async function POST(req: NextRequest) {
   const secs = Math.min(120, Math.max(5, parseInt(secondes) || 20))
   const admin = getSupabaseAdmin()
 
+  // Un duel asynchrone démarre directement (pas de lobby) : chacun rejoue le paquet
+  // quand il veut, sous 48 h. Un duel temps réel reste en attente d'un lancement par l'hôte.
+  const champsAsync = async
+    ? { mode: 'async', statut: 'en_cours', started_at: new Date().toISOString(), expire_at: new Date(Date.now() + 48 * 3600 * 1000).toISOString() }
+    : { statut: 'attente' }
+
   let code = ''
+  let derniereErreur = ''
   for (let i = 0; i < 6 && !code; i++) {
     const c = genCode()
     const { data, error } = await admin.from('matchs').insert({
       code: c, hote_id: user.id, titre: String(titre || 'Match').slice(0, 120),
-      deck: pub, secondes_par_question: secs, statut: 'attente',
+      deck: pub, secondes_par_question: secs, ...champsAsync,
     }).select('id').single()
+    if (error) derniereErreur = error.message
     if (!error && data) {
       // Les solutions DOIVENT être stockées (sinon impossible de corriger).
       await admin.from('match_solutions').insert({ match_id: data.id, solutions: sols })
@@ -75,6 +84,12 @@ export async function POST(req: NextRequest) {
       code = c
     }
   }
-  if (!code) return NextResponse.json({ error: 'Création impossible, réessaie.' }, { status: 500 })
-  return NextResponse.json({ code })
+  if (!code) {
+    // Le mode async a besoin des colonnes mode/expire_at (migration 0033).
+    const indice = async && /mode|expire_at|column/i.test(derniereErreur)
+      ? ' (la migration 0033 doit être exécutée dans Supabase pour les duels asynchrones)'
+      : ''
+    return NextResponse.json({ error: `Création impossible, réessaie.${indice}` }, { status: 500 })
+  }
+  return NextResponse.json({ code, mode: async ? 'async' : 'live' })
 }

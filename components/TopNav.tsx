@@ -77,6 +77,7 @@ export default function TopNav() {
     { href: '/entraide', label: 'Entraide' },
     { href: '/forum', label: 'Forum' },
     { href: '/annales', label: 'Annales' },
+    { href: '/contribuer', label: 'Proposer un contenu' },
     { href: '/classement', label: 'Classement' },
   ]
   const liensAdmin: { href: string; label: string }[] =
@@ -86,6 +87,7 @@ export default function TopNav() {
           ...(profil?.role === 'admin' ? [
             { href: '/admin/defi', label: 'Défi de la semaine' },
             { href: '/admin/qcm', label: 'QCM' },
+            { href: '/admin/contributions', label: 'Contributions' },
             { href: '/admin/remarques', label: 'Remarques' },
             { href: '/admin/import', label: 'Importer' },
             { href: '/admin/corbeille', label: 'Corbeille' },

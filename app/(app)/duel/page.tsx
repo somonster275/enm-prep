@@ -27,6 +27,7 @@ export default function DuelAccueil() {
   const [moduleId, setModuleId] = useState('')
   const [nb, setNb] = useState(10)
   const [secs, setSecs] = useState(20)
+  const [mode, setMode] = useState<'live' | 'async'>('live')
   const [creating, setCreating] = useState(false)
   const [erreur, setErreur] = useState('')
 
@@ -89,7 +90,7 @@ export default function DuelAccueil() {
       // solutions (jamais envoyées aux clients) et génère le code.
       const res = await fetch('/api/duel/creer', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ titre, deck, secondes: secs }),
+        body: JSON.stringify({ titre, deck, secondes: secs, mode }),
       })
       const j = await res.json().catch(() => ({}))
       if (!res.ok || !j.code) { setErreur(j.error || 'Impossible de créer le salon, réessaie.'); setCreating(false); return }
@@ -132,6 +133,22 @@ export default function DuelAccueil() {
       {/* Créer un match */}
       <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18, padding: 22, marginBottom: 26 }}>
         <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 14 }}>Créer un match</div>
+        {/* Type de duel : temps réel (ensemble, live) ou asynchrone (chacun sous 48 h) */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+          {([
+            { k: 'live', t: '⚡ Temps réel', d: 'Ensemble, en direct' },
+            { k: 'async', t: '🕒 Asynchrone', d: 'Chacun joue sous 48 h' },
+          ] as const).map(o => (
+            <button key={o.k} onClick={() => setMode(o.k)} style={{
+              flex: '1 1 200px', textAlign: 'left', cursor: 'pointer', fontFamily: FONT,
+              border: `1.5px solid ${mode === o.k ? '#DC4A2B' : '#EADFC9'}`, background: mode === o.k ? '#FCEFD3' : '#FFFBF2',
+              borderRadius: 12, padding: '10px 14px',
+            }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#2A2018' }}>{o.t}</div>
+              <div style={{ fontSize: 12, color: '#8A7E68', marginTop: 1 }}>{o.d}</div>
+            </button>
+          ))}
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <label style={{ flex: '1 1 220px', fontSize: 13, color: '#8A7E68' }}>
@@ -166,12 +183,14 @@ export default function DuelAccueil() {
                 {[5, 10, 15, 20, 30].map(n => <option key={n} value={n}>{n} questions</option>)}
               </select>
             </label>
-            <label style={{ flex: '1 1 160px', fontSize: 13, color: '#8A7E68' }}>
-              Temps par question
-              <select value={secs} onChange={e => setSecs(parseInt(e.target.value))} style={{ ...champ, marginTop: 5 }}>
-                {[10, 15, 20, 30, 45].map(s => <option key={s} value={s}>{s} secondes</option>)}
-              </select>
-            </label>
+            {mode === 'live' && (
+              <label style={{ flex: '1 1 160px', fontSize: 13, color: '#8A7E68' }}>
+                Temps par question
+                <select value={secs} onChange={e => setSecs(parseInt(e.target.value))} style={{ ...champ, marginTop: 5 }}>
+                  {[10, 15, 20, 30, 45].map(s => <option key={s} value={s}>{s} secondes</option>)}
+                </select>
+              </label>
+            )}
           </div>
           {erreur && <div style={{ fontSize: 13.5, color: '#D94A30' }}>{erreur}</div>}
           <button onClick={creer} disabled={creating} style={{ alignSelf: 'flex-start', height: 48, padding: '0 26px', border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: creating ? 0.7 : 1, fontFamily: FONT }}>

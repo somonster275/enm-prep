@@ -3,12 +3,14 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { enregistrerActivite } from '@/lib/streaks'
+import DuelAsync from '@/components/DuelAsync'
 
 // Le paquet public ne contient PAS les bonnes réponses (correction côté serveur).
 type MatchQuestionPub = { enonce: string; options: { t: string; full?: string }[]; cat: 'qcm' | 'fiche'; multi: boolean }
 type Match = {
   id: string; code: string; hote_id: string; titre: string | null; statut: string
   deck: MatchQuestionPub[]; secondes_par_question: number; started_at: string | null
+  mode?: string; expire_at?: string | null
 }
 type Joueur = { user_id: string; pseudo: string; score: number; repondu: number; justes: number; termine: boolean }
 // Débrief de fin : une entrée par question interrogée.
@@ -83,7 +85,7 @@ export default function SalleDuel() {
 
       // Reprise : les questions déjà écoulées sont marquées traitées pour ne
       // pas les re-poster (le serveur les rejetterait de toute façon).
-      if (mm.statut === 'en_cours' && mm.started_at) {
+      if (mm.mode !== 'async' && mm.statut === 'en_cours' && mm.started_at) {
         const cur = Math.floor((Date.now() - Date.parse(mm.started_at)) / 1000 / mm.secondes_par_question)
         for (let i = 0; i < cur; i++) traitees.current.add(i)
         idxRef.current = Math.max(0, cur)
@@ -116,7 +118,7 @@ export default function SalleDuel() {
 
   // --- Horloge synchronisée : l'index de question découle de started_at ---
   useEffect(() => {
-    if (!match || match.statut !== 'en_cours' || !match.started_at) return
+    if (!match || match.mode === 'async' || match.statut !== 'en_cours' || !match.started_at) return
     const startMs = Date.parse(match.started_at)
     const secs = match.secondes_par_question
     const total = match.deck.length
@@ -154,7 +156,7 @@ export default function SalleDuel() {
   // n'a pas encore basculé le match en « terminé ».
   useEffect(() => {
     const termine = fini || match?.statut === 'termine'
-    if (!termine || !match || correctionDemandee.current) return
+    if (!termine || !match || match.mode === 'async' || correctionDemandee.current) return
     correctionDemandee.current = true
     setChargeCorrection(true)
     let annule = false
@@ -235,6 +237,9 @@ export default function SalleDuel() {
     </div>
   )
   if (!match) return <div style={{ paddingTop: 40, textAlign: 'center', color: '#9A8D72', fontFamily: FONT }}>Chargement…</div>
+
+  // Duel asynchrone : rendu dédié (jeu auto-rythmé + comparaison), effets temps réel neutralisés.
+  if (match.mode === 'async') return <DuelAsync match={match as Parameters<typeof DuelAsync>[0]['match']} uid={uid} joueurs={joueurs} />
 
   const estHote = match.hote_id === uid
   const classement = [...joueurs].sort((a, b) => b.score - a.score || b.justes - a.justes)
