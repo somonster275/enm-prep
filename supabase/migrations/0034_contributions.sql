@@ -23,9 +23,12 @@ create index if not exists contributions_user_idx   on public.contributions (use
 
 -- L'étudiant crée ses propositions et peut relire les siennes (suivi du statut).
 -- La modération (lecture globale + approbation) passe par une route serveur en service_role.
+-- (drop-before-create : la migration reste ré-exécutable sans erreur « policy already exists »)
 alter table public.contributions enable row level security;
+drop policy if exists "contrib_insert" on public.contributions;
 create policy "contrib_insert" on public.contributions
   for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists "contrib_select_self" on public.contributions;
 create policy "contrib_select_self" on public.contributions
   for select to authenticated using (user_id = auth.uid());
 
