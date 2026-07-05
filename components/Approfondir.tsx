@@ -35,7 +35,7 @@ export default function Approfondir({ tags }: { tags: string[] }) {
       for (const c of (cours.data || []) as { id: string; titre: string; type: string | null }[])
         out.push({ titre: c.titre, href: `/cours?c=${c.id}`, emoji: c.type === 'pdf' ? '📕' : '📘', label: 'Cours' })
       for (const q of (qcm.data || []) as { id: string; titre: string }[])
-        out.push({ titre: q.titre, href: `/qcm`, emoji: '✅', label: 'QCM' })
+        out.push({ titre: q.titre, href: `/qcm?id=${q.id}`, emoji: '✅', label: 'QCM' })
       if (!annule) setLiens(out)
     }
     charger()
