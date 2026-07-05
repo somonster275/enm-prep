@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { sansHtml, texteComplet } from '@/lib/texte'
+import { melange } from '@/lib/aleatoire'
 
 // Une question de match, format unifié (QCM existant OU fiche convertie).
 export type MatchOption = { t: string; c: boolean }
@@ -12,8 +13,6 @@ export type MatchQuestion = {
 
 const POINTS_BASE = 100        // points d'une bonne réponse
 const POINTS_VITESSE = 50      // bonus max pour la rapidité (proportionnel au temps restant)
-
-const melange = <T,>(arr: T[]): T[] => [...arr].sort(() => Math.random() - 0.5)
 
 // ---- Similarité lexicale (pour des leurres crédibles, sans appel IA) ----
 // Mots vides ignorés : ils n'apportent pas de signal de proximité thématique.

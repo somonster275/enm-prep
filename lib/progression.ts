@@ -1,4 +1,7 @@
 import { scoreGlobal } from '@/lib/spaced-repetition'
+// Source unique de vérité pour l'objectif quotidien et le format de date (évite la
+// duplication : ils étaient redéfinis à l'identique ici et dans lib/streaks.ts).
+import { OBJECTIF_QUOTIDIEN, ymd } from '@/lib/streaks'
 
 /**
  * Progression globale = moyenne pondérée de 3 dimensions (chacune sur 100) :
@@ -9,17 +12,12 @@ import { scoreGlobal } from '@/lib/spaced-repetition'
  * Poids ajustables ici.
  */
 export const POIDS = { maitrise: 0.5, couverture: 0.3, regularite: 0.2 }
-export const OBJECTIF_QUOTIDIEN = 20
 
 export type DetailProgression = {
   global: number
   maitrise: number
   couverture: number
   regularite: number
-}
-
-function ymd(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 /** Régularité : moyenne sur 7 jours du taux d'atteinte de l'objectif quotidien (0-100). */

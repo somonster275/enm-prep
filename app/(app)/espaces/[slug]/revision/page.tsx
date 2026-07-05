@@ -12,15 +12,23 @@ import Approfondir from '@/components/Approfondir'
 import { nettoyerTags } from '@/lib/tags'
 import { enregistrerActivite, chargerActivite, calculerStreak, chargerPauses } from '@/lib/streaks'
 import { nouvellesRestantes, marquerNouvellesVues } from '@/lib/nouvelles-cartes'
+import { melange } from '@/lib/aleatoire'
 import { useIsMobile } from '@/lib/useIsMobile'
 
-// Récupère récursivement tous les IDs de modules enfants d'un module
+// Tous les IDs de modules descendants d'un module (lui inclus). UNE seule requête :
+// on charge la carte parent→enfants puis on descend l'arbre en mémoire (évite le N+1).
 async function getAllModuleIds(rootId: string): Promise<string[]> {
-  const ids: string[] = [rootId]
-  const { data: children } = await supabase.from('modules').select('id').eq('parent_id', rootId).is('deleted_at', null)
-  for (const child of children || []) {
-    const nested = await getAllModuleIds(child.id)
-    ids.push(...nested)
+  const { data } = await supabase.from('modules').select('id, parent_id').is('deleted_at', null)
+  const enfantsDe = new Map<string, string[]>()
+  for (const m of (data || []) as { id: string; parent_id: string | null }[]) {
+    if (m.parent_id) { const l = enfantsDe.get(m.parent_id) || []; l.push(m.id); enfantsDe.set(m.parent_id, l) }
+  }
+  const ids: string[] = []
+  const pile = [rootId]
+  while (pile.length) {
+    const cur = pile.pop()!
+    ids.push(cur)
+    for (const c of enfantsDe.get(cur) || []) pile.push(c)
   }
   return ids
 }
@@ -80,15 +88,19 @@ export default function RevisionPage() {
       if (mixte) {
         setEspace({ id: '', nom: 'Révision mixte', slug: '', description: '', couleur: '#DC4A2B', ordre: 0 } as Espace)
         setModuleLabel('Toutes matières')
-        const { data: fich } = await supabase.from('fiches').select('*').is('deleted_at', null).eq('suspendu', false)
+        // Colonnes ciblées (pas de select('*')) : la révision mixte charge toute la
+        // table fiches, autant limiter la charge utile au strict nécessaire.
+        const { data: fich } = await supabase.from('fiches')
+          .select('id, module_id, question, reponse, tags, suspendu, created_at')
+          .is('deleted_at', null).eq('suspendu', false)
         const fichList = (fich || []) as Fiche[]
         const { data: prog } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id)
         const progMap: Record<string, Progression> = {}
         ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
         setProgressions(progMap)
         const dues = fichList.filter((f: Fiche) => { const p = progMap[f.id]; return !p || estDue(p.prochaine_revision) })
-        // Mélange + plafond à 40 cartes pour garder une session raisonnable.
-        const d = dues.sort(() => Math.random() - 0.5).slice(0, 40)
+        // Mélange (Fisher-Yates) + plafond à 40 cartes pour garder une session raisonnable.
+        const d = melange(dues).slice(0, 40)
         setFichesExistent(fichList.length > 0)
         setDeck(d)
         setLoaded(true)
@@ -106,7 +118,7 @@ export default function RevisionPage() {
         const progMap: Record<string, Progression> = {}
         ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
         setProgressions(progMap)
-        setDeck((fich || []).sort(() => Math.random() - 0.5) as Fiche[])
+        setDeck(melange((fich || []) as Fiche[]))
         setLoaded(true)
         return
       }
@@ -123,7 +135,7 @@ export default function RevisionPage() {
         const progMap: Record<string, Progression> = {}
         ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
         setProgressions(progMap)
-        setDeck((fich || []).sort(() => Math.random() - 0.5) as Fiche[])
+        setDeck(melange((fich || []) as Fiche[]))
         setLoaded(true)
         return
       }
@@ -161,16 +173,16 @@ export default function RevisionPage() {
       let d: Fiche[]
       if (modeAlea) {
         // « Réviser quand même » : tout le deck, sans filtre ni plafond (choix explicite).
-        d = [...fichList].sort(() => Math.random() - 0.5)
+        d = melange(fichList)
       } else {
         // Cartes DUES (déjà vues, à réviser) : jamais plafonnées — il faut pouvoir rattraper.
         const revues = fichList.filter((f: Fiche) => { const p = progMap[f.id]; return p && estDue(p.prochaine_revision) })
-        // NOUVELLES cartes (jamais vues) : plafonnées à la limite quotidienne restante,
-        // pour éviter l'avalanche démotivante et respecter l'étalement de l'apprentissage.
-        const nouvelles = fichList.filter((f: Fiche) => !progMap[f.id]).sort(() => Math.random() - 0.5)
-        const restantes = nouvellesRestantes(user.id)
+        // NOUVELLES cartes (jamais vues) : plafonnées à la limite quotidienne restante
+        // (compteur en base, cross-device), pour éviter l'avalanche démotivante.
+        const nouvelles = melange(fichList.filter((f: Fiche) => !progMap[f.id]))
+        const restantes = await nouvellesRestantes(user.id)
         setNouvellesEnAttente(Math.max(0, nouvelles.length - restantes))
-        d = [...revues, ...nouvelles.slice(0, restantes)].sort(() => Math.random() - 0.5)
+        d = melange([...revues, ...nouvelles.slice(0, restantes)])
       }
       // On ne ressert PAS tout le deck quand plus rien n'est dû : reproposer des cartes
       // non dues ferait re-noter l'étudiant et écraserait ses intervalles (= bachotage,
@@ -206,7 +218,7 @@ export default function RevisionPage() {
     }
     await supabase.from('progression').upsert(prog, { onConflict: 'utilisateur_id,fiche_id' })
     enregistrerActivite(userId) // alimente la série / le momentum
-    if (etaitNouvelle) marquerNouvellesVues(userId, 1) // décompte une nouvelle carte du jour
+    if (etaitNouvelle) marquerNouvellesVues(1) // décompte une nouvelle carte du jour (compteur en base, atomique)
     setProgressions(prev => ({ ...prev, [fiche.id]: prog as Progression }))
     setSessionStats(s => { const n = [...s]; n[bouton]++; return n })
 
@@ -231,7 +243,7 @@ export default function RevisionPage() {
     const { ficheId, prevProg, idxBefore, requeued, bouton, etaitNouvelle } = lastAction
     if (prevProg) await supabase.from('progression').upsert(prevProg, { onConflict: 'utilisateur_id,fiche_id' })
     else await supabase.from('progression').delete().eq('utilisateur_id', userId).eq('fiche_id', ficheId)
-    if (etaitNouvelle) marquerNouvellesVues(userId, -1) // recrédite la nouvelle carte annulée
+    if (etaitNouvelle) marquerNouvellesVues(-1) // recrédite la nouvelle carte annulée
     setProgressions(prev => { const c = { ...prev }; if (prevProg) c[ficheId] = prevProg; else delete c[ficheId]; return c })
     setSessionStats(s => { const n = [...s]; if (n[bouton] > 0) n[bouton]--; return n })
     setDeck(d => {

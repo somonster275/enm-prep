@@ -27,7 +27,7 @@ export default function TopNav() {
       let { data: prof } = await supabase.from('profils').select('*').eq('id', user.id).single()
       if (!prof) {
         const { data: newProf } = await supabase.from('profils').insert({
-          id: user.id, email: user.email, role: 'etudiant'
+          id: user.id, email: user.email, role: 'lecteur'
         }).select().single()
         prof = newProf
       }

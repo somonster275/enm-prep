@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { enregistrerActivite } from '@/lib/streaks'
 import { reponseCorrecte } from '@/lib/qcm-parse'
+import { melange } from '@/lib/aleatoire'
 
 type Qcm = { id: string; titre: string; matiere: string | null; type?: string }
 type Question = {
@@ -55,8 +56,8 @@ export default function QcmPage() {
     const ids = (rep || []).map((r: { question_id: string }) => r.question_id)
     if (ids.length === 0) return
     const { data } = await supabase.from('qcm_questions').select('*').in('id', ids)
-    const melange = ((data || []) as Question[]).sort(() => Math.random() - 0.5)
-    setQuestions(melange); setReponses({}); setSaisies({}); setValides(new Set()); setActif(null); setModeErreurs(true)
+    const melangees = melange((data || []) as Question[])
+    setQuestions(melangees); setReponses({}); setSaisies({}); setValides(new Set()); setActif(null); setModeErreurs(true)
     window.scrollTo({ top: 0 })
   }
 

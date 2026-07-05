@@ -14,12 +14,13 @@ export function ymd(d: Date): string {
 /** Enregistre l'activité du jour (incrémente le compteur de cartes révisées). */
 export async function enregistrerActivite(userId: string, n = 1): Promise<void> {
   const jour = ymd(new Date())
+  // Incrément ATOMIQUE côté serveur (RPC, migration 0035) : pas de course read-then-write.
+  const { error } = await supabase.rpc('incr_activite', { p_jour: jour, p_delta: n })
+  if (!error) return
+  // Repli si la RPC n'existe pas encore (migration non exécutée) : ancien read-then-write.
   const { data } = await supabase
-    .from('activite_jours')
-    .select('cartes')
-    .eq('utilisateur_id', userId)
-    .eq('jour', jour)
-    .maybeSingle()
+    .from('activite_jours').select('cartes')
+    .eq('utilisateur_id', userId).eq('jour', jour).maybeSingle()
   if (data) {
     await supabase.from('activite_jours').update({ cartes: data.cartes + n })
       .eq('utilisateur_id', userId).eq('jour', jour)

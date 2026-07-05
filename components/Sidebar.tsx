@@ -24,7 +24,7 @@ export default function Sidebar() {
         const { data: newProf } = await supabase.from('profils').insert({
           id: user.id,
           email: user.email,
-          role: 'etudiant'
+          role: 'lecteur'
         }).select().single()
         prof = newProf
       }

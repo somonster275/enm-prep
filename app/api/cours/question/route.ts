@@ -147,17 +147,11 @@ export async function POST(request: NextRequest) {
       : "Aucun document de cours n'a encore été importé dans la base ENM.")
   }
 
-  // On s'engage à répondre → on incrémente le quota (borne Voyage + Claude).
-  // Résilient : sans la table ia_usage, l'incrément est simplement ignoré.
+  // On s'engage à répondre → incrément ATOMIQUE du quota (RPC, migration 0035) : plus de
+  // course read-then-write. Résilient : sans la RPC/table ia_usage, l'incrément est ignoré.
   if (user) {
     try {
-      const jour = jourCourant()
-      const { data, error } = await admin.from('ia_usage').select('questions')
-        .eq('user_id', user.id).eq('jour', jour).maybeSingle()
-      if (!error) {
-        if (data) await admin.from('ia_usage').update({ questions: data.questions + 1 }).eq('user_id', user.id).eq('jour', jour)
-        else await admin.from('ia_usage').insert({ user_id: user.id, jour, questions: 1 })
-      }
+      await admin.rpc('incr_ia_usage', { p_user: user.id, p_jour: jourCourant() })
     } catch { /* résilient */ }
   }
 

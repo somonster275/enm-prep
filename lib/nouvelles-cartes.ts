@@ -1,3 +1,4 @@
+import { supabase } from '@/lib/supabase'
 import { ymd } from '@/lib/streaks'
 
 /**
@@ -6,31 +7,33 @@ import { ymd } from '@/lib/streaks'
  * La répétition espacée est efficace parce qu'elle étale l'apprentissage : découvrir
  * 400 fiches fraîches d'un coup crée une avalanche démotivante et casse la mémorisation.
  * On limite donc le nombre de NOUVELLES cartes par jour ; les cartes DUES (déjà vues,
- * à réviser) ne sont jamais plafonnées — il faut toujours pouvoir rattraper ses révisions.
+ * à réviser) ne sont jamais plafonnées.
  *
- * Le compteur est stocké côté navigateur (localStorage), par utilisateur et par jour —
- * même approche que l'onboarding. Simple, sans migration ; se réinitialise à minuit.
+ * Le compteur est en BASE (table `nouvelles_jours`, migration 0035) : il est donc
+ * cross-device et non contournable en navigation privée. Incrément atomique via RPC.
+ * Résilient : si la table/RPC n'existe pas encore, aucun cap n'est appliqué (fail-open).
  */
 export const LIMITE_NOUVELLES_PAR_JOUR = 45
 
-function cle(userId: string): string {
-  return `codex-nouvelles-${userId}-${ymd(new Date())}`
+/** Nombre de nouvelles cartes déjà découvertes aujourd'hui (lecture directe, RLS self). */
+export async function nouvellesVuesAujourdhui(userId: string): Promise<number> {
+  try {
+    const { data, error } = await supabase.from('nouvelles_jours')
+      .select('n').eq('user_id', userId).eq('jour', ymd(new Date())).maybeSingle()
+    if (error) return 0
+    return data?.n ?? 0
+  } catch { return 0 }
 }
 
-/** Combien de nouvelles cartes l'étudiant a déjà découvertes aujourd'hui. */
-export function nouvellesVuesAujourdhui(userId: string): number {
-  if (typeof window === 'undefined') return 0
-  return parseInt(localStorage.getItem(cle(userId)) || '0', 10) || 0
+/** Nouvelles cartes encore autorisées aujourd'hui (limite pleine si le compteur est indisponible). */
+export async function nouvellesRestantes(userId: string): Promise<number> {
+  const vues = await nouvellesVuesAujourdhui(userId)
+  return Math.max(0, LIMITE_NOUVELLES_PAR_JOUR - vues)
 }
 
-/** Combien de nouvelles cartes il peut encore découvrir aujourd'hui (0 si plafond atteint). */
-export function nouvellesRestantes(userId: string): number {
-  return Math.max(0, LIMITE_NOUVELLES_PAR_JOUR - nouvellesVuesAujourdhui(userId))
-}
-
-/** Ajuste le compteur du jour (+1 quand une nouvelle carte est notée, -1 en cas d'annulation). */
-export function marquerNouvellesVues(userId: string, delta = 1): void {
-  if (typeof window === 'undefined') return
-  const n = Math.max(0, nouvellesVuesAujourdhui(userId) + delta)
-  localStorage.setItem(cle(userId), String(n))
+/** Ajuste le compteur du jour de façon ATOMIQUE (+1 à la découverte, -1 à l'annulation). */
+export async function marquerNouvellesVues(delta = 1): Promise<void> {
+  try {
+    await supabase.rpc('incr_nouvelles', { p_jour: ymd(new Date()), p_delta: delta })
+  } catch { /* résilient : compteur indisponible → on n'échoue pas la révision */ }
 }
