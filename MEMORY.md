@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-06-29 (suite 18).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-07-05 (suite 19).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,87 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-07-05 (suite 19) — Audit Fable + 6 chantiers (répétition espacée, vacances, QCM, RAG, duel async, contributions)
+**Contexte** : audit critique de l'architecture demandé à un sous-agent **Fable** (retour façon
+étudiant + comparaison avec Anki/Quizlet/Duolingo et surtout **edn.fr/MyEDN** — inspiration du
+user, plateformes leaders de prépa concours médecine EDN). Verdict Fable : couche métier (`lib/`)
+et sécurité saines ; faiblesses = tout en `'use client'`, styles inline, 0 test/CI, push direct
+sur `main`. Angle mort produit vs le concours : pas d'entraînement **rédactionnel** (dissert/cas
+pratique/note de synthèse) ni de **concours blanc chronométré** (ce que fait edn.fr).
+
+**⚠️ Migrations à exécuter par le user (Supabase SQL Editor) : 0031 → 0034.** Tout le code est
+**résilient** : sans les migrations, les fonctions concernées se masquent / renvoient une erreur
+propre, rien ne casse en prod. ⚠️ Piège rencontré : `create policy` n'a pas de `if not exists` →
+relancer une migration donne « policy already exists ». Correctif : `drop policy if exists` avant
+chaque `create policy` (fait sur 0034 ; à appliquer si on relance 0031/0032).
+
+**1. Correctif répétition espacée (quick win #1 de Fable) — `revision/page.tsx`.**
+- **Bug supprimé** : `if (d.length === 0) d = [...fichList]` ressortait TOUT le deck quand plus rien
+  n'était dû → re-notation → écrasement des intervalles (= bachotage). Retiré.
+- Deck vide (fiches existantes mais rien de dû) → écran **« ✅ Tu es à jour »** (état désirable) +
+  bouton **« Réviser quand même »** (`?mode=tout`) = sur-apprentissage devenu un choix explicite.
+  State `fichesExistent` pour distinguer « à jour » de « espace vide ».
+
+**2. Plafond de nouvelles cartes/jour = 45 — `lib/nouvelles-cartes.ts` (localStorage, PAS de migration).**
+- Les **nouvelles** cartes (jamais vues, `!progMap[f.id]`) sont plafonnées à `LIMITE_NOUVELLES_PAR_JOUR=45` ;
+  les cartes **dues** ne le sont jamais. Compteur `codex-nouvelles-<uid>-<YYYY-MM-DD>`, +1 à la notation
+  d'une nouvelle carte (`etaitNouvelle = prevProg===null`), −1 à l'annulation. State `nouvellesEnAttente`
+  → note « 🌱 X cartes en réserve » sur les écrans fin/à-jour.
+
+**3. Mode vacances 🌴 — migration `0031_pauses.sql` (table `pauses` user_id/debut/fin, RLS self).**
+- `lib/streaks.ts` : `chargerPauses()` (résilient/try-catch), `estEnPause()`, et **`calculerStreak(activite, pauses=[])`**
+  qui **saute** les jours en pause (ne casse pas la chaîne, ne compte pas comme travaillé) — garde-fou anti-boucle.
+- **`components/ModeVacances.tsx`** : bandeau dashboard (planifier « Ce week-end / 1 sem / 2 sem » ou dates ;
+  « En pause jusqu'au… ta série est protégée » + « Reprendre »). Se masque si la table n'existe pas.
+- Pauses passées à `calculerStreak` dans **dashboard**, **TopNav** et **fin de révision** (cohérence partout).
+
+**4. QCM — feedback immédiat + lien profond (quick win #2) — `qcm/page.tsx`.**
+- Correction **question par question** (state `valides: Set<string>`) au lieu d'une validation globale.
+  Chaque question a son bouton « Valider » → correction + explication immédiates (effet de test). Score global
+  quand tout est validé ; résultat enregistré par question au fil de l'eau. `enregistrerActivite`/`qcm_resultats`
+  une seule fois à la fin.
+- **Lien profond `/qcm?id=<id>`** (lu via `window.location.search`, pas de useSearchParams) ouvre直 le QCM →
+  branché dans **`Approfondir.tsx`** (avant : `/qcm` liste).
+
+**5. Garde-fous RAG (quick win #3) — `app/api/cours/question/route.ts`.**
+- **Seuil de similarité `SEUIL_SIMILARITE = 0.4`** en base ENM (la RPC `match_cours_chunks` renvoie déjà
+  `similarite`) : si aucun passage ≥ seuil → « pas d'info pertinente » au lieu de broder. Distingue base vide
+  (0 ligne) de hors-sujet (lignes mais toutes < seuil).
+- **Repli aléatoire des docs perso SUPPRIMÉ** : si la FTS ne trouve rien → message adapté (compte les docs perso
+  pour distinguer « aucun doc importé » de « aucun passage trouvé »).
+- **Quota IA** `LIMITE_QUESTIONS_JOUR = 40` par user/jour → migration **`0032_ia_quota.sql`** (table `ia_usage`
+  user_id/jour/questions, écrite en service_role, RLS select self). Résilient (try-catch → pas de quota si table absente).
+- **Bug latent corrigé** : les messages « pas de résultat » étaient renvoyés en `NextResponse.json` alors que le
+  client ne lit qu'un **flux SSE** → ils ne s'affichaient pas. Helper `messageSSE()` : ils passent par le flux.
+
+**6. Duel ASYNCHRONE (proposition #7) — migration `0033_duel_async.sql` (colonnes `matchs.mode` 'live'|'async', `matchs.expire_at`).**
+- Sélecteur **« ⚡ Temps réel » / « 🕒 Asynchrone »** à la création (`duel/page.tsx`). Async : match créé en `statut='en_cours'`,
+  `mode='async'`, `expire_at=now+48h` ; le créateur joue direct puis partage le code.
+- **`components/DuelAsync.tsx`** : jeu **auto-rythmé**, **feedback immédiat** (le serveur renvoie `correct` — la réponse
+  est verrouillée par l'anti-rejeu, donc zéro triche), **points fixes** (pas de bonus vitesse), reprise, comparaison des
+  scores (👑/⌛), débrief réutilisé.
+- Routes serveur (`select('*')` pour rester résilient si colonnes absentes) : **`creer`** (champs async),
+  **`repondre`** (branche async : pas de fenêtre temporelle, points fixes, marque `termine` si tout répondu, renvoie `correct`),
+  **`correction`** (débrief dispo dès que `mode==='async'`). Le temps réel est **inchangé** (effets clock/correction gardés
+  `if mode==='async' return` dans `duel/[code]/page.tsx`).
+
+**7. Contribution étudiante modérée (proposition #8) — migration `0034_contributions.sql` (table `contributions`).**
+- Calqué sur le pipeline « remarques ». Page **`/contribuer`** (menu Communauté → « Proposer un contenu ») : propose
+  une **fiche** (matière→chapitre→Q/R) ou un **QCM** (format texte `Q:`/`-`/`*`/`>` réutilisant **`parseTexte`** de
+  `lib/qcm-parse.ts`, avec prévisualisation live). Suivi du statut (nouveau/approuve/refuse) via RLS select self.
+- API **`/api/contributions`** (POST étudiant, insert + email admin) et **`/api/admin/contributions`** (GET liste + POST
+  approuver/refuser/supprimer). **Approuver crée réellement** la fiche (`fiches`) ou le QCM (`qcm` type 'choix' + `qcm_questions`).
+- Page admin **`/admin/contributions`** (menu Admin → « Contributions »). Liens ajoutés dans `TopNav.tsx`.
+
+**Déploiement** : tout vérifié `tsc --noEmit` + `npm run build` (0 erreur) et **poussé sur `main`** (auto-déployé
+sur codexprepa.com), via le circuit branche `claude/codex-vercel-supabase-deploy-0huif5` → merge ff-only sur `main`.
+
+**Reste de la liste Fable (non faits)** : #4 coach → **Mistral UE** (RGPD DeepSeek/Chine, `lib/ia.ts` rend ça trivial),
+#5 « **transformer en fiche** » depuis réponse RAG / débrief duel, #6 **auto-évaluation assistée du brouillon** par IA
+(le « Feynman » promis — différenciateur le plus atteignable selon Fable), #9 **stats de rétention + prévision de charge**,
+#10 (lourd) **entraînement rédactionnel corrigé par IA** (cas pratique/dissert/note de synthèse — l'épreuve réelle ENM,
+= le « concours blanc » qui manque vs edn.fr). Hygiène soulignée : tests sur `lib/`, CI, ne plus push direct sur `main`.
 
 ### 2026-06-29 (suite 18) — Système de tags (#) transversal + onglet « Approfondir »
 **Migration à exécuter par le user : 0030** (`tags text[]` + index GIN sur fiches/medias/
