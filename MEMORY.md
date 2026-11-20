@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-07-05 (suite 19).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 21).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,38 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 21) — Reprise après 4 mois : sécurité, Supabase, modèle Claude, verrou contributions
+**État constaté** : aucun commit depuis le 5 juillet ; build OK. **Projet Supabase en PAUSE** (plan gratuit,
+inactivité — dernière activité étudiante le **2026-07-11**) → restauré par le user. Diagnostic SQL (lecture seule) :
+migrations **0031→0035 toutes passées**, 7 comptes (4 lecteurs, **3 admins** — à revoir), 11 espaces, **1 536 fiches**,
+4 QCM, **1 seul document en base ENM** (RAG quasi vide), 6 duels. ⚠️ Le dashboard Supabase s'ouvre avec le
+compte propriétaire du projet `hoduewjiaowlvhkngoum` (sinon écran « Create an organization » vide — NE PAS créer).
+- **Sécurité** : `next` 16.2.6 → **16.4.6** + `npm audit fix` (faille critique : contournement du middleware/proxy
+  App Router + Turbopack = exactement la garde d'accès `proxy.ts`). 0 vulnérabilité. Smoke test prod OK
+  (pages protégées → 307 /login, API → 401).
+- **Modèle Claude** : `claude-sonnet-4-6` → **`claude-sonnet-5-5`**, centralisé dans `lib/ia.ts`
+  (`ANTHROPIC_MODEL` exporté ; `generer-fiches` passe désormais par `chatIA`). Réglages via `parametresClaude()` :
+  réflexion toujours active sur Sonnet 5.5 et comptée dans max_tokens → **plancher 16 000** ; **effort `medium`** ;
+  **repli serveur vers `claude-sonnet-5`** sur refus de sécurité (`client.beta.messages`, beta
+  `server-side-fallback-2026-06-01` — seule forme supportée par le SDK 0.106) ; refus de toute la chaîne →
+  message explicite (stream) ou erreur (chatIA). Pas de `temperature`/prefill dans le code (tous deux refusés).
+- **Contributions verrouillées** : migration **`0036_contributions_verrou.sql`** retire la policy `contrib_insert`
+  → insertion UNIQUEMENT via `/api/contributions` (service_role), qui applique **10 propositions / 24 h**.
+- Reste côté user : crédits API (Anthropic/Voyage/DeepSeek), `CHATBOT_PROVIDER=anthropic` sur Vercel (RGPD
+  DeepSeek), relancer les étudiants, enrichir la base ENM, revoir les 3 admins. Le user veut une copie locale :
+  `git clone`/`git pull` sur son Mac (les secrets ne sont pas dans Git → `vercel env pull .env.local`).
+
+### 2026-07-05 (suite 20) — Corrections de l'audit v2 (commit fbf8298)
+- Cap nouvelles cartes **en base** : table `nouvelles_jours` (migration **0035**), cross-device ; `lib/nouvelles-cartes.ts`
+  devenu async (`nouvellesRestantes`, `marquerNouvellesVues(delta)`), fail-open si la table manque.
+- **Compteurs atomiques** (RPC 0035) : `incr_nouvelles` et `incr_activite` (client, `auth.uid()`), `incr_ia_usage`
+  (serveur, exécution retirée à anon/authenticated). `enregistrerActivite` garde un repli read-then-write.
+- **Fisher-Yates** partagé (`lib/aleatoire.ts`) à la place des `sort(() => Math.random() - 0.5)` biaisés.
+- `getAllModuleIds` : N+1 → 1 requête ; révision mixte : select ciblé ; `OBJECTIF_QUOTIDIEN`/`ymd` dédupliqués
+  (progression importe depuis streaks) ; rôle auto-créé `'etudiant'` (hors enum) → `'lecteur'` (TopNav + Sidebar).
+- Gardé volontairement : clé anon en fallback dans `proxy.ts` (filet anti-crash Edge, clé publique) ; refonte
+  Server Components = chantier séparé.
 
 ### 2026-07-05 (suite 19) — Audit Fable + 6 chantiers (répétition espacée, vacances, QCM, RAG, duel async, contributions)
 **Contexte** : audit critique de l'architecture demandé à un sous-agent **Fable** (retour façon

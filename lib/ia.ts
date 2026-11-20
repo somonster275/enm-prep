@@ -4,7 +4,7 @@
  *   - 'deepseek'  : le chatbot/coach (gros volume, moins cher).
  *
  * Variables d'env :
- *   ANTHROPIC_MODEL  = claude-sonnet-4-6 (défaut)
+ *   ANTHROPIC_MODEL  = claude-sonnet-5-5 (défaut)
  *   DEEPSEEK_API_KEY = clé DeepSeek
  *   DEEPSEEK_MODEL   = deepseek-chat (défaut)
  *   CHATBOT_PROVIDER = 'deepseek' (défaut) — provider du coach (mettre 'anthropic' pour repasser le coach sous Claude)
@@ -18,7 +18,31 @@ import Anthropic from '@anthropic-ai/sdk'
 export type IAMessage = { role: 'user' | 'assistant'; content: string }
 export type Provider = 'anthropic' | 'deepseek'
 
-const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6'
+export const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5-5'
+
+/**
+ * Réglages Claude communs (Sonnet 5.5) :
+ *  - la réflexion (adaptive thinking) est toujours active et compte dans max_tokens →
+ *    plancher de 16 000 tokens pour ne pas tronquer la réponse (seul l'usage réel est facturé) ;
+ *  - effort « medium » : bon compromis qualité / latence pour du Q&R pédagogique ;
+ *  - repli serveur vers claude-sonnet-5 si les classifieurs de sécurité déclinent la requête
+ *    (faux positifs possibles sur des contenus de médecine légale, par ex.). Le repli n'est
+ *    envoyé que pour Sonnet 5.5 : un autre modèle via ANTHROPIC_MODEL n'accepte pas forcément cette cible.
+ */
+const PLANCHER_TOKENS = 16000
+const MESSAGE_REFUS = "Je ne peux pas répondre à cette demande. Reformule ta question, ou pose-la autrement."
+
+function parametresClaude(system: string, messages: IAMessage[], maxTokens: number) {
+  const repli = ANTHROPIC_MODEL === 'claude-sonnet-5-5'
+  return {
+    model: ANTHROPIC_MODEL,
+    max_tokens: Math.max(maxTokens, PLANCHER_TOKENS),
+    system,
+    messages,
+    output_config: { effort: 'medium' as const },
+    ...(repli ? { betas: ['server-side-fallback-2026-06-01'], fallbacks: [{ model: 'claude-sonnet-5' }] } : {}),
+  }
+}
 const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat'
 const DEEPSEEK_URL = (process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com') + '/chat/completions'
 
@@ -72,10 +96,15 @@ export async function* streamIA(
 
   // Anthropic (Claude)
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-  const stream = client.messages.stream({ model: ANTHROPIC_MODEL, max_tokens: maxTokens, system, messages })
+  const stream = client.beta.messages.stream(parametresClaude(system, messages, maxTokens))
+  let texte = false
   for await (const event of stream) {
-    if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') yield event.delta.text
+    if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') { texte = true; yield event.delta.text }
   }
+  // Toute la chaîne (modèle + repli) a décliné : on le dit au lieu de laisser une réponse vide
+  // ou tronquée sans explication.
+  const final = await stream.finalMessage()
+  if (final.stop_reason === 'refusal') yield texte ? `\n\n_${MESSAGE_REFUS}_` : MESSAGE_REFUS
 }
 
 /** Réponse complète, non-streaming. */
@@ -95,6 +124,7 @@ export async function chatIA(
   }
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-  const res = await client.messages.create({ model: ANTHROPIC_MODEL, max_tokens: maxTokens, system, messages })
+  const res = await client.beta.messages.create(parametresClaude(system, messages, maxTokens))
+  if (res.stop_reason === 'refusal') throw new Error(MESSAGE_REFUS)
   return res.content.filter(b => b.type === 'text').map(b => (b as { text: string }).text).join('')
 }

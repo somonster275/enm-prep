@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
+import { chatIA } from '@/lib/ia'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { utilisateurCourant } from '@/lib/auth-serveur'
 
@@ -30,18 +30,17 @@ export async function POST(request: NextRequest) {
   if (!sujet) return NextResponse.json({ error: 'Sujet ou texte manquant' }, { status: 400 })
   const n = Math.min(20, Math.max(1, parseInt(String(nombre), 10) || 8))
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  // Modèle, effort, repli et gestion des refus centralisés dans lib/ia.ts.
   let reponse: string
   try {
-    const res = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 4000,
+    reponse = await chatIA({
+      provider: 'anthropic',
       system: SYSTEME,
+      maxTokens: 4000,
       messages: [{ role: 'user', content: `Génère ${n} fiches de révision à partir de ceci :\n\n${sujet}` }],
     })
-    reponse = res.content.filter(b => b.type === 'text').map(b => (b as { text: string }).text).join('')
   } catch (e) {
-    return NextResponse.json({ error: `IA : ${String(e)}` }, { status: 502 })
+    return NextResponse.json({ error: `IA : ${e instanceof Error ? e.message : String(e)}` }, { status: 502 })
   }
 
   // Extraction robuste du JSON (au cas où le modèle ajoute des fences ```).

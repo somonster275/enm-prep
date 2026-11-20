@@ -5,6 +5,7 @@ import { envoyerEmailAdmin, escapeHtml } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://codexprepa.com'
+const LIMITE_PAR_24H = 10 // propositions max par étudiant sur 24 h glissantes
 
 type OptIn = { t: string; c?: boolean }
 type QIn = { enonce: string; options: OptIn[]; explication?: string }
@@ -17,6 +18,16 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}))
   const type = body?.type === 'qcm' ? 'qcm' : 'fiche'
   const admin = getSupabaseAdmin()
+
+  // Anti-spam : cette route est le SEUL point d'entrée (la migration 0036 retire
+  // l'insertion directe côté client), donc la limite ne peut pas être contournée.
+  const depuis = new Date(Date.now() - 24 * 3600 * 1000).toISOString()
+  const { count } = await admin.from('contributions')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id).gte('created_at', depuis)
+  if ((count ?? 0) >= LIMITE_PAR_24H) {
+    return NextResponse.json({ error: `Limite de ${LIMITE_PAR_24H} propositions par 24 h atteinte. Réessaie demain.` }, { status: 429 })
+  }
 
   let payload: Record<string, unknown>
   let titre = ''
