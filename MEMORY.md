@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 26).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 27).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,12 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 27) — Audit tâche 3 : note de révision perdue sans erreur
+- `revision/page.tsx` : `rateCard` vérifie l'erreur de l'upsert `progression`. En cas d'échec : toast « Note non
+  enregistrée… », la carte reste affichée (pas d'activité comptée, pas de passage à la suivante) pour renoter.
+  Même chose pour `annuler` (la restauration n'est plus faite en local si l'écriture en base échoue).
+- Non traité : un double appui rapide pendant l'enregistrement peut noter deux fois (déjà le cas avant).
 
 ### 2026-11-20 (suite 26) — Audit tâche 2 : formulaires publics limités
 - `lib/limite.ts` : `tropDeRequetes(request, clé, max, fenêtre)`, compteur **en mémoire par IP** (par instance

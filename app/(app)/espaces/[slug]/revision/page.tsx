@@ -216,7 +216,13 @@ export default function RevisionPage() {
       prochaine_revision: nextRev.toISOString(),
       derniere_revision: new Date().toISOString()
     }
-    await supabase.from('progression').upsert(prog, { onConflict: 'utilisateur_id,fiche_id' })
+    const { error } = await supabase.from('progression').upsert(prog, { onConflict: 'utilisateur_id,fiche_id' })
+    if (error) {
+      // On reste sur la carte : l'étudiant peut renoter une fois la connexion revenue.
+      setToast('Note non enregistrée — vérifie ta connexion et renote la carte')
+      setTimeout(() => setToast(null), 4000)
+      return
+    }
     enregistrerActivite(userId) // alimente la série / le momentum
     if (etaitNouvelle) marquerNouvellesVues(1) // décompte une nouvelle carte du jour (compteur en base, atomique)
     setProgressions(prev => ({ ...prev, [fiche.id]: prog as Progression }))
@@ -241,8 +247,14 @@ export default function RevisionPage() {
   const annuler = async () => {
     if (!lastAction || !userId) return
     const { ficheId, prevProg, idxBefore, requeued, bouton, etaitNouvelle } = lastAction
-    if (prevProg) await supabase.from('progression').upsert(prevProg, { onConflict: 'utilisateur_id,fiche_id' })
-    else await supabase.from('progression').delete().eq('utilisateur_id', userId).eq('fiche_id', ficheId)
+    const { error } = prevProg
+      ? await supabase.from('progression').upsert(prevProg, { onConflict: 'utilisateur_id,fiche_id' })
+      : await supabase.from('progression').delete().eq('utilisateur_id', userId).eq('fiche_id', ficheId)
+    if (error) {
+      setToast('Annulation non enregistrée — vérifie ta connexion et réessaie')
+      setTimeout(() => setToast(null), 4000)
+      return
+    }
     if (etaitNouvelle) marquerNouvellesVues(-1) // recrédite la nouvelle carte annulée
     setProgressions(prev => { const c = { ...prev }; if (prevProg) c[ficheId] = prevProg; else delete c[ficheId]; return c })
     setSessionStats(s => { const n = [...s]; if (n[bouton] > 0) n[bouton]--; return n })
