@@ -135,11 +135,10 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
       <div ref={chatRef} style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: compact ? 10 : 14, padding: compact ? '12px' : '0', minHeight: 0 }}>
         {messages.length === 0 && (
           <div style={{ textAlign: 'center', paddingTop: compact ? '1.5rem' : '3rem', color: 'var(--c-annotation-clair)' }}>
-            <div style={{ fontSize: compact ? 28 : 40, marginBottom: 10 }}>📕</div>
-            <div style={{ fontSize: compact ? 14 : 16, fontWeight: 700, color: 'var(--c-encre)', marginBottom: 14 }}>Ton coach de révision ENM</div>
+            <div style={{ fontFamily: 'var(--font-titre)', fontSize: compact ? 18 : 22, fontWeight: 600, color: 'var(--c-encre)', marginBottom: 14 }}>Ton coach de révision ENM</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 7, maxWidth: 460, margin: '0 auto', padding: compact ? '0 6px' : 0 }}>
               {SUGGESTIONS.map((s, i) => (
-                <button key={i} onClick={() => envoyer(s)} style={{ textAlign: 'left', background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 11, padding: compact ? '9px 12px' : '12px 16px', fontSize: compact ? 12.5 : 13.5, color: '#3A3226', cursor: 'pointer', fontFamily: font }}>{s}</button>
+                <button key={i} onClick={() => envoyer(s)} style={{ textAlign: 'left', background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: compact ? '9px 12px' : '12px 16px', fontSize: compact ? 12.5 : 13.5, color: '#3A3226', cursor: 'pointer', fontFamily: font }}>{s}</button>
               ))}
             </div>
           </div>
@@ -153,7 +152,7 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
           const { visible, taches } = extraireTaches(m.contenu)
           return (
             <div key={i} style={{ display: 'flex', gap: 9, alignItems: 'flex-start' }}>
-              <div style={{ width: compact ? 26 : 34, height: compact ? 26 : 34, borderRadius: 9, flexShrink: 0, marginTop: 2, background: coral + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: compact ? 14 : 18 }}>📕</div>
+              <div style={{ width: compact ? 26 : 34, height: compact ? 26 : 34, borderRadius: '50%', flexShrink: 0, marginTop: 2, background: 'var(--c-encre)', color: 'var(--c-papier)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-titre)', fontWeight: 600, fontSize: compact ? 12 : 14 }} aria-hidden>C</div>
               <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: '4px 14px 14px 14px', padding: compact ? '10px 13px' : '14px 18px', fontSize: compact ? 13.5 : 15, lineHeight: 1.6 }}>
                   {visible ? <div className="md-response"><ReactMarkdown remarkPlugins={[remarkGfm]} disallowedElements={['img']} unwrapDisallowed>{visible}</ReactMarkdown></div> : <span style={{ color: '#C2B7A0', fontStyle: 'italic' }}>…</span>}
@@ -197,8 +196,8 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
           <input value={question} onChange={e => setQuestion(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); envoyer() } }}
             placeholder="Pose ta question au coach…" disabled={loading}
-            style={{ flex: 1, padding: compact ? '10px 12px' : '12px 14px', borderRadius: 11, border: '1.5px solid var(--c-filet-fort)', background: 'var(--c-papier)', fontSize: compact ? 13.5 : 14.5, outline: 'none', fontFamily: font, opacity: loading ? 0.6 : 1, minWidth: 0 }} />
-          <button onClick={() => envoyer()} disabled={!question.trim() || loading} style={{ padding: compact ? '10px 16px' : '12px 22px', borderRadius: 11, background: coral, color: '#fff', border: 'none', cursor: question.trim() && !loading ? 'pointer' : 'default', fontSize: compact ? 13.5 : 14.5, fontWeight: 700, fontFamily: font, opacity: question.trim() && !loading ? 1 : 0.5, flexShrink: 0 }}>
+            style={{ flex: 1, padding: compact ? '10px 12px' : '12px 14px', borderRadius: 6, border: '1px solid var(--c-filet-fort)', background: '#FFFEFB', fontSize: compact ? 13.5 : 14.5, outline: 'none', fontFamily: font, opacity: loading ? 0.6 : 1, minWidth: 0 }} />
+          <button onClick={() => envoyer()} disabled={!question.trim() || loading} style={{ padding: compact ? '10px 16px' : '12px 22px', borderRadius: 6, background: 'var(--c-encre)', color: 'var(--c-papier)', border: 'none', cursor: question.trim() && !loading ? 'pointer' : 'default', fontSize: compact ? 13.5 : 14.5, fontWeight: 700, fontFamily: font, opacity: question.trim() && !loading ? 1 : 0.5, flexShrink: 0 }}>
             {loading ? '…' : '↑'}
           </button>
         </div>

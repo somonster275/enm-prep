@@ -8,68 +8,54 @@ type Matiere = { slug: string; nom: string; dues: number }
 
 const display = "var(--font-titre)"
 
-const FONCTIONS: { href: string; icone: string; label: string; couleur: string }[] = [
-  { href: '/espaces', icone: '🗂️', label: 'Fiches', couleur: '#A3122A' },
-  { href: '/cours', icone: '📘', label: 'Cours', couleur: '#3B82D9' },
-  { href: '/qcm', icone: '✅', label: 'QCM', couleur: '#E8A11E' },
-  { href: '/duel', icone: '⚔️', label: 'Duel', couleur: '#C0392B' },
-  { href: '/mind-maps', icone: '🧠', label: 'Mind maps', couleur: '#2DAE83' },
-  { href: '/media', icone: '🎬', label: 'Vidéos', couleur: '#3B82D9' },
-  { href: '/cours-ia', icone: '🤖', label: 'Coach IA', couleur: '#7C5CBF' },
-  { href: '/annales', icone: '📚', label: 'Annales', couleur: '#0F6E56' },
-  { href: '/forum', icone: '💬', label: 'Forum', couleur: '#D96A2D' },
-  { href: '/entraide', icone: '🤝', label: 'Entraide', couleur: '#2DAE83' },
-  { href: '/classement', icone: '🏆', label: 'Classement', couleur: '#E8A11E' },
-  { href: '/recherche', icone: '🔍', label: 'Recherche', couleur: '#8A7E68' },
-  { href: '/carnet', icone: '📕', label: 'Carnet', couleur: '#A3122A' },
+const FONCTIONS: { href: string; label: string; couleur: string }[] = [
+  { href: '/espaces', label: 'Fiches', couleur: '#A3122A' },
+  { href: '/cours', label: 'Cours', couleur: '#3B82D9' },
+  { href: '/qcm', label: 'QCM', couleur: '#E8A11E' },
+  { href: '/duel', label: 'Duel', couleur: '#C0392B' },
+  { href: '/mind-maps', label: 'Mind maps', couleur: '#2DAE83' },
+  { href: '/media', label: 'Vidéos', couleur: '#3B82D9' },
+  { href: '/cours-ia', label: 'Coach IA', couleur: '#7C5CBF' },
+  { href: '/annales', label: 'Annales', couleur: '#0F6E56' },
+  { href: '/forum', label: 'Forum', couleur: '#D96A2D' },
+  { href: '/entraide', label: 'Entraide', couleur: '#2DAE83' },
+  { href: '/classement', label: 'Classement', couleur: '#E8A11E' },
+  { href: '/recherche', label: 'Recherche', couleur: '#8A7E68' },
+  { href: '/carnet', label: 'Carnet', couleur: '#A3122A' },
 ]
 
 export default function AccesRapide({ matieres }: { matieres: Matiere[] }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18, padding: 22 }}>
-      <div style={{ fontFamily: display, fontWeight: 800, fontSize: 15, marginBottom: 14 }}>Accès rapide</div>
-
-      <div className="raccourcis-grille no-collapse" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))', gap: 10 }}>
+    <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '22px 24px' }}>
+      <h2 style={{ fontFamily: display, fontWeight: 600, fontSize: 19, margin: '0 0 12px' }}>Accès rapide</h2>
+      <div className="no-collapse" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(118px, 1fr))', gap: 6 }}>
         {FONCTIONS.map(f => (
           <Link key={f.href} href={f.href} className="raccourci" style={{
-            textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
-            padding: '13px 6px', borderRadius: 13, border: '1px solid var(--c-filet)', background: '#FFFDF9', minWidth: 0,
-          }}>
-            <span style={{ width: 36, height: 36, borderRadius: 10, background: f.couleur + '1F', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19, flexShrink: 0 }}>{f.icone}</span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#5C5345', textAlign: 'center', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.label}</span>
-          </Link>
+            textDecoration: 'none', color: 'var(--c-encre)', fontSize: 14, fontWeight: 500,
+            padding: '8px 10px', borderRadius: 4, borderLeft: `2px solid ${f.couleur}`, background: 'var(--c-papier)',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>{f.label}</Link>
         ))}
       </div>
 
       {matieres.length > 0 && (
         <>
-          <div style={{ fontFamily: display, fontWeight: 800, fontSize: 13.5, margin: '20px 0 10px', color: 'var(--c-annotation)' }}>Réviser une matière</div>
-          <div className="matieres-scroll" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+          <h3 style={{ fontFamily: display, fontWeight: 600, fontSize: 16, margin: '20px 0 10px' }}>Réviser une matière</h3>
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
             {matieres.map(m => (
               <Link key={m.slug} href={`/espaces/${m.slug}/revision`} className="raccourci" style={{
-                textDecoration: 'none', color: 'inherit', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8,
-                padding: '9px 14px', borderRadius: 999, border: '1px solid var(--c-filet)', background: '#FFFDF9', fontSize: 13, fontWeight: 600,
+                textDecoration: 'none', color: 'var(--c-encre)', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8,
+                padding: '7px 12px', borderRadius: 4, border: '1px solid var(--c-filet-fort)', fontSize: 14, fontWeight: 500,
               }}>
                 {m.nom}
-                {m.dues > 0 && <span style={{ background: 'var(--c-accent)', color: '#fff', fontSize: 11, fontWeight: 800, borderRadius: 999, padding: '1px 7px' }}>{m.dues}</span>}
+                {m.dues > 0 && <span style={{ background: 'var(--c-surligneur)', color: 'var(--c-encre)', fontSize: 12, fontWeight: 600, borderRadius: 2, padding: '0 5px' }}>{m.dues}</span>}
               </Link>
             ))}
           </div>
         </>
       )}
 
-      <style>{`
-        .raccourci{transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease}
-        .raccourci:hover{transform:translateY(-3px); box-shadow:0 6px 16px -8px rgba(40,30,60,.25); border-color:#E4D8C2}
-        .matieres-scroll::-webkit-scrollbar{height:6px}
-        .matieres-scroll::-webkit-scrollbar-track{background:transparent}
-        .matieres-scroll::-webkit-scrollbar-thumb{background:#E4D8C2; border-radius:999px}
-        @media(max-width:768px){
-          .raccourci{padding:10px 4px !important}
-          .raccourci span:first-child{width:30px !important; height:30px !important; font-size:16px !important}
-          .raccourci span:last-child{font-size:10.5px !important}
-        }
-      `}</style>
+      <style>{`.raccourci:hover{background:var(--c-papier-teinte)}`}</style>
     </div>
   )
 }

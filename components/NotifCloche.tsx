@@ -81,10 +81,10 @@ export default function NotifCloche() {
   return (
     <div ref={boxRef} style={{ position: 'relative' }}>
       <button onClick={() => setOpen(o => !o)} aria-label="Notifications" style={{
-        width: 38, height: 38, borderRadius: '50%', background: 'var(--c-papier-teinte)', border: '1px solid var(--c-filet)',
+        width: 36, height: 36, borderRadius: 6, background: 'transparent', border: '1px solid transparent',
         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
       }}>
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#6E6456" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#574F47" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
         {nonLues > 0 && (
@@ -93,9 +93,9 @@ export default function NotifCloche() {
       </button>
 
       {open && (
-        <div style={{ position: 'absolute', top: 46, right: 0, width: 320, maxHeight: 420, overflowY: 'auto', background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 14, boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', zIndex: 300, fontFamily: FONT }}>
+        <div style={{ position: 'absolute', top: 46, right: 0, width: 320, maxHeight: 420, overflowY: 'auto', background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', zIndex: 300, fontFamily: FONT }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderBottom: '1px solid var(--c-filet)' }}>
-            <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--c-encre)' }}>Notifications</span>
+            <span style={{ fontFamily: 'var(--font-titre)', fontWeight: 600, fontSize: 17, color: 'var(--c-encre)' }}>Notifications</span>
             {nonLues > 0 && <button onClick={toutLire} style={{ background: 'none', border: 'none', color: 'var(--c-accent)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>Tout lire</button>}
           </div>
           {items.length === 0 ? (
@@ -103,8 +103,8 @@ export default function NotifCloche() {
           ) : (
             items.map(n => (
               <button key={n.id} onClick={() => ouvrir(n)} style={{
-                width: '100%', textAlign: 'left', display: 'flex', gap: 10, padding: '11px 14px', border: 'none', borderBottom: '1px solid #F5EEE0',
-                background: n.lu ? '#fff' : 'var(--c-papier-chaud)', cursor: 'pointer', fontFamily: FONT,
+                width: '100%', textAlign: 'left', display: 'flex', gap: 10, padding: '11px 14px', border: 'none', borderBottom: '1px solid var(--c-filet)',
+                background: n.lu ? '#FFFEFB' : 'var(--c-papier-teinte)', cursor: 'pointer', fontFamily: FONT,
               }}>
                 {!n.lu && <span style={{ flexShrink: 0, width: 7, height: 7, borderRadius: '50%', background: 'var(--c-accent)', marginTop: 5 }} />}
                 <div style={{ flex: 1, minWidth: 0 }}>

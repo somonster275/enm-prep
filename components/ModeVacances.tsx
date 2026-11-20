@@ -74,26 +74,25 @@ export default function ModeVacances({ onChange }: { onChange?: () => void }) {
   const [samD, samF] = prochainWeekend()
 
   const boxStyle: React.CSSProperties = {
-    background: '#F3F0FA', border: '1px solid #DDD3F0', borderRadius: 14,
-    padding: '12px 16px', marginBottom: 24, fontFamily: "var(--font-texte)",
+    background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6,
+    padding: '12px 18px', marginBottom: 20, fontFamily: "var(--font-texte)",
   }
   const boutonPrincipal: React.CSSProperties = {
-    fontSize: 12.5, fontWeight: 700, color: '#fff', background: '#7C5CBF',
-    border: 'none', borderRadius: 9, padding: '8px 14px', cursor: 'pointer', fontFamily: 'inherit',
+    fontSize: 13.5, fontWeight: 600, color: 'var(--c-papier)', background: 'var(--c-encre)',
+    border: 'none', borderRadius: 6, padding: '8px 14px', cursor: 'pointer', fontFamily: 'inherit',
   }
   const boutonLeger: React.CSSProperties = {
-    fontSize: 12, fontWeight: 700, color: '#6A4FB0', background: '#fff',
-    border: '1px solid #DDD3F0', borderRadius: 9, padding: '7px 12px', cursor: 'pointer', fontFamily: 'inherit',
+    fontSize: 13, fontWeight: 600, color: 'var(--c-encre)', background: 'transparent',
+    border: '1px solid var(--c-filet-fort)', borderRadius: 6, padding: '7px 12px', cursor: 'pointer', fontFamily: 'inherit',
   }
 
   // === Pause en cours : on rassure, on propose de reprendre ===
   if (enCours) {
     return (
       <div style={{ ...boxStyle, background: '#EAF7F0', border: '1px solid #BFE6CF', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 22 }}>🌴</span>
         <div style={{ flex: '1 1 240px' }}>
-          <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0F6E56' }}>En pause jusqu'au {formatFr(enCours.fin)}</div>
-          <div style={{ fontSize: 11.5, color: '#5E7A6C', marginTop: 1 }}>Ta série est protégée — profite de ta pause, tes flammes t'attendent.</div>
+          <div style={{ fontSize: 14.5, fontWeight: 600, color: '#0F6E56' }}>En pause jusqu'au {formatFr(enCours.fin)}</div>
+          <div style={{ fontSize: 13, color: '#4E6A5C', marginTop: 1 }}>Ta série est protégée — profite de ta pause, tes flammes t'attendent.</div>
         </div>
         <button onClick={() => reprendre(enCours.id)} style={{ ...boutonLeger, color: '#0F6E56', borderColor: '#BFE6CF' }}>Reprendre maintenant</button>
       </div>
@@ -104,10 +103,9 @@ export default function ModeVacances({ onChange }: { onChange?: () => void }) {
   return (
     <div style={boxStyle}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 20 }}>🌴</span>
         <div style={{ flex: '1 1 240px' }}>
-          <div style={{ fontSize: 13.5, fontWeight: 700, color: '#4A3A6B' }}>Besoin d'une pause ?</div>
-          <div style={{ fontSize: 11.5, color: '#7A6E96', marginTop: 1 }}>
+          <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--c-encre)' }}>Besoin d&apos;une pause ?</div>
+          <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginTop: 1 }}>
             {pauses.length > 0
               ? `Pause prévue du ${formatFr(pauses[0].debut)} au ${formatFr(pauses[0].fin)}.`
               : 'Vacances, week-end… mets ta série en pause sans perdre tes flammes.'}
@@ -120,22 +118,22 @@ export default function ModeVacances({ onChange }: { onChange?: () => void }) {
       </div>
 
       {ouvert && (
-        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #DDD3F0' }}>
+        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--c-filet)' }}>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
             <button onClick={() => preset(samD, samF)} style={boutonLeger}>Ce week-end</button>
             <button onClick={() => preset(ymd(new Date()), ymd(ajouterJours(new Date(), 6)))} style={boutonLeger}>1 semaine</button>
             <button onClick={() => preset(ymd(new Date()), ymd(ajouterJours(new Date(), 13)))} style={boutonLeger}>2 semaines</button>
           </div>
           <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-            <label style={{ fontSize: 11.5, color: '#7A6E96', fontWeight: 600 }}>
+            <label style={{ fontSize: 13, color: 'var(--c-annotation)', fontWeight: 600 }}>
               Du<br />
               <input type="date" value={debut} onChange={e => setDebut(e.target.value)}
-                style={{ marginTop: 4, border: '1px solid #DDD3F0', borderRadius: 8, padding: '7px 10px', fontSize: 13, fontFamily: 'inherit', color: '#4A3A6B' }} />
+                style={{ marginTop: 4, border: '1px solid var(--c-filet-fort)', borderRadius: 6, padding: '7px 10px', fontSize: 13.5, fontFamily: 'inherit', color: 'var(--c-encre)', background: '#FFFEFB' }} />
             </label>
-            <label style={{ fontSize: 11.5, color: '#7A6E96', fontWeight: 600 }}>
+            <label style={{ fontSize: 13, color: 'var(--c-annotation)', fontWeight: 600 }}>
               Au<br />
               <input type="date" value={fin} min={debut} onChange={e => setFin(e.target.value)}
-                style={{ marginTop: 4, border: '1px solid #DDD3F0', borderRadius: 8, padding: '7px 10px', fontSize: 13, fontFamily: 'inherit', color: '#4A3A6B' }} />
+                style={{ marginTop: 4, border: '1px solid var(--c-filet-fort)', borderRadius: 6, padding: '7px 10px', fontSize: 13.5, fontFamily: 'inherit', color: 'var(--c-encre)', background: '#FFFEFB' }} />
             </label>
             <button onClick={planifier} style={{ ...boutonPrincipal, padding: '9px 18px' }}>Confirmer</button>
           </div>

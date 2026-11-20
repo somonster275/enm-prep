@@ -37,20 +37,19 @@ export default function NotesWidget({ titre = 'Mes tâches' }: { titre?: string 
   const restantes = notes.filter(n => !n.fait).length
 
   return (
-    <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18, fontFamily: font }}>
+    <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '22px 24px', fontFamily: font }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 18 }}>📝</span>
-          <span style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 15 }}>{titre}</span>
+          <span style={{ fontFamily: "var(--font-titre)", fontWeight: 600, fontSize: 19 }}>{titre}</span>
         </div>
-        {restantes > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: coral, background: 'var(--c-accent-pale)', borderRadius: 999, padding: '2px 9px' }}>{restantes}</span>}
+        {restantes > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--c-encre)', background: 'var(--c-surligneur)', borderRadius: 2, padding: '1px 6px' }}>{restantes}</span>}
       </div>
 
       <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
         <input value={texte} onChange={e => setTexte(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') ajouter() }}
           placeholder="Ajouter une tâche…"
-          style={{ flex: 1, minWidth: 0, padding: '8px 11px', borderRadius: 9, border: '1.5px solid var(--c-filet-fort)', background: 'var(--c-papier)', fontSize: 13, outline: 'none', fontFamily: font }} />
-        <button onClick={ajouter} disabled={!texte.trim()} style={{ padding: '8px 12px', borderRadius: 9, background: coral, color: '#fff', border: 'none', fontSize: 16, fontWeight: 700, cursor: texte.trim() ? 'pointer' : 'default', opacity: texte.trim() ? 1 : 0.5, lineHeight: 1 }}>+</button>
+          style={{ flex: 1, minWidth: 0, padding: '8px 11px', borderRadius: 6, border: '1px solid var(--c-filet-fort)', background: '#FFFEFB', fontSize: 14, outline: 'none', fontFamily: font }} />
+        <button onClick={ajouter} disabled={!texte.trim()} style={{ padding: '8px 12px', borderRadius: 6, background: 'var(--c-encre)', color: 'var(--c-papier)', border: 'none', fontSize: 16, fontWeight: 700, cursor: texte.trim() ? 'pointer' : 'default', opacity: texte.trim() ? 1 : 0.5, lineHeight: 1 }}>+</button>
       </div>
 
       {notes.length === 0 ? (
@@ -58,15 +57,15 @@ export default function NotesWidget({ titre = 'Mes tâches' }: { titre?: string 
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 260, overflowY: 'auto' }}>
           {notes.map(n => (
-            <div key={n.id} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '7px 8px', borderRadius: 9, background: n.fait ? '#F7F5F0' : 'var(--c-papier)' }}>
+            <div key={n.id} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '7px 8px', borderRadius: 4, background: n.fait ? 'transparent' : 'var(--c-papier)' }}>
               <button onClick={() => basculer(n)} aria-label="Terminer" style={{
-                width: 18, height: 18, flexShrink: 0, borderRadius: 5, cursor: 'pointer',
-                border: n.fait ? 'none' : '1.8px solid #CFC3A8', background: n.fait ? '#2DAE83' : '#fff',
+                width: 18, height: 18, flexShrink: 0, borderRadius: 3, cursor: 'pointer',
+                border: n.fait ? 'none' : '1.5px solid var(--c-discret)', background: n.fait ? 'var(--c-encre)' : '#FFFEFB',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 {n.fait && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
               </button>
-              <span style={{ flex: 1, fontSize: 13, color: n.fait ? '#A89D86' : 'var(--c-encre)', textDecoration: n.fait ? 'line-through' : 'none', wordBreak: 'break-word' }}>{n.contenu}</span>
+              <span style={{ flex: 1, fontSize: 14, color: n.fait ? 'var(--c-discret)' : 'var(--c-encre)', textDecoration: n.fait ? 'line-through' : 'none', wordBreak: 'break-word' }}>{n.contenu}</span>
               <button onClick={() => supprimer(n.id)} aria-label="Supprimer" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#C2B7A0', fontSize: 16, lineHeight: 1, padding: 2, flexShrink: 0 }}>×</button>
             </div>
           ))}
