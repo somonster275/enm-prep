@@ -111,9 +111,11 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 
 ### 2026-11-20 (suite 22) — graphify branché automatiquement sur le projet
 - **graphify** (github.com/Graphify-Labs/graphify, paquet PyPI `graphifyy[sql]`) : graphe de connaissances du
-  code (AST local, sans LLM, ~10 s, 847 nœuds incl. migrations SQL). `graphify claude install` a ajouté une
-  section « graphify » au `CLAUDE.md` + des hooks dans `.claude/settings.json` (PreToolUse Bash/Grep/Read/Glob →
-  rappel d'utiliser `graphify query` ; SessionStart compact). `graphify-out/` est dans `.gitignore`.
+  code (AST local, sans LLM, ~10 s, 847 nœuds incl. migrations SQL). **Mode léger choisi** : une courte consigne
+  dans `CLAUDE.md` (graphe pour les questions d'architecture / transverses, grep pour le ciblé), **pas de hooks**.
+  Mesure faite : sur 170 fichiers, une `graphify query` coûte ~1 600 tokens contre ~100 pour un grep ciblé, donc le
+  mode imposé (hooks PreToolUse via `graphify claude install`) était contre-productif. À réactiver quand le code
+  aura beaucoup grossi (plusieurs centaines de fichiers). `graphify-out/` est dans `.gitignore`.
 - **Environnement cloud « Default »** : script de démarrage qui installe graphify, enregistre le skill utilisateur
   et lance `graphify update .` dans `enm-prep` (en `|| true`, n'empêche jamais le démarrage).
 - Skills **ponytail** importés sur le compte claude.ai (pas dans le repo, à la demande du user).
