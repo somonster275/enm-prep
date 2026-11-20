@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 42).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 43).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,14 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 43) — Schéma complet exporté dans le dépôt + migration 0047
+- `supabase/schema.sql` : structure complète exportée par le user (43 tables, 100 policies, 7 triggers, fonctions et
+  droits, revokes compris). Rejoué sans erreur sur Postgres 16 vierge (auth/pgvector simulés). Pas de données.
+  Requête d'export + mode d'emploi : `supabase/README-schema.md` (à refaire après chaque migration).
+- Constats de l'export : `activite_jours` avait DÉJÀ une clé primaire (utilisateur_id, jour) → l'index unique de 0043
+  était inutile ; l'index GIN de 0044 doublait `cours_chunks_to_tsvector_idx`. **Migration `0047_index_doublons.sql`**
+  (à exécuter) les supprime. `pgvector` est installé dans le schéma public (à laisser tel quel).
 
 ### 2026-11-20 (suite 42) — ECC production-audit + test-coverage
 - **production-audit** (méthode ECC, preuves locales) : 62/100 « risqué ». Bloquants : projet Supabase en plan gratuit
