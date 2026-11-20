@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 25).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 26).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,16 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 26) — Audit tâche 2 : formulaires publics limités
+- `lib/limite.ts` : `tropDeRequetes(request, clé, max, fenêtre)`, compteur **en mémoire par IP** (par instance
+  Vercel, remis à zéro au démarrage à froid ; à passer sur une table Supabase si un vrai abus apparaît).
+- `/api/contact` et `/api/acces/demande` : 5 envois / heure / IP (réponse 429), champs tronqués (nom/email 200,
+  message 5 000 / 2 000 caractères).
+- `/api/acces/demande` : en plus, **plafond global durable** de 30 demandes / heure (compte sur `demandes_acces`,
+  sans migration), contre un remplissage avec des emails inventés depuis plusieurs IP.
+- Limite connue : `/api/contact` n'a pas de plafond global (pas de table) ; un attaquant multi-IP peut encore envoyer
+  des mails à l'admin.
 
 ### 2026-11-20 (suite 25) — Audit tâche 1 : plafond Supabase de 1 000 lignes
 - Nouveau helper **`toutesLesLignes(page)`** dans `lib/supabase.ts` : enchaîne les `.range()` par pages de 1 000

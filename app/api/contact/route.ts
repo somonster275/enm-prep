@@ -1,14 +1,18 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { envoyerEmailAdmin, escapeHtml } from '@/lib/email'
+import { tropDeRequetes } from '@/lib/limite'
 
 export const dynamic = 'force-dynamic'
 
 // Route PUBLIQUE : un visiteur/étudiant envoie un message à l'administrateur.
 export async function POST(request: NextRequest) {
+  if (tropDeRequetes(request, 'contact', 5, 60 * 60_000)) {
+    return NextResponse.json({ error: 'Trop de messages envoyés, réessaie dans une heure.' }, { status: 429 })
+  }
   const { nom, email, message } = await request.json().catch(() => ({}))
-  const mail = String(email || '').trim()
-  const msg = String(message || '').trim()
-  const nomPropre = String(nom || '').trim()
+  const mail = String(email || '').trim().slice(0, 200)
+  const msg = String(message || '').trim().slice(0, 5000)
+  const nomPropre = String(nom || '').trim().slice(0, 200)
 
   if (!msg) return NextResponse.json({ error: 'Écris un message.' }, { status: 400 })
   if (mail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) {
