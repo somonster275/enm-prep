@@ -109,7 +109,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 
 ## Journal des sessions
 
-### 2026-11-20 (suite 36) — Revue de toutes les RLS (pg_policies fourni par le user) + migration 0042 (À EXÉCUTER)
+### 2026-11-20 (suite 36) — Revue de toutes les RLS (pg_policies fourni par le user) + migration 0042 (exécutée par le user)
 - Revue complète des policies : tables du staff (fiches, modules, medias, mindmaps, qcm, cours, evenements,
   espaces, calendrier_flux, sources_actualites) bien réservées admin/éditeur en écriture ; données perso en
   « soi uniquement » ; profils, activite_jours, cours_documents/chunks conformes aux migrations 0037 à 0040.
