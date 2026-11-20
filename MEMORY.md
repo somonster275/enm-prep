@@ -121,7 +121,9 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   les bonnes réponses d'un duel restent lisibles par un tricheur dans `fiches` / `qcm_questions` (révision libre) ;
   4 policies redondantes sur `progression` (dont `progression_own`, rôle public, qui couvre aussi DELETE).
 - Vérifié par le user : aucune table `public` sans RLS (`pg_tables … not rowsecurity` → 0 ligne).
-  Reste non vérifié : policies du Storage (buckets `cours`, `medias`, `mindmaps`, `qcm`).
+  Storage vérifié : aucune policy sur `storage` → aucun client ne peut déposer / modifier / supprimer de fichier ;
+  seuls le serveur (service_role) et les adresses d'envoi signées de `/api/storage/upload` (staff) le peuvent.
+  Lecture publique voulue (buckets publics). **Toute la base est revue.**
 
 ### 2026-11-20 (suite 35) — Audit v3 : les 7 points restants
 - **Premiers tests du projet** : `npm test` (`tsx --test tests/*.test.ts`, `tsx` en devDependency) — paliers et
