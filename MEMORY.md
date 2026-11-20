@@ -113,7 +113,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Constat : clé Voyage sur l'offre gratuite (limite de débit après 64 passages) → 2227 passages ≈ 1 h d'indexation.
 - Base ENM : recherche sémantique (si embedding de la question OK) + recherche par mots, fusionnées (sens d'abord,
   8 max). Un échec Voyage sur la question ne bloque plus (repli mots). « Mes documents » utilise la même fonction.
-- **Migration `0046_recherche_mots_cours.sql`** : RPC `recherche_mots_cours` (to_tsquery french + ts_rank_cd,
+- **Migration `0046_recherche_mots_cours.sql`** (exécutée par le user) : RPC `recherche_mots_cours` (to_tsquery french + ts_rank_cd,
   filtres portée / auteur / matière / documents), exécution réservée au service_role. Testée 2× sur Postgres 16
   (classement, isolation perso, filtre matière, refus pour authenticated). Code résilient sans elle (repli JS).
 - Recommandé au user : ajouter un moyen de paiement Voyage pour accélérer l'indexation (non vérifié : doc Voyage
