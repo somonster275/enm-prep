@@ -109,7 +109,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 
 ## Journal des sessions
 
-### 2026-11-20 (suite 31) — Classement non falsifiable (migration 0039, À EXÉCUTER)
+### 2026-11-20 (suite 31) — Classement non falsifiable (migration 0039, exécutée par le user)
 - **Migration `0039_activite_verrou.sql`** (à exécuter par le user) : supprime TOUTES les policies héritées
   d'`activite_jours` (boucle sur pg_policies, noms inconnus) et ne garde que la lecture de sa propre ligne ;
   `incr_activite` borne le delta à ±1, la date à hier/aujourd'hui/demain, le compteur entre 0 et 1 000/jour,
