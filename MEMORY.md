@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 28).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 29).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,15 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 29) — Audit tâche 5 : export RGPD complet
+- `/api/compte/exporter` exporte désormais **27 tables** (avant 8) : + coach_messages, favoris, QCM (résultats,
+  réponses), duels (créés, participations, réponses), forum, astuces, annales, contributions, remarques de cours,
+  notifications, pauses, compteurs (nouvelles cartes, usage IA), médias vus, documents importés (noms, pas le texte).
+  Exclu volontairement : `google_drive_tokens` (secrets) et `quota_log` (technique).
+- Chaque table est paginée (`toutesLesLignes`, clé d'ordre unique par table) : plus de coupure à 1 000 lignes.
+- Non vérifié : la route de suppression de compte (`/api/compte/supprimer`) ne liste pas toutes ces tables ; elle
+  compte sur les `on delete cascade` vers `auth.users`, non contrôlés table par table.
 
 ### 2026-11-20 (suite 28) — Audit tâche 4 : l'annulation décompte l'activité
 - **Autorisation durable du user** : créer les PR ET les fusionner soi-même sur GitHub sans demander (après
