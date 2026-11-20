@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 45).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 46).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,18 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 46) — Refonte design : étape 3 (accueil)
+- `app/page.tsx` réécrit selon la maquette : nav sobre, hero « Le concours de la magistrature, une fiche à la fois. »
+  + **fiche bristol interactive** (`FicheDemo` : 3 fiches réelles — art. 1132/1137 C. civ., 122-5 C. pén., 1355 C. civ.
+  —, article surligné en jaune à l'affichage de la réponse, notation avec les **vrais** boutons `NIVEAUX` et
+  `intervalleMinutes`/`formatIntervalle` de `lib/spaced-repetition.ts`). Fonctionnalités en liste par verbe (Réviser,
+  S'entraîner, Comprendre, Avancer ensemble), sans cartes ni emoji. Section méthode = barres à l'échelle des intervalles
+  successifs du bouton « Correct » (1 j → 2 mois). Supprimés : tranches de codes, statistiques, aperçu chat, 3 grilles
+  de cartes, exemples. Logique de redirection récupération/invitation (`/bienvenue`) conservée telle quelle.
+- `.surligne` (animation CSS, `prefers-reduced-motion` respecté) ajouté à `globals.css`.
+- ⚠️ MEMORY plus haut décrit d'anciens niveaux (À revoir/Intermédiaire/Bien/Parfait) : les vrais sont À revoir /
+  Difficile / Correct / Facile (paliers façon Anki).
 
 ### 2026-11-20 (suite 45) — Refonte design : étape 2 (palette et polices)
 - Valeurs des jetons `globals.css` passées à la direction « code annoté » : papier #F7F5F1, encre #211C19, accent
