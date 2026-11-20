@@ -109,7 +109,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 
 ## Journal des sessions
 
-### 2026-11-20 (suite 34) — Audit v3 : 5 corrections prioritaires (migration 0041, À EXÉCUTER)
+### 2026-11-20 (suite 34) — Audit v3 : 5 corrections prioritaires (migration 0041, exécutée par le user)
 - Nouvel audit complet (`/ponytail-audit`, 12 constats). Corrigés ici les 5 prioritaires :
   1. **Lien piégé dans les annales** (XSS : `javascript:` enregistré via l'API REST, exécuté au clic d'un autre
      utilisateur) : migration **0041** (`check (url ~* '^https?://') not valid`) + la page n'affiche le lien que s'il
