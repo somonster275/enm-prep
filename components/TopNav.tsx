@@ -100,7 +100,7 @@ export default function TopNav() {
   const navLink = (href: string, label: string) => (
     <Link key={href} href={href} style={{
       fontSize: 14, fontWeight: isActive(href) ? 700 : 600,
-      color: isActive(href) ? '#2A2018' : '#8A7E68',
+      color: isActive(href) ? 'var(--c-encre)' : 'var(--c-annotation)',
       background: isActive(href) ? '#FCEFD3' : 'transparent',
       padding: '9px 16px', borderRadius: 10, textDecoration: 'none',
     }}>
@@ -121,10 +121,10 @@ export default function TopNav() {
       <div style={{ position: 'relative' }}>
         <button onClick={() => setOpen(!open)} style={{
           fontSize: 14, fontWeight: 600,
-          color: actif ? '#2A2018' : '#8A7E68',
+          color: actif ? 'var(--c-encre)' : 'var(--c-annotation)',
           background: actif ? '#FCEFD3' : 'transparent',
           padding: '9px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
-          fontFamily: "'Hanken Grotesk', sans-serif", display: 'flex', alignItems: 'center', gap: 5,
+          fontFamily: "var(--font-texte)", display: 'flex', alignItems: 'center', gap: 5,
         }}>
           {label}
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }}><polyline points="6 9 12 15 18 9"/></svg>
@@ -132,12 +132,12 @@ export default function TopNav() {
         {open && (
           <>
             <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 150 }} />
-            <div style={{ position: 'absolute', top: 44, left: 0, minWidth: 190, zIndex: 200, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', padding: 6 }}>
+            <div style={{ position: 'absolute', top: 44, left: 0, minWidth: 190, zIndex: 200, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', padding: 6 }}>
               {items.map(({ href, label }) => (
                 <Link key={href} href={href} onClick={() => setOpen(false)} style={{
                   display: 'block', padding: '9px 14px', borderRadius: 8,
                   fontSize: 14, fontWeight: pathname.startsWith(href) ? 700 : 500,
-                  color: pathname.startsWith(href) ? '#2A2018' : '#555',
+                  color: pathname.startsWith(href) ? 'var(--c-encre)' : '#555',
                   background: pathname.startsWith(href) ? '#FCEFD3' : 'transparent', textDecoration: 'none',
                 }}>{label}</Link>
               ))}
@@ -149,7 +149,7 @@ export default function TopNav() {
   }
 
   return (
-    <div style={{ background: '#fff', borderBottom: '1px solid #F0E7D6', position: 'sticky', top: 0, zIndex: 100 }}>
+    <div style={{ background: '#fff', borderBottom: '1px solid var(--c-filet)', position: 'sticky', top: 0, zIndex: 100 }}>
       <div style={{
         maxWidth: 1100, margin: '0 auto', padding: isMobile ? '0 16px' : '0 36px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64,
@@ -174,7 +174,7 @@ export default function TopNav() {
           {streak > 0 && !isMobile && (
             <span title={`${streak} jour${streak > 1 ? 's' : ''} d'affilée`} style={{
               display: 'flex', alignItems: 'center', gap: 7, fontWeight: 700, fontSize: 14,
-              color: '#D94A30', background: '#FCE9E3', padding: '8px 14px', borderRadius: 999,
+              color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '8px 14px', borderRadius: 999,
             }}>🔥 {streak} jour{streak > 1 ? 's' : ''}</span>
           )}
 
@@ -183,28 +183,28 @@ export default function TopNav() {
 
           {/* Avatar + menu compte */}
           <button onClick={() => setMenuOpen(o => !o)} style={{
-            width: 38, height: 38, borderRadius: '50%', background: '#DC4A2B', color: '#fff',
+            width: 38, height: 38, borderRadius: '50%', background: 'var(--c-accent)', color: '#fff',
             border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 15,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }} aria-label="Menu utilisateur">{initiales}</button>
 
           {menuOpen && (
-            <div style={{ position: 'absolute', top: 46, right: 0, width: 200, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 14, boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', padding: 6, zIndex: 200 }}>
-              <div style={{ padding: '10px 14px', borderBottom: '1px solid #F0E7D6', marginBottom: 4 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#2A2018' }}>{nomAffiche}</div>
-                <div style={{ fontSize: 12, color: '#9A8D72', marginTop: 2 }}>
+            <div style={{ position: 'absolute', top: 46, right: 0, width: 200, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 14, boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', padding: 6, zIndex: 200 }}>
+              <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--c-filet)', marginBottom: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-encre)' }}>{nomAffiche}</div>
+                <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginTop: 2 }}>
                   {profil?.role === 'admin' ? 'Administrateur' : profil?.role === 'editeur' ? 'Éditeur' : 'Étudiant'}
                 </div>
               </div>
-              <Link href="/compte" onClick={() => setMenuOpen(false)} style={{ display: 'block', padding: '9px 14px', borderRadius: 8, color: '#8A7E68', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Mon compte</Link>
-              <button onClick={logout} style={{ width: '100%', textAlign: 'left', padding: '9px 14px', borderRadius: 8, background: 'transparent', border: 'none', color: '#8A7E68', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'Hanken Grotesk', sans-serif" }}>Déconnexion</button>
+              <Link href="/compte" onClick={() => setMenuOpen(false)} style={{ display: 'block', padding: '9px 14px', borderRadius: 8, color: 'var(--c-annotation)', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Mon compte</Link>
+              <button onClick={logout} style={{ width: '100%', textAlign: 'left', padding: '9px 14px', borderRadius: 8, background: 'transparent', border: 'none', color: 'var(--c-annotation)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "var(--font-texte)" }}>Déconnexion</button>
             </div>
           )}
 
           {/* Hamburger — mobile uniquement */}
           {isMobile && (
             <button onClick={() => setNavOpen(o => !o)} aria-label="Menu" style={{
-              width: 38, height: 38, borderRadius: 10, background: '#FDF6EA', border: '1px solid #F0E7D6',
+              width: 38, height: 38, borderRadius: 10, background: 'var(--c-papier-teinte)', border: '1px solid var(--c-filet)',
               cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2A2018" strokeWidth="2.2" strokeLinecap="round">
@@ -217,41 +217,41 @@ export default function TopNav() {
 
       {/* Tiroir de navigation mobile */}
       {isMobile && navOpen && (
-        <div style={{ borderTop: '1px solid #F0E7D6', background: '#fff', padding: '8px 12px 14px' }}>
+        <div style={{ borderTop: '1px solid var(--c-filet)', background: '#fff', padding: '8px 12px 14px' }}>
           {liens.map(l => (
             <Link key={l.href} href={l.href} onClick={() => setNavOpen(false)} style={{
               display: 'block', padding: '12px 14px', borderRadius: 10, marginBottom: 2,
               fontSize: 15, fontWeight: isActive(l.href) ? 700 : 600,
-              color: isActive(l.href) ? '#2A2018' : '#6E6456',
+              color: isActive(l.href) ? 'var(--c-encre)' : 'var(--c-texte-doux)',
               background: isActive(l.href) ? '#FCEFD3' : 'transparent', textDecoration: 'none',
             }}>{l.label}</Link>
           ))}
-          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.1em', color: '#B6A98C', padding: '12px 14px 6px' }}>RESSOURCES</div>
+          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.1em', color: 'var(--c-discret)', padding: '12px 14px 6px' }}>RESSOURCES</div>
           {liensRessources.map(l => (
             <Link key={l.href} href={l.href} onClick={() => setNavOpen(false)} style={{
               display: 'block', padding: '12px 14px', borderRadius: 10, marginBottom: 2,
               fontSize: 15, fontWeight: isActive(l.href) ? 700 : 600,
-              color: isActive(l.href) ? '#2A2018' : '#6E6456',
+              color: isActive(l.href) ? 'var(--c-encre)' : 'var(--c-texte-doux)',
               background: isActive(l.href) ? '#FCEFD3' : 'transparent', textDecoration: 'none',
             }}>{l.label}</Link>
           ))}
-          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.1em', color: '#B6A98C', padding: '12px 14px 6px' }}>COMMUNAUTÉ</div>
+          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.1em', color: 'var(--c-discret)', padding: '12px 14px 6px' }}>COMMUNAUTÉ</div>
           {liensCommunaute.map(l => (
             <Link key={l.href} href={l.href} onClick={() => setNavOpen(false)} style={{
               display: 'block', padding: '12px 14px', borderRadius: 10, marginBottom: 2,
               fontSize: 15, fontWeight: isActive(l.href) ? 700 : 600,
-              color: isActive(l.href) ? '#2A2018' : '#6E6456',
+              color: isActive(l.href) ? 'var(--c-encre)' : 'var(--c-texte-doux)',
               background: isActive(l.href) ? '#FCEFD3' : 'transparent', textDecoration: 'none',
             }}>{l.label}</Link>
           ))}
           {liensAdmin.length > 0 && (
             <>
-              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.1em', color: '#B6A98C', padding: '12px 14px 6px' }}>ADMIN</div>
+              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.1em', color: 'var(--c-discret)', padding: '12px 14px 6px' }}>ADMIN</div>
               {liensAdmin.map(l => (
                 <Link key={l.href} href={l.href} onClick={() => setNavOpen(false)} style={{
                   display: 'block', padding: '12px 14px', borderRadius: 10, marginBottom: 2,
                   fontSize: 15, fontWeight: pathname.startsWith(l.href) ? 700 : 600,
-                  color: pathname.startsWith(l.href) ? '#2A2018' : '#6E6456',
+                  color: pathname.startsWith(l.href) ? 'var(--c-encre)' : 'var(--c-texte-doux)',
                   background: pathname.startsWith(l.href) ? '#FCEFD3' : 'transparent', textDecoration: 'none',
                 }}>{l.label}</Link>
               ))}

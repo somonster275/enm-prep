@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 import MethodeContenu from './MethodeContenu'
 import { useEchap } from '@/lib/useEchap'
 
-const FONT = "'Hanken Grotesk', sans-serif"
+const FONT = "var(--font-texte)"
 
 // Fenêtre d'accueil affichée UNE SEULE FOIS, à la première arrivée de l'étudiant
 // sur son espace. Mémorisée par utilisateur dans ce navigateur (ne revient plus).
@@ -35,25 +35,25 @@ export default function OnboardingModal() {
     <div onClick={fermer} style={{ position: 'fixed', inset: 0, background: 'rgba(40,30,20,.5)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Bienvenue" style={{
         background: '#fff', borderRadius: 20, width: '100%', maxWidth: 620, maxHeight: '88vh',
-        display: 'flex', flexDirection: 'column', fontFamily: FONT, color: '#2A2018',
+        display: 'flex', flexDirection: 'column', fontFamily: FONT, color: 'var(--c-encre)',
         boxShadow: '0 30px 80px -30px rgba(40,30,20,.6)', overflow: 'hidden',
       }}>
-        <div style={{ padding: '22px 26px 14px', borderBottom: '1px solid #F0E7D6' }}>
-          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 24 }}>Bienvenue sur codex 🎓</div>
-          <div style={{ fontSize: 14, color: '#8A7E68', marginTop: 4 }}>Prends 1 minute pour réviser… efficacement.</div>
+        <div style={{ padding: '22px 26px 14px', borderBottom: '1px solid var(--c-filet)' }}>
+          <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 24 }}>Bienvenue sur codex 🎓</div>
+          <div style={{ fontSize: 14, color: 'var(--c-annotation)', marginTop: 4 }}>Prends 1 minute pour réviser… efficacement.</div>
         </div>
 
         <div style={{ padding: '20px 26px', overflowY: 'auto' }}>
           <MethodeContenu />
         </div>
 
-        <div style={{ padding: '14px 26px', borderTop: '1px solid #F0E7D6', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <div style={{ padding: '14px 26px', borderTop: '1px solid var(--c-filet)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <button onClick={fermer} style={{
-            height: 40, padding: '0 18px', border: '1px solid #EADFC9', borderRadius: 10, background: 'transparent', color: '#A89880',
+            height: 40, padding: '0 18px', border: '1px solid var(--c-filet-fort)', borderRadius: 10, background: 'transparent', color: '#A89880',
             fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: FONT,
           }}>Passer</button>
           <button onClick={fermer} style={{
-            height: 46, padding: '0 26px', border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff',
+            height: 46, padding: '0 26px', border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff',
             fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: FONT,
           }}>C&apos;est parti !</button>
         </div>

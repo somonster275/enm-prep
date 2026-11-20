@@ -84,21 +84,21 @@ export default function ForumPage() {
     setReponses(r => ({ ...r, [qid]: (r[qid] || []).filter(x => x.id !== id) }))
   }
 
-  const font = "'Hanken Grotesk', sans-serif"
-  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid #EADFC9', borderRadius: 12, padding: '11px 14px', background: '#FFFBF2', fontSize: 14, outline: 'none', fontFamily: font }
+  const font = "var(--font-texte)"
+  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: font }
   const visibles = filtre ? questions.filter(q => q.matiere === filtre) : questions
   const dateFr = (s: string) => new Date(s).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
 
   return (
-    <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: font, color: '#2A2018' }}>
+    <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 28, margin: 0 }}>Forum d&apos;entraide</h1>
-        {!formOuvert && <button onClick={() => setFormOuvert(true)} style={{ padding: '10px 18px', borderRadius: 11, background: '#DC4A2B', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: font }}>Poser une question</button>}
+        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 28, margin: 0 }}>Forum d&apos;entraide</h1>
+        {!formOuvert && <button onClick={() => setFormOuvert(true)} style={{ padding: '10px 18px', borderRadius: 11, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: font }}>Poser une question</button>}
       </div>
-      <p style={{ fontSize: 15, color: '#8A7E68', margin: '8px 0 22px' }}>Posez vos questions, répondez à celles des autres. On avance ensemble.</p>
+      <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 22px' }}>Posez vos questions, répondez à celles des autres. On avance ensemble.</p>
 
       {formOuvert && (
-        <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 18, marginBottom: 22, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18, marginBottom: 22, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <input value={titre} onChange={e => setTitre(e.target.value)} placeholder="Ta question en une phrase…" style={champ} />
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <select value={matiere} onChange={e => setMatiere(e.target.value)} style={{ ...champ, flex: '1 1 200px' }}>
@@ -108,8 +108,8 @@ export default function ForumPage() {
           </div>
           <textarea value={corps} onChange={e => setCorps(e.target.value)} rows={3} placeholder="Détaille si besoin…" style={{ ...champ, resize: 'vertical', lineHeight: 1.5 }} />
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={poser} disabled={posting || !titre.trim()} style={{ height: 44, padding: '0 20px', border: 'none', borderRadius: 11, background: '#DC4A2B', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: posting || !titre.trim() ? 0.6 : 1, fontFamily: font }}>{posting ? 'Publication…' : 'Publier'}</button>
-            <button onClick={() => setFormOuvert(false)} style={{ height: 44, padding: '0 16px', border: '1.5px solid #EADFC9', borderRadius: 11, background: '#fff', color: '#6E6456', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>Annuler</button>
+            <button onClick={poser} disabled={posting || !titre.trim()} style={{ height: 44, padding: '0 20px', border: 'none', borderRadius: 11, background: 'var(--c-accent)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: posting || !titre.trim() ? 0.6 : 1, fontFamily: font }}>{posting ? 'Publication…' : 'Publier'}</button>
+            <button onClick={() => setFormOuvert(false)} style={{ height: 44, padding: '0 16px', border: '1.5px solid var(--c-filet-fort)', borderRadius: 11, background: '#fff', color: 'var(--c-texte-doux)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>Annuler</button>
           </div>
         </div>
       )}
@@ -117,59 +117,59 @@ export default function ForumPage() {
       {/* Filtre matière */}
       {matieres.length > 0 && (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
-          <button onClick={() => setFiltre('')} style={{ padding: '6px 12px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 12.5, fontWeight: 700, fontFamily: font, background: filtre === '' ? '#DC4A2B' : '#fff', color: filtre === '' ? '#fff' : '#8A7E68', borderWidth: filtre === '' ? 0 : 1, borderStyle: 'solid', borderColor: '#F0E7D6' }}>Toutes</button>
+          <button onClick={() => setFiltre('')} style={{ padding: '6px 12px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 12.5, fontWeight: 700, fontFamily: font, background: filtre === '' ? 'var(--c-accent)' : '#fff', color: filtre === '' ? '#fff' : 'var(--c-annotation)', borderWidth: filtre === '' ? 0 : 1, borderStyle: 'solid', borderColor: 'var(--c-filet)' }}>Toutes</button>
           {matieres.map(m => (
-            <button key={m} onClick={() => setFiltre(m)} style={{ padding: '6px 12px', borderRadius: 999, cursor: 'pointer', fontSize: 12.5, fontWeight: 700, fontFamily: font, background: filtre === m ? '#DC4A2B' : '#fff', color: filtre === m ? '#fff' : '#8A7E68', border: `1px solid ${filtre === m ? '#DC4A2B' : '#F0E7D6'}` }}>{m}</button>
+            <button key={m} onClick={() => setFiltre(m)} style={{ padding: '6px 12px', borderRadius: 999, cursor: 'pointer', fontSize: 12.5, fontWeight: 700, fontFamily: font, background: filtre === m ? 'var(--c-accent)' : '#fff', color: filtre === m ? '#fff' : 'var(--c-annotation)', border: `1px solid ${filtre === m ? 'var(--c-accent)' : 'var(--c-filet)'}` }}>{m}</button>
           ))}
         </div>
       )}
 
       {loading ? (
-        <div style={{ color: '#9A8D72', textAlign: 'center', padding: 30 }}>Chargement…</div>
+        <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : visibles.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: '#9A8D72', background: '#FFFBF2', border: '1px dashed #EADFC9', borderRadius: 16 }}>Aucune question pour l&apos;instant. Lance la discussion !</div>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>Aucune question pour l&apos;instant. Lance la discussion !</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {visibles.map(q => {
             const open = ouvert === q.id
             const reps = reponses[q.id] || []
             return (
-              <div key={q.id} style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 18 }}>
+              <div key={q.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                   <div {...activable} onClick={() => ouvrirFil(q.id)} style={{ flex: 1, cursor: 'pointer' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
                       {q.matiere && <span style={{ fontSize: 11.5, fontWeight: 700, color: '#0F6E56', background: '#ECF7F0', padding: '2px 8px', borderRadius: 999 }}>{q.matiere}</span>}
-                      <span style={{ fontSize: 12, color: '#9A8D72' }}>{q.auteur || 'Étudiant'} · {dateFr(q.created_at)}</span>
+                      <span style={{ fontSize: 12, color: 'var(--c-annotation-clair)' }}>{q.auteur || 'Étudiant'} · {dateFr(q.created_at)}</span>
                     </div>
                     <div style={{ fontSize: 15.5, fontWeight: 700 }}>{q.titre}</div>
-                    {q.corps && <div style={{ fontSize: 13.5, color: '#6E6456', marginTop: 4, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{q.corps}</div>}
+                    {q.corps && <div style={{ fontSize: 13.5, color: 'var(--c-texte-doux)', marginTop: 4, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{q.corps}</div>}
                   </div>
                   {(isAdmin || q.user_id === uid) && (
-                    <button onClick={() => supprimerQuestion(q.id)} title="Supprimer" style={{ border: 'none', background: 'transparent', color: '#C0B7A4', cursor: 'pointer', fontSize: 15, flexShrink: 0 }}>✕</button>
+                    <button onClick={() => supprimerQuestion(q.id)} title="Supprimer" style={{ border: 'none', background: 'transparent', color: 'var(--c-discret-clair)', cursor: 'pointer', fontSize: 15, flexShrink: 0 }}>✕</button>
                   )}
                 </div>
 
-                <button onClick={() => ouvrirFil(q.id)} style={{ marginTop: 10, background: 'none', border: 'none', color: '#DC4A2B', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, fontFamily: font }}>
+                <button onClick={() => ouvrirFil(q.id)} style={{ marginTop: 10, background: 'none', border: 'none', color: 'var(--c-accent)', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, fontFamily: font }}>
                   {open ? 'Masquer les réponses' : `Voir / répondre${reps.length ? ` (${reps.length})` : ''}`}
                 </button>
 
                 {open && (
                   <div style={{ marginTop: 12, borderTop: '1px solid #F5EEE0', paddingTop: 12 }}>
-                    {reps.length === 0 && <div style={{ fontSize: 13, color: '#9A8D72', marginBottom: 10 }}>Aucune réponse — sois le premier à aider.</div>}
+                    {reps.length === 0 && <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)', marginBottom: 10 }}>Aucune réponse — sois le premier à aider.</div>}
                     {reps.map(r => (
                       <div key={r.id} style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
-                        <div style={{ flex: 1, background: '#FFFBF2', border: '1px solid #F0E7D6', borderRadius: 12, padding: '10px 12px' }}>
-                          <div style={{ fontSize: 12, color: '#9A8D72', marginBottom: 3 }}>{r.auteur || 'Étudiant'} · {dateFr(r.created_at)}</div>
+                        <div style={{ flex: 1, background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '10px 12px' }}>
+                          <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginBottom: 3 }}>{r.auteur || 'Étudiant'} · {dateFr(r.created_at)}</div>
                           <div style={{ fontSize: 14, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{r.corps}</div>
                         </div>
                         {(isAdmin || r.user_id === uid) && (
-                          <button onClick={() => supprimerReponse(q.id, r.id)} title="Supprimer" style={{ border: 'none', background: 'transparent', color: '#C0B7A4', cursor: 'pointer', fontSize: 14 }}>✕</button>
+                          <button onClick={() => supprimerReponse(q.id, r.id)} title="Supprimer" style={{ border: 'none', background: 'transparent', color: 'var(--c-discret-clair)', cursor: 'pointer', fontSize: 14 }}>✕</button>
                         )}
                       </div>
                     ))}
                     <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                       <input value={reponse} onChange={e => setReponse(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') repondre(q.id) }} placeholder="Ta réponse…" style={{ ...champ, flex: 1 }} />
-                      <button onClick={() => repondre(q.id)} disabled={!reponse.trim()} style={{ padding: '0 18px', borderRadius: 11, background: '#DC4A2B', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, opacity: reponse.trim() ? 1 : 0.5, fontFamily: font }}>Envoyer</button>
+                      <button onClick={() => repondre(q.id)} disabled={!reponse.trim()} style={{ padding: '0 18px', borderRadius: 11, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, opacity: reponse.trim() ? 1 : 0.5, fontFamily: font }}>Envoyer</button>
                     </div>
                   </div>
                 )}

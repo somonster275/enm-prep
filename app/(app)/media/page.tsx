@@ -17,8 +17,8 @@ type Media = {
   espaces: { nom: string; slug: string; couleur: string } | null
 }
 
-const FONT = "'Hanken Grotesk', sans-serif"
-const DISPLAY = "'Bricolage Grotesque', sans-serif"
+const FONT = "var(--font-texte)"
+const DISPLAY = "var(--font-titre)"
 const ACCENT = '#3B82D9'
 
 // Extrait l'identifiant d'une vidéo YouTube depuis les formats d'URL courants.
@@ -129,12 +129,12 @@ export default function MediaPage() {
   const visibles = filtre ? items.filter(i => i.espaces?.nom === filtre) : items
 
   const inp: React.CSSProperties = {
-    width: '100%', boxSizing: 'border-box', padding: '11px 14px', borderRadius: 11, border: '1.5px solid #EADFC9',
-    fontSize: 14, fontFamily: FONT, background: '#FFFBF2', outline: 'none',
+    width: '100%', boxSizing: 'border-box', padding: '11px 14px', borderRadius: 11, border: '1.5px solid var(--c-filet-fort)',
+    fontSize: 14, fontFamily: FONT, background: 'var(--c-papier)', outline: 'none',
   }
 
   return (
-    <div style={{ paddingTop: 34, maxWidth: 860, margin: '0 auto', fontFamily: FONT, color: '#2A2018' }}>
+    <div style={{ paddingTop: 34, maxWidth: 860, margin: '0 auto', fontFamily: FONT, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ width: 48, height: 48, borderRadius: 14, background: ACCENT + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>🎬</div>
@@ -144,19 +144,19 @@ export default function MediaPage() {
           <button onClick={() => setFormOuvert(true)} style={{ padding: '10px 18px', borderRadius: 11, background: ACCENT, color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: FONT }}>Ajouter une vidéo</button>
         )}
       </div>
-      <p style={{ fontSize: 15, color: '#8A7E68', margin: '8px 0 24px', maxWidth: 600 }}>
+      <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 24px', maxWidth: 600 }}>
         Vidéos et podcasts à regarder directement ici, classés par matière. Les vidéos sont lues depuis YouTube (aucun fichier hébergé).
       </p>
 
       {tableManquante && (
-        <div style={{ fontSize: 13, color: '#D94A30', background: '#FCE9E3', padding: '12px 16px', borderRadius: 10, marginBottom: 24 }}>
+        <div style={{ fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '12px 16px', borderRadius: 10, marginBottom: 24 }}>
           La table <strong>medias</strong> n&apos;existe pas encore dans Supabase.
         </div>
       )}
 
       {/* Formulaire admin */}
       {isAdmin && formOuvert && !tableManquante && (
-        <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 20, marginBottom: 26, display: 'flex', flexDirection: 'column', gap: 11 }}>
+        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 20, marginBottom: 26, display: 'flex', flexDirection: 'column', gap: 11 }}>
           <div style={{ fontSize: 15, fontWeight: 700 }}>Ajouter une vidéo / un audio</div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <input value={titre} onChange={e => setTitre(e.target.value)} placeholder="Titre de la vidéo…" style={{ ...inp, flex: '2 1 240px' }} />
@@ -168,20 +168,20 @@ export default function MediaPage() {
           <input value={url} onChange={e => setUrl(e.target.value)} placeholder="Lien YouTube (https://youtu.be/… ou …/watch?v=…)" style={inp} />
           <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} placeholder="Description pour l'étudiant (ce qu'il va apprendre, points clés…)" style={{ ...inp, resize: 'vertical', lineHeight: 1.5 }} />
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#5C4A22', marginBottom: 5 }}># Tags <span style={{ fontWeight: 400, color: '#9A8D72' }}>(relient cette ressource aux fiches du même thème)</span></div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#5C4A22', marginBottom: 5 }}># Tags <span style={{ fontWeight: 400, color: 'var(--c-annotation-clair)' }}>(relient cette ressource aux fiches du même thème)</span></div>
             <TagsInput value={tags} onChange={setTags} accent={ACCENT} />
           </div>
-          <div style={{ fontSize: 12, color: '#9A8D72' }}>
+          <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)' }}>
             💡 Sur YouTube, mets la vidéo en <strong>« Non répertoriée »</strong> (pas « Privée » : une vidéo privée ne peut pas être lue ici). Seuls ceux qui ont le lien y accèdent.
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={ajouter} disabled={!titre.trim() || !espaceId || !url.trim() || saving} style={{ height: 44, padding: '0 22px', borderRadius: 11, background: ACCENT, color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: FONT, opacity: (!titre.trim() || !espaceId || !url.trim() || saving) ? 0.5 : 1 }}>{saving ? 'Ajout…' : 'Ajouter'}</button>
-            <button onClick={() => setFormOuvert(false)} style={{ height: 44, padding: '0 16px', borderRadius: 11, background: '#fff', color: '#6E6456', border: '1.5px solid #EADFC9', cursor: 'pointer', fontSize: 14, fontWeight: 600, fontFamily: FONT }}>Annuler</button>
+            <button onClick={() => setFormOuvert(false)} style={{ height: 44, padding: '0 16px', borderRadius: 11, background: '#fff', color: 'var(--c-texte-doux)', border: '1.5px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 14, fontWeight: 600, fontFamily: FONT }}>Annuler</button>
           </div>
-          {msg && <div style={{ fontSize: 13, color: msg.startsWith('❌') ? '#D94A30' : '#0E7C63' }}>{msg}</div>}
+          {msg && <div style={{ fontSize: 13, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
         </div>
       )}
-      {isAdmin && !formOuvert && msg && <div style={{ fontSize: 13, color: msg.startsWith('❌') ? '#D94A30' : '#0E7C63', marginBottom: 16 }}>{msg}</div>}
+      {isAdmin && !formOuvert && msg && <div style={{ fontSize: 13, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63', marginBottom: 16 }}>{msg}</div>}
 
       {/* Filtre matière */}
       {matieres.length > 0 && (
@@ -192,16 +192,16 @@ export default function MediaPage() {
       )}
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem 0', color: '#9A8D72' }}>Chargement…</div>
+        <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--c-annotation-clair)' }}>Chargement…</div>
       ) : visibles.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem 0', color: '#9A8D72', fontSize: 14 }}>Aucun contenu pour le moment.</div>
+        <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--c-annotation-clair)', fontSize: 14 }}>Aucun contenu pour le moment.</div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 18 }}>
           {visibles.map(it => {
             const yid = it.url ? youtubeId(it.url) : null
             const vu = vues.has(it.id)
             return (
-              <div key={it.id} style={{ background: '#fff', border: `1px solid ${vu ? '#BFE6CF' : '#F0E7D6'}`, borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div key={it.id} style={{ background: '#fff', border: `1px solid ${vu ? '#BFE6CF' : 'var(--c-filet)'}`, borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 {/* Lecteur */}
                 {yid ? (
                   <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', background: '#000' }}>
@@ -222,20 +222,20 @@ export default function MediaPage() {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                     <div style={{ fontSize: 15.5, fontWeight: 700, lineHeight: 1.3 }}>{it.titre}</div>
                     {isAdmin && (
-                      <button onClick={() => supprimer(it.id)} title="Supprimer" style={{ flexShrink: 0, border: 'none', background: '#FCE9E3', color: '#D94A30', borderRadius: 8, padding: '4px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>Suppr.</button>
+                      <button onClick={() => supprimer(it.id)} title="Supprimer" style={{ flexShrink: 0, border: 'none', background: 'var(--c-accent-pale)', color: 'var(--c-accent)', borderRadius: 8, padding: '4px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>Suppr.</button>
                     )}
                   </div>
                   {it.espaces && (
                     <span style={{ alignSelf: 'flex-start', fontSize: 11, fontWeight: 600, color: it.espaces.couleur, background: it.espaces.couleur + '1A', padding: '2px 9px', borderRadius: 999 }}>#{it.espaces.nom}</span>
                   )}
-                  {it.description && <p style={{ fontSize: 13.5, color: '#6E6456', lineHeight: 1.55, margin: '2px 0 0', whiteSpace: 'pre-wrap' }}>{it.description}</p>}
+                  {it.description && <p style={{ fontSize: 13.5, color: 'var(--c-texte-doux)', lineHeight: 1.55, margin: '2px 0 0', whiteSpace: 'pre-wrap' }}>{it.description}</p>}
                   <TagsEditeur table="medias" id={it.id} initial={it.tags} accent={ACCENT} canEdit={isAdmin} />
                   {!yid && it.url && lienSur(it.url) && !estAudio(it.url) && (
                     <a href={lienSur(it.url)!} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: ACCENT, fontWeight: 600, textDecoration: 'none', marginTop: 2 }}>Ouvrir le lien →</a>
                   )}
                   <button onClick={() => toggleVu(it.id)} style={{
                     alignSelf: 'flex-start', marginTop: 6, padding: '5px 12px', borderRadius: 9, cursor: 'pointer', fontSize: 12.5, fontWeight: 700, fontFamily: FONT,
-                    border: `1.5px solid ${vu ? '#2DAE83' : '#EADFC9'}`, background: vu ? '#ECF7F0' : '#fff', color: vu ? '#0F6E56' : '#9A8D72',
+                    border: `1.5px solid ${vu ? '#2DAE83' : 'var(--c-filet-fort)'}`, background: vu ? '#ECF7F0' : '#fff', color: vu ? '#0F6E56' : 'var(--c-annotation-clair)',
                   }}>{vu ? '✓ Vu' : 'Marquer comme vu'}</button>
                 </div>
               </div>
@@ -250,6 +250,6 @@ export default function MediaPage() {
 function chipStyle(actif: boolean): React.CSSProperties {
   return {
     padding: '6px 13px', borderRadius: 999, cursor: 'pointer', fontSize: 12.5, fontWeight: 700, fontFamily: FONT,
-    background: actif ? ACCENT : '#fff', color: actif ? '#fff' : '#8A7E68', border: `1px solid ${actif ? ACCENT : '#F0E7D6'}`,
+    background: actif ? ACCENT : '#fff', color: actif ? '#fff' : 'var(--c-annotation)', border: `1px solid ${actif ? ACCENT : 'var(--c-filet)'}`,
   }
 }

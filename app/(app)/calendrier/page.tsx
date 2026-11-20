@@ -60,7 +60,7 @@ const JOURS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 const MOIS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 
 function couleurType(type: string) {
-  return TYPES.find(t => t.value === type)?.couleur ?? '#8A7E68'
+  return TYPES.find(t => t.value === type)?.couleur ?? 'var(--c-annotation)'
 }
 function labelType(type: string) {
   return TYPES.find(t => t.value === type)?.label ?? type
@@ -259,17 +259,17 @@ export default function CalendrierPage() {
     chargerPlanning(list)
   }
 
-  const font = "'Hanken Grotesk', sans-serif"
-  const display = "'Bricolage Grotesque', sans-serif"
+  const font = "var(--font-texte)"
+  const display = "var(--font-titre)"
   const inp: React.CSSProperties = {
-    padding: '10px 12px', borderRadius: 10, border: '1.5px solid #EADFC9',
-    fontSize: 13, fontFamily: font, background: '#FFFBF2', outline: 'none', width: '100%', boxSizing: 'border-box',
+    padding: '10px 12px', borderRadius: 10, border: '1.5px solid var(--c-filet-fort)',
+    fontSize: 13, fontFamily: font, background: 'var(--c-papier)', outline: 'none', width: '100%', boxSizing: 'border-box',
   }
 
   const evJourSelectionne = joursSelectionne ? (evParJour[joursSelectionne] || []) : []
 
   return (
-    <div style={{ paddingTop: 34, maxWidth: 1000, margin: '0 auto', fontFamily: font, color: '#2A2018' }}>
+    <div style={{ paddingTop: 34, maxWidth: 1000, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
 
       {/* En-tête */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
@@ -279,7 +279,7 @@ export default function CalendrierPage() {
             <div style={{ fontFamily: display, fontWeight: 800, fontSize: 26 }}>Calendrier</div>
             {syncPlan && <span style={{ fontSize: 12, color: '#6366F1', fontWeight: 600 }}>↻ synchro planning…</span>}
           </div>
-          <p style={{ fontSize: 14, color: '#8A7E68', margin: '6px 0 0 56px' }}>Vos cours de la fac et les événements de la prépa, au même endroit.</p>
+          <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '6px 0 0 56px' }}>Vos cours de la fac et les événements de la prépa, au même endroit.</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           {isAdmin && (
@@ -290,7 +290,7 @@ export default function CalendrierPage() {
           )}
           {isAdmin && !tableManquante && (
             <button onClick={() => ouvrirFormulaire()} style={{
-              padding: '11px 20px', borderRadius: 11, background: '#DC4A2B', color: '#fff',
+              padding: '11px 20px', borderRadius: 11, background: 'var(--c-accent)', color: '#fff',
               border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: font,
             }}>+ Ajouter un événement</button>
           )}
@@ -303,9 +303,9 @@ export default function CalendrierPage() {
       </div>
 
       {tableManquante && (
-        <div style={{ fontSize: 13, color: '#D94A30', background: '#FCE9E3', padding: '14px 18px', borderRadius: 12, marginBottom: 24 }}>
+        <div style={{ fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '14px 18px', borderRadius: 12, marginBottom: 24 }}>
           La table <strong>evenements</strong> n'existe pas encore. Exécute le SQL ci-dessous dans Supabase.
-          <pre style={{ marginTop: 10, fontSize: 11, background: '#fff', padding: 12, borderRadius: 8, overflowX: 'auto', color: '#2A2018' }}>{`CREATE TABLE evenements (
+          <pre style={{ marginTop: 10, fontSize: 11, background: '#fff', padding: 12, borderRadius: 8, overflowX: 'auto', color: 'var(--c-encre)' }}>{`CREATE TABLE evenements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   titre TEXT NOT NULL,
   description TEXT,
@@ -324,20 +324,20 @@ CREATE POLICY "ev_write" ON evenements FOR ALL TO authenticated
         </div>
       )}
 
-      {msg && <div style={{ fontSize: 13, marginBottom: 16, color: msg.startsWith('❌') ? '#D94A30' : '#0E7C63', background: msg.startsWith('❌') ? '#FCE9E3' : '#E6F7F2', padding: '10px 14px', borderRadius: 10 }}>{msg}</div>}
+      {msg && <div style={{ fontSize: 13, marginBottom: 16, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63', background: msg.startsWith('❌') ? 'var(--c-accent-pale)' : '#E6F7F2', padding: '10px 14px', borderRadius: 10 }}>{msg}</div>}
 
       {/* Gestion des flux planning (admin) */}
       {isAdmin && showFlux && (
         <div style={{ background: '#fff', border: '1px solid #DDD6FE', borderRadius: 16, padding: 20, marginBottom: 24 }}>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Flux de planning (fac)</div>
-          <div style={{ fontSize: 12, color: '#9A8D72', marginBottom: 14 }}>
+          <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginBottom: 14 }}>
             Colle l'adresse de ton planning en ligne (extraplanning / IEJ). Les cours s'affichent automatiquement dans le calendrier (lecture seule).
           </div>
 
           {fluxTableManquante ? (
-            <div style={{ fontSize: 13, color: '#D94A30', background: '#FCE9E3', padding: '12px 14px', borderRadius: 10 }}>
+            <div style={{ fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '12px 14px', borderRadius: 10 }}>
               La table <strong>calendrier_flux</strong> n'existe pas encore. Exécute le SQL ci-dessous dans Supabase.
-              <pre style={{ marginTop: 10, fontSize: 11, background: '#fff', padding: 12, borderRadius: 8, overflowX: 'auto', color: '#2A2018' }}>{`CREATE TABLE calendrier_flux (
+              <pre style={{ marginTop: 10, fontSize: 11, background: '#fff', padding: 12, borderRadius: 8, overflowX: 'auto', color: 'var(--c-encre)' }}>{`CREATE TABLE calendrier_flux (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   nom TEXT NOT NULL,
   url TEXT NOT NULL,
@@ -358,7 +358,7 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
                     <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: f.couleur + '14', borderRadius: 999, padding: '5px 6px 5px 12px' }}>
                       <span style={{ width: 8, height: 8, borderRadius: '50%', background: f.couleur }} />
                       <span style={{ fontSize: 12, fontWeight: 600 }}>{f.nom}</span>
-                      <button onClick={() => supprimerFlux(f.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D94A30', fontSize: 15, lineHeight: 1, padding: '0 4px' }} title="Retirer">×</button>
+                      <button onClick={() => supprimerFlux(f.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--c-accent)', fontSize: 15, lineHeight: 1, padding: '0 4px' }} title="Retirer">×</button>
                     </div>
                   ))}
                 </div>
@@ -382,10 +382,10 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
 
       {/* Formulaire d'ajout d'événement */}
       {showForm && (
-        <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 22, marginBottom: 24 }}>
+        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 22, marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <div style={{ fontWeight: 700, fontSize: 15 }}>Nouvel événement</div>
-            <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#9A8D72', lineHeight: 1 }}>×</button>
+            <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--c-annotation-clair)', lineHeight: 1 }}>×</button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
             <div style={{ gridColumn: '1/-1' }}>
@@ -404,7 +404,7 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-            <button onClick={() => setShowForm(false)} style={{ padding: '10px 18px', borderRadius: 10, background: '#F4EDE0', border: 'none', cursor: 'pointer', fontSize: 13, fontFamily: font, color: '#8A7E68', fontWeight: 600 }}>Annuler</button>
+            <button onClick={() => setShowForm(false)} style={{ padding: '10px 18px', borderRadius: 10, background: '#F4EDE0', border: 'none', cursor: 'pointer', fontSize: 13, fontFamily: font, color: 'var(--c-annotation)', fontWeight: 600 }}>Annuler</button>
             <button onClick={sauvegarder} disabled={!fTitre.trim() || !fDate || saving} style={{
               padding: '10px 22px', borderRadius: 10, background: couleurType(fType), color: '#fff',
               border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: font,
@@ -419,16 +419,16 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24, alignItems: 'start' }}>
 
         {/* Calendrier */}
-        <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18, padding: 22 }}>
+        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18, padding: 22 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-            <button onClick={() => naviguerMois(-1)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#8A7E68', padding: '4px 10px' }}>‹</button>
+            <button onClick={() => naviguerMois(-1)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--c-annotation)', padding: '4px 10px' }}>‹</button>
             <div style={{ fontFamily: display, fontWeight: 800, fontSize: 18 }}>{MOIS_FR[mois]} {annee}</div>
-            <button onClick={() => naviguerMois(1)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#8A7E68', padding: '4px 10px' }}>›</button>
+            <button onClick={() => naviguerMois(1)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--c-annotation)', padding: '4px 10px' }}>›</button>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', marginBottom: 6 }}>
             {JOURS.map(j => (
-              <div key={j} style={{ textAlign: 'center', fontSize: 11, fontWeight: 700, color: '#9A8D72', padding: '4px 0' }}>{j}</div>
+              <div key={j} style={{ textAlign: 'center', fontSize: 11, fontWeight: 700, color: 'var(--c-annotation-clair)', padding: '4px 0' }}>{j}</div>
             ))}
           </div>
 
@@ -446,14 +446,14 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
                   style={{
                     minHeight: 56, minWidth: 0, borderRadius: 10, padding: '6px 4px 4px',
                     background: isSelected ? '#FCEFD3' : isToday ? '#FFF4E6' : '#FAFAF8',
-                    border: isToday ? '2px solid #DC4A2B' : isSelected ? '1.5px solid #EADFC9' : '1.5px solid transparent',
+                    border: isToday ? '2px solid var(--c-accent)' : isSelected ? '1.5px solid var(--c-filet-fort)' : '1.5px solid transparent',
                     cursor: 'pointer', position: 'relative', overflow: 'hidden',
                     opacity: hasPast ? 0.65 : 1,
                   }}
                 >
                   <div style={{
                     fontSize: 13, fontWeight: isToday ? 800 : 500,
-                    color: isToday ? '#DC4A2B' : '#2A2018', textAlign: 'center', marginBottom: 4,
+                    color: isToday ? 'var(--c-accent)' : 'var(--c-encre)', textAlign: 'center', marginBottom: 4,
                   }}>{jour}</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
                     {evs.slice(0, 3).map(ev => (
@@ -463,7 +463,7 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
                         overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
                       }}>{ev.titre}</div>
                     ))}
-                    {evs.length > 3 && <div style={{ fontSize: 9, color: '#9A8D72', textAlign: 'center' }}>+{evs.length - 3}</div>}
+                    {evs.length > 3 && <div style={{ fontSize: 9, color: 'var(--c-annotation-clair)', textAlign: 'center' }}>+{evs.length - 3}</div>}
                   </div>
                 </div>
               )
@@ -472,20 +472,20 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
 
           {/* Détail jour sélectionné */}
           {joursSelectionne && (
-            <div style={{ marginTop: 16, borderTop: '1px solid #F0E7D6', paddingTop: 14 }}>
+            <div style={{ marginTop: 16, borderTop: '1px solid var(--c-filet)', paddingTop: 14 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#2A2018' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-encre)' }}>
                   {new Date(joursSelectionne + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </div>
                 {isAdmin && (
                   <button onClick={() => ouvrirFormulaire(joursSelectionne)} style={{
-                    fontSize: 12, fontWeight: 600, color: '#DC4A2B', background: '#FCE9E3',
+                    fontSize: 12, fontWeight: 600, color: 'var(--c-accent)', background: 'var(--c-accent-pale)',
                     border: 'none', borderRadius: 8, padding: '5px 12px', cursor: 'pointer', fontFamily: font,
                   }}>+ Ajouter</button>
                 )}
               </div>
               {evJourSelectionne.length === 0 ? (
-                <div style={{ fontSize: 13, color: '#9A8D72' }}>Aucun événement ce jour.</div>
+                <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)' }}>Aucun événement ce jour.</div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {evJourSelectionne.map(ev => (
@@ -495,14 +495,14 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
                       borderLeft: `3px solid ${ev.couleur}`,
                     }}>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#2A2018' }}>{ev.titre}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-encre)' }}>{ev.titre}</div>
                         {(ev.heure || ev.fin) && (
-                          <div style={{ fontSize: 11, color: '#9A8D72', marginTop: 2 }}>
+                          <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginTop: 2 }}>
                             🕐 {ev.heure}{ev.fin ? ` – ${ev.fin}` : ''}
                           </div>
                         )}
-                        {ev.lieu && <div style={{ fontSize: 11, color: '#9A8D72', marginTop: 2 }}>📍 {ev.lieu}</div>}
-                        {ev.intervenant && <div style={{ fontSize: 11, color: '#9A8D72', marginTop: 2 }}>👤 {ev.intervenant}</div>}
+                        {ev.lieu && <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginTop: 2 }}>📍 {ev.lieu}</div>}
+                        {ev.intervenant && <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginTop: 2 }}>👤 {ev.intervenant}</div>}
                         {ev.description && <div style={{ fontSize: 12, color: '#5A4E3A', marginTop: 4 }}>{ev.description}</div>}
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
                           <span style={{ fontSize: 10, fontWeight: 600, color: ev.couleur, background: ev.couleur + '20', padding: '2px 7px', borderRadius: 999 }}>
@@ -514,7 +514,7 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
                         </div>
                       </div>
                       {isAdmin && !ev.readonly && (
-                        <button onClick={() => supprimer(ev.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D94A30', fontSize: 16, padding: '0 2px', lineHeight: 1, flexShrink: 0 }} title="Supprimer">×</button>
+                        <button onClick={() => supprimer(ev.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--c-accent)', fontSize: 16, padding: '0 2px', lineHeight: 1, flexShrink: 0 }} title="Supprimer">×</button>
                       )}
                     </div>
                   ))}
@@ -526,11 +526,11 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
 
         {/* Colonne droite : à venir */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ fontFamily: display, fontWeight: 800, fontSize: 17, color: '#2A2018' }}>À venir</div>
+          <div style={{ fontFamily: display, fontWeight: 800, fontSize: 17, color: 'var(--c-encre)' }}>À venir</div>
           {loading ? (
-            <div style={{ fontSize: 13, color: '#9A8D72' }}>Chargement…</div>
+            <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)' }}>Chargement…</div>
           ) : evProchains.length === 0 ? (
-            <div style={{ fontSize: 13, color: '#9A8D72', background: '#fff', borderRadius: 12, padding: '14px 16px', border: '1px solid #F0E7D6' }}>
+            <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)', background: '#fff', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--c-filet)' }}>
               Aucun événement à venir.
             </div>
           ) : (
@@ -543,7 +543,7 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
                   const [a, mo] = ev.date_debut.split('-').map(Number)
                   setAnnee(a); setMois(mo - 1); setJourSelectionne(ev.date_debut)
                 }} style={{
-                  background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12,
+                  background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12,
                   padding: '12px 14px', cursor: 'pointer', borderLeft: `4px solid ${ev.couleur}`,
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -552,12 +552,12 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
                       {ev.readonly ? ev.type : labelType(ev.type)}
                     </span>
                   </div>
-                  <div style={{ fontSize: 11, color: '#9A8D72', marginTop: 4 }}>
+                  <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginTop: 4 }}>
                     {d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}
                     {ev.heure && ` · ${ev.heure}`}
                     {ev.lieu && ` · ${ev.lieu}`}
                   </div>
-                  {isEvToday && <div style={{ fontSize: 11, fontWeight: 700, color: '#DC4A2B', marginTop: 4 }}>Aujourd'hui</div>}
+                  {isEvToday && <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--c-accent)', marginTop: 4 }}>Aujourd'hui</div>}
                   {!isEvToday && diff <= 7 && <div style={{ fontSize: 11, color: '#E8A11E', fontWeight: 600, marginTop: 4 }}>Dans {diff} jour{diff > 1 ? 's' : ''}</div>}
                 </div>
               )

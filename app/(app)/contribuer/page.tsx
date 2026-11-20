@@ -7,8 +7,8 @@ type Espace = { id: string; nom: string }
 type ModuleItem = { id: string; nom: string }
 type Contribution = { id: string; type: string; statut: string; titre: string | null; created_at: string }
 
-const FONT = "'Hanken Grotesk', sans-serif"
-const DISPLAY = "'Bricolage Grotesque', sans-serif"
+const FONT = "var(--font-texte)"
+const DISPLAY = "var(--font-titre)"
 
 const STATUT_LABEL: Record<string, { t: string; bg: string; c: string }> = {
   nouveau: { t: 'En attente', bg: '#FCEFD3', c: '#8A5A10' },
@@ -111,13 +111,13 @@ export default function ContribuerPage() {
     }
   }
 
-  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid #EADFC9', borderRadius: 12, padding: '11px 14px', background: '#FFFBF2', fontSize: 14, outline: 'none', fontFamily: FONT }
-  const label: React.CSSProperties = { fontSize: 13, color: '#8A7E68', fontWeight: 600, display: 'block', marginBottom: 5 }
+  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: FONT }
+  const label: React.CSSProperties = { fontSize: 13, color: 'var(--c-annotation)', fontWeight: 600, display: 'block', marginBottom: 5 }
 
   return (
-    <div style={{ paddingTop: 34, maxWidth: 720, margin: '0 auto', fontFamily: FONT, color: '#2A2018' }}>
+    <div style={{ paddingTop: 34, maxWidth: 720, margin: '0 auto', fontFamily: FONT, color: 'var(--c-encre)' }}>
       <h1 style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 28, margin: 0 }}>Proposer un contenu</h1>
-      <p style={{ fontSize: 15, color: '#8A7E68', margin: '8px 0 22px', maxWidth: 580 }}>
+      <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 22px', maxWidth: 580 }}>
         Aide toute la promo : propose une fiche ou un QCM. Un administrateur le relit avant publication — une fois validé, il devient disponible pour tous.
       </p>
 
@@ -126,12 +126,12 @@ export default function ContribuerPage() {
         {(['fiche', 'qcm'] as const).map(t => (
           <button key={t} onClick={() => { setType(t); setMessage(null) }} style={{
             padding: '9px 18px', borderRadius: 999, cursor: 'pointer', fontSize: 13.5, fontWeight: 700, fontFamily: FONT,
-            border: `1.5px solid ${type === t ? '#DC4A2B' : '#EADFC9'}`, background: type === t ? '#DC4A2B' : '#fff', color: type === t ? '#fff' : '#8A7E68',
+            border: `1.5px solid ${type === t ? 'var(--c-accent)' : 'var(--c-filet-fort)'}`, background: type === t ? 'var(--c-accent)' : '#fff', color: type === t ? '#fff' : 'var(--c-annotation)',
           }}>{t === 'fiche' ? '📇 Une fiche' : '✅ Un QCM'}</button>
         ))}
       </div>
 
-      <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18, padding: 22, marginBottom: 24 }}>
+      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18, padding: 22, marginBottom: 24 }}>
         {type === 'fiche' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -176,7 +176,7 @@ export default function ContribuerPage() {
               <textarea value={texteQcm} onChange={e => setTexteQcm(e.target.value)} rows={9}
                 placeholder={EXEMPLE_QCM} style={{ ...champ, resize: 'vertical', fontFamily: 'ui-monospace, monospace', fontSize: 13 }} />
             </label>
-            <div style={{ fontSize: 12, color: '#8A7E68', background: '#FFFBF2', border: '1px dashed #EADFC9', borderRadius: 10, padding: '10px 12px', lineHeight: 1.6 }}>
+            <div style={{ fontSize: 12, color: 'var(--c-annotation)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 10, padding: '10px 12px', lineHeight: 1.6 }}>
               <b>Format :</b> <code>Q:</code> pour une question, <code>-</code> devant chaque option, une <code>*</code> en fin de ligne marque la bonne réponse (plusieurs possibles), <code>&gt;</code> pour une explication facultative.
             </div>
             {texteQcm.trim() && (
@@ -190,7 +190,7 @@ export default function ContribuerPage() {
         {message && (
           <div style={{ marginTop: 14, fontSize: 13.5, fontWeight: 600, color: message.ok ? '#0E5A47' : '#C0392B' }}>{message.t}</div>
         )}
-        <button onClick={envoyer} disabled={envoi} style={{ marginTop: 16, height: 48, padding: '0 26px', border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: envoi ? 0.7 : 1, fontFamily: FONT }}>
+        <button onClick={envoyer} disabled={envoi} style={{ marginTop: 16, height: 48, padding: '0 26px', border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: envoi ? 0.7 : 1, fontFamily: FONT }}>
           {envoi ? 'Envoi…' : 'Proposer à la modération →'}
         </button>
       </div>
@@ -203,7 +203,7 @@ export default function ContribuerPage() {
             {mesContribs.map(c => {
               const s = STATUT_LABEL[c.statut] || STATUT_LABEL.nouveau
               return (
-                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: '11px 16px' }}>
+                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '11px 16px' }}>
                   <span style={{ fontSize: 18 }}>{c.type === 'qcm' ? '✅' : '📇'}</span>
                   <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{c.titre || (c.type === 'qcm' ? 'QCM' : 'Fiche')}</span>
                   <span style={{ fontSize: 11.5, fontWeight: 700, color: s.c, background: s.bg, borderRadius: 999, padding: '3px 10px' }}>{s.t}</span>

@@ -10,8 +10,8 @@ type Espace = { id: string; nom: string }
 type ModuleItem = { id: string; nom: string }
 type MatchOuvert = { code: string; titre: string | null; hote: string; n: number }
 
-const FONT = "'Hanken Grotesk', sans-serif"
-const DISPLAY = "'Bricolage Grotesque', sans-serif"
+const FONT = "var(--font-texte)"
+const DISPLAY = "var(--font-titre)"
 
 export default function DuelAccueil() {
   const router = useRouter()
@@ -106,32 +106,32 @@ export default function DuelAccueil() {
     router.push(`/duel/${v}`)
   }
 
-  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid #EADFC9', borderRadius: 12, padding: '11px 14px', background: '#FFFBF2', fontSize: 14, outline: 'none', fontFamily: FONT }
+  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: FONT }
 
   return (
-    <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: FONT, color: '#2A2018' }}>
+    <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: FONT, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <h1 style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 28, margin: 0 }}>Duel</h1>
-        <Link href="/duel/historique" style={{ fontSize: 13.5, fontWeight: 600, color: '#9A8D72', textDecoration: 'none' }}>Mes duels →</Link>
+        <Link href="/duel/historique" style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--c-annotation-clair)', textDecoration: 'none' }}>Mes duels →</Link>
       </div>
-      <p style={{ fontSize: 15, color: '#8A7E68', margin: '8px 0 24px', maxWidth: 560 }}>
+      <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 24px', maxWidth: 560 }}>
         Affronte d&apos;autres candidats en temps réel sur les mêmes questions — QCM et fiches mélangés, chrono et classement live. À deux ou en groupe.
       </p>
 
       {/* Rejoindre par code */}
-      <div style={{ background: '#2A2018', borderRadius: 18, padding: 22, marginBottom: 20, color: '#fff', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ background: 'var(--c-encre)', borderRadius: 18, padding: 22, marginBottom: 20, color: '#fff', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 200px' }}>
           <div style={{ fontWeight: 700, fontSize: 16 }}>Rejoindre un match</div>
           <div style={{ fontSize: 13, color: '#CDBFA6', marginTop: 2 }}>Entre le code partagé par l&apos;organisateur.</div>
         </div>
         <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} onKeyDown={e => { if (e.key === 'Enter') rejoindre(code) }}
           placeholder="CODE" maxLength={6}
-          style={{ width: 140, textAlign: 'center', letterSpacing: 4, fontWeight: 800, fontSize: 18, border: 'none', borderRadius: 12, padding: '12px 10px', background: '#fff', color: '#2A2018', outline: 'none', fontFamily: DISPLAY }} />
-        <button onClick={() => rejoindre(code)} disabled={code.trim().length < 4} style={{ height: 48, padding: '0 22px', border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', opacity: code.trim().length < 4 ? 0.5 : 1, fontFamily: FONT }}>Rejoindre</button>
+          style={{ width: 140, textAlign: 'center', letterSpacing: 4, fontWeight: 800, fontSize: 18, border: 'none', borderRadius: 12, padding: '12px 10px', background: '#fff', color: 'var(--c-encre)', outline: 'none', fontFamily: DISPLAY }} />
+        <button onClick={() => rejoindre(code)} disabled={code.trim().length < 4} style={{ height: 48, padding: '0 22px', border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', opacity: code.trim().length < 4 ? 0.5 : 1, fontFamily: FONT }}>Rejoindre</button>
       </div>
 
       {/* Créer un match */}
-      <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18, padding: 22, marginBottom: 26 }}>
+      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18, padding: 22, marginBottom: 26 }}>
         <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 14 }}>Créer un match</div>
         {/* Type de duel : temps réel (ensemble, live) ou asynchrone (chacun sous 48 h) */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
@@ -141,24 +141,24 @@ export default function DuelAccueil() {
           ] as const).map(o => (
             <button key={o.k} onClick={() => setMode(o.k)} style={{
               flex: '1 1 200px', textAlign: 'left', cursor: 'pointer', fontFamily: FONT,
-              border: `1.5px solid ${mode === o.k ? '#DC4A2B' : '#EADFC9'}`, background: mode === o.k ? '#FCEFD3' : '#FFFBF2',
+              border: `1.5px solid ${mode === o.k ? 'var(--c-accent)' : 'var(--c-filet-fort)'}`, background: mode === o.k ? '#FCEFD3' : 'var(--c-papier)',
               borderRadius: 12, padding: '10px 14px',
             }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#2A2018' }}>{o.t}</div>
-              <div style={{ fontSize: 12, color: '#8A7E68', marginTop: 1 }}>{o.d}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--c-encre)' }}>{o.t}</div>
+              <div style={{ fontSize: 12, color: 'var(--c-annotation)', marginTop: 1 }}>{o.d}</div>
             </button>
           ))}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <label style={{ flex: '1 1 220px', fontSize: 13, color: '#8A7E68' }}>
+            <label style={{ flex: '1 1 220px', fontSize: 13, color: 'var(--c-annotation)' }}>
               QCM (facultatif)
               <select value={qcmId} onChange={e => setQcmId(e.target.value)} style={{ ...champ, marginTop: 5 }}>
                 <option value="">— Aucun —</option>
                 {qcms.map(q => <option key={q.id} value={q.id}>{q.titre}{q.matiere ? ` · ${q.matiere}` : ''}</option>)}
               </select>
             </label>
-            <label style={{ flex: '1 1 220px', fontSize: 13, color: '#8A7E68' }}>
+            <label style={{ flex: '1 1 220px', fontSize: 13, color: 'var(--c-annotation)' }}>
               Fiches d&apos;une matière (facultatif)
               <select value={espaceId} onChange={e => setEspaceId(e.target.value)} style={{ ...champ, marginTop: 5 }}>
                 <option value="">— Aucune —</option>
@@ -167,7 +167,7 @@ export default function DuelAccueil() {
             </label>
             {/* Module/chapitre — visible une fois une matière choisie */}
             {espaceId && modules.length > 0 && (
-              <label style={{ flex: '1 1 220px', fontSize: 13, color: '#8A7E68' }}>
+              <label style={{ flex: '1 1 220px', fontSize: 13, color: 'var(--c-annotation)' }}>
                 Chapitre précis (facultatif)
                 <select value={moduleId} onChange={e => setModuleId(e.target.value)} style={{ ...champ, marginTop: 5 }}>
                   <option value="">Toute la matière</option>
@@ -177,14 +177,14 @@ export default function DuelAccueil() {
             )}
           </div>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <label style={{ flex: '1 1 160px', fontSize: 13, color: '#8A7E68' }}>
+            <label style={{ flex: '1 1 160px', fontSize: 13, color: 'var(--c-annotation)' }}>
               Nombre de questions
               <select value={nb} onChange={e => setNb(parseInt(e.target.value))} style={{ ...champ, marginTop: 5 }}>
                 {[5, 10, 15, 20, 30].map(n => <option key={n} value={n}>{n} questions</option>)}
               </select>
             </label>
             {mode === 'live' && (
-              <label style={{ flex: '1 1 160px', fontSize: 13, color: '#8A7E68' }}>
+              <label style={{ flex: '1 1 160px', fontSize: 13, color: 'var(--c-annotation)' }}>
                 Temps par question
                 <select value={secs} onChange={e => setSecs(parseInt(e.target.value))} style={{ ...champ, marginTop: 5 }}>
                   {[10, 15, 20, 30, 45].map(s => <option key={s} value={s}>{s} secondes</option>)}
@@ -192,8 +192,8 @@ export default function DuelAccueil() {
               </label>
             )}
           </div>
-          {erreur && <div style={{ fontSize: 13.5, color: '#D94A30' }}>{erreur}</div>}
-          <button onClick={creer} disabled={creating} style={{ alignSelf: 'flex-start', height: 48, padding: '0 26px', border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: creating ? 0.7 : 1, fontFamily: FONT }}>
+          {erreur && <div style={{ fontSize: 13.5, color: 'var(--c-accent)' }}>{erreur}</div>}
+          <button onClick={creer} disabled={creating} style={{ alignSelf: 'flex-start', height: 48, padding: '0 26px', border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: creating ? 0.7 : 1, fontFamily: FONT }}>
             {creating ? 'Création…' : 'Créer le salon →'}
           </button>
         </div>
@@ -202,16 +202,16 @@ export default function DuelAccueil() {
       {/* Salons ouverts */}
       <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 18, marginBottom: 12 }}>Salons en attente</div>
       {ouverts.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '30px 20px', color: '#9A8D72', background: '#FFFBF2', border: '1px dashed #EADFC9', borderRadius: 16 }}>
+        <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>
           Aucun salon ouvert. Crée le tien et partage le code !
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {ouverts.map(m => (
-            <div key={m.code} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: '12px 16px' }}>
-              <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 16, letterSpacing: 2, color: '#DC4A2B' }}>{m.code}</span>
+            <div key={m.code} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '12px 16px' }}>
+              <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 16, letterSpacing: 2, color: 'var(--c-accent)' }}>{m.code}</span>
               <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{m.titre || 'Match'}</span>
-              <span style={{ fontSize: 12.5, color: '#9A8D72' }}>{m.n} joueur{m.n > 1 ? 's' : ''}</span>
+              <span style={{ fontSize: 12.5, color: 'var(--c-annotation-clair)' }}>{m.n} joueur{m.n > 1 ? 's' : ''}</span>
               <button onClick={() => rejoindre(m.code)} style={{ border: 'none', background: '#FCEFD3', color: '#8A5A10', borderRadius: 9, padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>Rejoindre</button>
             </div>
           ))}

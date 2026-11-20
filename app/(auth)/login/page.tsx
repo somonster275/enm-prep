@@ -70,22 +70,22 @@ export default function LoginPage() {
 
   const inputStyle = (focused: boolean): React.CSSProperties => ({
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    height: 52, border: `1.5px solid ${focused ? '#DC4A2B' : '#EADFC9'}`,
+    height: 52, border: `1.5px solid ${focused ? 'var(--c-accent)' : 'var(--c-filet-fort)'}`,
     borderRadius: 14, padding: '0 16px',
-    background: focused ? '#fff' : '#FFFBF2',
+    background: focused ? '#fff' : 'var(--c-papier)',
     boxShadow: focused ? '0 0 0 4px rgba(220,74,43,.12)' : 'none',
   })
 
   return (
     <div style={{
       minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr',
-      fontFamily: "'Hanken Grotesk', sans-serif", color: '#2A2018',
+      fontFamily: "var(--font-texte)", color: 'var(--c-encre)',
     }}>
       {/* Panneau gauche — poster de marque (masqué sur mobile) */}
       <div className="hide-mobile" style={{
         position: 'relative', background: '#C6C4BD', overflow: 'hidden',
         padding: 52, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
-        color: '#2A2018',
+        color: 'var(--c-encre)',
       }}>
         {/* vignette papier */}
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(120% 120% at 50% 40%, rgba(255,255,255,.18), rgba(0,0,0,.06))', pointerEvents: 'none' }} />
@@ -100,10 +100,10 @@ export default function LoginPage() {
 
       {/* Panneau droit — formulaire */}
       <div className="login-form bg-grille" style={{ padding: '64px 60px', display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: '#fff' }}>
-        <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 30, letterSpacing: '-.01em' }}>
+        <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 30, letterSpacing: '-.01em' }}>
           Bon retour 👋
         </div>
-        <div style={{ fontSize: 15, color: '#8A7E68', marginTop: 6 }}>
+        <div style={{ fontSize: 15, color: 'var(--c-annotation)', marginTop: 6 }}>
           Connectez-vous pour continuer vos révisions.
         </div>
 
@@ -114,7 +114,7 @@ export default function LoginPage() {
               <input
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="votre@email.fr"
-                style={{ border: 'none', background: 'transparent', fontSize: 15, color: '#2A2018', outline: 'none', width: '100%', fontFamily: "'Hanken Grotesk', sans-serif" }}
+                style={{ border: 'none', background: 'transparent', fontSize: 15, color: 'var(--c-encre)', outline: 'none', width: '100%', fontFamily: "var(--font-texte)" }}
               />
             </div>
           </div>
@@ -123,7 +123,7 @@ export default function LoginPage() {
               <div style={{ fontSize: 13, fontWeight: 600, color: '#5C4A22' }}>Mot de passe</div>
               <button onClick={() => { setModeOubli(o => !o); setOEmail(email); setOStatut(''); setOErreur('') }} style={{
                 background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                color: '#9A8D72', fontWeight: 600, fontSize: 12.5, fontFamily: "'Hanken Grotesk', sans-serif",
+                color: 'var(--c-annotation-clair)', fontWeight: 600, fontSize: 12.5, fontFamily: "var(--font-texte)",
               }}>Mot de passe oublié ?</button>
             </div>
             <div style={inputStyle(false)}>
@@ -132,9 +132,9 @@ export default function LoginPage() {
                 onChange={e => setPassword(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') handleLogin() }}
                 placeholder="••••••••"
-                style={{ border: 'none', background: 'transparent', fontSize: 15, color: '#2A2018', outline: 'none', flex: 1, fontFamily: "'Hanken Grotesk', sans-serif" }}
+                style={{ border: 'none', background: 'transparent', fontSize: 15, color: 'var(--c-encre)', outline: 'none', flex: 1, fontFamily: "var(--font-texte)" }}
               />
-              <button onClick={() => setShowPassword(v => !v)} style={{ border: 'none', background: 'transparent', fontSize: 13, color: '#9A8D72', fontWeight: 600, cursor: 'pointer', padding: 0, fontFamily: "'Hanken Grotesk', sans-serif" }}>
+              <button onClick={() => setShowPassword(v => !v)} style={{ border: 'none', background: 'transparent', fontSize: 13, color: 'var(--c-annotation-clair)', fontWeight: 600, cursor: 'pointer', padding: 0, fontFamily: "var(--font-texte)" }}>
                 {showPassword ? 'Masquer' : 'Afficher'}
               </button>
             </div>
@@ -142,15 +142,15 @@ export default function LoginPage() {
         </div>
 
         {error && (
-          <div style={{ marginTop: 14, fontSize: 14, color: '#D94A30', background: '#FCE9E3', padding: '10px 14px', borderRadius: 10, textAlign: 'center' }}>
+          <div style={{ marginTop: 14, fontSize: 14, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '10px 14px', borderRadius: 10, textAlign: 'center' }}>
             {error}
           </div>
         )}
 
         <button onClick={handleLogin} disabled={loading} style={{
           marginTop: 26, height: 54,
-          fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 700, fontSize: 16,
-          color: '#fff', background: '#DC4A2B', border: 'none', borderRadius: 14,
+          fontFamily: "var(--font-texte)", fontWeight: 700, fontSize: 16,
+          color: '#fff', background: 'var(--c-accent)', border: 'none', borderRadius: 14,
           cursor: 'pointer', opacity: loading ? 0.7 : 1,
           boxShadow: '0 12px 24px -10px rgba(220,74,43,.8)',
         }}>
@@ -159,23 +159,23 @@ export default function LoginPage() {
 
         {/* Mot de passe oublié */}
         {modeOubli && (
-          <div style={{ marginTop: 18, background: '#FFFBF2', border: '1px solid #EFE7D7', borderRadius: 14, padding: '16px 16px' }}>
+          <div style={{ marginTop: 18, background: 'var(--c-papier)', border: '1px solid #EFE7D7', borderRadius: 14, padding: '16px 16px' }}>
             {oStatut === 'ok' ? (
               <div style={{ fontSize: 13.5, color: '#0F6E56', textAlign: 'center', lineHeight: 1.5 }}>
                 ✅ Si un compte existe pour cette adresse, un lien de réinitialisation vient d&apos;être envoyé. Ouvre-le pour choisir un nouveau mot de passe.
               </div>
             ) : (
               <div>
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: '#2A2018', marginBottom: 4 }}>Réinitialiser le mot de passe</div>
-                <div style={{ fontSize: 12.5, color: '#8A7E68', marginBottom: 12 }}>Reçois un lien par email pour en définir un nouveau.</div>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--c-encre)', marginBottom: 4 }}>Réinitialiser le mot de passe</div>
+                <div style={{ fontSize: 12.5, color: 'var(--c-annotation)', marginBottom: 12 }}>Reçois un lien par email pour en définir un nouveau.</div>
                 <input type="email" value={oEmail} onChange={e => setOEmail(e.target.value)} placeholder="ton@email.fr"
                   onKeyDown={e => { if (e.key === 'Enter') envoyerReset() }}
-                  style={{ width: '100%', height: 46, border: '1.5px solid #EADFC9', borderRadius: 12, padding: '0 14px', background: '#fff', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "'Hanken Grotesk', sans-serif" }} />
-                {oErreur && <div style={{ marginTop: 10, fontSize: 13, color: '#D94A30' }}>{oErreur}</div>}
+                  style={{ width: '100%', height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '0 14px', background: '#fff', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "var(--font-texte)" }} />
+                {oErreur && <div style={{ marginTop: 10, fontSize: 13, color: 'var(--c-accent)' }}>{oErreur}</div>}
                 <button onClick={envoyerReset} disabled={oStatut === 'envoi'} style={{
                   marginTop: 12, height: 46, width: '100%', border: 'none', borderRadius: 12,
-                  background: '#DC4A2B', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                  opacity: oStatut === 'envoi' ? 0.7 : 1, fontFamily: "'Hanken Grotesk', sans-serif",
+                  background: 'var(--c-accent)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                  opacity: oStatut === 'envoi' ? 0.7 : 1, fontFamily: "var(--font-texte)",
                 }}>{oStatut === 'envoi' ? 'Envoi…' : 'Envoyer le lien'}</button>
               </div>
             )}
@@ -185,11 +185,11 @@ export default function LoginPage() {
         {/* Demande d'accès lecteur */}
         <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px solid #EFE7D7' }}>
           {!modeDemande && (
-            <div style={{ fontSize: 13.5, color: '#8A7E68', textAlign: 'center' }}>
+            <div style={{ fontSize: 13.5, color: 'var(--c-annotation)', textAlign: 'center' }}>
               Pas encore de compte ?{' '}
               <button onClick={() => { setModeDemande(true); setDErreur('') }} style={{
                 background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                color: '#DC4A2B', fontWeight: 700, fontSize: 13.5, fontFamily: "'Hanken Grotesk', sans-serif", textDecoration: 'underline',
+                color: 'var(--c-accent)', fontWeight: 700, fontSize: 13.5, fontFamily: "var(--font-texte)", textDecoration: 'underline',
               }}>Demander un accès lecteur</button>
             </div>
           )}
@@ -202,25 +202,25 @@ export default function LoginPage() {
 
           {modeDemande && dStatut !== 'ok' && (
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#2A2018', marginBottom: 4 }}>Demander un accès lecteur</div>
-              <div style={{ fontSize: 12.5, color: '#8A7E68', marginBottom: 14 }}>Ta demande est envoyée à l'administrateur, qui valide la création de ton compte.</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--c-encre)', marginBottom: 4 }}>Demander un accès lecteur</div>
+              <div style={{ fontSize: 12.5, color: 'var(--c-annotation)', marginBottom: 14 }}>Ta demande est envoyée à l'administrateur, qui valide la création de ton compte.</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <input value={dNom} onChange={e => setDNom(e.target.value)} placeholder="Ton nom"
-                  style={{ height: 46, border: '1.5px solid #EADFC9', borderRadius: 12, padding: '0 14px', background: '#FFFBF2', fontSize: 14, outline: 'none', fontFamily: "'Hanken Grotesk', sans-serif" }} />
+                  style={{ height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '0 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: "var(--font-texte)" }} />
                 <input type="email" value={dEmail} onChange={e => setDEmail(e.target.value)} placeholder="Ton email"
-                  style={{ height: 46, border: '1.5px solid #EADFC9', borderRadius: 12, padding: '0 14px', background: '#FFFBF2', fontSize: 14, outline: 'none', fontFamily: "'Hanken Grotesk', sans-serif" }} />
+                  style={{ height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '0 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: "var(--font-texte)" }} />
                 <textarea value={dMessage} onChange={e => setDMessage(e.target.value)} placeholder="Message (facultatif) — qui es-tu, pourquoi cet accès…" rows={2}
-                  style={{ border: '1.5px solid #EADFC9', borderRadius: 12, padding: '10px 14px', background: '#FFFBF2', fontSize: 14, outline: 'none', resize: 'vertical', fontFamily: "'Hanken Grotesk', sans-serif" }} />
+                  style={{ border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '10px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', resize: 'vertical', fontFamily: "var(--font-texte)" }} />
               </div>
-              {dErreur && <div style={{ marginTop: 10, fontSize: 13, color: '#D94A30' }}>{dErreur}</div>}
+              {dErreur && <div style={{ marginTop: 10, fontSize: 13, color: 'var(--c-accent)' }}>{dErreur}</div>}
               <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
                 <button onClick={() => { setModeDemande(false); setDErreur('') }} style={{
-                  flex: 1, height: 48, border: '1.5px solid #EADFC9', background: '#fff', borderRadius: 12,
-                  fontSize: 14, fontWeight: 600, color: '#6E6456', cursor: 'pointer', fontFamily: "'Hanken Grotesk', sans-serif",
+                  flex: 1, height: 48, border: '1.5px solid var(--c-filet-fort)', background: '#fff', borderRadius: 12,
+                  fontSize: 14, fontWeight: 600, color: 'var(--c-texte-doux)', cursor: 'pointer', fontFamily: "var(--font-texte)",
                 }}>Annuler</button>
                 <button onClick={envoyerDemande} disabled={dStatut === 'envoi'} style={{
-                  flex: 2, height: 48, border: 'none', background: '#DC4A2B', color: '#fff', borderRadius: 12,
-                  fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: dStatut === 'envoi' ? 0.7 : 1, fontFamily: "'Hanken Grotesk', sans-serif",
+                  flex: 2, height: 48, border: 'none', background: 'var(--c-accent)', color: '#fff', borderRadius: 12,
+                  fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: dStatut === 'envoi' ? 0.7 : 1, fontFamily: "var(--font-texte)",
                 }}>{dStatut === 'envoi' ? 'Envoi…' : 'Envoyer la demande'}</button>
               </div>
             </div>

@@ -18,7 +18,7 @@ const FOURNISSEURS: Record<string, { label: string; icone: string; bg: string; f
   dropbox:  { label: 'Dropbox',      icone: '📦', bg: '#E8F1FE', fg: '#0061FF' },
   onedrive: { label: 'OneDrive',     icone: '🗂️', bg: '#E9F1FB', fg: '#0A4FB4' },
   notion:   { label: 'Notion',       icone: '📝', bg: '#F1F0EE', fg: '#37352F' },
-  autre:    { label: 'Lien',         icone: '🔗', bg: '#F1ECE1', fg: '#6E6456' },
+  autre:    { label: 'Lien',         icone: '🔗', bg: '#F1ECE1', fg: 'var(--c-texte-doux)' },
 }
 
 // Devine le fournisseur à partir de l'URL.
@@ -132,34 +132,34 @@ export default function DrivePage() {
   }
 
   const champ: React.CSSProperties = {
-    height: 46, border: '1.5px solid #EADFC9', borderRadius: 12, padding: '0 14px',
-    background: '#FFFBF2', fontSize: 14, outline: 'none', boxSizing: 'border-box',
-    fontFamily: "'Hanken Grotesk', sans-serif", width: '100%',
+    height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '0 14px',
+    background: 'var(--c-papier)', fontSize: 14, outline: 'none', boxSizing: 'border-box',
+    fontFamily: "var(--font-texte)", width: '100%',
   }
 
   // Aperçu en direct du fournisseur détecté pendant la saisie.
   const apercu = url.trim() ? FOURNISSEURS[detecter(url)] : null
 
   return (
-    <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: "'Hanken Grotesk', sans-serif", color: '#2A2018' }}>
-      <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 28, margin: 0 }}>Mon Drive</h1>
-      <p style={{ fontSize: 15, color: '#8A7E68', margin: '8px 0 24px', maxWidth: 560 }}>
+    <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: "var(--font-texte)", color: 'var(--c-encre)' }}>
+      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 28, margin: 0 }}>Mon Drive</h1>
+      <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 24px', maxWidth: 560 }}>
         Centralise l&apos;accès à tes cours : ajoute les liens partagés de tes dossiers
         (Google Drive, iCloud, Dropbox, OneDrive, Notion…) et ouvre-les en un clic depuis l&apos;app.
       </p>
 
       {/* ───────── Google Drive (connexion + navigation) ───────── */}
-      <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 20, marginBottom: 26 }}>
+      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 20, marginBottom: 26 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: gConnecte ? 16 : 6 }}>
           <div style={{ width: 40, height: 40, borderRadius: 11, background: '#E8F0FE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📁</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 15, fontWeight: 700 }}>Google Drive</div>
-            <div style={{ fontSize: 12.5, color: '#8A7E68' }}>
+            <div style={{ fontSize: 12.5, color: 'var(--c-annotation)' }}>
               {gConnecte ? (gEmail || 'Compte connecté') : 'Parcours et ouvre tes fichiers sans quitter codex.'}
             </div>
           </div>
           {gConnecte && (
-            <button onClick={deconnecterGoogle} style={{ border: '1.5px solid #EADFC9', background: '#fff', borderRadius: 10, padding: '8px 14px', fontSize: 13, fontWeight: 600, color: '#8A7E68', cursor: 'pointer', fontFamily: "'Hanken Grotesk', sans-serif" }}>Déconnecter</button>
+            <button onClick={deconnecterGoogle} style={{ border: '1.5px solid var(--c-filet-fort)', background: '#fff', borderRadius: 10, padding: '8px 14px', fontSize: 13, fontWeight: 600, color: 'var(--c-annotation)', cursor: 'pointer', fontFamily: "var(--font-texte)" }}>Déconnecter</button>
           )}
         </div>
 
@@ -186,24 +186,24 @@ export default function DrivePage() {
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 4, fontSize: 13.5, marginBottom: 12 }}>
               {gChemin.map((c, i) => (
                 <span key={c.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  {i > 0 && <span style={{ color: '#C0B7A4' }}>/</span>}
+                  {i > 0 && <span style={{ color: 'var(--c-discret-clair)' }}>/</span>}
                   <button onClick={() => allerVers(i)} disabled={i === gChemin.length - 1} style={{
                     border: 'none', background: 'transparent', padding: '2px 4px', cursor: i === gChemin.length - 1 ? 'default' : 'pointer',
                     fontSize: 13.5, fontWeight: i === gChemin.length - 1 ? 700 : 600,
-                    color: i === gChemin.length - 1 ? '#2A2018' : '#1A56C4', fontFamily: "'Hanken Grotesk', sans-serif",
+                    color: i === gChemin.length - 1 ? 'var(--c-encre)' : '#1A56C4', fontFamily: "var(--font-texte)",
                   }}>{c.name}</button>
                 </span>
               ))}
             </div>
 
-            {gErreur && <div style={{ fontSize: 13, color: '#D94A30', marginBottom: 10 }}>{gErreur}</div>}
+            {gErreur && <div style={{ fontSize: 13, color: 'var(--c-accent)', marginBottom: 10 }}>{gErreur}</div>}
 
             {gLoading ? (
-              <div style={{ color: '#9A8D72', padding: 16, fontSize: 14 }}>Chargement…</div>
+              <div style={{ color: 'var(--c-annotation-clair)', padding: 16, fontSize: 14 }}>Chargement…</div>
             ) : gFiles.length === 0 ? (
-              <div style={{ color: '#9A8D72', padding: 16, fontSize: 14 }}>Ce dossier est vide.</div>
+              <div style={{ color: 'var(--c-annotation-clair)', padding: 16, fontSize: 14 }}>Ce dossier est vide.</div>
             ) : (
-              <div style={{ border: '1px solid #F0E7D6', borderRadius: 12, overflow: 'hidden' }}>
+              <div style={{ border: '1px solid var(--c-filet)', borderRadius: 12, overflow: 'hidden' }}>
                 {gFiles.map((f, i) => {
                   const dossier = f.mimeType === DOSSIER_MIME
                   return (
@@ -212,14 +212,14 @@ export default function DrivePage() {
                       {dossier ? (
                         <button onClick={() => ouvrirDossier(f)} style={{
                           flex: 1, textAlign: 'left', border: 'none', background: 'transparent', cursor: 'pointer',
-                          fontSize: 14, fontWeight: 600, color: '#2A2018', fontFamily: "'Hanken Grotesk', sans-serif",
+                          fontSize: 14, fontWeight: 600, color: 'var(--c-encre)', fontFamily: "var(--font-texte)",
                           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                         }}>{f.name}</button>
                       ) : (
-                        <span style={{ flex: 1, fontSize: 14, color: '#2A2018', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</span>
+                        <span style={{ flex: 1, fontSize: 14, color: 'var(--c-encre)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</span>
                       )}
                       {dossier ? (
-                        <span style={{ fontSize: 12, color: '#C0B7A4' }}>›</span>
+                        <span style={{ fontSize: 12, color: 'var(--c-discret-clair)' }}>›</span>
                       ) : f.webViewLink ? (
                         <a href={f.webViewLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, fontWeight: 700, color: '#1A56C4', textDecoration: 'none', flexShrink: 0 }}>Ouvrir ↗</a>
                       ) : null}
@@ -233,10 +233,10 @@ export default function DrivePage() {
       </div>
 
       {/* ───────── Hub de liens (tous fournisseurs) ───────── */}
-      <div style={{ fontSize: 17, fontWeight: 700, fontFamily: "'Bricolage Grotesque', sans-serif", margin: '0 0 14px' }}>Mes liens</div>
+      <div style={{ fontSize: 17, fontWeight: 700, fontFamily: "var(--font-titre)", margin: '0 0 14px' }}>Mes liens</div>
 
       {/* Formulaire d'ajout */}
-      <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 20, marginBottom: 26 }}>
+      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 20, marginBottom: 26 }}>
         <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>Ajouter un lien</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <input value={titre} onChange={e => setTitre(e.target.value)} placeholder="Nom (ex. « Cours de droit civil »)" style={champ} />
@@ -252,11 +252,11 @@ export default function DrivePage() {
           <input value={matiere} onChange={e => setMatiere(e.target.value)} placeholder="Matière (facultatif, ex. « Droit pénal »)"
             onKeyDown={e => { if (e.key === 'Enter') ajouter() }} style={champ} />
         </div>
-        {erreur && <div style={{ marginTop: 12, fontSize: 13.5, color: '#D94A30' }}>{erreur}</div>}
+        {erreur && <div style={{ marginTop: 12, fontSize: 13.5, color: 'var(--c-accent)' }}>{erreur}</div>}
         <button onClick={ajouter} disabled={saving} style={{
           marginTop: 16, height: 46, padding: '0 22px', border: 'none', borderRadius: 12,
-          background: '#DC4A2B', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer',
-          opacity: saving ? 0.7 : 1, fontFamily: "'Hanken Grotesk', sans-serif",
+          background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer',
+          opacity: saving ? 0.7 : 1, fontFamily: "var(--font-texte)",
         }}>
           {saving ? 'Ajout…' : 'Ajouter le lien'}
         </button>
@@ -264,11 +264,11 @@ export default function DrivePage() {
 
       {/* Liste des liens */}
       {loading ? (
-        <div style={{ color: '#9A8D72', textAlign: 'center', padding: 30 }}>Chargement…</div>
+        <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : liens.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: '#9A8D72', background: '#FFFBF2', border: '1px dashed #EADFC9', borderRadius: 16 }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>
           <div style={{ fontSize: 30, marginBottom: 8 }}>🗂️</div>
-          <div style={{ fontSize: 14.5, fontWeight: 600, color: '#6E6456' }}>Aucun lien pour l&apos;instant.</div>
+          <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--c-texte-doux)' }}>Aucun lien pour l&apos;instant.</div>
           <div style={{ fontSize: 13, marginTop: 4 }}>Ajoute le lien partagé de ton dossier de cours ci-dessus.</div>
         </div>
       ) : (
@@ -276,22 +276,22 @@ export default function DrivePage() {
           {liens.map(l => {
             const f = FOURNISSEURS[l.fournisseur || 'autre'] || FOURNISSEURS.autre
             return (
-              <div key={l.id} style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 18, display: 'flex', flexDirection: 'column' }}>
+              <div key={l.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18, display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                   <div style={{ width: 42, height: 42, borderRadius: 11, background: f.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icone}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 15, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.titre}</div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: f.fg, marginTop: 2 }}>{f.label}</div>
                   </div>
-                  <button onClick={() => supprimer(l.id)} title="Supprimer" style={{ border: 'none', background: 'transparent', color: '#C0B7A4', cursor: 'pointer', fontSize: 16, padding: 0, lineHeight: 1 }}>✕</button>
+                  <button onClick={() => supprimer(l.id)} title="Supprimer" style={{ border: 'none', background: 'transparent', color: 'var(--c-discret-clair)', cursor: 'pointer', fontSize: 16, padding: 0, lineHeight: 1 }}>✕</button>
                 </div>
                 {l.matiere && (
-                  <span style={{ alignSelf: 'flex-start', marginTop: 12, fontSize: 12, fontWeight: 600, color: '#8A7E68', background: '#FCEFD3', padding: '4px 10px', borderRadius: 999 }}>{l.matiere}</span>
+                  <span style={{ alignSelf: 'flex-start', marginTop: 12, fontSize: 12, fontWeight: 600, color: 'var(--c-annotation)', background: '#FCEFD3', padding: '4px 10px', borderRadius: 999 }}>{l.matiere}</span>
                 )}
                 <a href={l.url} target="_blank" rel="noopener noreferrer" style={{
                   marginTop: 14, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  border: '1.5px solid #EADFC9', borderRadius: 11, background: '#FFFBF2',
-                  color: '#2A2018', fontSize: 14, fontWeight: 700, textDecoration: 'none',
+                  border: '1.5px solid var(--c-filet-fort)', borderRadius: 11, background: 'var(--c-papier)',
+                  color: 'var(--c-encre)', fontSize: 14, fontWeight: 700, textDecoration: 'none',
                 }}>
                   Ouvrir
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>

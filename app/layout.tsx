@@ -17,7 +17,7 @@ export const viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
-      <body style={{ margin: 0, fontFamily: "'Hanken Grotesk', sans-serif" }}>
+      <body style={{ margin: 0, fontFamily: "var(--font-texte)" }}>
         {children}
         <SiteFooter />
       </body>

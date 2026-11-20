@@ -17,18 +17,18 @@ export default function ChatbotBulle() {
           ...(isMobile
             ? { inset: 8, top: 8 }
             : { bottom: 92, right: 24, width: 380, height: 560, maxHeight: 'calc(100vh - 120px)' }),
-          background: '#FDF6EA', border: '1px solid #EADFC9', borderRadius: 18,
+          background: 'var(--c-papier-teinte)', border: '1px solid var(--c-filet-fort)', borderRadius: 18,
           boxShadow: '0 24px 60px -20px rgba(40,30,20,.4)', display: 'flex', flexDirection: 'column', overflow: 'hidden',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#fff', borderBottom: '1px solid #F0E7D6', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#fff', borderBottom: '1px solid var(--c-filet)', flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
               <span style={{ fontSize: 20 }}>📕</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 14.5, fontFamily: "'Bricolage Grotesque', sans-serif" }}>Coach IA</div>
-                <div style={{ fontSize: 11, color: '#9A8D72' }}>Révisions · planning · méthode</div>
+                <div style={{ fontWeight: 800, fontSize: 14.5, fontFamily: "var(--font-titre)" }}>Coach IA</div>
+                <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)' }}>Révisions · planning · méthode</div>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} aria-label="Fermer" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9A8D72', fontSize: 22, lineHeight: 1, padding: 4 }}>×</button>
+            <button onClick={() => setOpen(false)} aria-label="Fermer" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--c-annotation-clair)', fontSize: 22, lineHeight: 1, padding: 4 }}>×</button>
           </div>
           <div style={{ flex: 1, minHeight: 0 }}>
             <TuteurChat variant="bubble" />

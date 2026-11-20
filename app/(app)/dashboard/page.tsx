@@ -77,11 +77,11 @@ export default function Dashboard() {
     if (user) setPauses(await chargerPauses(user.id))
   }
 
-  const font = "'Hanken Grotesk', sans-serif"
-  const display = "'Bricolage Grotesque', sans-serif"
+  const font = "var(--font-texte)"
+  const display = "var(--font-titre)"
 
   if (loading) return (
-    <div style={{ paddingTop: '4rem', textAlign: 'center', color: '#9A8D72', fontFamily: font }}>Chargement…</div>
+    <div style={{ paddingTop: '4rem', textAlign: 'center', color: 'var(--c-annotation-clair)', fontFamily: font }}>Chargement…</div>
   )
 
   const modulesAbordes = new Set(progressions.map(p => fiches.find(f => f.id === p.fiche_id)?.module_id).filter(Boolean)).size
@@ -116,9 +116,9 @@ export default function Dashboard() {
 
   // Statistiques regroupées dans un widget rotatif unique.
   const statItems: StatItem[] = [
-    { cle: 'serie', icone: '🔥', iconeBg: '#FCE9E3', label: 'Série en cours', valeur: <>{streak} <span style={{ fontSize: 16, color: '#9A8D72', fontWeight: 700 }}>jour{streak > 1 ? 's' : ''}</span></> },
-    { cle: 'objectif', icone: '🎯', iconeBg: '#FCEFD3', label: 'Objectif du jour', valeur: <>{cartesJour}<span style={{ color: '#9A8D72' }}>/{OBJECTIF_QUOTIDIEN}</span></>, barPct: objectifPct },
-    { cle: 'semaine', icone: '✨', iconeBg: '#DDF3EE', label: 'Cette semaine', valeur: <>{totalSemaine} <span style={{ fontSize: 16, color: '#9A8D72', fontWeight: 700 }}>cartes</span></> },
+    { cle: 'serie', icone: '🔥', iconeBg: 'var(--c-accent-pale)', label: 'Série en cours', valeur: <>{streak} <span style={{ fontSize: 16, color: 'var(--c-annotation-clair)', fontWeight: 700 }}>jour{streak > 1 ? 's' : ''}</span></> },
+    { cle: 'objectif', icone: '🎯', iconeBg: '#FCEFD3', label: 'Objectif du jour', valeur: <>{cartesJour}<span style={{ color: 'var(--c-annotation-clair)' }}>/{OBJECTIF_QUOTIDIEN}</span></>, barPct: objectifPct },
+    { cle: 'semaine', icone: '✨', iconeBg: '#DDF3EE', label: 'Cette semaine', valeur: <>{totalSemaine} <span style={{ fontSize: 16, color: 'var(--c-annotation-clair)', fontWeight: 700 }}>cartes</span></> },
   ]
 
   // Compte à rebours ENM : prochain examen (récupéré séparément, toutes dates)
@@ -132,7 +132,7 @@ export default function Dashboard() {
     : null
 
   return (
-    <div style={{ paddingTop: '34px', fontFamily: font, color: '#2A2018' }}>
+    <div style={{ paddingTop: '34px', fontFamily: font, color: 'var(--c-encre)' }}>
       <OnboardingModal />
 
       {/* Salutation */}
@@ -140,7 +140,7 @@ export default function Dashboard() {
         <div style={{ fontFamily: display, fontWeight: 800, fontSize: 30, letterSpacing: '-.01em' }}>
           Bonjour, {prenom}.
         </div>
-        <div style={{ fontSize: 15, color: '#8A7E68', marginTop: 4 }}>
+        <div style={{ fontSize: 15, color: 'var(--c-annotation)', marginTop: 4 }}>
           {streak > 0 ? `${streak} jour${streak > 1 ? 's' : ''} d'affilée — ${message}` : message}
         </div>
       </div>
@@ -158,9 +158,9 @@ export default function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: '1.55fr 1fr', gap: 18, marginBottom: 34 }}>
 
         {/* Révisions du jour — bloc soleil */}
-        <div style={{ position: 'relative', background: '#FFC02E', borderRadius: 20, padding: 32, color: '#2A2018', overflow: 'hidden' }}>
+        <div style={{ position: 'relative', background: '#FFC02E', borderRadius: 20, padding: 32, color: 'var(--c-encre)', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', width: 200, height: 200, borderRadius: '50%', background: '#FFCE54', right: -30, top: -50 }} />
-          <div style={{ position: 'absolute', width: 90, height: 90, borderRadius: 20, background: '#DC4A2B', right: 90, bottom: -28, transform: 'rotate(16deg)' }} />
+          <div style={{ position: 'absolute', width: 90, height: 90, borderRadius: 20, background: 'var(--c-accent)', right: 90, bottom: -28, transform: 'rotate(16deg)' }} />
           <div style={{ position: 'absolute', width: 56, height: 56, borderRadius: '50%', background: '#2DAE83', right: 210, top: 24 }} />
           <div style={{ position: 'relative' }}>
             <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: '#7A5E14' }}>Révisions du jour</span>
@@ -171,20 +171,20 @@ export default function Dashboard() {
             {espaceDue ? (
               <Link href={`/espaces/${espaceDue.slug}/revision`} style={{
                 display: 'inline-block', marginTop: 22, fontFamily: font, fontWeight: 700, fontSize: 15,
-                color: '#fff', background: '#2A2018', borderRadius: 12, padding: '13px 24px', textDecoration: 'none',
+                color: '#fff', background: 'var(--c-encre)', borderRadius: 12, padding: '13px 24px', textDecoration: 'none',
               }}>Réviser maintenant →</Link>
             ) : (
               <Link href="/espaces" style={{
                 display: 'inline-block', marginTop: 22, fontFamily: font, fontWeight: 700, fontSize: 15,
-                color: '#fff', background: '#2A2018', borderRadius: 12, padding: '13px 24px', textDecoration: 'none',
+                color: '#fff', background: 'var(--c-encre)', borderRadius: 12, padding: '13px 24px', textDecoration: 'none',
               }}>Choisir un espace →</Link>
             )}
           </div>
         </div>
 
         {/* Momentum 7 jours */}
-        <div style={{ position: 'relative', background: '#2A2018', borderRadius: 20, padding: 28, color: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div style={{ position: 'absolute', width: 130, height: 130, borderRadius: '50%', background: '#DC4A2B', right: -36, top: -44, opacity: 0.7 }} />
+        <div style={{ position: 'relative', background: 'var(--c-encre)', borderRadius: 20, padding: 28, color: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div style={{ position: 'absolute', width: 130, height: 130, borderRadius: '50%', background: 'var(--c-accent)', right: -36, top: -44, opacity: 0.7 }} />
           <div style={{ position: 'relative' }}>
             <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: '#FFD9CC' }}>Votre momentum · 7 jours</span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 12 }}>
@@ -199,7 +199,7 @@ export default function Dashboard() {
                   width: '100%', height: `${Math.max(6, (j.cartes / maxBarre) * 64)}px`, borderRadius: 5,
                   background: j.estAujourdhui ? '#FFC02E' : (j.cartes > 0 ? '#E8694D' : '#4A3A2A'),
                 }} />
-                <span style={{ fontSize: 11, color: j.estAujourdhui ? '#E8694D' : '#9A8D72', fontWeight: j.estAujourdhui ? 700 : 400 }}>{j.lettre}</span>
+                <span style={{ fontSize: 11, color: j.estAujourdhui ? '#E8694D' : 'var(--c-annotation-clair)', fontWeight: j.estAujourdhui ? 700 : 400 }}>{j.lettre}</span>
               </div>
             ))}
           </div>
@@ -214,8 +214,8 @@ export default function Dashboard() {
               <div style={{ background: '#FFF7E8', border: '1px solid #F5DFB1', borderRadius: 14, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center' }}>
                 <span style={{ fontSize: 22 }}>⚡</span>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#2A2018' }}>{priorite.dues} fiche{priorite.dues > 1 ? 's' : ''} due{priorite.dues > 1 ? 's' : ''} en <span style={{ color: '#DC4A2B' }}>{priorite.nom}</span></div>
-                  <div style={{ fontSize: 11.5, color: '#8A7E68', marginTop: 1 }}>Commencer par cette matière →</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-encre)' }}>{priorite.dues} fiche{priorite.dues > 1 ? 's' : ''} due{priorite.dues > 1 ? 's' : ''} en <span style={{ color: 'var(--c-accent)' }}>{priorite.nom}</span></div>
+                  <div style={{ fontSize: 11.5, color: 'var(--c-annotation)', marginTop: 1 }}>Commencer par cette matière →</div>
                 </div>
               </div>
             </Link>
@@ -224,8 +224,8 @@ export default function Dashboard() {
             <div style={{ flex: '1 1 260px', background: '#F0F8F5', border: '1px solid #BFE6CF', borderRadius: 14, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center' }}>
               <span style={{ fontSize: 22 }}>🎯</span>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#2A2018' }}><span style={{ color: '#0F6E56' }}>{fichesPourSuivre} fiche{fichesPourSuivre > 1 ? 's' : ''}/jour</span> pour finir à J-{joursRestants}</div>
-                <div style={{ fontSize: 11.5, color: '#8A7E68', marginTop: 1 }}>{totalFiches - fichesVues} fiches non encore abordées</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-encre)' }}><span style={{ color: '#0F6E56' }}>{fichesPourSuivre} fiche{fichesPourSuivre > 1 ? 's' : ''}/jour</span> pour finir à J-{joursRestants}</div>
+                <div style={{ fontSize: 11.5, color: 'var(--c-annotation)', marginTop: 1 }}>{totalFiches - fichesVues} fiches non encore abordées</div>
               </div>
             </div>
           )}
@@ -236,7 +236,7 @@ export default function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
 
         {/* Mini calendrier — événements à venir */}
-        <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 18 }}>
+        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: 18 }}>📅</span>
@@ -245,7 +245,7 @@ export default function Dashboard() {
             <Link href="/calendrier" style={{ fontSize: 11, fontWeight: 600, color: '#7C5CBF', textDecoration: 'none' }}>Voir tout →</Link>
           </div>
           {evenements.length === 0 ? (
-            <div style={{ fontSize: 12, color: '#9A8D72', textAlign: 'center', padding: '12px 0' }}>Aucun événement à venir.</div>
+            <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', textAlign: 'center', padding: '12px 0' }}>Aucun événement à venir.</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {evenements.map(ev => {
@@ -254,11 +254,11 @@ export default function Dashboard() {
                 return (
                   <Link key={ev.id} href="/calendrier" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <div style={{ borderLeft: `3px solid ${ev.couleur}`, paddingLeft: 10, paddingTop: 2, paddingBottom: 2 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: '#2A2018' }}>{ev.titre}</div>
-                      <div style={{ fontSize: 11, color: '#9A8D72', marginTop: 1 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--c-encre)' }}>{ev.titre}</div>
+                      <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginTop: 1 }}>
                         {d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
                         {ev.heure && ` · ${ev.heure}`}
-                        {diff === 0 && <span style={{ marginLeft: 6, color: '#DC4A2B', fontWeight: 700 }}>auj.</span>}
+                        {diff === 0 && <span style={{ marginLeft: 6, color: 'var(--c-accent)', fontWeight: 700 }}>auj.</span>}
                         {diff > 0 && diff <= 7 && <span style={{ marginLeft: 6, color: '#E8A11E', fontWeight: 600 }}>J-{diff}</span>}
                       </div>
                       <span style={{ fontSize: 10, fontWeight: 600, color: ev.couleur }}>{TYPE_LABELS[ev.type] ?? ev.type}</span>

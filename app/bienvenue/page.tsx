@@ -111,23 +111,23 @@ export default function BienvenuePage() {
   }
 
   const champ: React.CSSProperties = {
-    width: '100%', height: 48, border: '1.5px solid #EADFC9', borderRadius: 12,
-    padding: '0 14px', background: '#FFFBF2', fontSize: 15, outline: 'none', boxSizing: 'border-box',
-    fontFamily: "'Hanken Grotesk', sans-serif",
+    width: '100%', height: 48, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12,
+    padding: '0 14px', background: 'var(--c-papier)', fontSize: 15, outline: 'none', boxSizing: 'border-box',
+    fontFamily: "var(--font-texte)",
   }
 
   return (
-    <div className="bg-grille" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FDF6EA', fontFamily: "'Hanken Grotesk', sans-serif", color: '#2A2018', padding: 20 }}>
-      <div style={{ width: '100%', maxWidth: 420, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18, padding: '2rem', boxShadow: '0 20px 44px -28px rgba(60,40,20,.22)' }}>
+    <div className="bg-grille" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--c-papier-teinte)', fontFamily: "var(--font-texte)", color: 'var(--c-encre)', padding: 20 }}>
+      <div style={{ width: '100%', maxWidth: 420, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18, padding: '2rem', boxShadow: '0 20px 44px -28px rgba(60,40,20,.22)' }}>
 
         {etat === 'verif' && (
-          <div style={{ textAlign: 'center', color: '#8A7E68' }}>Vérification de ton lien…</div>
+          <div style={{ textAlign: 'center', color: 'var(--c-annotation)' }}>Vérification de ton lien…</div>
         )}
 
         {etat === 'invalide' && (
           <div>
             <div style={{ textAlign: 'center', fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Lien invalide ou expiré</div>
-            <div style={{ textAlign: 'center', fontSize: 14, color: '#8A7E68', marginBottom: 20 }}>
+            <div style={{ textAlign: 'center', fontSize: 14, color: 'var(--c-annotation)', marginBottom: 20 }}>
               {raisonLien || "Ce lien d'invitation n'est plus valable."}
             </div>
 
@@ -140,11 +140,11 @@ export default function BienvenuePage() {
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#5C4A22', marginBottom: 8 }}>Renvoyer un lien</div>
                 <input type="email" value={rEmail} onChange={e => setREmail(e.target.value)} placeholder="ton@email.fr"
                   onKeyDown={e => { if (e.key === 'Enter') renvoyerLien() }} style={champ} />
-                {rErreur && <div style={{ marginTop: 10, fontSize: 13, color: '#D94A30' }}>{rErreur}</div>}
+                {rErreur && <div style={{ marginTop: 10, fontSize: 13, color: 'var(--c-accent)' }}>{rErreur}</div>}
                 <button onClick={renvoyerLien} disabled={rStatut === 'envoi'} style={{
                   marginTop: 14, height: 50, width: '100%', border: 'none', borderRadius: 12,
-                  background: '#DC4A2B', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                  opacity: rStatut === 'envoi' ? 0.7 : 1, fontFamily: "'Hanken Grotesk', sans-serif",
+                  background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer',
+                  opacity: rStatut === 'envoi' ? 0.7 : 1, fontFamily: "var(--font-texte)",
                 }}>
                   {rStatut === 'envoi' ? 'Envoi…' : 'M’envoyer un nouveau lien'}
                 </button>
@@ -152,7 +152,7 @@ export default function BienvenuePage() {
             )}
 
             <div style={{ textAlign: 'center', marginTop: 18 }}>
-              <a href="/login" style={{ color: '#8A7E68', fontWeight: 600, fontSize: 13.5, textDecoration: 'none' }}>Aller à la connexion</a>
+              <a href="/login" style={{ color: 'var(--c-annotation)', fontWeight: 600, fontSize: 13.5, textDecoration: 'none' }}>Aller à la connexion</a>
             </div>
           </div>
         )}
@@ -160,17 +160,17 @@ export default function BienvenuePage() {
         {etat === 'pret' && !done && (
           <div>
             <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Bienvenue 🎓</div>
-            <div style={{ fontSize: 14, color: '#8A7E68', marginBottom: 22 }}>Choisis ton mot de passe pour finaliser ton accès.</div>
+            <div style={{ fontSize: 14, color: 'var(--c-annotation)', marginBottom: 22 }}>Choisis ton mot de passe pour finaliser ton accès.</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <input type="password" value={mdp} onChange={e => setMdp(e.target.value)} placeholder="Mot de passe" style={champ} />
               <input type="password" value={mdp2} onChange={e => setMdp2(e.target.value)} placeholder="Confirme le mot de passe"
                 onKeyDown={e => { if (e.key === 'Enter') definir() }} style={champ} />
             </div>
-            {erreur && <div style={{ marginTop: 12, fontSize: 13.5, color: '#D94A30' }}>{erreur}</div>}
+            {erreur && <div style={{ marginTop: 12, fontSize: 13.5, color: 'var(--c-accent)' }}>{erreur}</div>}
             <button onClick={definir} disabled={loading} style={{
               marginTop: 18, height: 50, width: '100%', border: 'none', borderRadius: 12,
-              background: '#DC4A2B', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer',
-              opacity: loading ? 0.7 : 1, fontFamily: "'Hanken Grotesk', sans-serif",
+              background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer',
+              opacity: loading ? 0.7 : 1, fontFamily: "var(--font-texte)",
             }}>
               {loading ? 'Enregistrement…' : 'Valider et accéder à codex'}
             </button>
@@ -180,7 +180,7 @@ export default function BienvenuePage() {
         {done && (
           <div style={{ textAlign: 'center', color: '#0F6E56' }}>
             <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>✅ Mot de passe enregistré !</div>
-            <div style={{ fontSize: 14, color: '#8A7E68' }}>Connexion en cours, redirection…</div>
+            <div style={{ fontSize: 14, color: 'var(--c-annotation)' }}>Connexion en cours, redirection…</div>
           </div>
         )}
       </div>

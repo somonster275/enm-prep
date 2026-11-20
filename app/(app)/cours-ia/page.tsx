@@ -67,16 +67,16 @@ export default function CoursIAPage() {
   const fileRef = useRef<HTMLInputElement>(null)
   const chatRef = useRef<HTMLDivElement>(null)
 
-  const font = "'Hanken Grotesk', sans-serif"
+  const font = "var(--font-texte)"
   const coral = '#F2654B'
   const coralDark = '#B23A22'
   const coralBg = '#FDEFE9'
   const coralBorder = '#F8DACE'
-  const sand = '#FDF6EA'
-  const border = '#F0E7D6'
-  const textDark = '#2A2018'
-  const textMid = '#6E6456'
-  const textMuted = '#9A8D72'
+  const sand = 'var(--c-papier-teinte)'
+  const border = 'var(--c-filet)'
+  const textDark = 'var(--c-encre)'
+  const textMid = 'var(--c-texte-doux)'
+  const textMuted = 'var(--c-annotation-clair)'
 
   const affMsg = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 4000) }
 
@@ -422,7 +422,7 @@ export default function CoursIAPage() {
                   {uploading ? 'Indexation…' : 'Importer'}
                 </button>
               </div>
-              {msg && <div style={{ fontSize: 13, marginTop: 10, color: msg.startsWith('❌') ? '#D94A30' : '#0E7C63' }}>{msg}</div>}
+              {msg && <div style={{ fontSize: 13, marginTop: 10, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
               {docsAffiches.length > 0 && (
                 <div style={{ marginTop: 16, borderTop: `1px solid ${border}`, paddingTop: 12 }}>
                   <div style={{ fontSize: 11, color: textMuted, marginBottom: 8, fontWeight: 700, letterSpacing: '.08em' }}>DOCUMENTS INDEXÉS</div>
@@ -440,7 +440,7 @@ export default function CoursIAPage() {
                             title="Calcule les embeddings des passages qui n'en ont pas encore"
                             style={{ background: '#E6F4EF', color: '#0E7C63', border: 'none', borderRadius: 7, padding: '4px 10px', fontSize: 11, cursor: 'pointer', fontWeight: 600 }}>Reprendre</button>
                         )}
-                        <button onClick={() => supprimerDoc(d.id)} style={{ background: '#FCE9E3', color: '#D94A30', border: 'none', borderRadius: 7, padding: '4px 10px', fontSize: 11, cursor: 'pointer', fontWeight: 600 }}>Supprimer</button>
+                        <button onClick={() => supprimerDoc(d.id)} style={{ background: 'var(--c-accent-pale)', color: 'var(--c-accent)', border: 'none', borderRadius: 7, padding: '4px 10px', fontSize: 11, cursor: 'pointer', fontWeight: 600 }}>Supprimer</button>
                         </div>
                       </div>
                     ))}
@@ -467,7 +467,7 @@ export default function CoursIAPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 14, padding: '0 18px 13px', borderBottom: `1px solid #F4ECDC` }}>
                   <button onClick={() => setDocumentsSelectionnes(docs.map(d => d.id))} style={{ fontSize: 12, fontWeight: 700, color: coral, background: 'none', border: 'none', cursor: 'pointer', fontFamily: font, padding: 0 }}>Tout sélectionner</button>
-                  <button onClick={() => setDocumentsSelectionnes([])} style={{ fontSize: 12, fontWeight: 600, color: '#B6A98C', background: 'none', border: 'none', cursor: 'pointer', fontFamily: font, padding: 0 }}>Tout désélectionner</button>
+                  <button onClick={() => setDocumentsSelectionnes([])} style={{ fontSize: 12, fontWeight: 600, color: 'var(--c-discret)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: font, padding: 0 }}>Tout désélectionner</button>
                 </div>
 
                 <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, padding: '14px 14px 8px' }}>
@@ -493,7 +493,7 @@ export default function CoursIAPage() {
                               {checked && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
                             </div>
                             <span style={{ fontSize: 11, color: '#C9A98F' }}>📄</span>
-                            <span title={d.nom} style={{ flex: 1, fontSize: 13, fontWeight: checked ? 700 : 600, color: checked ? textDark : '#6E6456', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.nom}</span>
+                            <span title={d.nom} style={{ flex: 1, fontSize: 13, fontWeight: checked ? 700 : 600, color: checked ? textDark : 'var(--c-texte-doux)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.nom}</span>
                             <span style={{ flexShrink: 0, fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, fontWeight: 600, color: checked ? coralDark : textMuted, background: checked ? '#FCE0D6' : '#F4ECDC', padding: '2px 7px', borderRadius: 7 }}>{d.nb_chunks}</span>
                           </label>
                         )
@@ -519,7 +519,7 @@ export default function CoursIAPage() {
                           {checked && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
                         </div>
                         <span style={{ fontSize: 11, color: '#C9A98F' }}>📄</span>
-                        <span title={d.nom} style={{ flex: 1, fontSize: 13, fontWeight: checked ? 700 : 600, color: checked ? textDark : '#6E6456', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.nom}</span>
+                        <span title={d.nom} style={{ flex: 1, fontSize: 13, fontWeight: checked ? 700 : 600, color: checked ? textDark : 'var(--c-texte-doux)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.nom}</span>
                         <span style={{ flexShrink: 0, fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, fontWeight: 600, color: checked ? coralDark : textMuted, background: checked ? '#FCE0D6' : '#F4ECDC', padding: '2px 7px', borderRadius: 7 }}>{d.nb_chunks}</span>
                       </label>
                     )
@@ -559,10 +559,10 @@ export default function CoursIAPage() {
                     </div>
                     {docs.length === 0 && (
                       mode === 'personnel'
-                        ? <div style={{ marginTop: 12, fontSize: 13, color: '#D94A30' }}>⚠ Aucun document personnel — clique sur « + Importer » pour ajouter le tien.</div>
+                        ? <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-accent)' }}>⚠ Aucun document personnel — clique sur « + Importer » pour ajouter le tien.</div>
                         : isAdmin
-                          ? <div style={{ marginTop: 12, fontSize: 13, color: '#D94A30' }}>⚠ Base ENM vide — cliquez sur « + Importer » pour commencer.</div>
-                          : <div style={{ marginTop: 12, fontSize: 13, color: '#D94A30' }}>⚠ Aucun document n'a encore été importé dans la base ENM.</div>
+                          ? <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-accent)' }}>⚠ Base ENM vide — cliquez sur « + Importer » pour commencer.</div>
+                          : <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-accent)' }}>⚠ Aucun document n'a encore été importé dans la base ENM.</div>
                     )}
                   </div>
                 )}
@@ -593,7 +593,7 @@ export default function CoursIAPage() {
                         overflow: 'hidden',
                       }}>
                         {/* Header carte */}
-                        <div style={{ padding: '14px 22px 12px', background: 'linear-gradient(180deg,#FFF8EE,#FFFFFF)', borderBottom: `1px solid #F6EEDE` }}>
+                        <div style={{ padding: '14px 22px 12px', background: 'linear-gradient(180deg,var(--c-papier-chaud),#FFFFFF)', borderBottom: `1px solid #F6EEDE` }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                             {/* Avatar codex */}
                             <div style={{ width: 28, height: 28, borderRadius: 8, background: textDark, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 14, color: '#fff', flexShrink: 0 }}>

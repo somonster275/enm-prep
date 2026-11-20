@@ -75,7 +75,7 @@ export default function ModeVacances({ onChange }: { onChange?: () => void }) {
 
   const boxStyle: React.CSSProperties = {
     background: '#F3F0FA', border: '1px solid #DDD3F0', borderRadius: 14,
-    padding: '12px 16px', marginBottom: 24, fontFamily: "'Hanken Grotesk', sans-serif",
+    padding: '12px 16px', marginBottom: 24, fontFamily: "var(--font-texte)",
   }
   const boutonPrincipal: React.CSSProperties = {
     fontSize: 12.5, fontWeight: 700, color: '#fff', background: '#7C5CBF',

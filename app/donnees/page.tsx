@@ -7,7 +7,7 @@ const MAJ = '27 juin 2026'
 
 function Section({ titre, children }: { titre: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: '18px 20px' }}>
+    <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: '18px 20px' }}>
       <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>{titre}</div>
       <div style={{ fontSize: 14.5, lineHeight: 1.65, color: '#5C5448' }}>{children}</div>
     </div>
@@ -15,17 +15,17 @@ function Section({ titre, children }: { titre: string; children: React.ReactNode
 }
 
 export default function DonneesPage() {
-  const lien = { color: '#DC4A2B', fontWeight: 700, textDecoration: 'none' }
+  const lien = { color: 'var(--c-accent)', fontWeight: 700, textDecoration: 'none' }
   return (
-    <div className="bg-grille" style={{ minHeight: '100vh', backgroundColor: '#FDF6EA', fontFamily: "'Hanken Grotesk', sans-serif", color: '#2A2018' }}>
+    <div className="bg-grille" style={{ minHeight: '100vh', backgroundColor: 'var(--c-papier-teinte)', fontFamily: "var(--font-texte)", color: 'var(--c-encre)' }}>
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '28px 22px 60px' }}>
         <Link href="/" style={{ display: 'inline-block', marginBottom: 28 }}><LogoBadge size={20} /></Link>
 
-        <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 30, margin: 0 }}>Confidentialité & données</h1>
-        <p style={{ fontSize: 15.5, color: '#8A7E68', margin: '10px 0 6px' }}>
+        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 30, margin: 0 }}>Confidentialité & données</h1>
+        <p style={{ fontSize: 15.5, color: 'var(--c-annotation)', margin: '10px 0 6px' }}>
           Comment codex traite tes données personnelles, et les droits dont tu disposes (RGPD).
         </p>
-        <p style={{ fontSize: 12.5, color: '#B6A98C', margin: '0 0 26px' }}>Dernière mise à jour : {MAJ}</p>
+        <p style={{ fontSize: 12.5, color: 'var(--c-discret)', margin: '0 0 26px' }}>Dernière mise à jour : {MAJ}</p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <Section titre="Qui est responsable ?">
@@ -102,7 +102,7 @@ export default function DonneesPage() {
           </Section>
         </div>
 
-        <div style={{ marginTop: 22, fontSize: 14, color: '#8A7E68' }}>
+        <div style={{ marginTop: 22, fontSize: 14, color: 'var(--c-annotation)' }}>
           Une question ? <Link href="/contact" style={lien}>Contacte-nous</Link>.
         </div>
       </div>

@@ -10,7 +10,7 @@ type Props = {
   minHeight?: number
 }
 
-const COULEURS_TEXTE = ['#2A2018', '#DC4A2B', '#D94A30', '#0E7C63', '#1D4ED8', '#BE185D']
+const COULEURS_TEXTE = ['var(--c-encre)', 'var(--c-accent)', 'var(--c-accent)', '#0E7C63', '#1D4ED8', '#BE185D']
 const COULEURS_SURLIGNAGE = ['#FFF3A3', '#C8F5DE', '#FAD9D0', '#D9E4FF', '#F3D9FB']
 
 // Hors du composant : défini dans le rendu, il était recréé (démonté/remonté) à chaque frappe.
@@ -20,8 +20,8 @@ const Btn = ({ onClick, title, children, active }: { onClick: () => void; title:
     onMouseDown={e => { e.preventDefault(); onClick() }}
     style={{
       minWidth: 32, height: 32, padding: '0 8px', borderRadius: 7,
-      border: '1px solid #EADFC9', background: active ? '#FCE3D3' : '#fff',
-      color: '#2A2018', cursor: 'pointer', fontSize: 14, fontFamily: "'Hanken Grotesk', sans-serif",
+      border: '1px solid var(--c-filet-fort)', background: active ? '#FCE3D3' : '#fff',
+      color: 'var(--c-encre)', cursor: 'pointer', fontSize: 14, fontFamily: "var(--font-texte)",
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
     }}
   >{children}</button>
@@ -58,29 +58,29 @@ export default function RichEditor({ value, onChange, placeholder, minHeight = 1
     reader.readAsDataURL(file)
   }
 
-  const font = "'Hanken Grotesk', sans-serif"
+  const font = "var(--font-texte)"
   const fileRef = useRef<HTMLInputElement>(null)
 
 
   return (
-    <div style={{ border: '1.5px solid #EADFC9', borderRadius: 10, overflow: 'hidden', background: '#fff' }}>
+    <div style={{ border: '1.5px solid var(--c-filet-fort)', borderRadius: 10, overflow: 'hidden', background: '#fff' }}>
       {/* Barre d'outils */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: 8, borderBottom: '1px solid #F0E7D6', background: '#FFFBF2', position: 'relative' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: 8, borderBottom: '1px solid var(--c-filet)', background: 'var(--c-papier)', position: 'relative' }}>
         <Btn onClick={() => cmd('bold')} title="Gras"><b>G</b></Btn>
         <Btn onClick={() => cmd('italic')} title="Italique"><i>I</i></Btn>
         <Btn onClick={() => cmd('underline')} title="Souligné"><u>S</u></Btn>
         <Btn onClick={() => cmd('strikeThrough')} title="Barré"><s>B</s></Btn>
 
-        <div style={{ width: 1, background: '#EADFC9', margin: '2px 4px' }} />
+        <div style={{ width: 1, background: 'var(--c-filet-fort)', margin: '2px 4px' }} />
 
         {/* Couleur du texte */}
         <div style={{ position: 'relative' }}>
-          <Btn onClick={() => { setShowColors(s => !s); setShowHighlight(false) }} title="Couleur du texte"><span style={{ color: '#DC4A2B', fontWeight: 700 }}>A</span></Btn>
+          <Btn onClick={() => { setShowColors(s => !s); setShowHighlight(false) }} title="Couleur du texte"><span style={{ color: 'var(--c-accent)', fontWeight: 700 }}>A</span></Btn>
           {showColors && (
-            <div style={{ position: 'absolute', top: 36, left: 0, zIndex: 30, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 10, padding: 8, boxShadow: '0 6px 18px -6px rgba(40,30,60,.2)', display: 'flex', gap: 6 }}>
+            <div style={{ position: 'absolute', top: 36, left: 0, zIndex: 30, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 10, padding: 8, boxShadow: '0 6px 18px -6px rgba(40,30,60,.2)', display: 'flex', gap: 6 }}>
               {COULEURS_TEXTE.map(c => (
                 <button key={c} type="button" aria-label={`Couleur ${c}`} onMouseDown={e => { e.preventDefault(); cmd('foreColor', c); setShowColors(false) }}
-                  style={{ width: 22, height: 22, borderRadius: '50%', background: c, border: '2px solid #fff', boxShadow: '0 0 0 1px #EADFC9', cursor: 'pointer' }} />
+                  style={{ width: 22, height: 22, borderRadius: '50%', background: c, border: '2px solid #fff', boxShadow: '0 0 0 1px var(--c-filet-fort)', cursor: 'pointer' }} />
               ))}
             </div>
           )}
@@ -90,19 +90,19 @@ export default function RichEditor({ value, onChange, placeholder, minHeight = 1
         <div style={{ position: 'relative' }}>
           <Btn onClick={() => { setShowHighlight(s => !s); setShowColors(false) }} title="Surligner"><span style={{ background: '#FFF3A3', padding: '0 3px', borderRadius: 3 }}>H</span></Btn>
           {showHighlight && (
-            <div style={{ position: 'absolute', top: 36, left: 0, zIndex: 30, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 10, padding: 8, boxShadow: '0 6px 18px -6px rgba(40,30,60,.2)', display: 'flex', gap: 6, alignItems: 'center' }}>
+            <div style={{ position: 'absolute', top: 36, left: 0, zIndex: 30, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 10, padding: 8, boxShadow: '0 6px 18px -6px rgba(40,30,60,.2)', display: 'flex', gap: 6, alignItems: 'center' }}>
               {COULEURS_SURLIGNAGE.map(c => (
                 <button key={c} type="button" aria-label={`Surlignage ${c}`} onMouseDown={e => { e.preventDefault(); cmd('hiliteColor', c); setShowHighlight(false) }}
-                  style={{ width: 22, height: 22, borderRadius: 6, background: c, border: '1px solid #EADFC9', cursor: 'pointer' }} />
+                  style={{ width: 22, height: 22, borderRadius: 6, background: c, border: '1px solid var(--c-filet-fort)', cursor: 'pointer' }} />
               ))}
               <button type="button" onMouseDown={e => { e.preventDefault(); cmd('hiliteColor', 'transparent'); setShowHighlight(false) }}
                 title="Retirer le surlignage" aria-label="Retirer le surlignage"
-                style={{ width: 22, height: 22, borderRadius: 6, background: '#fff', border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 12 }}>✕</button>
+                style={{ width: 22, height: 22, borderRadius: 6, background: '#fff', border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 12 }}>✕</button>
             </div>
           )}
         </div>
 
-        <div style={{ width: 1, background: '#EADFC9', margin: '2px 4px' }} />
+        <div style={{ width: 1, background: 'var(--c-filet-fort)', margin: '2px 4px' }} />
 
         <Btn onClick={() => cmd('insertUnorderedList')} title="Liste à puces">≔</Btn>
         <Btn onClick={() => cmd('insertOrderedList')} title="Liste numérotée">1.</Btn>
@@ -124,7 +124,7 @@ export default function RichEditor({ value, onChange, placeholder, minHeight = 1
         onBlur={emit}
         style={{
           minHeight, padding: '12px 14px', fontSize: 14, lineHeight: 1.7,
-          color: '#2A2018', fontFamily: font, background: '#fff',
+          color: 'var(--c-encre)', fontFamily: font, background: '#fff',
         }}
       />
     </div>

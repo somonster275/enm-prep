@@ -34,7 +34,7 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
   const [userId, setUserId] = useState('')
   const [tachesAjoutees, setTachesAjoutees] = useState<Record<string, boolean>>({})
 
-  const font = "'Hanken Grotesk', sans-serif"
+  const font = "var(--font-texte)"
   const coral = '#DC4A2B'
 
   // Charge l'historique depuis la base (persistant entre appareils, plus de perte 24 h).
@@ -130,16 +130,16 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, fontFamily: font, color: '#2A2018' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, fontFamily: font, color: 'var(--c-encre)' }}>
       {/* Messages */}
       <div ref={chatRef} style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: compact ? 10 : 14, padding: compact ? '12px' : '0', minHeight: 0 }}>
         {messages.length === 0 && (
-          <div style={{ textAlign: 'center', paddingTop: compact ? '1.5rem' : '3rem', color: '#9A8D72' }}>
+          <div style={{ textAlign: 'center', paddingTop: compact ? '1.5rem' : '3rem', color: 'var(--c-annotation-clair)' }}>
             <div style={{ fontSize: compact ? 28 : 40, marginBottom: 10 }}>📕</div>
-            <div style={{ fontSize: compact ? 14 : 16, fontWeight: 700, color: '#2A2018', marginBottom: 14 }}>Ton coach de révision ENM</div>
+            <div style={{ fontSize: compact ? 14 : 16, fontWeight: 700, color: 'var(--c-encre)', marginBottom: 14 }}>Ton coach de révision ENM</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 7, maxWidth: 460, margin: '0 auto', padding: compact ? '0 6px' : 0 }}>
               {SUGGESTIONS.map((s, i) => (
-                <button key={i} onClick={() => envoyer(s)} style={{ textAlign: 'left', background: '#fff', border: '1px solid #F0E7D6', borderRadius: 11, padding: compact ? '9px 12px' : '12px 16px', fontSize: compact ? 12.5 : 13.5, color: '#3A3226', cursor: 'pointer', fontFamily: font }}>{s}</button>
+                <button key={i} onClick={() => envoyer(s)} style={{ textAlign: 'left', background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 11, padding: compact ? '9px 12px' : '12px 16px', fontSize: compact ? 12.5 : 13.5, color: '#3A3226', cursor: 'pointer', fontFamily: font }}>{s}</button>
               ))}
             </div>
           </div>
@@ -147,7 +147,7 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
         {messages.map((m, i) => {
           if (m.role === 'user') return (
             <div key={i} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <div style={{ background: '#2A2018', color: '#fff', borderRadius: '14px 14px 4px 14px', padding: compact ? '9px 13px' : '12px 18px', maxWidth: '85%', fontSize: compact ? 13.5 : 14.5, lineHeight: 1.55 }}>{m.contenu}</div>
+              <div style={{ background: 'var(--c-encre)', color: '#fff', borderRadius: '14px 14px 4px 14px', padding: compact ? '9px 13px' : '12px 18px', maxWidth: '85%', fontSize: compact ? 13.5 : 14.5, lineHeight: 1.55 }}>{m.contenu}</div>
             </div>
           )
           const { visible, taches } = extraireTaches(m.contenu)
@@ -155,11 +155,11 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
             <div key={i} style={{ display: 'flex', gap: 9, alignItems: 'flex-start' }}>
               <div style={{ width: compact ? 26 : 34, height: compact ? 26 : 34, borderRadius: 9, flexShrink: 0, marginTop: 2, background: coral + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: compact ? 14 : 18 }}>📕</div>
               <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: '4px 14px 14px 14px', padding: compact ? '10px 13px' : '14px 18px', fontSize: compact ? 13.5 : 15, lineHeight: 1.6 }}>
+                <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: '4px 14px 14px 14px', padding: compact ? '10px 13px' : '14px 18px', fontSize: compact ? 13.5 : 15, lineHeight: 1.6 }}>
                   {visible ? <div className="md-response"><ReactMarkdown remarkPlugins={[remarkGfm]} disallowedElements={['img']} unwrapDisallowed>{visible}</ReactMarkdown></div> : <span style={{ color: '#C2B7A0', fontStyle: 'italic' }}>…</span>}
                 </div>
                 {taches.length > 0 && (
-                  <div style={{ background: '#FFF8EE', border: '1px solid #F2D9A0', borderRadius: 12, padding: '10px 12px' }}>
+                  <div style={{ background: 'var(--c-papier-chaud)', border: '1px solid #F2D9A0', borderRadius: 12, padding: '10px 12px' }}>
                     <div style={{ fontSize: 11.5, fontWeight: 700, color: '#8A5A10', marginBottom: 8 }}>📝 Tâches proposées</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {taches.map((t, j) => {
@@ -185,19 +185,19 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
 
       {loading && (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '4px 0', flexShrink: 0 }}>
-          <button onClick={stop} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#2A2018', color: '#fff', border: 'none', borderRadius: 999, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>
+          <button onClick={stop} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--c-encre)', color: '#fff', border: 'none', borderRadius: 999, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>
             <span className="ia-spinner" style={{ borderColor: '#5a4', borderTopColor: '#fff', width: 11, height: 11 }} /> Stop
           </button>
         </div>
       )}
 
       {/* Saisie */}
-      <div style={{ flexShrink: 0, borderTop: '1px solid #F0E7D6', padding: compact ? '10px 12px' : '10px 0 0' }}>
+      <div style={{ flexShrink: 0, borderTop: '1px solid var(--c-filet)', padding: compact ? '10px 12px' : '10px 0 0' }}>
         <div style={{ display: 'flex', gap: 8 }}>
           <input value={question} onChange={e => setQuestion(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); envoyer() } }}
             placeholder="Pose ta question au coach…" disabled={loading}
-            style={{ flex: 1, padding: compact ? '10px 12px' : '12px 14px', borderRadius: 11, border: '1.5px solid #EADFC9', background: '#FFFBF2', fontSize: compact ? 13.5 : 14.5, outline: 'none', fontFamily: font, opacity: loading ? 0.6 : 1, minWidth: 0 }} />
+            style={{ flex: 1, padding: compact ? '10px 12px' : '12px 14px', borderRadius: 11, border: '1.5px solid var(--c-filet-fort)', background: 'var(--c-papier)', fontSize: compact ? 13.5 : 14.5, outline: 'none', fontFamily: font, opacity: loading ? 0.6 : 1, minWidth: 0 }} />
           <button onClick={() => envoyer()} disabled={!question.trim() || loading} style={{ padding: compact ? '10px 16px' : '12px 22px', borderRadius: 11, background: coral, color: '#fff', border: 'none', cursor: question.trim() && !loading ? 'pointer' : 'default', fontSize: compact ? 13.5 : 14.5, fontWeight: 700, fontFamily: font, opacity: question.trim() && !loading ? 1 : 0.5, flexShrink: 0 }}>
             {loading ? '…' : '↑'}
           </button>

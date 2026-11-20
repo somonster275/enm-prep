@@ -18,9 +18,9 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
   const [items, setItems] = useState<FicheGen[]>([])
   const [msg, setMsg] = useState('')
 
-  const font = "'Hanken Grotesk', sans-serif"
+  const font = "var(--font-texte)"
   const coral = '#DC4A2B'
-  const champ: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid #EADFC9', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: '#FFFBF2', outline: 'none' }
+  const champ: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid var(--c-filet-fort)', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: 'var(--c-papier)', outline: 'none' }
 
   const generer = async () => {
     if (!texte.trim()) { setMsg('❌ Indique un sujet ou colle un texte de cours.'); return }
@@ -53,13 +53,13 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
   }
 
   return (
-    <div style={{ background: '#FFF8EE', border: '1px solid #F2D9A0', borderRadius: 16, padding: '1.1rem 1.25rem', marginBottom: 16 }}>
+    <div style={{ background: 'var(--c-papier-chaud)', border: '1px solid #F2D9A0', borderRadius: 16, padding: '1.1rem 1.25rem', marginBottom: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} {...activable} aria-expanded={ouvert} onClick={() => setOuvert(o => !o)}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
           <span style={{ fontSize: 18 }}>✨</span>
           <span style={{ fontWeight: 700, fontSize: 14.5, color: '#8A5A10' }}>Générer des fiches avec l&apos;IA</span>
         </div>
-        <span style={{ color: '#B6A98C', fontSize: 13 }}>{ouvert ? '▲' : '▼'}</span>
+        <span style={{ color: 'var(--c-discret)', fontSize: 13 }}>{ouvert ? '▲' : '▼'}</span>
       </div>
 
       {ouvert && (
@@ -68,7 +68,7 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
             placeholder="Un thème (ex. « La responsabilité du fait des choses »), ou colle un extrait de cours à transformer en fiches…"
             style={{ ...champ, resize: 'vertical', marginBottom: 10 }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
-            <label style={{ fontSize: 13, color: '#6E6456', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <label style={{ fontSize: 13, color: 'var(--c-texte-doux)', display: 'flex', alignItems: 'center', gap: 8 }}>
               Nombre de fiches
               <input type="number" min={1} max={20} value={nombre} onChange={e => setNombre(Math.min(20, Math.max(1, parseInt(e.target.value) || 1)))}
                 style={{ ...champ, width: 70, padding: '7px 9px' }} />
@@ -78,17 +78,17 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
             </button>
           </div>
 
-          {msg && <div style={{ fontSize: 13, marginBottom: 10, color: msg.startsWith('❌') ? '#D94A30' : '#0E7C63' }}>{msg}</div>}
+          {msg && <div style={{ fontSize: 13, marginBottom: 10, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
 
           {items.length > 0 && (
             <div>
-              <div style={{ fontSize: 12.5, color: '#8A7E68', marginBottom: 10 }}>
+              <div style={{ fontSize: 12.5, color: 'var(--c-annotation)', marginBottom: 10 }}>
                 Relis et ajuste avant d&apos;ajouter. Décoche celles que tu ne veux pas.
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
                 {items.map((it, i) => (
-                  <div key={i} style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: 12, opacity: it.selected ? 1 : 0.5 }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#8A7E68', marginBottom: 8, cursor: 'pointer' }}>
+                  <div key={i} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: 12, opacity: it.selected ? 1 : 0.5 }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--c-annotation)', marginBottom: 8, cursor: 'pointer' }}>
                       <input type="checkbox" checked={it.selected} onChange={() => setItems(arr => arr.map((x, j) => j === i ? { ...x, selected: !x.selected } : x))} />
                       Fiche {i + 1}
                     </label>

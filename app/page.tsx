@@ -4,11 +4,11 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { LogoBadge, Logo } from '@/components/Logo'
 
-const INK = '#2A2018'
-const MUTED = '#8A7E68'
-const RED = '#DC4A2B'
-const CREAM = '#FDF6EA'
-const BORDER = '#F0E7D6'
+const INK = 'var(--c-encre)'
+const MUTED = 'var(--c-annotation)'
+const RED = 'var(--c-accent)'
+const CREAM = 'var(--c-papier-teinte)'
+const BORDER = 'var(--c-filet)'
 
 // Les matières du programme, autour du noyau « codex » (réseau hexagonal du hero).
 // Illustration « rangée de codes juridiques » du hero — codes réels (Légifrance).
@@ -30,7 +30,7 @@ const FONCTIONS = [
   { icone: '🧠', couleur: '#2DAE83', titre: 'Mind maps', desc: 'Visualiser les notions clés en cartes mentales et schémas par sujet.' },
   { icone: '🎬', couleur: '#3B82D9', titre: 'Vidéos', desc: 'Des vidéos sélectionnées par matière, à regarder directement dans codex.' },
   { icone: '📅', couleur: '#C2410C', titre: 'Calendrier', desc: 'Vos cours de la fac et les événements de la prépa réunis et synchronisés.' },
-  { icone: '🔥', couleur: '#D94A30', titre: 'Progression', desc: 'Régularité, maîtrise et couverture suivies jour après jour pour rester motivé.' },
+  { icone: '🔥', couleur: '#DC4A2B', titre: 'Progression', desc: 'Régularité, maîtrise et couverture suivies jour après jour pour rester motivé.' },
 ]
 
 // Outils collaboratifs — mis en avant dans une bande dédiée.
@@ -87,24 +87,24 @@ export default function Accueil() {
     height: 52, padding: '0 26px', borderRadius: 14, border: 'none',
     background: RED, color: '#fff', fontSize: 15.5, fontWeight: 700, cursor: 'pointer',
     textDecoration: 'none', boxShadow: '0 12px 24px -10px rgba(220,74,43,.8)',
-    fontFamily: "'Hanken Grotesk', sans-serif",
+    fontFamily: "var(--font-texte)",
   }
   const btnLigne: React.CSSProperties = {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
     height: 52, padding: '0 24px', borderRadius: 14, border: `1.5px solid ${BORDER}`,
     background: '#fff', color: INK, fontSize: 15.5, fontWeight: 700, cursor: 'pointer',
-    textDecoration: 'none', fontFamily: "'Hanken Grotesk', sans-serif",
+    textDecoration: 'none', fontFamily: "var(--font-texte)",
   }
 
   return (
-    <div className="bg-grille" style={{ minHeight: '100vh', backgroundColor: CREAM, color: INK, fontFamily: "'Hanken Grotesk', sans-serif" }}>
+    <div className="bg-grille" style={{ minHeight: '100vh', backgroundColor: CREAM, color: INK, fontFamily: "var(--font-texte)" }}>
 
       {/* ───────────── Barre de navigation ───────────── */}
       <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(253,246,234,.85)', backdropFilter: 'blur(10px)', borderBottom: `1px solid ${BORDER}` }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 24px', height: 70, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <LogoBadge size={20} />
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.08em', color: RED, background: '#FCE9E3', padding: '4px 9px', borderRadius: 999 }}>ENM · 2026</span>
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.08em', color: RED, background: 'var(--c-accent-pale)', padding: '4px 9px', borderRadius: 999 }}>ENM · 2026</span>
           </div>
 
           <nav className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
@@ -125,11 +125,11 @@ export default function Accueil() {
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: RED }} /> POUR LES CANDIDATS À L'ENM
           </div>
 
-          <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 56, lineHeight: 1.04, letterSpacing: '-.02em', margin: '22px 0 0' }}>
+          <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 56, lineHeight: 1.04, letterSpacing: '-.02em', margin: '22px 0 0' }}>
             Tout pour <span style={{ color: RED }}>réussir</span><br />le concours de la magistrature.
           </h1>
 
-          <p style={{ fontSize: 18, lineHeight: 1.6, color: '#6E6456', margin: '20px 0 0', maxWidth: 540 }}>
+          <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--c-texte-doux)', margin: '20px 0 0', maxWidth: 540 }}>
             Fiches en répétition espacée, QCM, mind maps, cours sourcés et un tuteur IA qui connaît votre progression. Toutes vos révisions ENM réunies dans un seul espace.
           </p>
 
@@ -148,7 +148,7 @@ export default function Accueil() {
           <div style={{ display: 'flex', gap: 40, marginTop: 38 }}>
             {[['9', 'Matières au programme'], ['100%', 'Conçu par un candidat à l\'ENM'], ['1', 'Espace pour tout réviser']].map(([n, l]) => (
               <div key={l}>
-                <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 30, color: INK }}>{n}</div>
+                <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 30, color: INK }}>{n}</div>
                 <div style={{ fontSize: 13, color: MUTED, marginTop: 2, maxWidth: 130 }}>{l}</div>
               </div>
             ))}
@@ -163,7 +163,7 @@ export default function Accueil() {
 
       {/* ───────────── Aperçu « comme une question de cours » ───────────── */}
       <section id="apercu" style={{ maxWidth: 900, margin: '0 auto', padding: '50px 24px' }}>
-        <h2 style={{ textAlign: 'center', fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 34, letterSpacing: '-.01em', margin: 0 }}>
+        <h2 style={{ textAlign: 'center', fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 34, letterSpacing: '-.01em', margin: 0 }}>
           Un aperçu, comme en révision
         </h2>
         <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 22, padding: 24, marginTop: 28, boxShadow: '0 24px 60px -40px rgba(60,40,20,.3)' }}>
@@ -181,7 +181,7 @@ export default function Accueil() {
           <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
             <div style={{ flexShrink: 0 }}><LogoBadge size={14} /></div>
             <div style={{ background: CREAM, border: `1px solid ${BORDER}`, borderRadius: '14px 14px 14px 4px', padding: '14px 16px', fontSize: 14.5, lineHeight: 1.6, color: INK }}>
-              <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: '.05em', color: RED, background: '#FCE9E3', padding: '3px 8px', borderRadius: 6 }}>DROIT CIVIL</span>
+              <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: '.05em', color: RED, background: 'var(--c-accent-pale)', padding: '3px 8px', borderRadius: 6 }}>DROIT CIVIL</span>
               <div style={{ marginTop: 10 }}>
                 Le <strong>dol</strong> (art. 1137 C. civ.) suppose des <strong>manœuvres</strong> d'un cocontractant pour tromper. L'<strong>erreur sur la substance</strong> (art. 1132) est spontanée et porte sur une qualité essentielle. Le dol vicie le consentement même sur une erreur qui aurait été indifférente.
               </div>
@@ -201,7 +201,7 @@ export default function Accueil() {
 
       {/* ───────────── Ce que vous pouvez faire ───────────── */}
       <section id="fonctions" style={{ maxWidth: 1140, margin: '0 auto', padding: '40px 24px 20px' }}>
-        <h2 style={{ textAlign: 'center', fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 34, letterSpacing: '-.01em', margin: 0 }}>
+        <h2 style={{ textAlign: 'center', fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 34, letterSpacing: '-.01em', margin: 0 }}>
           Ce que vous pouvez faire
         </h2>
         <p style={{ textAlign: 'center', fontSize: 16.5, color: MUTED, margin: '12px auto 0', maxWidth: 560 }}>
@@ -212,7 +212,7 @@ export default function Accueil() {
           {FONCTIONS.map(f => (
             <div key={f.titre} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 18, padding: 22 }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: `${f.couleur}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{f.icone}</div>
-              <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 700, fontSize: 17, marginTop: 14 }}>{f.titre}</div>
+              <div style={{ fontFamily: "var(--font-titre)", fontWeight: 700, fontSize: 17, marginTop: 14 }}>{f.titre}</div>
               <div style={{ fontSize: 13.5, lineHeight: 1.55, color: MUTED, marginTop: 7 }}>{f.desc}</div>
             </div>
           ))}
@@ -220,13 +220,13 @@ export default function Accueil() {
       </section>
 
       {/* ───────────── Collaboratif (mis en avant) ───────────── */}
-      <section id="communaute" style={{ background: 'linear-gradient(135deg, #FFF4E6 0%, #FCE9E3 100%)', borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}`, marginTop: 30 }}>
+      <section id="communaute" style={{ background: 'linear-gradient(135deg, #FFF4E6 0%, var(--c-accent-pale) 100%)', borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}`, marginTop: 30 }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '56px 24px' }}>
           <div style={{ textAlign: 'center', maxWidth: 620, margin: '0 auto' }}>
             <div style={{ display: 'inline-block', fontSize: 11.5, fontWeight: 800, letterSpacing: '.09em', textTransform: 'uppercase', color: '#fff', background: RED, borderRadius: 999, padding: '5px 13px' }}>
               Le cœur de codex
             </div>
-            <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 34, letterSpacing: '-.01em', margin: '14px 0 0', lineHeight: 1.12 }}>
+            <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 34, letterSpacing: '-.01em', margin: '14px 0 0', lineHeight: 1.12 }}>
               Réviser <span style={{ color: RED }}>ensemble</span>, pas chacun dans son coin
             </h2>
             <p style={{ fontSize: 16.5, color: '#6E5A50', margin: '12px auto 0', maxWidth: 540, lineHeight: 1.55 }}>
@@ -238,7 +238,7 @@ export default function Accueil() {
             {COLLAB.map(f => (
               <div key={f.titre} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 18, padding: 22, boxShadow: '0 18px 44px -34px rgba(60,40,20,.4)' }}>
                 <div style={{ width: 44, height: 44, borderRadius: 12, background: `${f.couleur}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{f.icone}</div>
-                <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 700, fontSize: 17, marginTop: 14 }}>{f.titre}</div>
+                <div style={{ fontFamily: "var(--font-titre)", fontWeight: 700, fontSize: 17, marginTop: 14 }}>{f.titre}</div>
                 <div style={{ fontSize: 13.5, lineHeight: 1.55, color: MUTED, marginTop: 7 }}>{f.desc}</div>
               </div>
             ))}
@@ -251,7 +251,7 @@ export default function Accueil() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
           {EXEMPLES.map(e => (
             <div key={e.titre} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 18, padding: 24 }}>
-              <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 700, fontSize: 16.5 }}>{e.titre}</div>
+              <div style={{ fontFamily: "var(--font-titre)", fontWeight: 700, fontSize: 16.5 }}>{e.titre}</div>
               <div style={{ fontSize: 14.5, fontStyle: 'italic', color: INK, margin: '12px 0', lineHeight: 1.5 }}>{e.q}</div>
               <div style={{ fontSize: 12.5, color: MUTED }}>{e.note}</div>
             </div>
@@ -264,7 +264,7 @@ export default function Accueil() {
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '60px 24px', display: 'flex', gap: 48, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 380px' }}>
             <div style={{ display: 'inline-block', fontSize: 12, fontWeight: 800, letterSpacing: '.1em', color: RED, border: `1px solid ${BORDER}`, padding: '6px 14px', borderRadius: 999 }}>LA MÉTHODE</div>
-            <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 38, letterSpacing: '-.01em', margin: '18px 0 0', lineHeight: 1.1 }}>
+            <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 38, letterSpacing: '-.01em', margin: '18px 0 0', lineHeight: 1.1 }}>
               Pensé pour le <span style={{ color: RED }}>concours</span>, pas pour réviser au hasard.
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 18, marginTop: 26 }}>
@@ -274,7 +274,7 @@ export default function Accueil() {
                 ['Un peu chaque jour', 'La régularité est suivie et récompensée — l\'important, c\'est de revenir.'],
               ].map(([t, d]) => (
                 <div key={t} style={{ display: 'flex', gap: 14 }}>
-                  <div style={{ flexShrink: 0, width: 26, height: 26, borderRadius: 8, background: '#FCE9E3', color: RED, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14 }}>✓</div>
+                  <div style={{ flexShrink: 0, width: 26, height: 26, borderRadius: 8, background: 'var(--c-accent-pale)', color: RED, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14 }}>✓</div>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 16 }}>{t}</div>
                     <div style={{ fontSize: 14.5, color: MUTED, marginTop: 3, lineHeight: 1.5 }}>{d}</div>
@@ -288,7 +288,7 @@ export default function Accueil() {
             <div style={{ background: CREAM, border: `1px solid ${BORDER}`, borderRadius: 22, padding: 32, width: '100%', maxWidth: 380 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: MUTED, letterSpacing: '.04em' }}>VOTRE PROGRESSION</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 8 }}>
-                <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 48, color: RED }}>🔥 7</span>
+                <span style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 48, color: RED }}>🔥 7</span>
                 <span style={{ fontSize: 15, color: MUTED, fontWeight: 600 }}>jours d'affilée</span>
               </div>
               <div style={{ height: 1, background: BORDER, margin: '20px 0' }} />
@@ -309,7 +309,7 @@ export default function Accueil() {
 
       {/* ───────────── CTA final ───────────── */}
       <section style={{ maxWidth: 1140, margin: '0 auto', padding: '70px 24px', textAlign: 'center' }}>
-        <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 40, letterSpacing: '-.01em', margin: 0 }}>
+        <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 40, letterSpacing: '-.01em', margin: 0 }}>
           Prêt à réviser autrement ?
         </h2>
         <p style={{ fontSize: 17, color: MUTED, margin: '14px auto 0', maxWidth: 500 }}>
@@ -339,7 +339,7 @@ export default function Accueil() {
 function CodexCodes() {
   const overlay = 'linear-gradient(100deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,.05) 16%, rgba(0,0,0,.04) 78%, rgba(0,0,0,.18) 100%)'
   return (
-    <div style={{ width: 480, maxWidth: '100%', padding: '8px 4px 0', fontFamily: "'Hanken Grotesk', sans-serif" }} aria-label="Illustration — codes juridiques">
+    <div style={{ width: 480, maxWidth: '100%', padding: '8px 4px 0', fontFamily: "var(--font-texte)" }} aria-label="Illustration — codes juridiques">
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 9, height: 296 }}>
         {LIVRES.map((l, i) => (
           <div key={i} style={{
@@ -351,7 +351,7 @@ function CodexCodes() {
           }}>
             <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, fontWeight: 600, color: '#fff', background: 'rgba(0,0,0,.16)', borderRadius: 3, padding: '2px 7px' }}>2026</div>
             <div style={{ flex: 1, width: '100%', margin: '9px 0', border: '1px solid rgba(255,255,255,.55)', borderRadius: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
-              <span style={{ fontFamily: "'Hanken Grotesk', sans-serif", fontSize: 8, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(255,255,255,.7)' }}>{l.kicker}</span>
+              <span style={{ fontFamily: "var(--font-texte)", fontSize: 8, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(255,255,255,.7)' }}>{l.kicker}</span>
               <span style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: l.size, fontWeight: 800, lineHeight: 0.98, color: '#fff', textAlign: 'center' }}>
                 {l.titre.split('\n').map((t, j) => <span key={j}>{j > 0 && <br />}{t}</span>)}
               </span>

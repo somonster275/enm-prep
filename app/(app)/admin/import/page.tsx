@@ -277,23 +277,23 @@ export default function ImportPage() {
     if (fileRef.current) fileRef.current.value = ''
   }
 
-  const font = "'Hanken Grotesk', sans-serif"
-  const card: React.CSSProperties = { background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: '1.5rem', marginBottom: 16 }
-  const inp: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid #EADFC9', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: '#FFFBF2', outline: 'none' }
-  const lbl: React.CSSProperties = { fontSize: 12, display: 'block', marginBottom: 6, color: '#8A7E68', fontWeight: 600 }
-  const btnP: React.CSSProperties = { padding: '11px 24px', borderRadius: 10, background: '#DC4A2B', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: font }
-  const btnS: React.CSSProperties = { padding: '11px 18px', borderRadius: 10, background: '#FDF6EA', color: '#8A7E68', border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 14, fontFamily: font }
+  const font = "var(--font-texte)"
+  const card: React.CSSProperties = { background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: '1.5rem', marginBottom: 16 }
+  const inp: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid var(--c-filet-fort)', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: 'var(--c-papier)', outline: 'none' }
+  const lbl: React.CSSProperties = { fontSize: 12, display: 'block', marginBottom: 6, color: 'var(--c-annotation)', fontWeight: 600 }
+  const btnP: React.CSSProperties = { padding: '11px 24px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: font }
+  const btnS: React.CSSProperties = { padding: '11px 18px', borderRadius: 10, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)', border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 14, fontFamily: font }
 
   const steps = ['Fichier', 'Aperçu', 'Destination', 'Terminé']
   const stepIdx = etape === 'upload' ? 0 : etape === 'preview' ? 1 : etape === 'import' ? 2 : 3
 
   return (
-    <div style={{ paddingTop: '34px', maxWidth: 720, margin: '0 auto', fontFamily: font, color: '#2A2018' }}>
+    <div style={{ paddingTop: '34px', maxWidth: 720, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
 
-      <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 26, marginBottom: 8 }}>
+      <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 26, marginBottom: 8 }}>
         Importer des cartes Anki
       </div>
-      <p style={{ fontSize: 14, color: '#8A7E68', margin: '0 0 28px' }}>
+      <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '0 0 28px' }}>
         Compatible avec les fichiers <strong>.apkg</strong> (export natif Anki) et <strong>.txt</strong> (Notes in Plain Text).
       </p>
 
@@ -305,15 +305,15 @@ export default function ImportPage() {
               <div style={{
                 width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 13, fontWeight: 700,
-                background: i <= stepIdx ? '#DC4A2B' : '#F0E7D6',
-                color: i <= stepIdx ? '#fff' : '#9A8D72',
+                background: i <= stepIdx ? 'var(--c-accent)' : 'var(--c-filet)',
+                color: i <= stepIdx ? '#fff' : 'var(--c-annotation-clair)',
               }}>
                 {i < stepIdx ? '✓' : i + 1}
               </div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: i === stepIdx ? '#2A2018' : '#9A8D72', whiteSpace: 'nowrap' }}>{s}</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: i === stepIdx ? 'var(--c-encre)' : 'var(--c-annotation-clair)', whiteSpace: 'nowrap' }}>{s}</div>
             </div>
             {i < steps.length - 1 && (
-              <div style={{ flex: 1, height: 2, background: i < stepIdx ? '#DC4A2B' : '#F0E7D6', margin: '0 6px', marginBottom: 18 }} />
+              <div style={{ flex: 1, height: 2, background: i < stepIdx ? 'var(--c-accent)' : 'var(--c-filet)', margin: '0 6px', marginBottom: 18 }} />
             )}
           </div>
         ))}
@@ -329,22 +329,22 @@ export default function ImportPage() {
             {...activable} onClick={() => !parsing && fileRef.current?.click()}
             style={{
               border: '2px dashed #F2C4B5', borderRadius: 12, padding: '2.5rem',
-              textAlign: 'center', cursor: parsing ? 'wait' : 'pointer', background: '#FFFBF2',
+              textAlign: 'center', cursor: parsing ? 'wait' : 'pointer', background: 'var(--c-papier)',
             }}
           >
             {parsing ? (
               <>
                 <div style={{ fontSize: 36, marginBottom: 10 }}>⏳</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#DC4A2B' }}>Lecture du fichier en cours…</div>
-                <div style={{ fontSize: 12, color: '#9A8D72', marginTop: 4 }}>Le fichier .apkg peut prendre quelques secondes</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-accent)' }}>Lecture du fichier en cours…</div>
+                <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginTop: 4 }}>Le fichier .apkg peut prendre quelques secondes</div>
               </>
             ) : (
               <>
                 <div style={{ fontSize: 36, marginBottom: 10 }}>📂</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#2A2018', marginBottom: 4 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-encre)', marginBottom: 4 }}>
                   Glisse le fichier ici ou clique pour l'ouvrir
                 </div>
-                <div style={{ fontSize: 12, color: '#9A8D72' }}>
+                <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)' }}>
                   Formats supportés : <strong>.apkg</strong> · <strong>.txt</strong>
                 </div>
               </>
@@ -357,21 +357,21 @@ export default function ImportPage() {
           </div>
 
           {erreur && (
-            <div style={{ marginTop: 14, fontSize: 13, color: '#D94A30', background: '#FCE9E3', padding: '10px 14px', borderRadius: 10 }}>
+            <div style={{ marginTop: 14, fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '10px 14px', borderRadius: 10 }}>
               ❌ {erreur}
             </div>
           )}
 
           <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <div style={{ padding: '14px 16px', background: '#FDF6EA', borderRadius: 10, fontSize: 13, color: '#8A7E68', lineHeight: 1.6 }}>
-              <strong style={{ color: '#2A2018' }}>Export .apkg</strong><br />
+            <div style={{ padding: '14px 16px', background: 'var(--c-papier-teinte)', borderRadius: 10, fontSize: 13, color: 'var(--c-annotation)', lineHeight: 1.6 }}>
+              <strong style={{ color: 'var(--c-encre)' }}>Export .apkg</strong><br />
               1. Anki → clic droit sur un paquet<br />
               2. <strong>Exporter</strong><br />
               3. Format : <strong>Paquet Anki (.apkg)</strong><br />
               4. Clique Exporter
             </div>
-            <div style={{ padding: '14px 16px', background: '#FDF6EA', borderRadius: 10, fontSize: 13, color: '#8A7E68', lineHeight: 1.6 }}>
-              <strong style={{ color: '#2A2018' }}>Export .txt</strong><br />
+            <div style={{ padding: '14px 16px', background: 'var(--c-papier-teinte)', borderRadius: 10, fontSize: 13, color: 'var(--c-annotation)', lineHeight: 1.6 }}>
+              <strong style={{ color: 'var(--c-encre)' }}>Export .txt</strong><br />
               1. Anki → Fichier → Exporter<br />
               2. Format : <strong>Notes in Plain Text</strong><br />
               3. Décoche "Inclure les tags"<br />
@@ -390,16 +390,16 @@ export default function ImportPage() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 340, overflowY: 'auto' }}>
               {cartes.slice(0, 50).map((c, i) => (
-                <div key={i} style={{ padding: '10px 12px', background: '#FDF6EA', borderRadius: 10, fontSize: 13 }}>
-                  <div style={{ fontWeight: 600, color: '#2A2018', marginBottom: 3 }}>{htmlToText(c.question)}</div>
-                  <div style={{ color: '#8A7E68', lineHeight: 1.5 }}>
+                <div key={i} style={{ padding: '10px 12px', background: 'var(--c-papier-teinte)', borderRadius: 10, fontSize: 13 }}>
+                  <div style={{ fontWeight: 600, color: 'var(--c-encre)', marginBottom: 3 }}>{htmlToText(c.question)}</div>
+                  <div style={{ color: 'var(--c-annotation)', lineHeight: 1.5 }}>
                     {htmlToText(c.reponse).slice(0, 140)}{htmlToText(c.reponse).length > 140 ? '…' : ''}
-                    {/^.*<img/i.test(c.reponse) || /<img/i.test(c.question) ? <span style={{ marginLeft: 6, fontSize: 11, color: '#DC4A2B', fontWeight: 600 }}>🖼️ image</span> : null}
+                    {/^.*<img/i.test(c.reponse) || /<img/i.test(c.question) ? <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--c-accent)', fontWeight: 600 }}>🖼️ image</span> : null}
                   </div>
                 </div>
               ))}
               {cartes.length > 50 && (
-                <div style={{ textAlign: 'center', fontSize: 12, color: '#9A8D72', padding: '8px 0' }}>… et {cartes.length - 50} autres cartes</div>
+                <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--c-annotation-clair)', padding: '8px 0' }}>… et {cartes.length - 50} autres cartes</div>
               )}
             </div>
           </div>
@@ -433,7 +433,7 @@ export default function ImportPage() {
             </div>
             {espaceId && (
               !creatingModule ? (
-                <button onClick={() => setCreatingModule(true)} style={{ fontSize: 13, fontWeight: 600, color: '#DC4A2B', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, fontFamily: font }}>
+                <button onClick={() => setCreatingModule(true)} style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-accent)', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, fontFamily: font }}>
                   + Créer un nouveau module
                 </button>
               ) : (
@@ -448,11 +448,11 @@ export default function ImportPage() {
             )}
           </div>
 
-          <div style={{ ...card, background: '#FDF6EA', border: '1px solid #EADFC9' }}>
-            <div style={{ fontSize: 14, color: '#8A7E68' }}>
-              <strong style={{ color: '#2A2018' }}>{cartes.length} cartes</strong> seront importées
-              {moduleId && modules.find(m => m.id === moduleId) && <> dans <strong style={{ color: '#2A2018' }}>"{modules.find(m => m.id === moduleId)?.nom}"</strong></>}
-              {espaceId && espaces.find(e => e.id === espaceId) && <> — espace <strong style={{ color: '#2A2018' }}>{espaces.find(e => e.id === espaceId)?.nom}</strong></>}.
+          <div style={{ ...card, background: 'var(--c-papier-teinte)', border: '1px solid var(--c-filet-fort)' }}>
+            <div style={{ fontSize: 14, color: 'var(--c-annotation)' }}>
+              <strong style={{ color: 'var(--c-encre)' }}>{cartes.length} cartes</strong> seront importées
+              {moduleId && modules.find(m => m.id === moduleId) && <> dans <strong style={{ color: 'var(--c-encre)' }}>"{modules.find(m => m.id === moduleId)?.nom}"</strong></>}
+              {espaceId && espaces.find(e => e.id === espaceId) && <> — espace <strong style={{ color: 'var(--c-encre)' }}>{espaces.find(e => e.id === espaceId)?.nom}</strong></>}.
             </div>
           </div>
 
@@ -462,7 +462,7 @@ export default function ImportPage() {
               {importing ? 'Import en cours…' : `Importer ${cartes.length} cartes →`}
             </button>
           </div>
-          {importing && <div style={{ marginTop: 12, fontSize: 13, color: '#9A8D72', textAlign: 'center' }}>Ne ferme pas la page…</div>}
+          {importing && <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-annotation-clair)', textAlign: 'center' }}>Ne ferme pas la page…</div>}
         </div>
       )}
 
@@ -470,12 +470,12 @@ export default function ImportPage() {
       {etape === 'done' && (
         <div style={{ ...card, textAlign: 'center', padding: '3rem' }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>{importResult.erreurs === 0 ? '🎉' : '⚠️'}</div>
-          <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 24, marginBottom: 8 }}>
+          <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 24, marginBottom: 8 }}>
             {importResult.erreurs === 0 ? 'Import réussi !' : 'Import partiel'}
           </div>
-          <div style={{ fontSize: 15, color: '#8A7E68', marginBottom: 24, lineHeight: 1.6 }}>
+          <div style={{ fontSize: 15, color: 'var(--c-annotation)', marginBottom: 24, lineHeight: 1.6 }}>
             <span style={{ color: '#0E7C63', fontWeight: 700 }}>{importResult.ok} cartes importées</span>
-            {importResult.erreurs > 0 && <><br /><span style={{ color: '#D94A30' }}>{importResult.erreurs} erreurs</span></>}
+            {importResult.erreurs > 0 && <><br /><span style={{ color: 'var(--c-accent)' }}>{importResult.erreurs} erreurs</span></>}
           </div>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
             <button style={btnS} onClick={reset}>Importer un autre fichier</button>

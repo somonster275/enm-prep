@@ -20,7 +20,7 @@ export default function FavoriButton({ ficheId, uid, initial }: { ficheId: strin
   return (
     <button onClick={toggle} title={fav ? 'Retirer des favoris' : 'Ajouter aux favoris'} style={{
       border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 18, lineHeight: 1,
-      color: fav ? '#E8A11E' : '#C0B7A4', padding: 2,
+      color: fav ? '#E8A11E' : 'var(--c-discret-clair)', padding: 2,
     }}>{fav ? '★' : '☆'}</button>
   )
 }

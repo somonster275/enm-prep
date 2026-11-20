@@ -88,41 +88,41 @@ export default function RecherchePage() {
   }
 
   const total = groupes.reduce((s, g) => s + g.items.length, 0)
-  const font = "'Hanken Grotesk', sans-serif"
+  const font = "var(--font-texte)"
 
   return (
-    <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: font, color: '#2A2018' }}>
-      <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 28, margin: 0 }}>Rechercher</h1>
-      <p style={{ fontSize: 15, color: '#8A7E68', margin: '8px 0 20px' }}>Dans tes fiches, QCM, vidéos, annales et le forum — par mot-clé, ou par <b style={{ color: '#7C5CBF' }}>#tag</b> pour relier les ressources d&apos;un même thème.</p>
+    <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
+      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 28, margin: 0 }}>Rechercher</h1>
+      <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 20px' }}>Dans tes fiches, QCM, vidéos, annales et le forum — par mot-clé, ou par <b style={{ color: '#7C5CBF' }}>#tag</b> pour relier les ressources d&apos;un même thème.</p>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
         <input value={q} onChange={e => setQ(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') lancer() }} autoFocus
           placeholder="Ex. « prescription », « dol », ou « #droit-penal »…"
-          style={{ flex: 1, border: '1.5px solid #EADFC9', borderRadius: 12, padding: '12px 16px', background: '#FFFBF2', fontSize: 15, outline: 'none', fontFamily: font }} />
-        <button onClick={lancer} disabled={q.trim().length < 2} style={{ padding: '0 22px', borderRadius: 12, background: '#DC4A2B', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14.5, fontWeight: 700, opacity: q.trim().length < 2 ? 0.5 : 1, fontFamily: font }}>Chercher</button>
+          style={{ flex: 1, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '12px 16px', background: 'var(--c-papier)', fontSize: 15, outline: 'none', fontFamily: font }} />
+        <button onClick={lancer} disabled={q.trim().length < 2} style={{ padding: '0 22px', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14.5, fontWeight: 700, opacity: q.trim().length < 2 ? 0.5 : 1, fontFamily: font }}>Chercher</button>
       </div>
 
       {loading ? (
-        <div style={{ color: '#9A8D72', textAlign: 'center', padding: 30 }}>Recherche…</div>
+        <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Recherche…</div>
       ) : cherche && total === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: '#9A8D72', background: '#FFFBF2', border: '1px dashed #EADFC9', borderRadius: 16 }}>Aucun résultat pour « {q} ».</div>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>Aucun résultat pour « {q} ».</div>
       ) : total > 0 ? (
         <>
-          <div style={{ fontSize: 13, color: '#9A8D72', marginBottom: 14 }}>{total} résultat{total > 1 ? 's' : ''}</div>
+          <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)', marginBottom: 14 }}>{total} résultat{total > 1 ? 's' : ''}</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
             {groupes.map(grp => (
               <div key={grp.cle}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                   <span>{grp.icone}</span>
                   <span style={{ fontWeight: 700, fontSize: 15 }}>{grp.label}</span>
-                  <span style={{ fontSize: 12, color: '#9A8D72' }}>· {grp.items.length}</span>
+                  <span style={{ fontSize: 12, color: 'var(--c-annotation-clair)' }}>· {grp.items.length}</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {grp.items.map(it => (
                     <Link key={it.id} href={it.href} style={{ textDecoration: 'none', color: 'inherit' }}>
-                      <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: '12px 15px', borderLeft: `3px solid ${grp.couleur}` }}>
+                      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '12px 15px', borderLeft: `3px solid ${grp.couleur}` }}>
                         <div style={{ fontSize: 14.5, fontWeight: 600, lineHeight: 1.35 }}>{it.titre}</div>
-                        {it.sous && <div style={{ fontSize: 12.5, color: '#9A8D72', marginTop: 3 }}>{it.sous}</div>}
+                        {it.sous && <div style={{ fontSize: 12.5, color: 'var(--c-annotation-clair)', marginTop: 3 }}>{it.sous}</div>}
                       </div>
                     </Link>
                   ))}

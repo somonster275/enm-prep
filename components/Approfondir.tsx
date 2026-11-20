@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
-const FONT = "'Hanken Grotesk', sans-serif"
+const FONT = "var(--font-texte)"
 
 type Lien = { titre: string; href: string; emoji: string; label: string }
 
@@ -61,11 +61,11 @@ export default function Approfondir({ tags }: { tags: string[] }) {
           {liens.map((l, i) => (
             <a key={i} href={l.href} target="_blank" rel="noopener noreferrer" style={{
               display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10,
-              border: '1px solid #F0E7D6', background: '#FFFBF2', textDecoration: 'none', color: '#2A2018',
+              border: '1px solid var(--c-filet)', background: 'var(--c-papier)', textDecoration: 'none', color: 'var(--c-encre)',
             }}>
               <span style={{ fontSize: 18, flexShrink: 0 }}>{l.emoji}</span>
               <span style={{ flex: 1, fontSize: 13.5, fontWeight: 600 }}>{l.titre}</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#9A8D72', flexShrink: 0 }}>{l.label} ↗</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--c-annotation-clair)', flexShrink: 0 }}>{l.label} ↗</span>
             </a>
           ))}
         </div>

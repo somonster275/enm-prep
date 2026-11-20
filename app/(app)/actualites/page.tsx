@@ -8,7 +8,7 @@ type Article = {
   extrait: string; image: string | null; source: string; couleur: string
 }
 
-const COULEURS = ['#DC4A2B', '#2DAE83', '#3B82D9', '#E8A11E', '#7C5CBF', '#0E7C63']
+const COULEURS = ['var(--c-accent)', '#2DAE83', '#3B82D9', '#E8A11E', '#7C5CBF', '#0E7C63']
 
 // Sources pré-configurées : insérées automatiquement au premier chargement (par un admin) si la table est vide.
 const SOURCES_DEFAUT = [
@@ -33,8 +33,8 @@ export default function ActualitesPage() {
   const [msg, setMsg] = useState('')
   const afficherMsg = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 3500) }
 
-  const font = "'Hanken Grotesk', sans-serif"
-  const display = "'Bricolage Grotesque', sans-serif"
+  const font = "var(--font-texte)"
+  const display = "var(--font-titre)"
 
   const synchroniser = useCallback(async (srcs: Source[]) => {
     if (srcs.length === 0) { setArticles([]); return }
@@ -103,8 +103,8 @@ export default function ActualitesPage() {
   }
 
   const inp: React.CSSProperties = {
-    padding: '10px 12px', borderRadius: 10, border: '1.5px solid #EADFC9',
-    fontSize: 13, fontFamily: font, background: '#FFFBF2', outline: 'none', boxSizing: 'border-box',
+    padding: '10px 12px', borderRadius: 10, border: '1.5px solid var(--c-filet-fort)',
+    fontSize: 13, fontFamily: font, background: 'var(--c-papier)', outline: 'none', boxSizing: 'border-box',
   }
 
   const formatDate = (iso: string | null) => {
@@ -118,7 +118,7 @@ export default function ActualitesPage() {
   }
 
   return (
-    <div style={{ paddingTop: 34, maxWidth: 1000, margin: '0 auto', fontFamily: font, color: '#2A2018' }}>
+    <div style={{ paddingTop: 34, maxWidth: 1000, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
 
       {/* En-tête */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
@@ -127,12 +127,12 @@ export default function ActualitesPage() {
             <div style={{ width: 44, height: 44, borderRadius: 12, background: '#DC4A2B22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📰</div>
             <div style={{ fontFamily: display, fontWeight: 800, fontSize: 26 }}>Actualités</div>
           </div>
-          <p style={{ fontSize: 14, color: '#8A7E68', margin: '6px 0 0 56px' }}>L'actualité juridique de la semaine, en direct des sites de référence.</p>
+          <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '6px 0 0 56px' }}>L'actualité juridique de la semaine, en direct des sites de référence.</p>
         </div>
         {!tableManquante && sources.length > 0 && (
           <button onClick={() => synchroniser(sources)} disabled={sync} style={{
-            padding: '10px 18px', borderRadius: 11, background: '#fff', color: '#8A7E68',
-            border: '1px solid #F0E7D6', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: font,
+            padding: '10px 18px', borderRadius: 11, background: '#fff', color: 'var(--c-annotation)',
+            border: '1px solid var(--c-filet)', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: font,
             display: 'flex', alignItems: 'center', gap: 7,
           }}>
             <span style={{ display: 'inline-block', transform: sync ? 'rotate(360deg)' : 'none', transition: 'transform .6s' }}>↻</span>
@@ -142,13 +142,13 @@ export default function ActualitesPage() {
       </div>
 
       {tableManquante && (
-        <div style={{ fontSize: 13, color: '#D94A30', background: '#FCE9E3', padding: '14px 18px', borderRadius: 12, marginBottom: 24 }}>
+        <div style={{ fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '14px 18px', borderRadius: 12, marginBottom: 24 }}>
           La table <strong>sources_actualites</strong> n'existe pas encore. Exécute le SQL ci-dessous dans Supabase.
-          <pre style={{ marginTop: 10, fontSize: 11, background: '#fff', padding: 12, borderRadius: 8, overflowX: 'auto', color: '#2A2018' }}>{`CREATE TABLE sources_actualites (
+          <pre style={{ marginTop: 10, fontSize: 11, background: '#fff', padding: 12, borderRadius: 8, overflowX: 'auto', color: 'var(--c-encre)' }}>{`CREATE TABLE sources_actualites (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   nom TEXT NOT NULL,
   url TEXT NOT NULL,
-  couleur TEXT DEFAULT '#DC4A2B',
+  couleur TEXT DEFAULT 'var(--c-accent)',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE sources_actualites ENABLE ROW LEVEL SECURITY;
@@ -161,9 +161,9 @@ CREATE POLICY "src_write" ON sources_actualites FOR ALL TO authenticated
 
       {/* Gestion des sources (admin) */}
       {isAdmin && !tableManquante && (
-        <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 20, marginBottom: 28 }}>
+        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 20, marginBottom: 28 }}>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Sources de flux (RSS)</div>
-          <div style={{ fontSize: 12, color: '#9A8D72', marginBottom: 14 }}>
+          <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginBottom: 14 }}>
             Colle l'adresse du flux RSS d'un site juridique (ex. Dalloz Actualité, Village de la Justice, Conseil constitutionnel…).
           </div>
 
@@ -173,7 +173,7 @@ CREATE POLICY "src_write" ON sources_actualites FOR ALL TO authenticated
                 <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: s.couleur + '14', borderRadius: 999, padding: '5px 6px 5px 12px' }}>
                   <span style={{ width: 8, height: 8, borderRadius: '50%', background: s.couleur }} />
                   <span style={{ fontSize: 12, fontWeight: 600 }}>{s.nom}</span>
-                  <button onClick={() => supprimerSource(s.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D94A30', fontSize: 15, lineHeight: 1, padding: '0 4px' }} title="Retirer">×</button>
+                  <button onClick={() => supprimerSource(s.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--c-accent)', fontSize: 15, lineHeight: 1, padding: '0 4px' }} title="Retirer">×</button>
                 </div>
               ))}
             </div>
@@ -186,17 +186,17 @@ CREATE POLICY "src_write" ON sources_actualites FOR ALL TO authenticated
               {COULEURS.map(c => (
                 <button key={c} onClick={() => setCouleur(c)} style={{
                   width: 22, height: 22, borderRadius: '50%', background: c, cursor: 'pointer',
-                  border: couleur === c ? '2px solid #2A2018' : '2px solid transparent',
+                  border: couleur === c ? '2px solid var(--c-encre)' : '2px solid transparent',
                 }} />
               ))}
             </div>
             <button onClick={ajouterSource} disabled={!nom.trim() || !url.trim()} style={{
-              padding: '10px 20px', borderRadius: 10, background: '#DC4A2B', color: '#fff',
+              padding: '10px 20px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff',
               border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: font,
               opacity: (!nom.trim() || !url.trim()) ? 0.5 : 1, whiteSpace: 'nowrap',
             }}>Ajouter</button>
           </div>
-          {msg && <div style={{ fontSize: 13, marginTop: 12, color: msg.startsWith('❌') ? '#D94A30' : '#0E7C63' }}>{msg}</div>}
+          {msg && <div style={{ fontSize: 13, marginTop: 12, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
         </div>
       )}
 
@@ -208,13 +208,13 @@ CREATE POLICY "src_write" ON sources_actualites FOR ALL TO authenticated
 
       {/* Articles */}
       {loading || sync ? (
-        <div style={{ textAlign: 'center', padding: '3rem 0', color: '#9A8D72' }}>Chargement des actualités…</div>
+        <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--c-annotation-clair)' }}>Chargement des actualités…</div>
       ) : sources.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem 0', color: '#9A8D72', fontSize: 14 }}>
+        <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--c-annotation-clair)', fontSize: 14 }}>
           {isAdmin ? 'Ajoutez une source de flux RSS pour voir les actualités apparaître.' : 'Aucune source d\'actualité configurée pour le moment.'}
         </div>
       ) : articles.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem 0', color: '#9A8D72', fontSize: 14 }}>
+        <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--c-annotation-clair)', fontSize: 14 }}>
           Aucun article récupéré. Vérifiez les adresses des flux.
         </div>
       ) : (
@@ -222,7 +222,7 @@ CREATE POLICY "src_write" ON sources_actualites FOR ALL TO authenticated
           {articles.map((a, i) => (
             <a key={i} href={a.lien} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
               <div style={{
-                background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, overflow: 'hidden',
+                background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, overflow: 'hidden',
                 cursor: 'pointer', height: '100%', display: 'flex', flexDirection: 'column',
               }}>
                 {a.image && (
@@ -232,10 +232,10 @@ CREATE POLICY "src_write" ON sources_actualites FOR ALL TO authenticated
                 <div style={{ padding: 18, display: 'flex', flexDirection: 'column', flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                     <span style={{ fontSize: 11, fontWeight: 700, color: a.couleur, background: a.couleur + '18', padding: '3px 10px', borderRadius: 999 }}>{a.source}</span>
-                    {a.date && <span style={{ fontSize: 11, color: '#9A8D72' }}>{formatDate(a.date)}</span>}
+                    {a.date && <span style={{ fontSize: 11, color: 'var(--c-annotation-clair)' }}>{formatDate(a.date)}</span>}
                   </div>
                   <div style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.35, marginBottom: 8 }}>{a.titre}</div>
-                  {a.extrait && <div style={{ fontSize: 13, color: '#8A7E68', lineHeight: 1.5, flex: 1 }}>{a.extrait}</div>}
+                  {a.extrait && <div style={{ fontSize: 13, color: 'var(--c-annotation)', lineHeight: 1.5, flex: 1 }}>{a.extrait}</div>}
                   <div style={{ fontSize: 12, fontWeight: 600, color: a.couleur, marginTop: 12 }}>Lire l'article →</div>
                 </div>
               </div>

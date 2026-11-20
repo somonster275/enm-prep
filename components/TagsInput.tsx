@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { normaliserTag } from '@/lib/tags'
 
-const FONT = "'Hanken Grotesk', sans-serif"
+const FONT = "var(--font-texte)"
 
 // Saisie de tags sous forme de pastilles « # ». Tape un mot puis Entrée, espace
 // ou virgule pour l'ajouter ; clique × pour retirer.
@@ -26,8 +26,8 @@ export default function TagsInput({
   return (
     <div style={{
       display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6,
-      border: '1.5px solid #EADFC9', borderRadius: 11, padding: '7px 10px',
-      background: '#FFFBF2', fontFamily: FONT, minHeight: 44, boxSizing: 'border-box',
+      border: '1.5px solid var(--c-filet-fort)', borderRadius: 11, padding: '7px 10px',
+      background: 'var(--c-papier)', fontFamily: FONT, minHeight: 44, boxSizing: 'border-box',
     }}>
       {value.map(t => (
         <span key={t} style={{
@@ -53,7 +53,7 @@ export default function TagsInput({
           else if (e.key === 'Backspace' && !saisie && value.length) retirer(value[value.length - 1])
         }}
         placeholder={value.length ? '' : placeholder}
-        style={{ flex: 1, minWidth: 120, border: 'none', outline: 'none', background: 'transparent', fontSize: 13.5, fontFamily: FONT, color: '#2A2018' }}
+        style={{ flex: 1, minWidth: 120, border: 'none', outline: 'none', background: 'transparent', fontSize: 13.5, fontFamily: FONT, color: 'var(--c-encre)' }}
       />
     </div>
   )

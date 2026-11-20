@@ -47,8 +47,8 @@ export default function OutilContenu({ table, accent, icone, titre, description,
   const [msg, setMsg] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
-  const font = "'Hanken Grotesk', sans-serif"
-  const display = "'Bricolage Grotesque', sans-serif"
+  const font = "var(--font-texte)"
+  const display = "var(--font-titre)"
   const afficherMsg = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 4000) }
 
   const charger = async () => {
@@ -118,28 +118,28 @@ export default function OutilContenu({ table, accent, icone, titre, description,
   }
 
   const inp: React.CSSProperties = {
-    padding: '10px 12px', borderRadius: 10, border: '1.5px solid #EADFC9',
-    fontSize: 13, fontFamily: font, background: '#FFFBF2', outline: 'none', boxSizing: 'border-box',
+    padding: '10px 12px', borderRadius: 10, border: '1.5px solid var(--c-filet-fort)',
+    fontSize: 13, fontFamily: font, background: 'var(--c-papier)', outline: 'none', boxSizing: 'border-box',
   }
 
   const canAdd = nom.trim() && espaceId && !uploading
 
   return (
-    <div style={{ paddingTop: '34px', maxWidth: 900, margin: '0 auto', fontFamily: font, color: '#2A2018' }}>
+    <div style={{ paddingTop: '34px', maxWidth: 900, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 6 }}>
         <div style={{ width: 48, height: 48, borderRadius: 14, background: accent + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>{icone}</div>
         <div style={{ fontFamily: display, fontWeight: 800, fontSize: 28 }}>{titre}</div>
       </div>
-      <p style={{ fontSize: 15, color: '#8A7E68', margin: '0 0 28px' }}>{description}</p>
+      <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '0 0 28px' }}>{description}</p>
 
       {tableManquante && (
-        <div style={{ fontSize: 13, color: '#D94A30', background: '#FCE9E3', padding: '12px 16px', borderRadius: 10, marginBottom: 24 }}>
+        <div style={{ fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '12px 16px', borderRadius: 10, marginBottom: 24 }}>
           La table <strong>{table}</strong> n'existe pas encore dans Supabase. Exécute le SQL fourni pour activer cet outil.
         </div>
       )}
 
       {isAdmin && !tableManquante && (
-        <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 20, marginBottom: 28 }}>
+        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 20, marginBottom: 28 }}>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>Ajouter un contenu</div>
           <div style={{ display: 'grid', gridTemplateColumns: withType ? '1.4fr 1fr 1fr' : '1.6fr 1fr', gap: 10, marginBottom: 10 }}>
             <input value={nom} onChange={e => setNom(e.target.value)} placeholder="Titre…" style={inp} />
@@ -166,11 +166,11 @@ export default function OutilContenu({ table, accent, icone, titre, description,
             />
             {bucketStorage && (
               <>
-                <span style={{ fontSize: 12, color: '#9A8D72', flexShrink: 0 }}>ou</span>
+                <span style={{ fontSize: 12, color: 'var(--c-annotation-clair)', flexShrink: 0 }}>ou</span>
                 <label style={{
                   padding: '10px 14px', borderRadius: 10, border: `1.5px dashed ${accent}66`,
                   fontSize: 12, fontWeight: 600, color: accent, cursor: 'pointer', whiteSpace: 'nowrap',
-                  background: fichier ? accent + '10' : '#FFFBF2', flexShrink: 0,
+                  background: fichier ? accent + '10' : 'var(--c-papier)', flexShrink: 0,
                 }}>
                   {fichier ? `📎 ${fichier.name.length > 20 ? fichier.name.slice(0, 18) + '…' : fichier.name}` : 'Choisir un fichier'}
                   <input
@@ -183,14 +183,14 @@ export default function OutilContenu({ table, accent, icone, titre, description,
                 </label>
                 {fichier && (
                   <button onClick={() => { setFichier(null); if (fileRef.current) fileRef.current.value = '' }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: '#D94A30', padding: '0 4px' }}>×</button>
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: 'var(--c-accent)', padding: '0 4px' }}>×</button>
                 )}
               </>
             )}
           </div>
 
           <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#5C4A22', marginBottom: 5 }}># Tags <span style={{ fontWeight: 400, color: '#9A8D72' }}>(relient ce contenu aux fiches du même thème)</span></div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#5C4A22', marginBottom: 5 }}># Tags <span style={{ fontWeight: 400, color: 'var(--c-annotation-clair)' }}>(relient ce contenu aux fiches du même thème)</span></div>
             <TagsInput value={tags} onChange={setTags} accent={accent} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -202,24 +202,24 @@ export default function OutilContenu({ table, accent, icone, titre, description,
               {uploading ? 'Envoi en cours…' : 'Ajouter'}
             </button>
           </div>
-          {msg && <div style={{ fontSize: 13, marginTop: 10, color: msg.startsWith('❌') ? '#D94A30' : '#0E7C63' }}>{msg}</div>}
+          {msg && <div style={{ fontSize: 13, marginTop: 10, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
         </div>
       )}
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '3rem 0', color: '#9A8D72' }}>Chargement…</div>
+        <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--c-annotation-clair)' }}>Chargement…</div>
       ) : items.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem 0', color: '#9A8D72', fontSize: 14 }}>
+        <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--c-annotation-clair)', fontSize: 14 }}>
           Aucun contenu pour le moment.
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {items.map(it => (
-            <div key={it.id} style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+            <div key={it.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>
                   {it.titre}
-                  {withType && it.type && <span style={{ fontSize: 11, color: '#8A7E68', marginLeft: 8 }}>· {it.type}</span>}
+                  {withType && it.type && <span style={{ fontSize: 11, color: 'var(--c-annotation)', marginLeft: 8 }}>· {it.type}</span>}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
                   {it.espaces && (
@@ -233,7 +233,7 @@ export default function OutilContenu({ table, accent, icone, titre, description,
               </div>
               {isAdmin && (
                 <button onClick={() => supprimer(it.id)} style={{
-                  padding: '6px 12px', borderRadius: 8, background: '#FCE9E3', color: '#D94A30',
+                  padding: '6px 12px', borderRadius: 8, background: 'var(--c-accent-pale)', color: 'var(--c-accent)',
                   border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font, flexShrink: 0,
                 }}>Supprimer</button>
               )}

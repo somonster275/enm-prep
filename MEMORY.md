@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 43).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 44).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,21 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 44) — Refonte design « code annoté » : étape 1 (jetons, sans changement visuel)
+- Direction validée par le user sur maquette (artifact claude.ai/artifact/59vUXFkHdADXy9viVN5LCS) : papier légèrement
+  chaud, encre brun-noir, rouge des codes (#A3122A), surligneur jaune réservé aux moments clés, titres **Newsreader**,
+  texte **Geist**, logo Bagel inchangé. Hero = fiche interactive ; fonctionnalités en liste par verbe ; dashboard
+  centré sur « N fiches à réviser » + rayon de codes (maîtrise par matière). Plan : 1 jetons → 2 palette/polices →
+  3 accueil → 4 connexion + dashboard.
+- **Étape 1 faite** (branche `claude/beautiful-noether-faylt4`, pas sur main) : variables `--c-*` et `--font-titre/texte`
+  dans `globals.css` (valeurs = design actuel) ; 63 fichiers `app/` + `components/` passés par script (15 couleurs
+  principales + Hanken/Bricolage → `var(...)`). Newsreader + Geist auto-hébergées (`public/fonts/`, `fonts.css`), pas
+  encore utilisées. Accueil/connexion/méthode identiques au pixel (hors un fond d'icône : #D94A30 fusionné dans l'accent).
+- ⚠️ **Pièges** : une couleur à laquelle on concatène un canal alpha (`couleur + '18'`, `${coral}66`) doit rester en hex
+  → laissés en hex : les champs `couleur:` des listes, les `const coral/ACCENT`, `Logo.tsx` (attributs SVG `fill`,
+  qui n'acceptent pas `var()`). `app/api/` (emails) et `error.tsx`/`global-error.tsx` non touchés. Couleurs de
+  niveaux (`lib/spaced-repetition.ts`) inchangées. À l'étape 2, ces hex restants sont à changer à la main.
 
 ### 2026-11-20 (suite 43) — Schéma complet exporté dans le dépôt + migration 0047
 - `supabase/schema.sql` : structure complète exportée par le user (43 tables, 100 policies, 7 triggers, fonctions et

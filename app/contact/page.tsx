@@ -25,28 +25,28 @@ export default function ContactPage() {
   }
 
   const champ: React.CSSProperties = {
-    width: '100%', border: '1.5px solid #EADFC9', borderRadius: 12, padding: '12px 14px',
-    background: '#FFFBF2', fontSize: 14.5, outline: 'none', boxSizing: 'border-box',
-    fontFamily: "'Hanken Grotesk', sans-serif",
+    width: '100%', border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '12px 14px',
+    background: 'var(--c-papier)', fontSize: 14.5, outline: 'none', boxSizing: 'border-box',
+    fontFamily: "var(--font-texte)",
   }
 
   return (
-    <div className="bg-grille" style={{ minHeight: '100vh', backgroundColor: '#FDF6EA', fontFamily: "'Hanken Grotesk', sans-serif", color: '#2A2018' }}>
+    <div className="bg-grille" style={{ minHeight: '100vh', backgroundColor: 'var(--c-papier-teinte)', fontFamily: "var(--font-texte)", color: 'var(--c-encre)' }}>
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '28px 22px 60px' }}>
         <Link href="/" style={{ display: 'inline-block', marginBottom: 28 }}><LogoBadge size={20} /></Link>
 
-        <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 30, margin: 0 }}>Nous contacter</h1>
-        <p style={{ fontSize: 15.5, color: '#8A7E68', margin: '10px 0 26px' }}>
+        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 30, margin: 0 }}>Nous contacter</h1>
+        <p style={{ fontSize: 15.5, color: 'var(--c-annotation)', margin: '10px 0 26px' }}>
           Une question, un souci, une suggestion ? Écris-nous, le message arrive directement à l&apos;administrateur de codex.
         </p>
 
-        <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18, padding: 24 }}>
+        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18, padding: 24 }}>
           {statut === 'ok' ? (
             <div style={{ textAlign: 'center', padding: '20px 10px' }}>
               <div style={{ fontSize: 30, marginBottom: 8 }}>✅</div>
               <div style={{ fontSize: 16, fontWeight: 700 }}>Message envoyé !</div>
-              <div style={{ fontSize: 14, color: '#8A7E68', marginTop: 6 }}>On te répondra dès que possible.</div>
-              <Link href="/" style={{ display: 'inline-block', marginTop: 18, color: '#DC4A2B', fontWeight: 700, textDecoration: 'none' }}>Retour à l&apos;accueil</Link>
+              <div style={{ fontSize: 14, color: 'var(--c-annotation)', marginTop: 6 }}>On te répondra dès que possible.</div>
+              <Link href="/" style={{ display: 'inline-block', marginTop: 18, color: 'var(--c-accent)', fontWeight: 700, textDecoration: 'none' }}>Retour à l&apos;accueil</Link>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -54,11 +54,11 @@ export default function ContactPage() {
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Ton email (pour qu'on te réponde)" style={champ} />
               <textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="Ton message…" rows={6}
                 style={{ ...champ, resize: 'vertical', lineHeight: 1.5 }} />
-              {erreur && <div style={{ fontSize: 13.5, color: '#D94A30' }}>{erreur}</div>}
+              {erreur && <div style={{ fontSize: 13.5, color: 'var(--c-accent)' }}>{erreur}</div>}
               <button onClick={envoyer} disabled={statut === 'envoi'} style={{
-                height: 50, border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff',
+                height: 50, border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff',
                 fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: statut === 'envoi' ? 0.7 : 1,
-                fontFamily: "'Hanken Grotesk', sans-serif",
+                fontFamily: "var(--font-texte)",
               }}>{statut === 'envoi' ? 'Envoi…' : 'Envoyer le message'}</button>
             </div>
           )}

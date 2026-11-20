@@ -4,8 +4,8 @@ import React from 'react'
 // et sur la page /methode. Présente les outils de codex (dont le collaboratif,
 // mis en valeur) et les méthodes validées par la science de l'apprentissage.
 
-const FONT = "'Hanken Grotesk', sans-serif"
-const DISPLAY = "'Bricolage Grotesque', sans-serif"
+const FONT = "var(--font-texte)"
+const DISPLAY = "var(--font-titre)"
 
 // Outils pour réviser en solo (cœur de la mémorisation).
 const REVISER: { emoji: string; titre: string; desc: string }[] = [
@@ -56,9 +56,9 @@ function GrilleOutils({ items }: { items: { emoji: string; titre: string; desc: 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
       {items.map(o => (
-        <div key={o.titre} style={{ background: '#FFFBF2', border: '1px solid #F0E7D6', borderRadius: 12, padding: '12px 14px' }}>
+        <div key={o.titre} style={{ background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '12px 14px' }}>
           <div style={{ fontSize: 14, fontWeight: 700 }}>{o.emoji} {o.titre}</div>
-          <div style={{ fontSize: 12.5, color: '#8A7E68', marginTop: 3, lineHeight: 1.5 }}>{o.desc}</div>
+          <div style={{ fontSize: 12.5, color: 'var(--c-annotation)', marginTop: 3, lineHeight: 1.5 }}>{o.desc}</div>
         </div>
       ))}
     </div>
@@ -67,14 +67,14 @@ function GrilleOutils({ items }: { items: { emoji: string; titre: string; desc: 
 
 export default function MethodeContenu() {
   return (
-    <div style={{ fontFamily: FONT, color: '#2A2018' }}>
+    <div style={{ fontFamily: FONT, color: 'var(--c-encre)' }}>
       <p style={{ fontSize: 15, lineHeight: 1.6, color: '#5C5448', margin: '0 0 18px' }}>
         codex réunit, au même endroit, des outils pour <b>réviser efficacement</b>, une <b>communauté de candidats</b> pour ne pas avancer seul·e,
         et un accompagnement au quotidien — le tout fondé sur les méthodes <b>validées par la science de l&apos;apprentissage</b>.
       </p>
 
       {/* Origine : un projet d'étudiant, entre pairs. */}
-      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: '#FFFBF2', border: '1px solid #F0E7D6', borderRadius: 14, padding: '14px 16px', margin: '0 0 24px' }}>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 14, padding: '14px 16px', margin: '0 0 24px' }}>
         <span style={{ fontSize: 22, flexShrink: 0 }}>🎓</span>
         <div style={{ fontSize: 13.5, color: '#5C5448', lineHeight: 1.55 }}>
           <b>Conçu par un étudiant en classe préparatoire à l&apos;ENM</b>, pour les candidats au concours.
@@ -87,12 +87,12 @@ export default function MethodeContenu() {
 
       {/* Collaboratif — bloc mis en valeur */}
       <div style={{
-        background: 'linear-gradient(135deg, #FFF4E6 0%, #FCE9E3 100%)',
-        border: '1px solid #F3C6BC', borderRadius: 18, padding: '20px 20px 22px', marginBottom: 26, position: 'relative', overflow: 'hidden',
+        background: 'linear-gradient(135deg, #FFF4E6 0%, var(--c-accent-pale) 100%)',
+        border: '1px solid var(--c-accent-bord)', borderRadius: 18, padding: '20px 20px 22px', marginBottom: 26, position: 'relative', overflow: 'hidden',
       }}>
-        <div style={{ position: 'absolute', width: 120, height: 120, borderRadius: '50%', background: '#DC4A2B', opacity: 0.08, right: -28, top: -34 }} />
+        <div style={{ position: 'absolute', width: 120, height: 120, borderRadius: '50%', background: 'var(--c-accent)', opacity: 0.08, right: -28, top: -34 }} />
         <div style={{ position: 'relative' }}>
-          <div style={{ display: 'inline-block', fontSize: 11, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#fff', background: '#DC4A2B', borderRadius: 999, padding: '4px 11px', marginBottom: 10 }}>
+          <div style={{ display: 'inline-block', fontSize: 11, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#fff', background: 'var(--c-accent)', borderRadius: 999, padding: '4px 11px', marginBottom: 10 }}>
             Le cœur de codex
           </div>
           <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 21, lineHeight: 1.2, marginBottom: 6 }}>
@@ -128,7 +128,7 @@ export default function MethodeContenu() {
       <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 17, margin: '0 0 12px', color: '#C0392B' }}>❌ Ce qui ne marche pas</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {MARCHE_PAS.map(m => (
-          <div key={m.titre} style={{ display: 'flex', gap: 12, background: '#FCEEEA', border: '1px solid #F3C6BC', borderRadius: 12, padding: '12px 14px' }}>
+          <div key={m.titre} style={{ display: 'flex', gap: 12, background: '#FCEEEA', border: '1px solid var(--c-accent-bord)', borderRadius: 12, padding: '12px 14px' }}>
             <span style={{ flexShrink: 0, color: '#C0392B', fontWeight: 800 }}>✕</span>
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: '#A33125' }}>{m.titre}</div>

@@ -110,19 +110,19 @@ export default function Editeur() {
     setFiches(f => f.filter(fc => fc.id !== id))
   }
 
-  const font = "'Hanken Grotesk', sans-serif"
-  const cardStyle: React.CSSProperties = { background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: '1.25rem', marginBottom: 16 }
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid #EADFC9', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: '#FFFBF2', outline: 'none' }
-  const labelStyle: React.CSSProperties = { fontSize: 12, display: 'block', marginBottom: 6, color: '#8A7E68', fontWeight: 600 }
+  const font = "var(--font-texte)"
+  const cardStyle: React.CSSProperties = { background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: '1.25rem', marginBottom: 16 }
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid var(--c-filet-fort)', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: 'var(--c-papier)', outline: 'none' }
+  const labelStyle: React.CSSProperties = { fontSize: 12, display: 'block', marginBottom: 6, color: 'var(--c-annotation)', fontWeight: 600 }
   const msgStyle: React.CSSProperties = {
     fontSize: 13, padding: '8px 12px', borderRadius: 8, marginBottom: 12,
-    color: msg.startsWith('❌') ? '#D94A30' : '#0E7C63',
-    background: msg.startsWith('❌') ? '#FCE9E3' : '#DDF3EE',
+    color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63',
+    background: msg.startsWith('❌') ? 'var(--c-accent-pale)' : '#DDF3EE',
   }
 
   return (
-    <div style={{ paddingTop: '34px', maxWidth: 900, margin: '0 auto', fontFamily: font, color: '#2A2018' }}>
-      <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 26, marginBottom: '1.5rem' }}>
+    <div style={{ paddingTop: '34px', maxWidth: 900, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
+      <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 26, marginBottom: '1.5rem' }}>
         Éditeur de fiches
       </div>
 
@@ -142,9 +142,9 @@ export default function Editeur() {
             <button key={o} onClick={() => setOnglet(o)} style={{
               padding: '9px 20px', borderRadius: 10, cursor: 'pointer',
               fontSize: 13, fontWeight: 600, fontFamily: font,
-              background: onglet === o ? '#DC4A2B' : '#fff',
-              color: onglet === o ? '#fff' : '#8A7E68',
-              border: onglet === o ? '2px solid #DC4A2B' : '1px solid #F0E7D6',
+              background: onglet === o ? 'var(--c-accent)' : '#fff',
+              color: onglet === o ? '#fff' : 'var(--c-annotation)',
+              border: onglet === o ? '2px solid var(--c-accent)' : '1px solid var(--c-filet)',
             } as React.CSSProperties}>
               {o === 'fiches' ? 'Fiches' : `Modules (${modules.length})`}
             </button>
@@ -160,7 +160,7 @@ export default function Editeur() {
               <h2 style={{ fontSize: 15, fontWeight: 700, margin: 0 }}>Modules de cet espace</h2>
               {!creatingModule && (
                 <button onClick={() => setCreatingModule(true)} style={{
-                  padding: '8px 16px', borderRadius: 8, background: '#DC4A2B', color: '#fff',
+                  padding: '8px 16px', borderRadius: 8, background: 'var(--c-accent)', color: '#fff',
                   border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: font,
                 }}>
                   + Nouveau module
@@ -170,7 +170,7 @@ export default function Editeur() {
 
             {/* Formulaire création */}
             {creatingModule && (
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 14, padding: '12px', background: '#FDF6EA', borderRadius: 10 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 14, padding: '12px', background: 'var(--c-papier-teinte)', borderRadius: 10 }}>
                 <input
                   value={nomModule} onChange={e => setNomModule(e.target.value)} autoFocus
                   onKeyDown={e => { if (e.key === 'Enter') creerModule(); if (e.key === 'Escape') { setCreatingModule(false); setNomModule('') } }}
@@ -178,27 +178,27 @@ export default function Editeur() {
                   style={{ ...inputStyle, flex: 1, marginBottom: 0 }}
                 />
                 <button onClick={creerModule} disabled={!nomModule.trim()} style={{
-                  padding: '10px 18px', borderRadius: 10, background: '#DC4A2B', color: '#fff',
+                  padding: '10px 18px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff',
                   border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: font,
                   opacity: !nomModule.trim() ? 0.5 : 1,
                 }}>Créer</button>
                 <button onClick={() => { setCreatingModule(false); setNomModule('') }} style={{
-                  padding: '10px 14px', borderRadius: 10, background: '#fff', color: '#8A7E68',
-                  border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 13, fontFamily: font,
+                  padding: '10px 14px', borderRadius: 10, background: '#fff', color: 'var(--c-annotation)',
+                  border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 13, fontFamily: font,
                 }}>Annuler</button>
               </div>
             )}
 
             {/* Liste des modules */}
             {modules.length === 0 ? (
-              <div style={{ fontSize: 14, color: '#9A8D72', textAlign: 'center', padding: '2rem 0' }}>
+              <div style={{ fontSize: 14, color: 'var(--c-annotation-clair)', textAlign: 'center', padding: '2rem 0' }}>
                 Aucun module dans cet espace. Créez-en un ci-dessus.
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {modules.map(mod => (
                   <div key={mod.id} style={{
-                    padding: '12px 14px', background: '#FDF6EA', borderRadius: 10,
+                    padding: '12px 14px', background: 'var(--c-papier-teinte)', borderRadius: 10,
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
                   }}>
                     {editModule?.id === mod.id ? (
@@ -209,32 +209,32 @@ export default function Editeur() {
                           style={{ ...inputStyle, flex: 1, marginBottom: 0 }}
                         />
                         <button onClick={() => renommerModule(mod)} style={{
-                          padding: '8px 14px', borderRadius: 8, background: '#DC4A2B', color: '#fff',
+                          padding: '8px 14px', borderRadius: 8, background: 'var(--c-accent)', color: '#fff',
                           border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font,
                         }}>Sauver</button>
                         <button onClick={() => setEditModule(null)} style={{
-                          padding: '8px 12px', borderRadius: 8, background: '#fff', color: '#8A7E68',
-                          border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 12, fontFamily: font,
+                          padding: '8px 12px', borderRadius: 8, background: '#fff', color: 'var(--c-annotation)',
+                          border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 12, fontFamily: font,
                         }}>Annuler</button>
                       </div>
                     ) : (
                       <>
                         <div>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: '#2A2018' }}>{mod.nom}</div>
-                          <div style={{ fontSize: 12, color: '#9A8D72', marginTop: 2 }}>ordre {mod.ordre}</div>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-encre)' }}>{mod.nom}</div>
+                          <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginTop: 2 }}>ordre {mod.ordre}</div>
                         </div>
                         <div style={{ display: 'flex', gap: 6 }}>
                           <button onClick={() => { setModuleId(mod.id); setOnglet('fiches') }} style={{
-                            padding: '6px 12px', borderRadius: 8, background: '#fff', color: '#DC4A2B',
+                            padding: '6px 12px', borderRadius: 8, background: '#fff', color: 'var(--c-accent)',
                             border: '1px solid #F2C4B5', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font,
                           }}>Voir les fiches</button>
                           <button onClick={() => { setEditModule(mod); setEditNomModule(mod.nom) }} style={{
-                            padding: '6px 12px', borderRadius: 8, background: '#fff', color: '#8A7E68',
-                            border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 12, fontFamily: font,
+                            padding: '6px 12px', borderRadius: 8, background: '#fff', color: 'var(--c-annotation)',
+                            border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 12, fontFamily: font,
                           }}>Renommer</button>
                           <button onClick={() => supprimerModule(mod)} style={{
-                            padding: '6px 12px', borderRadius: 8, background: '#FCE9E3', color: '#D94A30',
-                            border: '1px solid #FCE9E3', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font,
+                            padding: '6px 12px', borderRadius: 8, background: 'var(--c-accent-pale)', color: 'var(--c-accent)',
+                            border: '1px solid var(--c-accent-pale)', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font,
                           }}>Supprimer</button>
                         </div>
                       </>
@@ -262,7 +262,7 @@ export default function Editeur() {
                 </select>
                 {!creatingModule && (
                   <button onClick={() => setCreatingModule(true)} style={{
-                    padding: '10px 14px', borderRadius: 10, background: '#FDF6EA', color: '#DC4A2B',
+                    padding: '10px 14px', borderRadius: 10, background: 'var(--c-papier-teinte)', color: 'var(--c-accent)',
                     border: '1px solid #F2C4B5', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: font, whiteSpace: 'nowrap',
                   }}>+ Nouveau module</button>
                 )}
@@ -273,17 +273,17 @@ export default function Editeur() {
                     onKeyDown={e => { if (e.key === 'Enter') creerModule(); if (e.key === 'Escape') { setCreatingModule(false); setNomModule('') } }}
                     placeholder="Nom du module…" style={{ ...inputStyle, flex: 1, marginBottom: 0 }} />
                   <button onClick={creerModule} disabled={!nomModule.trim()} style={{
-                    padding: '10px 16px', borderRadius: 10, background: '#DC4A2B', color: '#fff',
+                    padding: '10px 16px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff',
                     border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: font, opacity: !nomModule.trim() ? 0.5 : 1,
                   }}>Créer</button>
                   <button onClick={() => { setCreatingModule(false); setNomModule('') }} style={{
-                    padding: '10px 12px', borderRadius: 10, background: '#fff', color: '#8A7E68',
-                    border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 13, fontFamily: font,
+                    padding: '10px 12px', borderRadius: 10, background: '#fff', color: 'var(--c-annotation)',
+                    border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 13, fontFamily: font,
                   }}>✕</button>
                 </div>
               )}
               {!moduleId && modules.length === 0 && (
-                <p style={{ fontSize: 12, color: '#9A8D72', marginTop: 8 }}>Cet espace n'a pas encore de module. Créez-en un pour ajouter des fiches.</p>
+                <p style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginTop: 8 }}>Cet espace n'a pas encore de module. Créez-en un pour ajouter des fiches.</p>
               )}
             </div>
           )}
@@ -310,7 +310,7 @@ export default function Editeur() {
               {msg && <div style={msgStyle}>{msg}</div>}
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={sauvegarder} disabled={!question || !reponse || !moduleId} style={{
-                  padding: '11px 22px', borderRadius: 10, background: '#DC4A2B', color: '#fff',
+                  padding: '11px 22px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff',
                   border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: font,
                   opacity: (!question || !reponse || !moduleId) ? 0.4 : 1,
                 }}>
@@ -318,8 +318,8 @@ export default function Editeur() {
                 </button>
                 {editFiche && (
                   <button onClick={() => { setEditFiche(null); setQuestion(''); setReponse('') }} style={{
-                    padding: '11px 16px', borderRadius: 10, background: '#FDF6EA', color: '#8A7E68',
-                    border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 13, fontFamily: font,
+                    padding: '11px 16px', borderRadius: 10, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)',
+                    border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 13, fontFamily: font,
                   }}>Annuler</button>
                 )}
               </div>
@@ -335,17 +335,17 @@ export default function Editeur() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {fiches.map(f => (
                   <div key={f.id} style={{
-                    padding: '12px 14px', background: '#FDF6EA', borderRadius: 10,
+                    padding: '12px 14px', background: 'var(--c-papier-teinte)', borderRadius: 10,
                     display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8,
                   }}>
                     <div style={{ flex: 1, fontSize: 13, lineHeight: 1.5 }}>{f.question.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()}</div>
                     <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                       <button onClick={() => { setEditFiche(f); setQuestion(f.question); setReponse(f.reponse); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-                        style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid #EADFC9', background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
+                        style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid var(--c-filet-fort)', background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
                         Modifier
                       </button>
                       <button onClick={() => supprimerFiche(f.id)}
-                        style={{ padding: '5px 12px', borderRadius: 7, background: '#FCE9E3', color: '#D94A30', border: '1px solid #FCE9E3', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
+                        style={{ padding: '5px 12px', borderRadius: 7, background: 'var(--c-accent-pale)', color: 'var(--c-accent)', border: '1px solid var(--c-accent-pale)', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
                         Supprimer
                       </button>
                     </div>

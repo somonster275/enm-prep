@@ -5,8 +5,8 @@ import { supabase } from '@/lib/supabase'
 import { enregistrerActivite } from '@/lib/streaks'
 import { activable } from '@/lib/a11y'
 
-const FONT = "'Hanken Grotesk', sans-serif"
-const DISPLAY = "'Bricolage Grotesque', sans-serif"
+const FONT = "var(--font-texte)"
+const DISPLAY = "var(--font-titre)"
 
 type OptionPub = { t: string; full?: string }
 type QuestionPub = { enonce: string; options: OptionPub[]; cat: 'qcm' | 'fiche'; multi: boolean }
@@ -116,53 +116,53 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
     const monScore = moi?.score ?? 0
     const mesJustes = moi?.justes ?? Object.values(answered).filter(a => a.juste).length
     return (
-      <div style={{ paddingTop: 34, maxWidth: 560, margin: '0 auto', fontFamily: FONT, color: '#2A2018' }}>
+      <div style={{ paddingTop: 34, maxWidth: 560, margin: '0 auto', fontFamily: FONT, color: 'var(--c-encre)' }}>
         <div style={{ textAlign: 'center', marginBottom: 20 }}>
           <div style={{ fontSize: 46 }}>🏁</div>
           <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 26 }}>Duel terminé</div>
-          <div style={{ fontSize: 14, color: '#8A7E68' }}>{match.titre} · {total} questions</div>
+          <div style={{ fontSize: 14, color: 'var(--c-annotation)' }}>{match.titre} · {total} questions</div>
         </div>
 
         {/* Ton score */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 14, background: '#FCE9E3', border: '1px solid #F3C6BC', marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 14, background: 'var(--c-accent-pale)', border: '1px solid var(--c-accent-bord)', marginBottom: 10 }}>
           <span style={{ fontSize: 22 }}>🧑‍⚖️</span>
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: 15 }}>Toi</div>
-            <div style={{ fontSize: 12.5, color: '#9A8D72' }}>{mesJustes}/{total} bonnes réponses</div>
+            <div style={{ fontSize: 12.5, color: 'var(--c-annotation-clair)' }}>{mesJustes}/{total} bonnes réponses</div>
           </div>
-          <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 20, color: '#DC4A2B' }}>{monScore}</span>
+          <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 20, color: 'var(--c-accent)' }}>{monScore}</span>
         </div>
 
         {/* Adversaires */}
         {adversaires.length === 0 ? (
-          <div style={{ background: '#FFF8EE', border: '1px solid #F2D9A0', borderRadius: 12, padding: '12px 16px', fontSize: 13.5, color: '#8A5A10' }}>
+          <div style={{ background: 'var(--c-papier-chaud)', border: '1px solid #F2D9A0', borderRadius: 12, padding: '12px 16px', fontSize: 13.5, color: '#8A5A10' }}>
             Personne n&apos;a encore relevé ton défi. Partage le code <b>{match.code}</b> — tu seras notifié de son score ici.
           </div>
         ) : adversaires.map(a => (
-          <div key={a.user_id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 14, background: '#fff', border: '1px solid #F0E7D6', marginBottom: 8 }}>
+          <div key={a.user_id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 14, background: '#fff', border: '1px solid var(--c-filet)', marginBottom: 8 }}>
             <span style={{ fontSize: 22 }}>{a.termine ? (a.score > monScore ? '👑' : '🎓') : '⌛'}</span>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 700, fontSize: 15 }}>{a.pseudo}</div>
-              <div style={{ fontSize: 12.5, color: '#9A8D72' }}>{a.termine ? `${a.justes}/${total} bonnes réponses` : 'n\'a pas encore terminé'}</div>
+              <div style={{ fontSize: 12.5, color: 'var(--c-annotation-clair)' }}>{a.termine ? `${a.justes}/${total} bonnes réponses` : 'n\'a pas encore terminé'}</div>
             </div>
-            <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 20, color: a.termine ? '#2A2018' : '#C0B7A4' }}>{a.termine ? a.score : '—'}</span>
+            <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 20, color: a.termine ? 'var(--c-encre)' : 'var(--c-discret-clair)' }}>{a.termine ? a.score : '—'}</span>
           </div>
         ))}
 
         {/* Inviter */}
         <button onClick={() => navigator.clipboard?.writeText(`${location.origin}/duel/${match.code}`)}
-          style={{ width: '100%', marginTop: 12, height: 44, border: '1px solid #EADFC9', borderRadius: 12, background: '#fff', color: '#8A7E68', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
+          style={{ width: '100%', marginTop: 12, height: 44, border: '1px solid var(--c-filet-fort)', borderRadius: 12, background: '#fff', color: 'var(--c-annotation)', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
           🔗 Copier le lien du défi (code {match.code})
         </button>
 
         {/* Débrief : cartes interrogées + rangement des erreurs */}
         <div style={{ marginTop: 28 }}>
           <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 19, marginBottom: 8 }}>Revois tes questions</div>
-          {!correction && <div style={{ color: '#9A8D72', fontSize: 14, padding: '10px 0' }}>Préparation du débrief…</div>}
+          {!correction && <div style={{ color: 'var(--c-annotation-clair)', fontSize: 14, padding: '10px 0' }}>Préparation du débrief…</div>}
           {correction && (
             <>
               {(correction.nbFichesRangees > 0 || correction.nbQcmRangees > 0) ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#FCE9E3', border: '1px solid #F3C6BC', borderRadius: 12, padding: '12px 16px', marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--c-accent-pale)', border: '1px solid var(--c-accent-bord)', borderRadius: 12, padding: '12px 16px', marginBottom: 16 }}>
                   <span style={{ fontSize: 22 }}>📌</span>
                   <div style={{ fontSize: 13.5, color: '#A8453B', lineHeight: 1.45 }}>
                     <b>{correction.nbErreurs} erreur{correction.nbErreurs > 1 ? 's' : ''}</b> rangée{correction.nbErreurs > 1 ? 's' : ''} dans tes cartes à réviser
@@ -177,7 +177,7 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
               )}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {correction.correction.map((c, i) => (
-                  <div key={i} style={{ background: '#fff', border: `1px solid ${c.juste ? '#BFE6CF' : '#F3C6BC'}`, borderRadius: 14, padding: 16 }}>
+                  <div key={i} style={{ background: '#fff', border: `1px solid ${c.juste ? '#BFE6CF' : 'var(--c-accent-bord)'}`, borderRadius: 14, padding: 16 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
                       <div style={{ fontSize: 14.5, fontWeight: 700, lineHeight: 1.4 }}>{i + 1}. {c.enonce}</div>
                       <span style={{ flexShrink: 0, fontSize: 13 }}>{c.juste ? '✅' : '❌'}</span>
@@ -186,9 +186,9 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
                       {c.options.map((t, oi) => {
                         const estCorrect = c.correct.includes(oi)
                         const choisi = c.choix.includes(oi)
-                        let bg = '#FFFBF2', bd = '#EADFC9', col = '#2A2018'
+                        let bg = 'var(--c-papier)', bd = 'var(--c-filet-fort)', col = 'var(--c-encre)'
                         if (estCorrect) { bg = '#ECF7F0'; bd = '#BFE6CF'; col = '#0E5A47' }
-                        else if (choisi) { bg = '#FCEEEA'; bd = '#F3C6BC'; col = '#A8453B' }
+                        else if (choisi) { bg = '#FCEEEA'; bd = 'var(--c-accent-bord)'; col = '#A8453B' }
                         const complet = c.optionsCompletes?.[oi] || t
                         const tronquee = / \[…\]$/.test(t) || complet.length > t.length
                         const cle = `${i}-${oi}`
@@ -200,7 +200,7 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
                               {estCorrect && <span style={{ fontSize: 11, fontWeight: 800, color: '#0F6E56', flexShrink: 0 }}>BONNE RÉPONSE</span>}
                               {!estCorrect && choisi && <span style={{ fontSize: 11, fontWeight: 800, color: '#C0392B', flexShrink: 0 }}>TON CHOIX</span>}
                             </div>
-                            {tronquee && <div style={{ fontSize: 11.5, fontWeight: 700, color: '#8A7E68', marginTop: 5 }}>{ouvert ? '▲ Réduire' : '▼ Voir toute la carte'}</div>}
+                            {tronquee && <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--c-annotation)', marginTop: 5 }}>{ouvert ? '▲ Réduire' : '▼ Voir toute la carte'}</div>}
                           </div>
                         )
                       })}
@@ -213,38 +213,38 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
           )}
         </div>
 
-        <button onClick={() => router.push('/duel')} style={{ width: '100%', height: 48, marginTop: 22, border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>Nouveau duel</button>
+        <button onClick={() => router.push('/duel')} style={{ width: '100%', height: 48, marginTop: 22, border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>Nouveau duel</button>
       </div>
     )
   }
 
   // ---------- Expiré (et pas terminé) ----------
   if (expire) return (
-    <div style={{ paddingTop: 60, textAlign: 'center', fontFamily: FONT, color: '#2A2018' }}>
+    <div style={{ paddingTop: 60, textAlign: 'center', fontFamily: FONT, color: 'var(--c-encre)' }}>
       <div style={{ fontSize: 40, marginBottom: 10 }}>⌛</div>
       <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 22 }}>Défi expiré</div>
-      <p style={{ color: '#8A7E68', fontSize: 14 }}>Ce duel asynchrone a dépassé son délai de 48 h.</p>
-      <button onClick={() => router.push('/duel')} style={{ marginTop: 10, padding: '11px 22px', border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>Retour aux duels</button>
+      <p style={{ color: 'var(--c-annotation)', fontSize: 14 }}>Ce duel asynchrone a dépassé son délai de 48 h.</p>
+      <button onClick={() => router.push('/duel')} style={{ marginTop: 10, padding: '11px 22px', border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>Retour aux duels</button>
     </div>
   )
 
   // ---------- Jeu auto-rythmé ----------
   const q = match.deck[idx]
-  if (!q) return <div style={{ paddingTop: 40, textAlign: 'center', color: '#9A8D72', fontFamily: FONT }}>…</div>
+  if (!q) return <div style={{ paddingTop: 40, textAlign: 'center', color: 'var(--c-annotation-clair)', fontFamily: FONT }}>…</div>
   const rep = answered[idx]
 
   return (
-    <div style={{ paddingTop: 34, maxWidth: 640, margin: '0 auto', fontFamily: FONT, color: '#2A2018' }}>
+    <div style={{ paddingTop: 34, maxWidth: 640, margin: '0 auto', fontFamily: FONT, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <button onClick={() => router.push('/duel')} style={{ border: 'none', background: 'transparent', color: '#9A8D72', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: 0, fontFamily: FONT }}>← Quitter</button>
-        <span style={{ fontSize: 13, fontWeight: 700, color: '#8A7E68' }}>Question {idx + 1} / {total}</span>
+        <button onClick={() => router.push('/duel')} style={{ border: 'none', background: 'transparent', color: 'var(--c-annotation-clair)', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: 0, fontFamily: FONT }}>← Quitter</button>
+        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-annotation)' }}>Question {idx + 1} / {total}</span>
       </div>
-      <div style={{ height: 8, background: '#F0E7D6', borderRadius: 999, overflow: 'hidden', marginBottom: 18 }}>
+      <div style={{ height: 8, background: 'var(--c-filet)', borderRadius: 999, overflow: 'hidden', marginBottom: 18 }}>
         <div style={{ height: '100%', width: `${(nbRepondu / total) * 100}%`, background: '#2DAE83', borderRadius: 999, transition: 'width .25s' }} />
       </div>
-      <div style={{ fontSize: 11.5, color: '#9A8D72', marginBottom: 14 }}>🕒 Duel asynchrone — joue à ton rythme, ton adversaire fera de même sous 48 h.</div>
+      <div style={{ fontSize: 11.5, color: 'var(--c-annotation-clair)', marginBottom: 14 }}>🕒 Duel asynchrone — joue à ton rythme, ton adversaire fera de même sous 48 h.</div>
 
-      <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18, padding: 22, marginBottom: 16 }}>
+      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18, padding: 22, marginBottom: 16 }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: q.cat === 'fiche' ? '#0F6E56' : '#8A5A10', marginBottom: 8 }}>{q.cat === 'fiche' ? 'FICHE' : 'QCM'}</div>
         <div style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.4 }}>{q.enonce}</div>
         {q.multi && <div style={{ fontSize: 12, color: '#0F6E56', fontWeight: 600, marginTop: 6 }}>☑ Plusieurs réponses possibles</div>}
@@ -253,17 +253,17 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 18 }}>
         {q.options.map((o, oi) => {
           const sel = selection.has(oi)
-          let bg = '#FFFBF2', bd = '#EADFC9'
+          let bg = 'var(--c-papier)', bd = 'var(--c-filet-fort)'
           if (verrou && rep) {
             if (rep.correct.includes(oi)) { bg = '#ECF7F0'; bd = '#BFE6CF' }
-            else if (rep.choix.includes(oi)) { bg = '#FCEEEA'; bd = '#F3C6BC' }
+            else if (rep.choix.includes(oi)) { bg = '#FCEEEA'; bd = 'var(--c-accent-bord)' }
           } else if (sel) { bg = '#FCEFD3'; bd = '#E8A11E' }
           return (
             <button key={oi} onClick={() => choisir(oi, q.multi)} disabled={verrou} style={{
               display: 'flex', alignItems: 'flex-start', gap: 12, textAlign: 'left', cursor: verrou ? 'default' : 'pointer',
-              border: `1.5px solid ${bd}`, background: bg, borderRadius: 12, padding: '13px 16px', fontSize: 15, fontFamily: FONT, color: '#2A2018',
+              border: `1.5px solid ${bd}`, background: bg, borderRadius: 12, padding: '13px 16px', fontSize: 15, fontFamily: FONT, color: 'var(--c-encre)',
             }}>
-              <span style={{ flexShrink: 0, width: 20, height: 20, marginTop: 1, borderRadius: q.multi ? 5 : '50%', border: `2px solid ${sel || (verrou && rep?.correct.includes(oi)) ? '#2DAE83' : '#C0B7A4'}`, background: (sel || (verrou && rep?.correct.includes(oi))) ? '#2DAE83' : '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12 }}>{(sel || (verrou && rep?.correct.includes(oi))) ? '✓' : ''}</span>
+              <span style={{ flexShrink: 0, width: 20, height: 20, marginTop: 1, borderRadius: q.multi ? 5 : '50%', border: `2px solid ${sel || (verrou && rep?.correct.includes(oi)) ? '#2DAE83' : 'var(--c-discret-clair)'}`, background: (sel || (verrou && rep?.correct.includes(oi))) ? '#2DAE83' : '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12 }}>{(sel || (verrou && rep?.correct.includes(oi))) ? '✓' : ''}</span>
               <span style={{ flex: 1, whiteSpace: 'pre-wrap', lineHeight: 1.45 }}>{verrou && o.full ? o.full : o.t}</span>
               {verrou && rep?.correct.includes(oi) && <span style={{ fontSize: 11, fontWeight: 800, color: '#0F6E56', flexShrink: 0 }}>BONNE</span>}
             </button>
@@ -276,12 +276,12 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
           <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 15, color: rep.juste ? '#0F6E56' : '#C0392B', marginBottom: 12 }}>
             {rep.juste ? '✅ Bonne réponse !' : '❌ Raté — la bonne réponse est en vert.'}
           </div>
-          <button onClick={suivant} style={{ width: '100%', height: 50, border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
+          <button onClick={suivant} style={{ width: '100%', height: 50, border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
             {idx + 1 >= total ? 'Voir mes résultats →' : 'Question suivante →'}
           </button>
         </>
       ) : (
-        <button onClick={valider} disabled={selection.size === 0 || envoi} style={{ width: '100%', height: 50, border: 'none', borderRadius: 12, background: '#DC4A2B', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: selection.size === 0 || envoi ? 0.5 : 1, fontFamily: FONT }}>
+        <button onClick={valider} disabled={selection.size === 0 || envoi} style={{ width: '100%', height: 50, border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: selection.size === 0 || envoi ? 0.5 : 1, fontFamily: FONT }}>
           {envoi ? '…' : 'Valider'}
         </button>
       )}

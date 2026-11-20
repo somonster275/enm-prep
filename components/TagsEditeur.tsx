@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 import TagsInput from './TagsInput'
 import { nettoyerTags } from '@/lib/tags'
 
-const FONT = "'Hanken Grotesk', sans-serif"
+const FONT = "var(--font-texte)"
 
 // Édite les tags d'une ressource déjà enregistrée (cours, média, mind map, QCM…).
 // Affiche les tags ; en mode admin, permet de les modifier et d'enregistrer
@@ -45,7 +45,7 @@ export default function TagsEditeur({
         <TagsInput value={tags} onChange={setTags} accent={accent} />
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={enregistrer} disabled={saving} style={{ height: 34, padding: '0 16px', border: 'none', borderRadius: 9, background: accent, color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT, opacity: saving ? 0.6 : 1 }}>{saving ? 'Enregistrement…' : 'Enregistrer les tags'}</button>
-          <button onClick={() => { setTags(nettoyerTags(initial)); setEdit(false) }} style={{ height: 34, padding: '0 12px', border: '1px solid #EADFC9', borderRadius: 9, background: '#fff', color: '#8A7E68', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>Annuler</button>
+          <button onClick={() => { setTags(nettoyerTags(initial)); setEdit(false) }} style={{ height: 34, padding: '0 12px', border: '1px solid var(--c-filet-fort)', borderRadius: 9, background: '#fff', color: 'var(--c-annotation)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>Annuler</button>
         </div>
       </div>
     )

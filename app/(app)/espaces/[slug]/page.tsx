@@ -60,31 +60,31 @@ export default function EspacePage() {
     load()
   }, [slug])
 
-  if (!espace) return <div style={{ padding: '2rem', color: '#888', fontFamily: "'Hanken Grotesk', sans-serif" }}>Chargement...</div>
+  if (!espace) return <div style={{ padding: '2rem', color: '#888', fontFamily: "var(--font-texte)" }}>Chargement...</div>
 
   const score = scoreGlobal(progressions)
   const due = progressions.filter(p => estDue(p.prochaine_revision)).length
-  const font = "'Hanken Grotesk', sans-serif"
-  const display = "'Bricolage Grotesque', sans-serif"
+  const font = "var(--font-texte)"
+  const display = "var(--font-titre)"
 
   return (
-    <div style={{ paddingTop: '34px', maxWidth: 800, margin: '0 auto', fontFamily: font, color: '#2A2018' }}>
+    <div style={{ paddingTop: '34px', maxWidth: 800, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
 
       {/* En-tête */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
         <div>
-          <div style={{ fontSize: 13, color: '#9A8D72', marginBottom: 6 }}>
-            <Link href="/espaces" style={{ color: '#9A8D72', textDecoration: 'none' }}>Espaces</Link> / {espace.nom}
+          <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)', marginBottom: 6 }}>
+            <Link href="/espaces" style={{ color: 'var(--c-annotation-clair)', textDecoration: 'none' }}>Espaces</Link> / {espace.nom}
           </div>
           <h1 style={{ fontFamily: display, fontSize: 26, fontWeight: 800, margin: '0 0 4px', color: espace.couleur }}>
             {espace.nom}
           </h1>
-          <p style={{ fontSize: 14, color: '#9A8D72', margin: 0 }}>{modules.length} module{modules.length > 1 ? 's' : ''}</p>
+          <p style={{ fontSize: 14, color: 'var(--c-annotation-clair)', margin: 0 }}>{modules.length} module{modules.length > 1 ? 's' : ''}</p>
         </div>
         {score > 0 && (
           <div style={{ textAlign: 'center', background: espace.couleur + '18', borderRadius: 14, padding: '14px 22px' }}>
             <div style={{ fontSize: 30, fontWeight: 800, color: espace.couleur, fontFamily: display }}>{score}%</div>
-            <div style={{ fontSize: 11, color: '#9A8D72' }}>Fiches maîtrisées</div>
+            <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)' }}>Fiches maîtrisées</div>
           </div>
         )}
       </div>
@@ -101,9 +101,9 @@ export default function EspacePage() {
           fontSize: 13, fontWeight: 700, textDecoration: 'none', textAlign: 'center', fontFamily: font,
         }}>Réviser ({due} dues)</Link>
         <Link href={`/espaces/${slug}/revision?mode=tout`} style={{
-          flex: 1, padding: '12px', borderRadius: 10, background: '#fff', color: '#8A7E68',
+          flex: 1, padding: '12px', borderRadius: 10, background: '#fff', color: 'var(--c-annotation)',
           fontSize: 13, textDecoration: 'none', textAlign: 'center', fontFamily: font,
-          border: '1px solid #F0E7D6',
+          border: '1px solid var(--c-filet)',
         }}>Tout réviser (aléatoire)</Link>
       </div>
 
@@ -117,7 +117,7 @@ export default function EspacePage() {
           const maitrisees = progMod.filter(p => (p.palier ?? 0) >= 4).length
           return (
             <Link key={mod.id} href={`/espaces/${slug}/modules/${mod.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: '1rem 1.25rem', cursor: 'pointer' }}>
+              <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '1rem 1.25rem', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div style={{ fontSize: 14, fontWeight: 600 }}>{mod.nom}</div>
                   <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -129,7 +129,7 @@ export default function EspacePage() {
                 <div style={{ height: 4, background: '#F1E4CE', borderRadius: 4, overflow: 'hidden', marginBottom: 8 }}>
                   <div style={{ height: '100%', width: `${scoreMod}%`, background: espace.couleur, borderRadius: 4 }} />
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#9A8D72' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--c-annotation-clair)' }}>
                   <span>{vues}/{fichMod.length} vues</span>
                   <span>{maitrisees} maîtrisées</span>
                 </div>
@@ -138,7 +138,7 @@ export default function EspacePage() {
           )
         })}
         {modules.length === 0 && (
-          <div style={{ fontSize: 14, color: '#9A8D72', padding: '1rem 0' }}>
+          <div style={{ fontSize: 14, color: 'var(--c-annotation-clair)', padding: '1rem 0' }}>
             Aucun module dans cette matière. Créez-en depuis l'éditeur.
           </div>
         )}
@@ -154,12 +154,12 @@ export default function EspacePage() {
           {isAdmin && <Link href="/cours" style={{ fontSize: 13, fontWeight: 600, color: '#3B82D9', textDecoration: 'none' }}>+ Ajouter</Link>}
         </div>
         {cours.length === 0 ? (
-          <div style={{ fontSize: 13, color: '#9A8D72', padding: '0.5rem 0' }}>Aucun cours dans cette matière pour l&apos;instant.</div>
+          <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)', padding: '0.5rem 0' }}>Aucun cours dans cette matière pour l&apos;instant.</div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {cours.map(c => (
               <Link key={c.id} href={`/cours?c=${c.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, fontWeight: 600 }}>
                     <span>{c.type === 'pdf' ? '📕' : '📘'}</span>{c.titre}
                   </div>
@@ -188,16 +188,16 @@ export default function EspacePage() {
               )}
             </div>
             {items.length === 0 ? (
-              <div style={{ fontSize: 13, color: '#9A8D72', padding: '0.5rem 0' }}>
+              <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)', padding: '0.5rem 0' }}>
                 Aucun contenu dans cette matière pour l'instant.
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {items.map(it => (
-                  <div key={it.id} style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                  <div key={it.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
                     <div style={{ fontSize: 14, fontWeight: 600 }}>
                       {it.titre}
-                      {it.type && <span style={{ fontSize: 11, color: '#8A7E68', marginLeft: 8 }}>· {it.type}</span>}
+                      {it.type && <span style={{ fontSize: 11, color: 'var(--c-annotation)', marginLeft: 8 }}>· {it.type}</span>}
                     </div>
                     {lienSur(it.url) && <a href={lienSur(it.url)!} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: t.accent, textDecoration: 'none', fontWeight: 600, flexShrink: 0 }}>Ouvrir →</a>}
                   </div>

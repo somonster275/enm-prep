@@ -32,7 +32,7 @@ export default function CorbeillePage() {
   const [msg, setMsg] = useState('')
 
   const afficherMsg = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 3000) }
-  const font = "'Hanken Grotesk', sans-serif"
+  const font = "var(--font-texte)"
 
   const charger = async () => {
     // Purge automatique de tout ce qui dépasse 30 jours
@@ -119,9 +119,9 @@ export default function CorbeillePage() {
     await charger()
   }
 
-  if (loading) return <div style={{ paddingTop: '4rem', textAlign: 'center', color: '#9A8D72', fontFamily: font }}>Chargement…</div>
+  if (loading) return <div style={{ paddingTop: '4rem', textAlign: 'center', color: 'var(--c-annotation-clair)', fontFamily: font }}>Chargement…</div>
   if (isAdmin === false) return (
-    <div style={{ paddingTop: '4rem', textAlign: 'center', color: '#9A8D72', fontFamily: font }}>
+    <div style={{ paddingTop: '4rem', textAlign: 'center', color: 'var(--c-annotation-clair)', fontFamily: font }}>
       Accès réservé aux administrateurs.
     </div>
   )
@@ -133,28 +133,28 @@ export default function CorbeillePage() {
     border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font,
   }
   const btnDelete: React.CSSProperties = {
-    padding: '6px 12px', borderRadius: 8, background: '#FCE9E3', color: '#D94A30',
+    padding: '6px 12px', borderRadius: 8, background: 'var(--c-accent-pale)', color: 'var(--c-accent)',
     border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font,
   }
 
   return (
-    <div style={{ paddingTop: '34px', maxWidth: 820, margin: '0 auto', fontFamily: font, color: '#2A2018' }}>
+    <div style={{ paddingTop: '34px', maxWidth: 820, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-        <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 26 }}>Corbeille</div>
+        <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 26 }}>Corbeille</div>
         {!vide && (
           <button onClick={viderCorbeille} style={{ ...btnDelete, padding: '9px 16px', fontSize: 13 }}>Vider la corbeille</button>
         )}
       </div>
-      <p style={{ fontSize: 13, color: '#9A8D72', margin: '0 0 24px' }}>
+      <p style={{ fontSize: 13, color: 'var(--c-annotation-clair)', margin: '0 0 24px' }}>
         Les éléments supprimés sont conservés {RETENTION_JOURS} jours, puis effacés automatiquement.
       </p>
 
       {msg && (
-        <div style={{ fontSize: 13, padding: '10px 14px', borderRadius: 10, marginBottom: 16, color: msg.startsWith('🗑️') ? '#D94A30' : '#0E7C63', background: msg.startsWith('🗑️') ? '#FCE9E3' : '#DDF3EE' }}>{msg}</div>
+        <div style={{ fontSize: 13, padding: '10px 14px', borderRadius: 10, marginBottom: 16, color: msg.startsWith('🗑️') ? 'var(--c-accent)' : '#0E7C63', background: msg.startsWith('🗑️') ? 'var(--c-accent-pale)' : '#DDF3EE' }}>{msg}</div>
       )}
 
       {vide ? (
-        <div style={{ textAlign: 'center', padding: '4rem 0', color: '#9A8D72' }}>
+        <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--c-annotation-clair)' }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🗑️</div>
           <div style={{ fontSize: 15 }}>La corbeille est vide.</div>
         </div>
@@ -163,15 +163,15 @@ export default function CorbeillePage() {
           {/* MODULES */}
           {modules.length > 0 && (
             <div style={{ marginBottom: 28 }}>
-              <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 18, marginBottom: 12 }}>
-                Modules <span style={{ fontSize: 14, color: '#9A8D72', fontWeight: 400 }}>({modules.length})</span>
+              <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 18, marginBottom: 12 }}>
+                Modules <span style={{ fontSize: 14, color: 'var(--c-annotation-clair)', fontWeight: 400 }}>({modules.length})</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {modules.map(mod => (
-                  <div key={mod.id} style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                  <div key={mod.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600 }}>{mod.nom}</div>
-                      <div style={{ fontSize: 12, color: '#9A8D72', marginTop: 2 }}>
+                      <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginTop: 2 }}>
                         {mod.espaces?.nom ?? 'Espace inconnu'} · supprimé il y a {RETENTION_JOURS - joursRestants(mod.deleted_at)} j · purge dans {joursRestants(mod.deleted_at)} j
                       </div>
                     </div>
@@ -188,15 +188,15 @@ export default function CorbeillePage() {
           {/* FICHES */}
           {fiches.length > 0 && (
             <div>
-              <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 18, marginBottom: 12 }}>
-                Fiches <span style={{ fontSize: 14, color: '#9A8D72', fontWeight: 400 }}>({fiches.length})</span>
+              <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 18, marginBottom: 12 }}>
+                Fiches <span style={{ fontSize: 14, color: 'var(--c-annotation-clair)', fontWeight: 400 }}>({fiches.length})</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {fiches.map(f => (
-                  <div key={f.id} style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                  <div key={f.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.question}</div>
-                      <div style={{ fontSize: 12, color: '#9A8D72', marginTop: 2 }}>
+                      <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginTop: 2 }}>
                         {f.modules?.nom ?? 'Module supprimé'} · purge dans {joursRestants(f.deleted_at)} j
                       </div>
                     </div>

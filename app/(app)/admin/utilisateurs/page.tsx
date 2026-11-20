@@ -132,15 +132,15 @@ export default function AdminUtilisateurs() {
         <div style={{ background: '#fff', border: '1px solid #F2D9A0', borderRadius: 12, padding: '1.25rem', marginBottom: '1.5rem' }}>
           <h2 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 1rem', display: 'flex', alignItems: 'center', gap: 8 }}>
             Demandes d&apos;accès en attente
-            <span style={{ background: '#DC4A2B', color: '#fff', fontSize: 12, fontWeight: 700, borderRadius: 999, padding: '1px 9px' }}>{demandes.length}</span>
+            <span style={{ background: 'var(--c-accent)', color: '#fff', fontSize: 12, fontWeight: 700, borderRadius: 999, padding: '1px 9px' }}>{demandes.length}</span>
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {demandes.map(d => (
-              <div key={d.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, padding: '12px 14px', background: '#FFFBF2', border: '1px solid #F0E7D6', borderRadius: 10 }}>
+              <div key={d.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, padding: '12px 14px', background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 10 }}>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: 13.5, fontWeight: 600 }}>{d.nom || d.email}</div>
                   <div style={{ fontSize: 12, color: '#888' }}>{d.email}</div>
-                  {d.message && <div style={{ fontSize: 12.5, color: '#6E6456', marginTop: 4, fontStyle: 'italic' }}>« {d.message} »</div>}
+                  {d.message && <div style={{ fontSize: 12.5, color: 'var(--c-texte-doux)', marginTop: 4, fontStyle: 'italic' }}>« {d.message} »</div>}
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                   <button onClick={() => traiterDemande(d.id, 'refuser')} disabled={traitement === d.id} style={{
@@ -183,7 +183,7 @@ export default function AdminUtilisateurs() {
             </select>
           </div>
         </div>
-        {message && <div style={{ fontSize: 13, color: message.startsWith('❌') ? '#D94A30' : '#0F6E56', marginBottom: 10 }}>{message}</div>}
+        {message && <div style={{ fontSize: 13, color: message.startsWith('❌') ? 'var(--c-accent)' : '#0F6E56', marginBottom: 10 }}>{message}</div>}
         <button onClick={creerUtilisateur} disabled={loading}
           style={{ padding: '10px 20px', borderRadius: 8, background: '#534AB7', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: loading ? 0.7 : 1 }}>
           {loading ? 'Création...' : 'Créer le compte'}
@@ -215,7 +215,7 @@ export default function AdminUtilisateurs() {
                   )}
                   {u.id !== monId && (
                     <button onClick={() => supprimerUtilisateur(u.id, u.nom || u.email)} title="Supprimer ce compte"
-                      style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #F3C9BE', background: '#FCE9E3', color: '#D94A30', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                      style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #F3C9BE', background: 'var(--c-accent-pale)', color: 'var(--c-accent)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
                       Supprimer
                     </button>
                   )}
@@ -235,7 +235,7 @@ export default function AdminUtilisateurs() {
                     {mdpLoading ? '…' : 'Enregistrer'}
                   </button>
                   <button onClick={() => setMdpEdit(null)}
-                    style={{ padding: '8px 14px', borderRadius: 8, background: '#fff', color: '#6E6456', border: '1px solid #E0E0E0', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    style={{ padding: '8px 14px', borderRadius: 8, background: '#fff', color: 'var(--c-texte-doux)', border: '1px solid #E0E0E0', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
                     Annuler
                   </button>
                 </div>

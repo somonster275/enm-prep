@@ -8,8 +8,8 @@ type Ligne = {
   score: number; justes: number; rang: number; nb: number
 }
 
-const FONT = "'Hanken Grotesk', sans-serif"
-const DISPLAY = "'Bricolage Grotesque', sans-serif"
+const FONT = "var(--font-texte)"
+const DISPLAY = "var(--font-titre)"
 
 export default function HistoriqueDuels() {
   const [lignes, setLignes] = useState<Ligne[]>([])
@@ -65,42 +65,42 @@ export default function HistoriqueDuels() {
   const dateFr = (s: string | null) => s ? new Date(s).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : ''
 
   return (
-    <div style={{ paddingTop: 34, maxWidth: 720, margin: '0 auto', fontFamily: FONT, color: '#2A2018' }}>
+    <div style={{ paddingTop: 34, maxWidth: 720, margin: '0 auto', fontFamily: FONT, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
         <h1 style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 28, margin: 0 }}>Mes duels</h1>
-        <Link href="/duel" style={{ fontSize: 13.5, color: '#9A8D72', textDecoration: 'none' }}>← Retour aux duels</Link>
+        <Link href="/duel" style={{ fontSize: 13.5, color: 'var(--c-annotation-clair)', textDecoration: 'none' }}>← Retour aux duels</Link>
       </div>
 
       {loading ? (
-        <div style={{ color: '#9A8D72', textAlign: 'center', padding: 30 }}>Chargement…</div>
+        <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : lignes.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: '#9A8D72', background: '#FFFBF2', border: '1px dashed #EADFC9', borderRadius: 16 }}>
-          Tu n&apos;as pas encore terminé de duel. <Link href="/duel" style={{ color: '#DC4A2B', fontWeight: 700 }}>Lance ton premier match !</Link>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>
+          Tu n&apos;as pas encore terminé de duel. <Link href="/duel" style={{ color: 'var(--c-accent)', fontWeight: 700 }}>Lance ton premier match !</Link>
         </div>
       ) : (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 22 }}>
             {[
-              { l: 'Matchs joués', v: stats.joues, c: '#2A2018' },
-              { l: 'Victoires 🥇', v: stats.victoires, c: '#DC4A2B' },
+              { l: 'Matchs joués', v: stats.joues, c: 'var(--c-encre)' },
+              { l: 'Victoires 🥇', v: stats.victoires, c: 'var(--c-accent)' },
               { l: 'Bonnes réponses', v: `${stats.tauxJustes}%`, c: '#0F6E56' },
             ].map(s => (
-              <div key={s.l} style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 14, padding: 16, textAlign: 'center' }}>
+              <div key={s.l} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 14, padding: 16, textAlign: 'center' }}>
                 <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 26, color: s.c }}>{s.v}</div>
-                <div style={{ fontSize: 12.5, color: '#8A7E68', marginTop: 2 }}>{s.l}</div>
+                <div style={{ fontSize: 12.5, color: 'var(--c-annotation)', marginTop: 2 }}>{s.l}</div>
               </div>
             ))}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {lignes.map(l => (
-              <div key={l.matchId} style={{ display: 'flex', alignItems: 'center', gap: 14, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 12, padding: '12px 16px' }}>
+              <div key={l.matchId} style={{ display: 'flex', alignItems: 'center', gap: 14, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '12px 16px' }}>
                 <span style={{ fontSize: 18, width: 30, textAlign: 'center' }}>{l.rang === 1 ? '🥇' : l.rang === 2 ? '🥈' : l.rang === 3 ? '🥉' : `#${l.rang}`}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14.5, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.titre}</div>
-                  <div style={{ fontSize: 12, color: '#9A8D72' }}>{dateFr(l.date)} · {l.justes}/{l.total} bonnes · {l.nb} joueur{l.nb > 1 ? 's' : ''}</div>
+                  <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)' }}>{dateFr(l.date)} · {l.justes}/{l.total} bonnes · {l.nb} joueur{l.nb > 1 ? 's' : ''}</div>
                 </div>
-                <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 18, color: '#DC4A2B' }}>{l.score}</span>
+                <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 18, color: 'var(--c-accent)' }}>{l.score}</span>
               </div>
             ))}
           </div>

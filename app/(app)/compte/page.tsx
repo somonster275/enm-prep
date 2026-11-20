@@ -78,26 +78,26 @@ export default function ComptePage() {
   }
 
   const champ: React.CSSProperties = {
-    width: '100%', height: 46, border: '1.5px solid #EADFC9', borderRadius: 12,
-    padding: '0 14px', background: '#FFFBF2', fontSize: 14, outline: 'none', boxSizing: 'border-box',
-    fontFamily: "'Hanken Grotesk', sans-serif",
+    width: '100%', height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12,
+    padding: '0 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', boxSizing: 'border-box',
+    fontFamily: "var(--font-texte)",
   }
   const carte: React.CSSProperties = {
-    background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: '1.5rem',
+    background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: '1.5rem',
   }
   const bouton = (disabled: boolean): React.CSSProperties => ({
     marginTop: 18, height: 48, width: '100%', border: 'none', borderRadius: 12,
-    background: '#DC4A2B', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer',
-    opacity: disabled ? 0.7 : 1, fontFamily: "'Hanken Grotesk', sans-serif",
+    background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer',
+    opacity: disabled ? 0.7 : 1, fontFamily: "var(--font-texte)",
   })
 
   return (
-    <div style={{ padding: '1.5rem', maxWidth: 520, margin: '0 auto', fontFamily: "'Hanken Grotesk', sans-serif" }}>
+    <div style={{ padding: '1.5rem', maxWidth: 520, margin: '0 auto', fontFamily: "var(--font-texte)" }}>
       <h1 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 1.5rem' }}>Mon compte</h1>
 
       {/* Identité */}
       <div style={carte}>
-        <div style={{ fontSize: 13, color: '#8A7E68', marginBottom: 4 }}>Connecté en tant que</div>
+        <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginBottom: 4 }}>Connecté en tant que</div>
         <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 24 }}>{email}</div>
 
         <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 14px' }}>Mon identité</h2>
@@ -114,7 +114,7 @@ export default function ComptePage() {
         </div>
 
         {msgId && (
-          <div style={{ marginTop: 12, fontSize: 13.5, color: msgId.type === 'ok' ? '#0F6E56' : '#D94A30' }}>
+          <div style={{ marginTop: 12, fontSize: 13.5, color: msgId.type === 'ok' ? '#0F6E56' : 'var(--c-accent)' }}>
             {msgId.texte}
           </div>
         )}
@@ -134,7 +134,7 @@ export default function ComptePage() {
         </div>
 
         {message && (
-          <div style={{ marginTop: 12, fontSize: 13.5, color: message.type === 'ok' ? '#0F6E56' : '#D94A30' }}>
+          <div style={{ marginTop: 12, fontSize: 13.5, color: message.type === 'ok' ? '#0F6E56' : 'var(--c-accent)' }}>
             {message.texte}
           </div>
         )}
@@ -150,7 +150,7 @@ export default function ComptePage() {
           <div style={{ width: 48, height: 48, borderRadius: 12, background: '#EEF2FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>🎓</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 15, fontWeight: 700 }}>ENT — Université Paris 1</div>
-            <div style={{ fontSize: 13, color: '#8A7E68', marginTop: 2 }}>Ton environnement numérique de travail (Panthéon-Sorbonne).</div>
+            <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginTop: 2 }}>Ton environnement numérique de travail (Panthéon-Sorbonne).</div>
           </div>
         </div>
         <a href="https://ent.univ-paris1.fr/" target="_blank" rel="noopener noreferrer" style={{
@@ -166,41 +166,41 @@ export default function ComptePage() {
       {/* Mes données — RGPD */}
       <div style={{ ...carte, marginTop: 20 }}>
         <h2 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 6px' }}>Mes données</h2>
-        <div style={{ fontSize: 13.5, color: '#8A7E68', lineHeight: 1.5, marginBottom: 16 }}>
+        <div style={{ fontSize: 13.5, color: 'var(--c-annotation)', lineHeight: 1.5, marginBottom: 16 }}>
           Tes données t&apos;appartiennent. Tu peux les exporter à tout moment ou supprimer
-          définitivement ton compte. Voir la <a href="/donnees" style={{ color: '#DC4A2B', fontWeight: 700, textDecoration: 'none' }}>politique de confidentialité</a>.
+          définitivement ton compte. Voir la <a href="/donnees" style={{ color: 'var(--c-accent)', fontWeight: 700, textDecoration: 'none' }}>politique de confidentialité</a>.
         </div>
 
         <a href="/api/compte/exporter" style={{
           height: 46, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-          border: '1.5px solid #EADFC9', borderRadius: 12, background: '#FFFBF2',
-          color: '#2A2018', fontSize: 14, fontWeight: 700, textDecoration: 'none',
+          border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, background: 'var(--c-papier)',
+          color: 'var(--c-encre)', fontSize: 14, fontWeight: 700, textDecoration: 'none',
         }}>Exporter mes données (JSON)</a>
 
         <button onClick={() => { setSuppOuvert(true); setConfirmTxt(''); setSuppErr('') }} style={{
-          marginTop: 10, height: 46, width: '100%', border: '1.5px solid #F3C6BC', borderRadius: 12,
-          background: '#fff', color: '#D94A30', fontSize: 14, fontWeight: 700, cursor: 'pointer',
-          fontFamily: "'Hanken Grotesk', sans-serif",
+          marginTop: 10, height: 46, width: '100%', border: '1.5px solid var(--c-accent-bord)', borderRadius: 12,
+          background: '#fff', color: 'var(--c-accent)', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+          fontFamily: "var(--font-texte)",
         }}>Supprimer mon compte</button>
       </div>
 
       {/* Modal de confirmation de suppression */}
       {suppOuvert && (
         <div onClick={() => !suppLoading && setSuppOuvert(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(40,30,20,.45)', zIndex: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Supprimer mon compte" style={{ background: '#fff', borderRadius: 18, padding: 24, width: '100%', maxWidth: 440, fontFamily: "'Hanken Grotesk', sans-serif", color: '#2A2018' }}>
+          <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Supprimer mon compte" style={{ background: '#fff', borderRadius: 18, padding: 24, width: '100%', maxWidth: 440, fontFamily: "var(--font-texte)", color: 'var(--c-encre)' }}>
             <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 6 }}>Supprimer mon compte</div>
-            <div style={{ fontSize: 14, color: '#8A7E68', lineHeight: 1.5, marginBottom: 14 }}>
+            <div style={{ fontSize: 14, color: 'var(--c-annotation)', lineHeight: 1.5, marginBottom: 14 }}>
               Cette action est <b>irréversible</b>. Toutes tes données (progression, notes, fiche d&apos;entraide,
               liens, remarques…) seront <b>définitivement supprimées</b>. Pour confirmer, écris <b>SUPPRIMER</b> ci-dessous.
             </div>
             <input value={confirmTxt} onChange={e => setConfirmTxt(e.target.value)} placeholder="SUPPRIMER"
-              style={{ width: '100%', height: 46, border: '1.5px solid #EADFC9', borderRadius: 12, padding: '0 14px', background: '#FFFBF2', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "'Hanken Grotesk', sans-serif" }} />
-            {suppErr && <div style={{ color: '#D94A30', fontSize: 13, marginTop: 8 }}>{suppErr}</div>}
+              style={{ width: '100%', height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '0 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "var(--font-texte)" }} />
+            {suppErr && <div style={{ color: 'var(--c-accent)', fontSize: 13, marginTop: 8 }}>{suppErr}</div>}
             <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-              <button onClick={() => setSuppOuvert(false)} disabled={suppLoading} style={{ flex: 1, height: 46, border: '1.5px solid #EADFC9', background: '#fff', borderRadius: 11, fontSize: 14, fontWeight: 600, color: '#6E6456', cursor: 'pointer', fontFamily: "'Hanken Grotesk', sans-serif" }}>Annuler</button>
+              <button onClick={() => setSuppOuvert(false)} disabled={suppLoading} style={{ flex: 1, height: 46, border: '1.5px solid var(--c-filet-fort)', background: '#fff', borderRadius: 11, fontSize: 14, fontWeight: 600, color: 'var(--c-texte-doux)', cursor: 'pointer', fontFamily: "var(--font-texte)" }}>Annuler</button>
               <button onClick={supprimerCompte} disabled={suppLoading || confirmTxt.trim().toUpperCase() !== 'SUPPRIMER'} style={{
-                flex: 2, height: 46, border: 'none', borderRadius: 11, background: '#D94A30', color: '#fff',
-                fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Hanken Grotesk', sans-serif",
+                flex: 2, height: 46, border: 'none', borderRadius: 11, background: 'var(--c-accent)', color: '#fff',
+                fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "var(--font-texte)",
                 opacity: (suppLoading || confirmTxt.trim().toUpperCase() !== 'SUPPRIMER') ? 0.5 : 1,
               }}>{suppLoading ? 'Suppression…' : 'Supprimer définitivement'}</button>
             </div>
