@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 32).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 33).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,13 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 33) — Matières réservées aux connectés (migration 0040, À EXÉCUTER)
+- **Migration `0040_espaces_connectes.sql`** : supprime `lecture_espaces` (rôle public, lisible sans compte),
+  crée `espaces_select_connectes` (select, authenticated). Vérifié : aucune page publique ne lit `espaces`.
+- Classement « +1 en boucle » (jusqu'à 1 000/jour) **laissé volontairement** : classement anonyme, faible enjeu ;
+  la seule vraie parade (compter côté serveur depuis `progression`) changerait le sens du classement et ne
+  couvrirait plus QCM/duels. À reprendre seulement si une triche est constatée.
 
 ### 2026-11-20 (suite 32) — Révision : double appui ignoré
 - `revision/page.tsx` : `rateCard` et `annuler` enrobés par `verrouille()` (verrou `useRef`, libéré dans un
