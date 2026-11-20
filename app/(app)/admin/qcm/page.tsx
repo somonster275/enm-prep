@@ -150,7 +150,7 @@ export default function AdminQcmPage() {
 
   return (
     <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
-      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 26, margin: 0 }}>Créer un QCM</h1>
+      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 26, margin: 0 }}>Créer un QCM</h1>
       <p style={{ fontSize: 14.5, color: 'var(--c-annotation)', margin: '8px 0 18px' }}>
         Importe ton QCM depuis un <b>lien</b>, ou colle-le en <b>texte</b> ou en <b>HTML</b>, puis vérifie les bonnes réponses avant d&apos;enregistrer.
       </p>

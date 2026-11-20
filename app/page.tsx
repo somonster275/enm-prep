@@ -23,14 +23,14 @@ const LIVRES: { h: number; rot: string; bg: string; kicker: string; titre: strin
 
 // Tout ce que l'étudiant peut faire dans l'app (outils individuels).
 const FONCTIONS = [
-  { icone: '🗂️', couleur: '#DC4A2B', titre: 'Fiches de révision', desc: 'Vos fiches par matière, servies en répétition espacée pour ancrer durablement.' },
+  { icone: '🗂️', couleur: '#A3122A', titre: 'Fiches de révision', desc: 'Vos fiches par matière, servies en répétition espacée pour ancrer durablement.' },
   { icone: '✅', couleur: '#E8A11E', titre: 'QCM & erreurs', desc: 'Des QCM auto-corrigés, et un mode qui vous fait rejouer vos erreurs jusqu\'à les maîtriser.' },
   { icone: '💬', couleur: '#534AB7', titre: 'Questions de cours', desc: 'Une question, une réponse sourcée sur une base de cours sélectionnée avec soin.' },
   { icone: '🤖', couleur: '#0F766E', titre: 'Coach IA', desc: 'Un coach qui connaît votre progression et vous propose la prochaine étape.' },
   { icone: '🧠', couleur: '#2DAE83', titre: 'Mind maps', desc: 'Visualiser les notions clés en cartes mentales et schémas par sujet.' },
   { icone: '🎬', couleur: '#3B82D9', titre: 'Vidéos', desc: 'Des vidéos sélectionnées par matière, à regarder directement dans codex.' },
   { icone: '📅', couleur: '#C2410C', titre: 'Calendrier', desc: 'Vos cours de la fac et les événements de la prépa réunis et synchronisés.' },
-  { icone: '🔥', couleur: '#DC4A2B', titre: 'Progression', desc: 'Régularité, maîtrise et couverture suivies jour après jour pour rester motivé.' },
+  { icone: '🔥', couleur: '#A3122A', titre: 'Progression', desc: 'Régularité, maîtrise et couverture suivies jour après jour pour rester motivé.' },
 ]
 
 // Outils collaboratifs — mis en avant dans une bande dédiée.
@@ -86,7 +86,7 @@ export default function Accueil() {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
     height: 52, padding: '0 26px', borderRadius: 14, border: 'none',
     background: RED, color: '#fff', fontSize: 15.5, fontWeight: 700, cursor: 'pointer',
-    textDecoration: 'none', boxShadow: '0 12px 24px -10px rgba(220,74,43,.8)',
+    textDecoration: 'none', boxShadow: '0 12px 24px -10px rgba(163,18,42,.8)',
     fontFamily: "var(--font-texte)",
   }
   const btnLigne: React.CSSProperties = {
@@ -125,7 +125,7 @@ export default function Accueil() {
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: RED }} /> POUR LES CANDIDATS À L'ENM
           </div>
 
-          <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 56, lineHeight: 1.04, letterSpacing: '-.02em', margin: '22px 0 0' }}>
+          <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 56, lineHeight: 1.04, letterSpacing: '-.02em', margin: '22px 0 0' }}>
             Tout pour <span style={{ color: RED }}>réussir</span><br />le concours de la magistrature.
           </h1>
 
@@ -148,7 +148,7 @@ export default function Accueil() {
           <div style={{ display: 'flex', gap: 40, marginTop: 38 }}>
             {[['9', 'Matières au programme'], ['100%', 'Conçu par un candidat à l\'ENM'], ['1', 'Espace pour tout réviser']].map(([n, l]) => (
               <div key={l}>
-                <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 30, color: INK }}>{n}</div>
+                <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 30, color: INK }}>{n}</div>
                 <div style={{ fontSize: 13, color: MUTED, marginTop: 2, maxWidth: 130 }}>{l}</div>
               </div>
             ))}
@@ -163,7 +163,7 @@ export default function Accueil() {
 
       {/* ───────────── Aperçu « comme une question de cours » ───────────── */}
       <section id="apercu" style={{ maxWidth: 900, margin: '0 auto', padding: '50px 24px' }}>
-        <h2 style={{ textAlign: 'center', fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 34, letterSpacing: '-.01em', margin: 0 }}>
+        <h2 style={{ textAlign: 'center', fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 34, letterSpacing: '-.01em', margin: 0 }}>
           Un aperçu, comme en révision
         </h2>
         <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 22, padding: 24, marginTop: 28, boxShadow: '0 24px 60px -40px rgba(60,40,20,.3)' }}>
@@ -201,7 +201,7 @@ export default function Accueil() {
 
       {/* ───────────── Ce que vous pouvez faire ───────────── */}
       <section id="fonctions" style={{ maxWidth: 1140, margin: '0 auto', padding: '40px 24px 20px' }}>
-        <h2 style={{ textAlign: 'center', fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 34, letterSpacing: '-.01em', margin: 0 }}>
+        <h2 style={{ textAlign: 'center', fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 34, letterSpacing: '-.01em', margin: 0 }}>
           Ce que vous pouvez faire
         </h2>
         <p style={{ textAlign: 'center', fontSize: 16.5, color: MUTED, margin: '12px auto 0', maxWidth: 560 }}>
@@ -212,7 +212,7 @@ export default function Accueil() {
           {FONCTIONS.map(f => (
             <div key={f.titre} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 18, padding: 22 }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: `${f.couleur}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{f.icone}</div>
-              <div style={{ fontFamily: "var(--font-titre)", fontWeight: 700, fontSize: 17, marginTop: 14 }}>{f.titre}</div>
+              <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 17, marginTop: 14 }}>{f.titre}</div>
               <div style={{ fontSize: 13.5, lineHeight: 1.55, color: MUTED, marginTop: 7 }}>{f.desc}</div>
             </div>
           ))}
@@ -226,7 +226,7 @@ export default function Accueil() {
             <div style={{ display: 'inline-block', fontSize: 11.5, fontWeight: 800, letterSpacing: '.09em', textTransform: 'uppercase', color: '#fff', background: RED, borderRadius: 999, padding: '5px 13px' }}>
               Le cœur de codex
             </div>
-            <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 34, letterSpacing: '-.01em', margin: '14px 0 0', lineHeight: 1.12 }}>
+            <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 34, letterSpacing: '-.01em', margin: '14px 0 0', lineHeight: 1.12 }}>
               Réviser <span style={{ color: RED }}>ensemble</span>, pas chacun dans son coin
             </h2>
             <p style={{ fontSize: 16.5, color: '#6E5A50', margin: '12px auto 0', maxWidth: 540, lineHeight: 1.55 }}>
@@ -238,7 +238,7 @@ export default function Accueil() {
             {COLLAB.map(f => (
               <div key={f.titre} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 18, padding: 22, boxShadow: '0 18px 44px -34px rgba(60,40,20,.4)' }}>
                 <div style={{ width: 44, height: 44, borderRadius: 12, background: `${f.couleur}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{f.icone}</div>
-                <div style={{ fontFamily: "var(--font-titre)", fontWeight: 700, fontSize: 17, marginTop: 14 }}>{f.titre}</div>
+                <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 17, marginTop: 14 }}>{f.titre}</div>
                 <div style={{ fontSize: 13.5, lineHeight: 1.55, color: MUTED, marginTop: 7 }}>{f.desc}</div>
               </div>
             ))}
@@ -251,7 +251,7 @@ export default function Accueil() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
           {EXEMPLES.map(e => (
             <div key={e.titre} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 18, padding: 24 }}>
-              <div style={{ fontFamily: "var(--font-titre)", fontWeight: 700, fontSize: 16.5 }}>{e.titre}</div>
+              <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 16.5 }}>{e.titre}</div>
               <div style={{ fontSize: 14.5, fontStyle: 'italic', color: INK, margin: '12px 0', lineHeight: 1.5 }}>{e.q}</div>
               <div style={{ fontSize: 12.5, color: MUTED }}>{e.note}</div>
             </div>
@@ -264,7 +264,7 @@ export default function Accueil() {
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '60px 24px', display: 'flex', gap: 48, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 380px' }}>
             <div style={{ display: 'inline-block', fontSize: 12, fontWeight: 800, letterSpacing: '.1em', color: RED, border: `1px solid ${BORDER}`, padding: '6px 14px', borderRadius: 999 }}>LA MÉTHODE</div>
-            <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 38, letterSpacing: '-.01em', margin: '18px 0 0', lineHeight: 1.1 }}>
+            <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 38, letterSpacing: '-.01em', margin: '18px 0 0', lineHeight: 1.1 }}>
               Pensé pour le <span style={{ color: RED }}>concours</span>, pas pour réviser au hasard.
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 18, marginTop: 26 }}>
@@ -288,7 +288,7 @@ export default function Accueil() {
             <div style={{ background: CREAM, border: `1px solid ${BORDER}`, borderRadius: 22, padding: 32, width: '100%', maxWidth: 380 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: MUTED, letterSpacing: '.04em' }}>VOTRE PROGRESSION</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 8 }}>
-                <span style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 48, color: RED }}>🔥 7</span>
+                <span style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 48, color: RED }}>🔥 7</span>
                 <span style={{ fontSize: 15, color: MUTED, fontWeight: 600 }}>jours d'affilée</span>
               </div>
               <div style={{ height: 1, background: BORDER, margin: '20px 0' }} />
@@ -309,7 +309,7 @@ export default function Accueil() {
 
       {/* ───────────── CTA final ───────────── */}
       <section style={{ maxWidth: 1140, margin: '0 auto', padding: '70px 24px', textAlign: 'center' }}>
-        <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 40, letterSpacing: '-.01em', margin: 0 }}>
+        <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 40, letterSpacing: '-.01em', margin: 0 }}>
           Prêt à réviser autrement ?
         </h2>
         <p style={{ fontSize: 17, color: MUTED, margin: '14px auto 0', maxWidth: 500 }}>
@@ -349,14 +349,14 @@ function CodexCodes() {
             display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '11px 7px 9px',
             transform: `rotate(${l.rot})`,
           }}>
-            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, fontWeight: 600, color: '#fff', background: 'rgba(0,0,0,.16)', borderRadius: 3, padding: '2px 7px' }}>2026</div>
+            <div style={{ fontFamily: "var(--font-texte)", fontSize: 11, fontWeight: 600, color: '#fff', background: 'rgba(0,0,0,.16)', borderRadius: 3, padding: '2px 7px' }}>2026</div>
             <div style={{ flex: 1, width: '100%', margin: '9px 0', border: '1px solid rgba(255,255,255,.55)', borderRadius: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
               <span style={{ fontFamily: "var(--font-texte)", fontSize: 8, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(255,255,255,.7)' }}>{l.kicker}</span>
-              <span style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: l.size, fontWeight: 800, lineHeight: 0.98, color: '#fff', textAlign: 'center' }}>
+              <span style={{ fontFamily: "var(--font-titre)", fontSize: l.size, fontWeight: 'var(--titre-poids)', lineHeight: 0.98, color: '#fff', textAlign: 'center' }}>
                 {l.titre.split('\n').map((t, j) => <span key={j}>{j > 0 && <br />}{t}</span>)}
               </span>
             </div>
-            <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,.92)', letterSpacing: '-.01em' }}>codex</div>
+            <div style={{ fontFamily: "var(--font-titre)", fontSize: 11, fontWeight: 'var(--titre-poids)', color: 'rgba(255,255,255,.92)', letterSpacing: '-.01em' }}>codex</div>
           </div>
         ))}
       </div>

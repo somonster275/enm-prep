@@ -1,7 +1,7 @@
 import React from 'react'
 
 const INK = '#000000'
-const RED = '#DC4A2B'
+const RED = '#F2E25C' // surligneur jaune derrière « ode »
 
 /**
  * Logo « codex » — police Bagel Fat One (style bubble rétro), version pleine.

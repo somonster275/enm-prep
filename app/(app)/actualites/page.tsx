@@ -12,7 +12,7 @@ const COULEURS = ['var(--c-accent)', '#2DAE83', '#3B82D9', '#E8A11E', '#7C5CBF',
 
 // Sources pré-configurées : insérées automatiquement au premier chargement (par un admin) si la table est vide.
 const SOURCES_DEFAUT = [
-  { nom: 'Le Club des Juristes', url: 'https://www.leclubdesjuristes.com/feed/', couleur: '#DC4A2B' },
+  { nom: 'Le Club des Juristes', url: 'https://www.leclubdesjuristes.com/feed/', couleur: '#A3122A' },
   { nom: 'Dalloz Étudiant', url: 'https://actu.dalloz-etudiant.fr/rss.xml', couleur: '#2DAE83' },
   { nom: 'Vie-publique', url: 'https://www.vie-publique.fr/actualites-feeds.xml', couleur: '#3B82D9' },
 ]
@@ -124,7 +124,7 @@ export default function ActualitesPage() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#DC4A2B22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📰</div>
+            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#A3122A22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📰</div>
             <div style={{ fontFamily: display, fontWeight: 800, fontSize: 26 }}>Actualités</div>
           </div>
           <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '6px 0 0 56px' }}>L'actualité juridique de la semaine, en direct des sites de référence.</p>

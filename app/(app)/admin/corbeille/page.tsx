@@ -140,7 +140,7 @@ export default function CorbeillePage() {
   return (
     <div style={{ paddingTop: '34px', maxWidth: 820, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-        <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 26 }}>Corbeille</div>
+        <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 26 }}>Corbeille</div>
         {!vide && (
           <button onClick={viderCorbeille} style={{ ...btnDelete, padding: '9px 16px', fontSize: 13 }}>Vider la corbeille</button>
         )}
@@ -163,7 +163,7 @@ export default function CorbeillePage() {
           {/* MODULES */}
           {modules.length > 0 && (
             <div style={{ marginBottom: 28 }}>
-              <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 18, marginBottom: 12 }}>
+              <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 18, marginBottom: 12 }}>
                 Modules <span style={{ fontSize: 14, color: 'var(--c-annotation-clair)', fontWeight: 400 }}>({modules.length})</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -188,7 +188,7 @@ export default function CorbeillePage() {
           {/* FICHES */}
           {fiches.length > 0 && (
             <div>
-              <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 18, marginBottom: 12 }}>
+              <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 18, marginBottom: 12 }}>
                 Fiches <span style={{ fontSize: 14, color: 'var(--c-annotation-clair)', fontWeight: 400 }}>({fiches.length})</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

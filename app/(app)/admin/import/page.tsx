@@ -290,7 +290,7 @@ export default function ImportPage() {
   return (
     <div style={{ paddingTop: '34px', maxWidth: 720, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
 
-      <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 26, marginBottom: 8 }}>
+      <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 26, marginBottom: 8 }}>
         Importer des cartes Anki
       </div>
       <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '0 0 28px' }}>
@@ -470,7 +470,7 @@ export default function ImportPage() {
       {etape === 'done' && (
         <div style={{ ...card, textAlign: 'center', padding: '3rem' }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>{importResult.erreurs === 0 ? '🎉' : '⚠️'}</div>
-          <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 24, marginBottom: 8 }}>
+          <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 24, marginBottom: 8 }}>
             {importResult.erreurs === 0 ? 'Import réussi !' : 'Import partiel'}
           </div>
           <div style={{ fontSize: 15, color: 'var(--c-annotation)', marginBottom: 24, lineHeight: 1.6 }}>

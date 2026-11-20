@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 44).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 45).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,21 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 45) — Refonte design : étape 2 (palette et polices)
+- Valeurs des jetons `globals.css` passées à la direction « code annoté » : papier #F7F5F1, encre #211C19, accent
+  rouge des codes #A3122A (+ `--c-surligneur` #F2E25C). Polices : `--font-titre` Newsreader, `--font-texte` Geist,
+  `--titre-poids: 500` (les ~50 titres en 700/800 lisent cette variable ; à ajuster ici si trop fin/épais).
+  `body` passe d'Arial à `var(--font-texte)`.
+- Hex restants convertis à la main par script : corails #DC4A2B/#D94A30/#F2654B et leurs rgba → #A3122A ; Baloo 2 →
+  titre, Space Grotesk → texte ; logo : aplat derrière « ode » en jaune surligneur (`Logo.tsx`). Pages d'erreur et
+  emails (`app/api`) alignés.
+- Polices Baloo 2, Bricolage, Hanken, Space Grotesk **supprimées** (fichiers + `fonts.css`). Restent Bagel (logo),
+  Newsreader, Geist.
+- Reste pour les étapes 3-4 : tranches de codes de l'accueil encore en dégradés corail/orange (couleurs propres à
+  `app/page.tsx`), panneau gauche gris de la connexion, refonte de l'accueil et du dashboard.
+- ⚠️ Piège de vérif : un `next start` resté actif sur le même port sert l'ancien build (CSS 500) → page sans styles.
+  Tuer `next-server` avant de relancer.
 
 ### 2026-11-20 (suite 44) — Refonte design « code annoté » : étape 1 (jetons, sans changement visuel)
 - Direction validée par le user sur maquette (artifact claude.ai/artifact/59vUXFkHdADXy9viVN5LCS) : papier légèrement

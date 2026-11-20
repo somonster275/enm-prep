@@ -143,13 +143,13 @@ export default function QcmPage() {
     return (
       <div style={{ paddingTop: 34, maxWidth: 720, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
         <button onClick={retour} style={{ background: 'none', border: 'none', color: 'var(--c-annotation-clair)', fontSize: 13, cursor: 'pointer', padding: 0, marginBottom: 12 }}>← Tous les QCM</button>
-        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 24, margin: '0 0 4px' }}>{actif ? actif.titre : '🎯 Mes erreurs'}</h1>
+        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 24, margin: '0 0 4px' }}>{actif ? actif.titre : '🎯 Mes erreurs'}</h1>
         {actif?.matiere && <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginBottom: 16 }}>{actif.matiere}</div>}
         {modeErreurs && <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginBottom: 16 }}>Rejoue les questions que tu as déjà ratées. Une bonne réponse les retire de ta liste.</div>}
 
         {tousValides && (
           <div style={{ background: score === questions.length ? '#ECF7F0' : 'var(--c-papier-chaud)', border: `1px solid ${score === questions.length ? '#BFE6CF' : '#F2D9A0'}`, borderRadius: 16, padding: 18, marginBottom: 18, textAlign: 'center' }}>
-            <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 28 }}>{score} / {questions.length}</div>
+            <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 28 }}>{score} / {questions.length}</div>
             <div style={{ fontSize: 14, color: 'var(--c-texte-doux)', marginTop: 4 }}>{score === questions.length ? '🎉 Sans faute !' : 'Revois les explications ci-dessous.'}</div>
           </div>
         )}
@@ -240,7 +240,7 @@ export default function QcmPage() {
   // ---------- Vue : liste ----------
   return (
     <div style={{ paddingTop: 34, maxWidth: 820, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
-      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 28, margin: 0 }}>QCM</h1>
+      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 28, margin: 0 }}>QCM</h1>
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 20px' }}>Entraîne-toi avec des QCM auto-corrigés. Chaque QCM terminé compte dans ton activité.</p>
 
       {nbErreurs > 0 && (

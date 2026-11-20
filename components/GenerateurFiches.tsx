@@ -19,7 +19,7 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
   const [msg, setMsg] = useState('')
 
   const font = "var(--font-texte)"
-  const coral = '#DC4A2B'
+  const coral = '#A3122A'
   const champ: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid var(--c-filet-fort)', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: 'var(--c-papier)', outline: 'none' }
 
   const generer = async () => {

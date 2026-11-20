@@ -21,7 +21,7 @@ export default function DonneesPage() {
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '28px 22px 60px' }}>
         <Link href="/" style={{ display: 'inline-block', marginBottom: 28 }}><LogoBadge size={20} /></Link>
 
-        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 30, margin: 0 }}>Confidentialité & données</h1>
+        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 30, margin: 0 }}>Confidentialité & données</h1>
         <p style={{ fontSize: 15.5, color: 'var(--c-annotation)', margin: '10px 0 6px' }}>
           Comment codex traite tes données personnelles, et les droits dont tu disposes (RGPD).
         </p>

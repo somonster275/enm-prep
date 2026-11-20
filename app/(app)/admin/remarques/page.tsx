@@ -47,7 +47,7 @@ export default function AdminRemarques() {
   return (
     <div style={{ paddingTop: 34, maxWidth: 820, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, flexWrap: 'wrap', gap: 10 }}>
-        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 26, margin: 0 }}>Remarques des étudiants</h1>
+        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 26, margin: 0 }}>Remarques des étudiants</h1>
         <div style={{ display: 'flex', gap: 6, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 11, padding: 3 }}>
           {(['nouveau', 'tous'] as const).map(f => (
             <button key={f} onClick={() => setFiltre(f)} style={{

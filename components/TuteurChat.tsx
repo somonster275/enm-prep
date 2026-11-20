@@ -35,7 +35,7 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
   const [tachesAjoutees, setTachesAjoutees] = useState<Record<string, boolean>>({})
 
   const font = "var(--font-texte)"
-  const coral = '#DC4A2B'
+  const coral = '#A3122A'
 
   // Charge l'historique depuis la base (persistant entre appareils, plus de perte 24 h).
   useEffect(() => {

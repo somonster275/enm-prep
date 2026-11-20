@@ -56,7 +56,7 @@ export default function AdminDefiPage() {
 
   return (
     <div style={{ paddingTop: 34, maxWidth: 620, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
-      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 26, margin: 0 }}>Défi de la semaine</h1>
+      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 26, margin: 0 }}>Défi de la semaine</h1>
       <p style={{ fontSize: 14.5, color: 'var(--c-annotation)', margin: '8px 0 22px' }}>Choisis le défi qui s&apos;affiche aux étudiants sur la page Classement.</p>
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>

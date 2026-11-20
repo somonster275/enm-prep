@@ -9,7 +9,7 @@ type Matiere = { slug: string; nom: string; dues: number }
 const display = "var(--font-titre)"
 
 const FONCTIONS: { href: string; icone: string; label: string; couleur: string }[] = [
-  { href: '/espaces', icone: '🗂️', label: 'Fiches', couleur: '#DC4A2B' },
+  { href: '/espaces', icone: '🗂️', label: 'Fiches', couleur: '#A3122A' },
   { href: '/cours', icone: '📘', label: 'Cours', couleur: '#3B82D9' },
   { href: '/qcm', icone: '✅', label: 'QCM', couleur: '#E8A11E' },
   { href: '/duel', icone: '⚔️', label: 'Duel', couleur: '#C0392B' },
@@ -21,7 +21,7 @@ const FONCTIONS: { href: string; icone: string; label: string; couleur: string }
   { href: '/entraide', icone: '🤝', label: 'Entraide', couleur: '#2DAE83' },
   { href: '/classement', icone: '🏆', label: 'Classement', couleur: '#E8A11E' },
   { href: '/recherche', icone: '🔍', label: 'Recherche', couleur: '#8A7E68' },
-  { href: '/carnet', icone: '📕', label: 'Carnet', couleur: '#DC4A2B' },
+  { href: '/carnet', icone: '📕', label: 'Carnet', couleur: '#A3122A' },
 ]
 
 export default function AccesRapide({ matieres }: { matieres: Matiere[] }) {

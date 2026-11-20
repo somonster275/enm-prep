@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
            ${apercu ? `<li><b>Fiche :</b> ${escapeHtml(apercu)}</li>` : ''}
          </ul>
          <p style="white-space:pre-wrap;border-left:3px solid #EADFC9;padding-left:12px;color:#3A352F">${escapeHtml(msg)}</p>
-         <p><a href="${APP_URL}/admin/remarques" style="background:#DC4A2B;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">Voir les remarques</a></p>
+         <p><a href="${APP_URL}/admin/remarques" style="background:#A3122A;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">Voir les remarques</a></p>
        </div>`
     )
   } catch (e) {

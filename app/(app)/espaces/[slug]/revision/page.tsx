@@ -87,7 +87,7 @@ export default function RevisionPage() {
 
       // ===== Révision MIXTE (entrelacement) : cartes dues, toutes matières confondues =====
       if (mixte) {
-        setEspace({ id: '', nom: 'Révision mixte', slug: '', description: '', couleur: '#DC4A2B', ordre: 0 } as Espace)
+        setEspace({ id: '', nom: 'Révision mixte', slug: '', description: '', couleur: '#A3122A', ordre: 0 } as Espace)
         setModuleLabel('Toutes matières')
         // Colonnes ciblées (pas de select('*')) : la révision mixte charge toute la
         // table fiches, autant limiter la charge utile au strict nécessaire.
@@ -354,7 +354,7 @@ export default function RevisionPage() {
     return (
     <div style={{ padding: '3rem', textAlign: 'center', maxWidth: 480, margin: '0 auto', fontFamily: font }}>
       <div style={{ fontSize: 40, marginBottom: 12 }}>{aJour ? '✅' : '📭'}</div>
-      <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 22, margin: '0 0 8px' }}>{aJour ? 'Tu es à jour !' : 'Aucune fiche à réviser'}</h2>
+      <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 22, margin: '0 0 8px' }}>{aJour ? 'Tu es à jour !' : 'Aucune fiche à réviser'}</h2>
       <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '0 0 2rem' }}>
         {aJour
           ? 'Plus rien à réviser ici pour le moment — tes cartes reviendront automatiquement au bon moment pour ancrer ta mémoire. Reviens un peu plus tard.'
@@ -388,7 +388,7 @@ export default function RevisionPage() {
     return (
     <div style={{ padding: '3rem', textAlign: 'center', maxWidth: 500, margin: '0 auto', fontFamily: font }}>
       <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
-      <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 26, marginBottom: 8 }}>Session terminée</div>
+      <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 26, marginBottom: 8 }}>Session terminée</div>
       <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '0 0 1.25rem' }}>{deck.length} fiche{deck.length > 1 ? 's' : ''} révisée{deck.length > 1 ? 's' : ''}</p>
       {nouvellesEnAttente > 0 && (
         <p style={{ fontSize: 12.5, color: '#7C5CBF', margin: '-0.75rem 0 1.25rem', fontWeight: 600 }}>

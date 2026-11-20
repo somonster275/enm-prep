@@ -6,7 +6,7 @@ import { useIsMobile } from '@/lib/useIsMobile'
 export default function ChatbotBulle() {
   const [open, setOpen] = useState(false)
   const isMobile = useIsMobile()
-  const coral = '#DC4A2B'
+  const coral = '#A3122A'
 
   return (
     <>
@@ -24,7 +24,7 @@ export default function ChatbotBulle() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
               <span style={{ fontSize: 20 }}>📕</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 14.5, fontFamily: "var(--font-titre)" }}>Coach IA</div>
+                <div style={{ fontWeight: 'var(--titre-poids)', fontSize: 14.5, fontFamily: "var(--font-titre)" }}>Coach IA</div>
                 <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)' }}>Révisions · planning · méthode</div>
               </div>
             </div>
@@ -41,7 +41,7 @@ export default function ChatbotBulle() {
         position: 'fixed', bottom: 22, right: 22, zIndex: 1000,
         width: 60, height: 60, borderRadius: '50%', border: 'none', cursor: 'pointer',
         background: coral, color: '#fff', fontSize: 27,
-        boxShadow: '0 12px 28px -8px rgba(220,74,43,.7)',
+        boxShadow: '0 12px 28px -8px rgba(163,18,42,.7)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         {open ? '×' : '📕'}

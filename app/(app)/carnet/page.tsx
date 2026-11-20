@@ -35,7 +35,7 @@ export default function CarnetPage() {
 
   return (
     <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
-      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 28, margin: 0 }}>Mon carnet d&apos;erreurs</h1>
+      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 28, margin: 0 }}>Mon carnet d&apos;erreurs</h1>
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 22px', maxWidth: 600 }}>
         Les fiches que tu as trouvées difficiles (mal notées) se rassemblent ici automatiquement. Revois-les en priorité.
       </p>

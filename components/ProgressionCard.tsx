@@ -7,7 +7,7 @@ export default function ProgressionCard({ detail }: { detail: DetailProgression 
   const dims: { label: string; valeur: number; couleur: string }[] = [
     { label: 'Maîtrise', valeur: detail.maitrise, couleur: '#0F6E56' },
     { label: 'Couverture', valeur: detail.couverture, couleur: '#185FA5' },
-    { label: 'Régularité', valeur: detail.regularite, couleur: '#DC4A2B' },
+    { label: 'Régularité', valeur: detail.regularite, couleur: '#A3122A' },
   ]
 
   return (

@@ -5,24 +5,26 @@
   --foreground: #171717;
 
   /* Jetons de design : toute l'app lit ces variables (styles inline compris).
-     Changer une valeur ici recolore l'app entière. Valeurs actuelles = design d'origine. */
-  --c-encre: #2A2018;            /* texte principal */
-  --c-texte-doux: #6E6456;
-  --c-annotation: #8A7E68;       /* texte secondaire */
-  --c-annotation-clair: #9A8D72;
-  --c-discret: #B6A98C;
-  --c-discret-clair: #C0B7A4;
-  --c-filet: #F0E7D6;            /* bordures */
-  --c-filet-fort: #EADFC9;
-  --c-papier: #FFFBF2;           /* fonds */
-  --c-papier-teinte: #FDF6EA;
-  --c-papier-chaud: #FFF8EE;
-  --c-accent: #DC4A2B;
-  --c-accent-pale: #FCE9E3;
-  --c-accent-bord: #F3C6BC;
+     Changer une valeur ici recolore l'app entière. Direction « code annoté » (cf. MEMORY.md). */
+  --c-encre: #211C19;            /* encre brun-noir */
+  --c-texte-doux: #574F47;
+  --c-annotation: #6B6259;       /* texte secondaire */
+  --c-annotation-clair: #7A7167;
+  --c-discret: #A1988C;
+  --c-discret-clair: #B5ADA2;
+  --c-filet: #E7E2D9;            /* bordures */
+  --c-filet-fort: #DCD5C9;
+  --c-papier: #F7F5F1;           /* papier, légèrement chaud */
+  --c-papier-teinte: #F1EEE8;
+  --c-papier-chaud: #FAF8F4;
+  --c-accent: #A3122A;            /* rouge des codes */
+  --c-accent-pale: #F6E4E6;
+  --c-accent-bord: #E3B5BB;
+  --c-surligneur: #F2E25C;       /* réservé aux moments clés */
 
-  --font-titre: 'Bricolage Grotesque', sans-serif;
-  --font-texte: 'Hanken Grotesk', sans-serif;
+  --font-titre: 'Newsreader', Georgia, serif;
+  --titre-poids: 500;
+  --font-texte: 'Geist', 'Helvetica Neue', Arial, sans-serif;
 }
 
 @theme inline {
@@ -57,7 +59,7 @@
 .md-response em { font-style: italic; }
 .md-response h1, .md-response h2, .md-response h3 {
   font-family: var(--font-titre);
-  font-weight: 800; margin: 1em 0 0.4em; color: var(--c-encre);
+  font-weight: var(--titre-poids); margin: 1em 0 0.4em; color: var(--c-encre);
 }
 .md-response h1 { font-size: 1.2em; }
 .md-response h2 { font-size: 1.1em; }
@@ -82,7 +84,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-texte);
 }
 
 /* Contenu riche des fiches (importé d'Anki ou édité dans l'app) */

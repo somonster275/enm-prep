@@ -71,7 +71,7 @@ export default function AnnalesPage() {
   return (
     <div style={{ paddingTop: 34, maxWidth: 820, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 28, margin: 0 }}>Annales & corrigés partagés</h1>
+        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 28, margin: 0 }}>Annales & corrigés partagés</h1>
         {!formOuvert && <button onClick={() => setFormOuvert(true)} style={{ padding: '10px 18px', borderRadius: 11, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: font }}>Partager un document</button>}
       </div>
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 22px' }}>Une bibliothèque commune : sujets passés, corrigés, fiches… partagés entre candidats via leurs liens.</p>

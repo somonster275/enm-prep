@@ -9,7 +9,7 @@ export default function NotesWidget({ titre = 'Mes tâches' }: { titre?: string 
   const [userId, setUserId] = useState('')
   const [texte, setTexte] = useState('')
   const font = "var(--font-texte)"
-  const coral = '#DC4A2B'
+  const coral = '#A3122A'
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
@@ -41,7 +41,7 @@ export default function NotesWidget({ titre = 'Mes tâches' }: { titre?: string 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 18 }}>📝</span>
-          <span style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 15 }}>{titre}</span>
+          <span style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 15 }}>{titre}</span>
         </div>
         {restantes > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: coral, background: 'var(--c-accent-pale)', borderRadius: 999, padding: '2px 9px' }}>{restantes}</span>}
       </div>

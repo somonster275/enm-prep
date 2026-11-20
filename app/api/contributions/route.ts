@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
            <li><b>Intitulé :</b> ${escapeHtml(titre)}</li>
            ${type === 'qcm' ? `<li><b>Questions :</b> ${nbQ}</li>` : ''}
          </ul>
-         <p><a href="${APP_URL}/admin/contributions" style="background:#DC4A2B;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">Modérer les contributions</a></p>
+         <p><a href="${APP_URL}/admin/contributions" style="background:#A3122A;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">Modérer les contributions</a></p>
        </div>`
     )
   } catch (e) {

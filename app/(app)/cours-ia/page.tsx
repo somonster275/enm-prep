@@ -68,7 +68,7 @@ export default function CoursIAPage() {
   const chatRef = useRef<HTMLDivElement>(null)
 
   const font = "var(--font-texte)"
-  const coral = '#F2654B'
+  const coral = '#A3122A'
   const coralDark = '#B23A22'
   const coralBg = '#FDEFE9'
   const coralBorder = '#F8DACE'
@@ -326,7 +326,7 @@ export default function CoursIAPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ position: 'relative', display: 'inline-block', lineHeight: 1 }}>
                 <div style={{ position: 'absolute', zIndex: 0, left: 10, right: 8, top: 4, bottom: 3, background: coral, borderRadius: 7 }} />
-                <span style={{ position: 'relative', zIndex: 1, fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 22, color: textDark, padding: '0 4px' }}>codex</span>
+                <span style={{ position: 'relative', zIndex: 1, fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 22, color: textDark, padding: '0 4px' }}>codex</span>
               </div>
               <span style={{ fontSize: 13, color: textMuted, borderLeft: `1px solid ${border}`, paddingLeft: 12 }}>
                 Questions de cours
@@ -343,7 +343,7 @@ export default function CoursIAPage() {
                     fontSize: 12.5, fontWeight: 700, fontFamily: font,
                     background: actif ? coral : 'transparent',
                     color: actif ? '#fff' : textMid,
-                    boxShadow: actif ? `0 6px 14px -7px rgba(242,101,75,.8)` : 'none',
+                    boxShadow: actif ? `0 6px 14px -7px rgba(163,18,42,.8)` : 'none',
                   }}>{label}</button>
                 )})}
                 <button onClick={() => setVueTuteur(true)} style={{
@@ -351,7 +351,7 @@ export default function CoursIAPage() {
                   fontSize: 12.5, fontWeight: 700, fontFamily: font,
                   background: vueTuteur ? coral : 'transparent',
                   color: vueTuteur ? '#fff' : textMid,
-                  boxShadow: vueTuteur ? `0 6px 14px -7px rgba(242,101,75,.8)` : 'none',
+                  boxShadow: vueTuteur ? `0 6px 14px -7px rgba(163,18,42,.8)` : 'none',
                 }}>📕 Coach IA</button>
               </div>
               {/* Sélection de documents : réservée à « Mes documents ».
@@ -417,7 +417,7 @@ export default function CoursIAPage() {
                 <button onClick={importerDoc} disabled={!fichier || uploading} style={{
                   padding: '10px 22px', borderRadius: 10, background: coral, color: '#fff', border: 'none',
                   cursor: fichier && !uploading ? 'pointer' : 'default', fontSize: 13, fontWeight: 700, fontFamily: font,
-                  opacity: fichier && !uploading ? 1 : 0.5, boxShadow: fichier && !uploading ? `0 8px 18px -8px rgba(242,101,75,.7)` : 'none',
+                  opacity: fichier && !uploading ? 1 : 0.5, boxShadow: fichier && !uploading ? `0 8px 18px -8px rgba(163,18,42,.7)` : 'none',
                 }}>
                   {uploading ? 'Indexation…' : 'Importer'}
                 </button>
@@ -431,7 +431,7 @@ export default function CoursIAPage() {
                       <div key={d.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, padding: '8px 12px', background: sand, borderRadius: 10, border: `1px solid ${border}` }}>
                         <div>
                           <span style={{ fontWeight: 600 }}>{d.nom}</span>
-                          <span style={{ color: textMuted, marginLeft: 8, fontFamily: "'Space Grotesk', sans-serif", fontSize: 12 }}>· {d.nb_chunks} passages</span>
+                          <span style={{ color: textMuted, marginLeft: 8, fontFamily: "var(--font-texte)", fontSize: 12 }}>· {d.nb_chunks} passages</span>
                           {d.espaces && <span style={{ marginLeft: 8, fontSize: 11, background: d.espaces.couleur + '20', color: d.espaces.couleur, padding: '1px 6px', borderRadius: 10, fontWeight: 600 }}>#{d.espaces.nom}</span>}
                         </div>
                         <div style={{ display: 'flex', gap: 6 }}>
@@ -488,13 +488,13 @@ export default function CoursIAPage() {
                               background: checked ? coral : '#fff',
                               border: checked ? 'none' : `1.8px solid #DCCFB8`,
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              boxShadow: checked ? `0 3px 8px -3px rgba(242,101,75,.7)` : 'none',
+                              boxShadow: checked ? `0 3px 8px -3px rgba(163,18,42,.7)` : 'none',
                             }}>
                               {checked && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
                             </div>
                             <span style={{ fontSize: 11, color: '#C9A98F' }}>📄</span>
                             <span title={d.nom} style={{ flex: 1, fontSize: 13, fontWeight: checked ? 700 : 600, color: checked ? textDark : 'var(--c-texte-doux)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.nom}</span>
-                            <span style={{ flexShrink: 0, fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, fontWeight: 600, color: checked ? coralDark : textMuted, background: checked ? '#FCE0D6' : '#F4ECDC', padding: '2px 7px', borderRadius: 7 }}>{d.nb_chunks}</span>
+                            <span style={{ flexShrink: 0, fontFamily: "var(--font-texte)", fontSize: 11, fontWeight: 600, color: checked ? coralDark : textMuted, background: checked ? '#FCE0D6' : '#F4ECDC', padding: '2px 7px', borderRadius: 7 }}>{d.nb_chunks}</span>
                           </label>
                         )
                       })}
@@ -514,13 +514,13 @@ export default function CoursIAPage() {
                           background: checked ? coral : '#fff',
                           border: checked ? 'none' : `1.8px solid #DCCFB8`,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          boxShadow: checked ? `0 3px 8px -3px rgba(242,101,75,.7)` : 'none',
+                          boxShadow: checked ? `0 3px 8px -3px rgba(163,18,42,.7)` : 'none',
                         }}>
                           {checked && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
                         </div>
                         <span style={{ fontSize: 11, color: '#C9A98F' }}>📄</span>
                         <span title={d.nom} style={{ flex: 1, fontSize: 13, fontWeight: checked ? 700 : 600, color: checked ? textDark : 'var(--c-texte-doux)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.nom}</span>
-                        <span style={{ flexShrink: 0, fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, fontWeight: 600, color: checked ? coralDark : textMuted, background: checked ? '#FCE0D6' : '#F4ECDC', padding: '2px 7px', borderRadius: 7 }}>{d.nb_chunks}</span>
+                        <span style={{ flexShrink: 0, fontFamily: "var(--font-texte)", fontSize: 11, fontWeight: 600, color: checked ? coralDark : textMuted, background: checked ? '#FCE0D6' : '#F4ECDC', padding: '2px 7px', borderRadius: 7 }}>{d.nb_chunks}</span>
                       </label>
                     )
                   })}
@@ -548,7 +548,7 @@ export default function CoursIAPage() {
                     <div style={{ fontSize: 36, marginBottom: 14 }}>
                       <div style={{ position: 'relative', display: 'inline-block', lineHeight: 1 }}>
                         <div style={{ position: 'absolute', zIndex: 0, left: 14, right: 10, top: 6, bottom: 5, background: coral, borderRadius: 9 }} />
-                        <span style={{ position: 'relative', zIndex: 1, fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 36, color: textDark, padding: '0 5px' }}>codex</span>
+                        <span style={{ position: 'relative', zIndex: 1, fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 36, color: textDark, padding: '0 5px' }}>codex</span>
                       </div>
                     </div>
                     <div style={{ fontSize: 15, fontWeight: 700, color: textDark, marginBottom: 6 }}>Posez votre première question</div>
@@ -596,7 +596,7 @@ export default function CoursIAPage() {
                         <div style={{ padding: '14px 22px 12px', background: 'linear-gradient(180deg,var(--c-papier-chaud),#FFFFFF)', borderBottom: `1px solid #F6EEDE` }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                             {/* Avatar codex */}
-                            <div style={{ width: 28, height: 28, borderRadius: 8, background: textDark, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 14, color: '#fff', flexShrink: 0 }}>
+                            <div style={{ width: 28, height: 28, borderRadius: 8, background: textDark, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 14, color: '#fff', flexShrink: 0 }}>
                               c<span style={{ color: coral }}>.</span>
                             </div>
                             <span style={{ fontWeight: 700, fontSize: 13.5, color: textDark }}>Réponse</span>
@@ -620,17 +620,17 @@ export default function CoursIAPage() {
                           {(m.sources || enCours) && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 10, flexWrap: 'wrap' }}>
                               {(m.sources && m.sources.length > 0) && (
-                                <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: textDark, background: '#FBF6EC', border: `1px solid ${border}`, padding: '3px 9px', borderRadius: 7, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 500 }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: textDark, background: '#FBF6EC', border: `1px solid ${border}`, padding: '3px 9px', borderRadius: 7, fontFamily: "var(--font-texte)", fontWeight: 500 }}>
                                   🔍 {m.sources.length} doc{m.sources.length > 1 ? 's' : ''}
                                 </span>
                               )}
                               {m.nbPassages !== undefined && (
-                                <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: textDark, background: '#FBF6EC', border: `1px solid ${border}`, padding: '3px 9px', borderRadius: 7, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 500 }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: textDark, background: '#FBF6EC', border: `1px solid ${border}`, padding: '3px 9px', borderRadius: 7, fontFamily: "var(--font-texte)", fontWeight: 500 }}>
                                   {m.nbPassages} passage{m.nbPassages > 1 ? 's' : ''}
                                 </span>
                               )}
                               {(m.tReflexion !== undefined || enCours) && (
-                                <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: textDark, background: '#FBF6EC', border: `1px solid ${border}`, padding: '3px 9px', borderRadius: 7, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 500 }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: textDark, background: '#FBF6EC', border: `1px solid ${border}`, padding: '3px 9px', borderRadius: 7, fontFamily: "var(--font-texte)", fontWeight: 500 }}>
                                   ✏️ Rédaction
                                 </span>
                               )}
@@ -653,11 +653,11 @@ export default function CoursIAPage() {
                         {m.tReflexion !== undefined && (
                           <div style={{ display: 'flex', gap: 8, padding: '0 24px 18px', flexWrap: 'wrap' }}>
                             <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: textMid, background: '#FBF6EC', border: `1px solid ${border}`, padding: '6px 11px', borderRadius: 10 }}>
-                              ⚡ Premier mot en <strong style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, color: textDark, marginLeft: 3 }}>{fmtSec(m.tReflexion)}</strong>
+                              ⚡ Premier mot en <strong style={{ fontFamily: "var(--font-texte)", fontWeight: 600, color: textDark, marginLeft: 3 }}>{fmtSec(m.tReflexion)}</strong>
                             </span>
                             {m.tRedaction !== undefined && (
                               <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: textMid, background: '#FBF6EC', border: `1px solid ${border}`, padding: '6px 11px', borderRadius: 10 }}>
-                                ✏️ Rédigé en <strong style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, color: textDark, marginLeft: 3 }}>{fmtSec(m.tRedaction)}</strong>
+                                ✏️ Rédigé en <strong style={{ fontFamily: "var(--font-texte)", fontWeight: 600, color: textDark, marginLeft: 3 }}>{fmtSec(m.tRedaction)}</strong>
                               </span>
                             )}
                           </div>
@@ -672,7 +672,7 @@ export default function CoursIAPage() {
                             </span>
                             {m.sources.map((s, j) => (
                               <span key={j} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, background: coralBg, color: coralDark, padding: '4px 10px', borderRadius: 8, fontWeight: 600, border: `1px solid ${coralBorder}` }}>
-                                <span style={{ width: 17, height: 17, borderRadius: 5, background: j === 0 ? coral : '#FCE6DE', color: j === 0 ? '#fff' : coralDark, fontFamily: "'Space Grotesk', sans-serif", fontSize: 10, fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{j + 1}</span>
+                                <span style={{ width: 17, height: 17, borderRadius: 5, background: j === 0 ? coral : '#FCE6DE', color: j === 0 ? '#fff' : coralDark, fontFamily: "var(--font-texte)", fontSize: 10, fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{j + 1}</span>
                                 📄 {s}
                               </span>
                             ))}
@@ -686,7 +686,7 @@ export default function CoursIAPage() {
                 {/* Stop pill flottante */}
                 {phase !== 'idle' && (
                   <div style={{ display: 'flex', justifyContent: 'center', marginTop: 4, flexShrink: 0 }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, background: '#fff', border: `1px solid ${border}`, borderRadius: 999, padding: '7px 8px 7px 16px', boxShadow: `0 6px 20px -8px rgba(242,101,75,.25)` }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, background: '#fff', border: `1px solid ${border}`, borderRadius: 999, padding: '7px 8px 7px 16px', boxShadow: `0 6px 20px -8px rgba(163,18,42,.25)` }}>
                       <span className="ia-spinner" style={{ borderColor: coralBg, borderTopColor: coral }} />
                       <span style={{ fontSize: 13, fontWeight: 600, color: coral }}>{phase === 'recherche' ? 'Recherche…' : 'Rédaction…'}</span>
                       <button onClick={stopGeneration} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: textDark, color: '#fff', border: 'none', borderRadius: 999, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>
@@ -714,13 +714,13 @@ export default function CoursIAPage() {
                     disabled={loading}
                     style={{ flex: 1, border: 'none', outline: 'none', fontSize: 14.5, fontFamily: font, color: textDark, background: 'transparent', opacity: loading ? 0.6 : 1 }}
                   />
-                  <span style={{ flexShrink: 0, fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: '#C2B7A0', border: `1px solid #ECE2D0`, padding: '4px 8px', borderRadius: 7 }}>⏎ pour envoyer</span>
+                  <span style={{ flexShrink: 0, fontFamily: "var(--font-texte)", fontSize: 11, color: '#C2B7A0', border: `1px solid #ECE2D0`, padding: '4px 8px', borderRadius: 7 }}>⏎ pour envoyer</span>
                   <button onClick={poserQuestion} disabled={!question.trim() || loading} style={{
                     flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8,
                     padding: '12px 22px', borderRadius: 13, background: coral, color: '#fff', border: 'none',
                     cursor: question.trim() && !loading ? 'pointer' : 'default', fontSize: 14, fontWeight: 700, fontFamily: font,
                     opacity: question.trim() && !loading ? 1 : 0.5,
-                    boxShadow: question.trim() && !loading ? `0 8px 20px -8px rgba(242,101,75,.8)` : 'none',
+                    boxShadow: question.trim() && !loading ? `0 8px 20px -8px rgba(163,18,42,.8)` : 'none',
                   }}>
                     {loading ? '…' : <>Envoyer <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></>}
                   </button>
@@ -728,15 +728,15 @@ export default function CoursIAPage() {
 
                 {/* Avertissements */}
                 <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap', padding: '0 4px' }}>
-                  <span style={{ fontSize: 12, color: textMuted, fontFamily: "'Space Grotesk', sans-serif" }}>
+                  <span style={{ fontSize: 12, color: textMuted, fontFamily: "var(--font-texte)" }}>
                     ⏳ Conversations conservées <strong style={{ fontWeight: 600 }}>24 h</strong> dans ce navigateur.{' '}
                     {messages.length > 0 && (
-                      <button onClick={() => { localStorage.removeItem(cleLS(mode, userId)); setMessages([]) }} style={{ background: 'none', border: 'none', color: coral, fontSize: 12, cursor: 'pointer', textDecoration: 'underline', fontFamily: "'Space Grotesk', sans-serif", padding: 0, fontWeight: 600 }}>
+                      <button onClick={() => { localStorage.removeItem(cleLS(mode, userId)); setMessages([]) }} style={{ background: 'none', border: 'none', color: coral, fontSize: 12, cursor: 'pointer', textDecoration: 'underline', fontFamily: "var(--font-texte)", padding: 0, fontWeight: 600 }}>
                         Effacer
                       </button>
                     )}
                   </span>
-                  <span style={{ fontSize: 12, color: textMuted, fontFamily: "'Space Grotesk', sans-serif" }}>
+                  <span style={{ fontSize: 12, color: textMuted, fontFamily: "var(--font-texte)" }}>
                     ⚠️ Assistant propulsé par Claude (Anthropic) — recoupez avec vos cours, n&apos;y inscrivez pas d&apos;informations personnelles.
                   </span>
                 </div>

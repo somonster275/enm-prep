@@ -42,7 +42,7 @@ export default function RecherchePage() {
       sous: [r.modules?.espaces?.nom, r.modules?.nom].filter(Boolean).join(' › ') || stripHtml(r.reponse).slice(0, 90),
       href: r.modules?.espaces ? `/espaces/${r.modules.espaces.slug}/modules/${r.module_id}` : '#',
     }))
-    if (ff.length) g.push({ cle: 'fiches', label: 'Fiches', icone: '🗂️', couleur: '#DC4A2B', items: ff })
+    if (ff.length) g.push({ cle: 'fiches', label: 'Fiches', icone: '🗂️', couleur: '#A3122A', items: ff })
 
     const qq = (qcms.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'QCM', href: '/qcm' }))
     if (qq.length) g.push({ cle: 'qcm', label: 'QCM', icone: '✅', couleur: '#E8A11E', items: qq })
@@ -76,7 +76,7 @@ export default function RecherchePage() {
       sous: [r.modules?.espaces?.nom, r.modules?.nom].filter(Boolean).join(' › ') || stripHtml(r.reponse).slice(0, 90),
       href: r.modules?.espaces ? `/espaces/${r.modules.espaces.slug}/modules/${r.module_id}` : '#',
     }))
-    if (ff.length) g.push({ cle: 'fiches', label: 'Fiches', icone: '🗂️', couleur: '#DC4A2B', items: ff })
+    if (ff.length) g.push({ cle: 'fiches', label: 'Fiches', icone: '🗂️', couleur: '#A3122A', items: ff })
     const qq = (qcms.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'QCM', href: '/qcm' }))
     if (qq.length) g.push({ cle: 'qcm', label: 'QCM', icone: '✅', couleur: '#E8A11E', items: qq })
     const mm = (medias.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.espaces?.nom || 'Vidéo / audio', href: r.url || '/media' }))
@@ -92,7 +92,7 @@ export default function RecherchePage() {
 
   return (
     <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
-      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 28, margin: 0 }}>Rechercher</h1>
+      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 28, margin: 0 }}>Rechercher</h1>
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 20px' }}>Dans tes fiches, QCM, vidéos, annales et le forum — par mot-clé, ou par <b style={{ color: '#7C5CBF' }}>#tag</b> pour relier les ressources d&apos;un même thème.</p>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>

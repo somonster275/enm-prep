@@ -39,7 +39,7 @@ export default function OnboardingModal() {
         boxShadow: '0 30px 80px -30px rgba(40,30,20,.6)', overflow: 'hidden',
       }}>
         <div style={{ padding: '22px 26px 14px', borderBottom: '1px solid var(--c-filet)' }}>
-          <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 24 }}>Bienvenue sur codex 🎓</div>
+          <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 24 }}>Bienvenue sur codex 🎓</div>
           <div style={{ fontSize: 14, color: 'var(--c-annotation)', marginTop: 4 }}>Prends 1 minute pour réviser… efficacement.</div>
         </div>
 

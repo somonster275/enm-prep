@@ -10,7 +10,7 @@ export default function MethodePage() {
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '28px 22px 60px' }}>
         <Link href="/" style={{ display: 'inline-block', marginBottom: 28 }}><LogoBadge size={20} /></Link>
 
-        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 30, margin: '0 0 18px' }}>Bien réviser : la méthode</h1>
+        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 30, margin: '0 0 18px' }}>Bien réviser : la méthode</h1>
 
         <MethodeContenu />
       </div>

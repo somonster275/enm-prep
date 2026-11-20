@@ -89,7 +89,7 @@ export default function EntraidePage() {
 
   return (
     <div style={{ paddingTop: 34, maxWidth: 820, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
-      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 28, margin: 0 }}>Entraide</h1>
+      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 28, margin: 0 }}>Entraide</h1>
       <p style={{ fontSize: 15.5, color: 'var(--c-annotation)', margin: '8px 0 24px', maxWidth: 600 }}>
         Un annuaire entre candidats : laisse tes coordonnées et les matières où tu te sens à l&apos;aise,
         pour aider d&apos;autres étudiants — et trouver de l&apos;aide à ton tour.
@@ -134,7 +134,7 @@ export default function EntraidePage() {
       </div>
 
       {/* Annuaire */}
-      <div style={{ fontFamily: "var(--font-titre)", fontWeight: 700, fontSize: 18, marginBottom: 14 }}>
+      <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 18, marginBottom: 14 }}>
         Les étudiants disponibles {liste.length > 0 && <span style={{ fontSize: 14, color: 'var(--c-annotation-clair)', fontWeight: 400, fontFamily: font }}>({liste.length})</span>}
       </div>
 

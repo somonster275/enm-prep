@@ -44,7 +44,7 @@ type Flux = { id: string; nom: string; url: string; couleur: string }
 
 const TYPES: { value: string; label: string; couleur: string }[] = [
   { value: 'cours',    label: 'Cours',    couleur: '#3B82D9' },
-  { value: 'examen',   label: 'Examen',   couleur: '#DC4A2B' },
+  { value: 'examen',   label: 'Examen',   couleur: '#A3122A' },
   { value: 'deadline', label: 'Deadline', couleur: '#E8A11E' },
   { value: 'autre',    label: 'Autre',    couleur: '#2DAE83' },
 ]
@@ -275,7 +275,7 @@ export default function CalendrierPage() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#DC4A2B22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📅</div>
+            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#A3122A22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📅</div>
             <div style={{ fontFamily: display, fontWeight: 800, fontSize: 26 }}>Calendrier</div>
             {syncPlan && <span style={{ fontSize: 12, color: '#6366F1', fontWeight: 600 }}>↻ synchro planning…</span>}
           </div>

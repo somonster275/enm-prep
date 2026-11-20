@@ -73,7 +73,7 @@ export default function LoginPage() {
     height: 52, border: `1.5px solid ${focused ? 'var(--c-accent)' : 'var(--c-filet-fort)'}`,
     borderRadius: 14, padding: '0 16px',
     background: focused ? '#fff' : 'var(--c-papier)',
-    boxShadow: focused ? '0 0 0 4px rgba(220,74,43,.12)' : 'none',
+    boxShadow: focused ? '0 0 0 4px rgba(163,18,42,.12)' : 'none',
   })
 
   return (
@@ -100,7 +100,7 @@ export default function LoginPage() {
 
       {/* Panneau droit — formulaire */}
       <div className="login-form bg-grille" style={{ padding: '64px 60px', display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: '#fff' }}>
-        <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 30, letterSpacing: '-.01em' }}>
+        <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 30, letterSpacing: '-.01em' }}>
           Bon retour 👋
         </div>
         <div style={{ fontSize: 15, color: 'var(--c-annotation)', marginTop: 6 }}>
@@ -152,7 +152,7 @@ export default function LoginPage() {
           fontFamily: "var(--font-texte)", fontWeight: 700, fontSize: 16,
           color: '#fff', background: 'var(--c-accent)', border: 'none', borderRadius: 14,
           cursor: 'pointer', opacity: loading ? 0.7 : 1,
-          boxShadow: '0 12px 24px -10px rgba(220,74,43,.8)',
+          boxShadow: '0 12px 24px -10px rgba(163,18,42,.8)',
         }}>
           {loading ? 'Connexion…' : 'Se connecter'}
         </button>

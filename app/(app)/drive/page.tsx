@@ -142,7 +142,7 @@ export default function DrivePage() {
 
   return (
     <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: "var(--font-texte)", color: 'var(--c-encre)' }}>
-      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 28, margin: 0 }}>Mon Drive</h1>
+      <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 28, margin: 0 }}>Mon Drive</h1>
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 24px', maxWidth: 560 }}>
         Centralise l&apos;accès à tes cours : ajoute les liens partagés de tes dossiers
         (Google Drive, iCloud, Dropbox, OneDrive, Notion…) et ouvre-les en un clic depuis l&apos;app.
@@ -233,7 +233,7 @@ export default function DrivePage() {
       </div>
 
       {/* ───────── Hub de liens (tous fournisseurs) ───────── */}
-      <div style={{ fontSize: 17, fontWeight: 700, fontFamily: "var(--font-titre)", margin: '0 0 14px' }}>Mes liens</div>
+      <div style={{ fontSize: 17, fontWeight: 'var(--titre-poids)', fontFamily: "var(--font-titre)", margin: '0 0 14px' }}>Mes liens</div>
 
       {/* Formulaire d'ajout */}
       <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 20, marginBottom: 26 }}>

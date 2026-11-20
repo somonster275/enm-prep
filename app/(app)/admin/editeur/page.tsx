@@ -122,7 +122,7 @@ export default function Editeur() {
 
   return (
     <div style={{ paddingTop: '34px', maxWidth: 900, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
-      <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 26, marginBottom: '1.5rem' }}>
+      <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 26, marginBottom: '1.5rem' }}>
         Éditeur de fiches
       </div>
 

@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
            <li><b>Email :</b> ${escapeHtml(mail)}</li>
            <li><b>Message :</b> ${escapeHtml(messagePropre || '—')}</li>
          </ul>
-         <p><a href="${APP_URL}/admin/utilisateurs" style="background:#DC4A2B;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">Valider ou refuser</a></p>
+         <p><a href="${APP_URL}/admin/utilisateurs" style="background:#A3122A;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">Valider ou refuser</a></p>
        </div>`
     )
   } catch (e) {

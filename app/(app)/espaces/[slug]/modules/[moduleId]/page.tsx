@@ -237,7 +237,7 @@ export default function ModulePage() {
       <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18, padding: '24px 28px', marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 24, color: espace.couleur }}>
+            <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 24, color: espace.couleur }}>
               {module.nom}
             </div>
             <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginTop: 4 }}>
@@ -344,7 +344,7 @@ export default function ModulePage() {
       {/* ===== SOUS-MODULES ===== */}
       <div style={{ marginBottom: 28 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 18 }}>
+          <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 18 }}>
             Sous-modules {sousModules.length > 0 && <span style={{ fontSize: 14, color: 'var(--c-annotation-clair)', fontFamily: font, fontWeight: 400 }}>({sousModules.length})</span>}
           </div>
           {isAdmin && !creatingSousModule && (
@@ -412,7 +412,7 @@ export default function ModulePage() {
       {(cours.length > 0 || isAdmin) && (
         <div style={{ marginBottom: 32 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 18 }}>📘 Cours</div>
+            <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 18 }}>📘 Cours</div>
             {isAdmin && <Link href="/cours" style={{ fontSize: 13, fontWeight: 600, color: '#3B82D9', textDecoration: 'none' }}>+ Ajouter</Link>}
           </div>
           {cours.length === 0 ? (
@@ -436,7 +436,7 @@ export default function ModulePage() {
 
       {/* ===== FICHES DIRECTES ===== */}
       <div>
-        <div style={{ fontFamily: "var(--font-titre)", fontWeight: 800, fontSize: 18, marginBottom: 12 }}>
+        <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 18, marginBottom: 12 }}>
           Fiches {totalFiches > 0 && <span style={{ fontSize: 14, color: 'var(--c-annotation-clair)', fontFamily: font, fontWeight: 400 }}>({totalFiches})</span>}
         </div>
 
@@ -462,7 +462,7 @@ export default function ModulePage() {
                     </div>
                     <div style={{ marginBottom: 12 }}>
                       <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--c-annotation)', display: 'block', marginBottom: 4 }}># Tags <span style={{ fontWeight: 400, textTransform: 'none' }}>(relient cette fiche aux vidéos, cours, QCM… du même thème → onglet « Approfondir » en révision)</span></label>
-                      <TagsInput value={tagsFiche} onChange={setTagsFiche} accent="#DC4A2B" />
+                      <TagsInput value={tagsFiche} onChange={setTagsFiche} accent="#A3122A" />
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button onClick={sauvegarderFiche} style={{ padding: '9px 20px', borderRadius: 8, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: font }}>Enregistrer</button>
