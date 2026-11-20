@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 36).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 37).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,22 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 37) — Scan ECC (6 agents Everything Claude Code) + correctifs sans Supabase
+- Scan via le dépôt ECC (agents security, database, typescript, react, silent-failure, rag) — rapport dans la conversation.
+- Corrigé (code seul, aucune migration) :
+  - suppression de `app/auth/callback/route.ts` (POST public inutilisé qui posait des cookies de session → login CSRF) ;
+  - `RichEditor` : HTML initial passé dans DOMPurify (config `CONFIG` exportée de `RichContent`) ;
+  - révision : si la lecture de `progression` échoue, écran d'erreur au lieu d'un deck qui écraserait les paliers ;
+  - `duel/repondre` et `duel/correction` : 403 si non inscrit dans `match_joueurs` ; 500 si solutions illisibles ;
+    « déjà répondu » seulement sur `23505` ; upserts de correction vérifiés ;
+  - `compte/supprimer` : erreurs vérifiées (table absente tolérée), compte auth supprimé avant le profil ;
+  - admin : impossible de supprimer ou de changer le rôle d'un autre admin ;
+  - `cours/question` : quota rendu atomique via la valeur renvoyée par `incr_ia_usage` (refus si > limite).
+- **Reste à faire, nécessite Supabase** : `matchs_update` (hôte modifie chrono/mode), `incr_nouvelles` sans bornes ni revoke,
+  unique `(utilisateur_id, jour)` sur `activite_jours`, `revoke execute` sur `nom_affichage`.
+- Reste aussi (code) : SSRF par redirection/DNS, en-têtes de sécurité, décalage UTC/Paris, chunking des longs PDF,
+  ~30 écritures client sans contrôle d'erreur, accessibilité clavier de la révision.
 
 ### 2026-11-20 (suite 36) — Revue de toutes les RLS (pg_policies fourni par le user) + migration 0042 (exécutée par le user)
 - Revue complète des policies : tables du staff (fiches, modules, medias, mindmaps, qcm, cours, evenements,

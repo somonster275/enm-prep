@@ -24,6 +24,11 @@ export async function POST(req: NextRequest) {
     .eq('code', String(code || '').toUpperCase()).maybeSingle()
   if (!m) return NextResponse.json({ error: 'Match introuvable' }, { status: 404 })
 
+  // Seuls les joueurs inscrits au match peuvent répondre (sinon le code suffirait à obtenir les corrections).
+  const { data: joueur } = await admin.from('match_joueurs')
+    .select('user_id').eq('match_id', m.id).eq('user_id', user.id).maybeSingle()
+  if (!joueur) return NextResponse.json({ error: 'Tu ne participes pas à ce duel' }, { status: 403 })
+
   const async = m.mode === 'async'
   if (async) {
     // Duel asynchrone : pas d'horloge partagée, mais une date limite pour rejouer.
@@ -45,7 +50,9 @@ export async function POST(req: NextRequest) {
   // En async, chacun joue à son rythme → pas de fenêtre (l'anti-rejeu par clé primaire suffit).
   if (!async && (qi > curIdx || qi < curIdx - 1)) return NextResponse.json({ error: 'Hors fenêtre' }, { status: 409 })
 
-  const { data: sol } = await admin.from('match_solutions').select('solutions').eq('match_id', m.id).maybeSingle()
+  const { data: sol, error: solErr } = await admin.from('match_solutions').select('solutions').eq('match_id', m.id).maybeSingle()
+  // Sans les solutions, une bonne réponse serait notée fausse puis verrouillée par l'anti-rejeu.
+  if (solErr) return NextResponse.json({ error: 'Correction indisponible, réessaie' }, { status: 500 })
   const correct: number[] = (sol?.solutions?.[qi]) || []
   const choixArr: number[] = Array.isArray(choix) ? choix.filter((n: unknown) => Number.isInteger(n)) : []
   const juste = choixArr.length > 0 && choixArr.length === correct.length && correct.every(c => choixArr.includes(c))
@@ -59,7 +66,8 @@ export async function POST(req: NextRequest) {
   // Enregistre la réponse ; un doublon (déjà répondu) est rejeté par la clé primaire.
   const { error: insErr } = await admin.from('match_reponses')
     .insert({ match_id: m.id, user_id: user.id, q_index: qi, juste, points })
-  if (insErr) return NextResponse.json({ ok: true, deja: true })
+  if (insErr?.code === '23505') return NextResponse.json({ ok: true, deja: true })
+  if (insErr) return NextResponse.json({ error: 'Réponse non enregistrée, réessaie' }, { status: 500 })
   // Mémorise les choix pour le débrief (best-effort : la colonne peut ne pas
   // exister si la migration 0026 n'est pas encore passée).
   await admin.from('match_reponses').update({ choix: choixArr })

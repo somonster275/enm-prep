@@ -51,6 +51,7 @@ export default function RevisionPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [done, setDone] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const [erreurChargement, setErreurChargement] = useState(false)
   const [fichesExistent, setFichesExistent] = useState(false) // des fiches existent dans ce périmètre (distingue « à jour » de « vide »)
   const [nouvellesEnAttente, setNouvellesEnAttente] = useState(0) // nouvelles cartes retenues par le plafond quotidien
   const [isAdmin, setIsAdmin] = useState(false)
@@ -94,7 +95,8 @@ export default function RevisionPage() {
           .select('id, module_id, question, reponse, tags, suspendu, created_at')
           .is('deleted_at', null).eq('suspendu', false).order('id').range(de, a))
         const fichList = (fich || []) as Fiche[]
-        const { data: prog } = await toutesLesLignes<Progression>((de, a) => supabase.from('progression').select('*').eq('utilisateur_id', user.id).order('fiche_id').range(de, a))
+        const { data: prog, error: errProg } = await toutesLesLignes<Progression>((de, a) => supabase.from('progression').select('*').eq('utilisateur_id', user.id).order('fiche_id').range(de, a))
+        if (errProg) { setErreurChargement(true); return } // sinon des fiches déjà vues passeraient pour nouvelles et leur palier serait écrasé
         const progMap: Record<string, Progression> = {}
         ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
         setProgressions(progMap)
@@ -111,7 +113,8 @@ export default function RevisionPage() {
       if (carnet) {
         setEspace({ id: '', nom: "Carnet d'erreurs", slug: '', description: '', couleur: '#C0392B', ordre: 0 } as Espace)
         setModuleLabel('À revoir')
-        const { data: prog } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id).lte('niveau', 1)
+        const { data: prog, error: errProg } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id).lte('niveau', 1)
+        if (errProg) { setErreurChargement(true); return }
         const ids = (prog || []).map((p: Progression) => p.fiche_id)
         if (ids.length === 0) { setLoaded(true); return }
         const { data: fich } = await supabase.from('fiches').select('*').in('id', ids).is('deleted_at', null).eq('suspendu', false)
@@ -131,7 +134,8 @@ export default function RevisionPage() {
         const ids = (fav || []).map((x: { fiche_id: string }) => x.fiche_id)
         if (ids.length === 0) { setLoaded(true); return }
         const { data: fich } = await supabase.from('fiches').select('*').in('id', ids).is('deleted_at', null).eq('suspendu', false)
-        const { data: prog } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id).in('fiche_id', ids)
+        const { data: prog, error: errProg } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id).in('fiche_id', ids)
+        if (errProg) { setErreurChargement(true); return }
         const progMap: Record<string, Progression> = {}
         ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
         setProgressions(progMap)
@@ -162,9 +166,10 @@ export default function RevisionPage() {
       const { data: fich } = await supabase.from('fiches').select('*').in('module_id', modIds).is('deleted_at', null).eq('suspendu', false)
       const fichList = fich || []
 
-      const { data: prog } = await supabase.from('progression').select('*')
+      const { data: prog, error: errProg } = await supabase.from('progression').select('*')
         .eq('utilisateur_id', user.id)
         .in('fiche_id', fichList.map((f: Fiche) => f.id))
+      if (errProg) { setErreurChargement(true); return }
       const progMap: Record<string, Progression> = {}
       ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
       setProgressions(progMap)
@@ -327,6 +332,12 @@ export default function RevisionPage() {
         : `/espaces/${slug}`
 
   const font = "'Hanken Grotesk', sans-serif"
+
+  if (erreurChargement) return (
+    <div role="alert" style={{ padding: '2rem', color: '#C0392B', textAlign: 'center', fontFamily: font }}>
+      Impossible de charger ta progression. Recharge la page pour éviter de perdre ton historique de révision.
+    </div>
+  )
 
   if (!loaded || !espace) return (
     <div style={{ padding: '2rem', color: '#9A8D72', textAlign: 'center', fontFamily: font }}>Chargement…</div>

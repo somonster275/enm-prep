@@ -32,6 +32,9 @@ export async function POST(request: NextRequest) {
   if (!id || !ROLES.includes(role)) return NextResponse.json({ error: 'Requête invalide' }, { status: 400 })
   if (id === g.user.id) return NextResponse.json({ error: 'Tu ne peux pas changer ton propre rôle.' }, { status: 400 })
 
+  const { data: cible } = await getSupabaseAdmin().from('profils').select('role').eq('id', id).maybeSingle()
+  if (cible?.role === 'admin') return NextResponse.json({ error: "Impossible de modifier le rôle d'un autre administrateur." }, { status: 403 })
+
   const { error } = await getSupabaseAdmin().from('profils').update({ role }).eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })

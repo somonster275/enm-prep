@@ -152,10 +152,12 @@ export async function POST(request: NextRequest) {
 
   // On s'engage à répondre → incrément ATOMIQUE du quota (RPC, migration 0035) : plus de
   // course read-then-write. Résilient : sans la RPC/table ia_usage, l'incrément est ignoré.
+  // Le compteur renvoyé tranche : des requêtes parallèles passées au contrôle initial sont refusées ici.
   if (user) {
-    try {
-      await admin.rpc('incr_ia_usage', { p_user: user.id, p_jour: jourCourant() })
-    } catch { /* résilient */ }
+    const { data: n } = await admin.rpc('incr_ia_usage', { p_user: user.id, p_jour: jourCourant() })
+    if (typeof n === 'number' && n > LIMITE_QUESTIONS_JOUR) {
+      return messageSSE(`Tu as atteint la limite de ${LIMITE_QUESTIONS_JOUR} questions pour aujourd'hui. Reviens demain — cela évite aussi de saturer le service. 🙂`)
+    }
   }
 
   const contexteTexte = extraits.map(e => `[Source : ${e.nom}]\n${e.contenu}`).join('\n\n---\n\n')

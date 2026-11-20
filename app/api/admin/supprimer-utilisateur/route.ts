@@ -18,6 +18,8 @@ export async function POST(request: NextRequest) {
   }
 
   const admin = getSupabaseAdmin()
+  const { data: cible } = await admin.from('profils').select('role').eq('id', id).maybeSingle()
+  if (cible?.role === 'admin') return NextResponse.json({ error: 'Impossible de supprimer un autre administrateur.' }, { status: 403 })
 
   // Compte d'authentification d'abord : s'il échoue, la personne garde un profil cohérent.
   const { error } = await admin.auth.admin.deleteUser(id)

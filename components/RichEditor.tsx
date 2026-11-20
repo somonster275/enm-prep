@@ -1,5 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import DOMPurify from 'dompurify'
+import { CONFIG } from './RichContent'
 
 type Props = {
   value: string
@@ -19,7 +21,7 @@ export default function RichEditor({ value, onChange, placeholder, minHeight = 1
   // Initialise le contenu une seule fois (évite de casser le curseur à chaque frappe)
   useEffect(() => {
     if (ref.current && ref.current.innerHTML !== value) {
-      ref.current.innerHTML = value || ''
+      ref.current.innerHTML = DOMPurify.sanitize(value || '', CONFIG)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

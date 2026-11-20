@@ -23,6 +23,10 @@ export async function POST(req: NextRequest) {
     .eq('code', String(code || '').toUpperCase()).maybeSingle()
   if (!m) return NextResponse.json({ error: 'Match introuvable' }, { status: 404 })
 
+  const { data: joueur } = await admin.from('match_joueurs')
+    .select('user_id').eq('match_id', m.id).eq('user_id', user.id).maybeSingle()
+  if (!joueur) return NextResponse.json({ error: 'Tu ne participes pas à ce duel' }, { status: 403 })
+
   // On ne livre le débrief qu'une fois le match réellement terminé (ou son temps écoulé).
   // En async, chacun finit à son rythme : le débrief est dispo dès que le joueur a joué
   // (le client ne l'appelle qu'à la fin de SA partie).
@@ -92,10 +96,12 @@ export async function POST(req: NextRequest) {
       utilisateur_id: user.id, fiche_id, niveau: 0, palier: 0,
       prochaine_revision: now, derniere_revision: now,
     }))
-    await admin.from('progression').upsert(rows, { onConflict: 'utilisateur_id,fiche_id' })
+    const { error } = await admin.from('progression').upsert(rows, { onConflict: 'utilisateur_id,fiche_id' })
+    if (error) { console.error('duel/correction progression:', error.message); fichesEnErreur.length = 0 }
   }
   if (qcmRows.length) {
-    await admin.from('qcm_reponses').upsert(qcmRows, { onConflict: 'user_id,question_id' })
+    const { error } = await admin.from('qcm_reponses').upsert(qcmRows, { onConflict: 'user_id,question_id' })
+    if (error) { console.error('duel/correction qcm_reponses:', error.message); qcmRows.length = 0 }
   }
 
   const nbErreurs = correction.filter(c => !c.juste).length

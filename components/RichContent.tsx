@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react'
 import DOMPurify from 'dompurify'
 
-const CONFIG = {
+export const CONFIG = {
   ALLOWED_TAGS: [
     'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'sub', 'sup', 'mark',
     'span', 'div', 'p', 'br', 'hr',
