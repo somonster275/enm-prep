@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 30).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 31).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,16 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 31) — Classement non falsifiable (migration 0039, À EXÉCUTER)
+- **Migration `0039_activite_verrou.sql`** (à exécuter par le user) : supprime TOUTES les policies héritées
+  d'`activite_jours` (boucle sur pg_policies, noms inconnus) et ne garde que la lecture de sa propre ligne ;
+  `incr_activite` borne le delta à ±1, la date à hier/aujourd'hui/demain, le compteur entre 0 et 1 000/jour,
+  et n'est plus exécutable par `anon`. Testée sur un Postgres 16 local (rôles et `auth.uid()` simulés) :
+  rejouable, triche bloquée (delta 100 000, date passée, update/insert direct).
+- Aucun changement de code : le repli read-then-write de `enregistrerActivite` ne sert plus qu'avant la migration.
+- Limite restante : un étudiant peut encore appeler `incr_activite(+1)` en boucle (jusqu'à 1 000/jour). Vraie
+  solution si ça arrive : compter l'activité côté serveur à partir de la table `progression`.
 
 ### 2026-11-20 (suite 30) — Audit tâche 6 : code mort supprimé
 - Supprimés (aucun usage vérifié par grep) : `components/Sidebar.tsx`, `meilleurStreak` (`lib/streaks.ts`),
