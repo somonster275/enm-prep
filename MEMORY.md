@@ -116,6 +116,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - **Migration `0046_recherche_mots_cours.sql`** (exécutée par le user) : RPC `recherche_mots_cours` (to_tsquery french + ts_rank_cd,
   filtres portée / auteur / matière / documents), exécution réservée au service_role. Testée 2× sur Postgres 16
   (classement, isolation perso, filtre matière, refus pour authenticated). Code résilient sans elle (repli JS).
+- **En suspens (choix du user)** : carte non ajoutée sur Voyage pour l'instant → indexation lente, recherche par mots en attendant.
 - Recommandé au user : ajouter un moyen de paiement Voyage pour accélérer l'indexation (non vérifié : doc Voyage
   inaccessible depuis la session).
 
