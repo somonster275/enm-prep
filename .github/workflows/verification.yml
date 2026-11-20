@@ -1,0 +1,30 @@
+# Vérification à chaque push et pull request : types, tests, build.
+# (Le lint n'est pas inclus : il reste des erreurs anciennes à résorber avant de pouvoir le rendre bloquant.)
+name: Vérification
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+concurrency:
+  group: verification-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Types
+        run: npx tsc --noEmit
+      - name: Tests
+        run: npm test
+      - name: Build
+        run: npm run build

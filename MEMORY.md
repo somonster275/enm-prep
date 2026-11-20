@@ -119,6 +119,9 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   (fausse base Supabase via `mock.module` : duel/repondre, duel/lancer, compte/supprimer, admin/supprimer-utilisateur,
   admin/utilisateurs, cours/indexer). 28 tests ; vérifié qu'ils échouent si on retire le contrôle d'inscription au duel
   ou la protection des admins. Couverture des fichiers testés ≈ 82 % lignes (≈ 40 routes et les pages restent sans test).
+- Ajouts suite à l'audit : `app/error.tsx` (Réessayer / Tableau de bord, référence `digest`) et `app/global-error.tsx`
+  (Next 16 : la prop est `retry`, plus `reset`) ; CI GitHub `.github/workflows/verification.yml` (types, tests, build
+  à chaque push ; lint exclu tant qu'il reste ~80 erreurs anciennes).
 
 ### 2026-11-20 (suite 41) — Recherche hybride base ENM + migration 0046
 - Constat : clé Voyage sur l'offre gratuite (limite de débit après 64 passages) → 2227 passages ≈ 1 h d'indexation.
