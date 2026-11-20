@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 27).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 28).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,14 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 28) — Audit tâche 4 : l'annulation décompte l'activité
+- **Autorisation durable du user** : créer les PR ET les fusionner soi-même sur GitHub sans demander (après
+  `tsc` + `build` OK et statut Vercel vert). PR #7 fusionnée ainsi.
+- `annuler()` (révision) appelle `enregistrerActivite(userId, -1)` : la carte annulée ne compte plus dans la série,
+  l'objectif du jour ni le classement. Réutilise la RPC `incr_activite` (accepte un delta négatif), sans migration.
+- À noter pour la tâche « classement » : `incr_activite` accepte n'importe quel `p_delta` depuis le client, donc un
+  étudiant peut gonfler son compteur via l'API (même faille que `activite_jours_update`).
 
 ### 2026-11-20 (suite 27) — Audit tâche 3 : note de révision perdue sans erreur
 - `revision/page.tsx` : `rateCard` vérifie l'erreur de l'upsert `progression`. En cas d'échec : toast « Note non
