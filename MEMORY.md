@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 35).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 36).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,19 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 36) — Revue de toutes les RLS (pg_policies fourni par le user) + migration 0042 (À EXÉCUTER)
+- Revue complète des policies : tables du staff (fiches, modules, medias, mindmaps, qcm, cours, evenements,
+  espaces, calendrier_flux, sources_actualites) bien réservées admin/éditeur en écriture ; données perso en
+  « soi uniquement » ; profils, activite_jours, cours_documents/chunks conformes aux migrations 0037 à 0040.
+- **Faille trouvée** : `match_joueurs.mj_insert` ne vérifiait que `user_id` → un étudiant rejoignait un duel avec
+  un score inventé (jamais recalculé s'il ne répond pas). **Migration `0042_duel_score_initial.sql`** : le trigger
+  `forcer_pseudo` remet aussi score/repondu/justes/termine à zéro. Testée sur Postgres 16 (rejouable, score forcé à 0).
+- Constats laissés tels quels (choix produit / faible enjeu) : `qcm_write` (ALL) laisse les éditeurs supprimer des
+  QCM alors que `qcm_delete` vise l'admin seul ; `matchs_update` laisse l'hôte modifier son match (statut, horaires) ;
+  les bonnes réponses d'un duel restent lisibles par un tricheur dans `fiches` / `qcm_questions` (révision libre) ;
+  4 policies redondantes sur `progression` (dont `progression_own`, rôle public, qui couvre aussi DELETE).
+- Pas encore vérifié : tables dont le RLS serait DÉSACTIVÉ (absentes de pg_policies) et policies du Storage.
 
 ### 2026-11-20 (suite 35) — Audit v3 : les 7 points restants
 - **Premiers tests du projet** : `npm test` (`tsx --test tests/*.test.ts`, `tsx` en devDependency) — paliers et
