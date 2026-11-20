@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 50).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 51).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,18 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 51) — Refonte design : nettoyage des emoji (pages étudiantes)
+- Emoji décoratifs retirés (≈290 → 176) : page module, QCM (tuiles de type, 🎯, 🎉, ✅/❌ → « Juste »/« Faux »,
+  💡 → « Explication. », filtres matières en onglets encre au lieu de pilules corail), Questions de cours,
+  `MethodeContenu` (champ `emoji` supprimé) + titre de l'onboarding, duels (`DuelAsync`, `duel/[code]`,
+  historique : 🥇🥈🥉 → « 1er / 2e / 3e » en Newsreader, statut adversaire « Devant / Derrière / En cours »),
+  classement, recherche (champ `icone` des groupes supprimé).
+- ⚠️ Les messages d'état préfixés ✅/❌ servaient de test (`msg.startsWith('❌')`) → remplacés par le préfixe
+  « Erreur : » et `startsWith('Erreur')` (page module, Questions de cours). Garder ce couplage en tête.
+- Gardés volontairement : ✓ ✕ (listes « ce qui marche », états), ★ favoris, sélecteur d'icône admin
+  (`espaces/page.tsx`). Restent surtout des pages admin + drive, calendrier, média, cours, contribuer, actualités,
+  `Approfondir`, `GenerateurFiches`, `AstucesFiche`, `OutilContenu`.
 
 ### 2026-11-20 (suite 50) — Refonte design : pages des matières + rattrapage de la passe
 - `espaces/page.tsx` : titre « Vos matières » ; Révision mixte / Carnet / Favoris / Recherche = une bande de 4 liens

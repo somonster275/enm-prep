@@ -128,18 +128,18 @@ export default function CoursIAPage() {
     setUploading(true)
     let texte: string
     try { texte = await extraireTexte(fichier) }
-    catch (e) { setUploading(false); affMsg('❌ ' + (e instanceof Error ? e.message : String(e))); return }
+    catch (e) { setUploading(false); affMsg('Erreur : ' + (e instanceof Error ? e.message : String(e))); return }
     const res = await fetch('/api/cours/upload', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nom: fichier.name, texte, espace_id: mode === 'officiel' ? espaceDoc || null : null, portee: mode }),
     })
     const json = await res.json().catch(() => ({ error: res.status === 413 ? 'Document trop long' : 'Envoi impossible' }))
-    if (!res.ok) { setUploading(false); affMsg('❌ ' + json.error); return }
+    if (!res.ok) { setUploading(false); affMsg('Erreur : ' + json.error); return }
     setFichier(null); setEspaceDoc('')
     if (fileRef.current) fileRef.current.value = ''
     chargerDocs(mode, userId)
     if (json.aIndexer) await indexerDoc(json.id, json.chunks)
-    else affMsg(`✅ ${json.chunks} passages indexés`)
+    else affMsg(`${json.chunks} passages indexés`)
     setUploading(false)
   }
 
@@ -154,7 +154,7 @@ export default function CoursIAPage() {
       const json = res ? await res.json().catch(() => ({})) : {}
       if (res?.ok) {
         attentes = 0
-        if (json.restants === 0) { affMsg(`✅ ${total} passages indexés`); return }
+        if (json.restants === 0) { affMsg(`${total} passages indexés`); return }
         setMsg(`⏳ Indexation : ${Math.max(0, total - json.restants)} / ${total} passages — garde la page ouverte`)
         continue
       }
@@ -164,7 +164,7 @@ export default function CoursIAPage() {
         await new Promise(r => setTimeout(r, 20_000))
         continue
       }
-      setMsg(`❌ Indexation interrompue (${json.error || 'connexion perdue'}). Clique sur « Reprendre » à côté du document.`)
+      setMsg(`Erreur : indexation interrompue (${json.error || 'connexion perdue'}). Clique sur « Reprendre » à côté du document.`)
       return
     }
   }
@@ -176,7 +176,7 @@ export default function CoursIAPage() {
     })
     if (!res.ok) {
       const json = await res.json().catch(() => ({}))
-      affMsg('❌ ' + (json.error || 'Suppression impossible'))
+      affMsg('Erreur : ' + (json.error || 'Suppression impossible'))
       return
     }
     setDocs(d => d.filter(x => x.id !== id))
@@ -215,7 +215,7 @@ export default function CoursIAPage() {
 
     if (!res.ok || !res.body) {
       const json = await res.json().catch(() => ({}))
-      const contenu = '⚠️ ' + (json.error || `Erreur lors de la connexion à l'IA (${res.status}).`)
+      const contenu = 'Erreur : ' + (json.error || `Erreur lors de la connexion à l'IA (${res.status}).`)
       setMessages(m => { const next = [...m, { role: 'assistant' as const, contenu, ts: Date.now() }]; sauvegarderDansLS(mode, userId, next); return next })
       setLoading(false); setPhase('idle'); abortRef.current = null
       return
@@ -268,7 +268,7 @@ export default function CoursIAPage() {
             if (obj.error) {
               setMessages(m => {
                 const copy = [...m]
-                copy[copy.length - 1] = { ...copy[copy.length - 1], contenu: '⚠️ Erreur : ' + obj.error }
+                copy[copy.length - 1] = { ...copy[copy.length - 1], contenu: 'Erreur : ' + obj.error }
                 return copy
               })
             }
@@ -352,7 +352,7 @@ export default function CoursIAPage() {
                   background: vueTuteur ? coral : 'transparent',
                   color: vueTuteur ? '#fff' : textMid,
                   boxShadow: vueTuteur ? `0 6px 14px -7px rgba(163,18,42,.8)` : 'none',
-                }}>📕 Coach IA</button>
+                }}>Coach IA</button>
               </div>
               {/* Sélection de documents : réservée à « Mes documents ».
                   En base ENM, les étudiants interrogent toute la base sans voir la liste. */}
@@ -407,7 +407,7 @@ export default function CoursIAPage() {
                   flex: 2, padding: '10px 14px', borderRadius: 6, border: `1.5px dashed ${coral}66`,
                   fontSize: 13, fontWeight: 600, color: coral, cursor: 'pointer', background: fichier ? coralBg : sand,
                 }}>
-                  {fichier ? `📎 ${fichier.name}` : 'Choisir un fichier (PDF, Word, TXT)…'}
+                  {fichier ? `${fichier.name}` : 'Choisir un fichier (PDF, Word, TXT)…'}
                   <input ref={fileRef} type="file" accept=".pdf,.txt,.doc,.docx,text/plain,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style={{ display: 'none' }}
                     onChange={e => setFichier(e.target.files?.[0] || null)} />
                 </label>
@@ -422,7 +422,7 @@ export default function CoursIAPage() {
                   {uploading ? 'Indexation…' : 'Importer'}
                 </button>
               </div>
-              {msg && <div style={{ fontSize: 13, marginTop: 10, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
+              {msg && <div style={{ fontSize: 13, marginTop: 10, color: msg.startsWith('Erreur') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
               {docsAffiches.length > 0 && (
                 <div style={{ marginTop: 16, borderTop: `1px solid ${border}`, paddingTop: 12 }}>
                   <div style={{ fontSize: 11, color: textMuted, marginBottom: 8, fontWeight: 700, letterSpacing: '.08em' }}>DOCUMENTS INDEXÉS</div>
@@ -492,7 +492,6 @@ export default function CoursIAPage() {
                             }}>
                               {checked && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
                             </div>
-                            <span style={{ fontSize: 11, color: '#C9A98F' }}>📄</span>
                             <span title={d.nom} style={{ flex: 1, fontSize: 13, fontWeight: checked ? 700 : 600, color: checked ? textDark : 'var(--c-texte-doux)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.nom}</span>
                             <span style={{ flexShrink: 0, fontFamily: "var(--font-texte)", fontSize: 11, fontWeight: 600, color: checked ? coralDark : textMuted, background: checked ? '#FCE0D6' : '#F4ECDC', padding: '2px 7px', borderRadius: 7 }}>{d.nb_chunks}</span>
                           </label>
@@ -518,7 +517,6 @@ export default function CoursIAPage() {
                         }}>
                           {checked && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
                         </div>
-                        <span style={{ fontSize: 11, color: '#C9A98F' }}>📄</span>
                         <span title={d.nom} style={{ flex: 1, fontSize: 13, fontWeight: checked ? 700 : 600, color: checked ? textDark : 'var(--c-texte-doux)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.nom}</span>
                         <span style={{ flexShrink: 0, fontFamily: "var(--font-texte)", fontSize: 11, fontWeight: 600, color: checked ? coralDark : textMuted, background: checked ? '#FCE0D6' : '#F4ECDC', padding: '2px 7px', borderRadius: 7 }}>{d.nb_chunks}</span>
                       </label>
@@ -559,10 +557,10 @@ export default function CoursIAPage() {
                     </div>
                     {docs.length === 0 && (
                       mode === 'personnel'
-                        ? <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-accent)' }}>⚠ Aucun document personnel — clique sur « + Importer » pour ajouter le tien.</div>
+                        ? <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-accent)' }}>Aucun document personnel — clique sur « + Importer » pour ajouter le tien.</div>
                         : isAdmin
-                          ? <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-accent)' }}>⚠ Base ENM vide — cliquez sur « + Importer » pour commencer.</div>
-                          : <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-accent)' }}>⚠ Aucun document n'a encore été importé dans la base ENM.</div>
+                          ? <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-accent)' }}>Base ENM vide — cliquez sur « + Importer » pour commencer.</div>
+                          : <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-accent)' }}>Aucun document n'a encore été importé dans la base ENM.</div>
                     )}
                   </div>
                 )}
@@ -621,7 +619,7 @@ export default function CoursIAPage() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 10, flexWrap: 'wrap' }}>
                               {(m.sources && m.sources.length > 0) && (
                                 <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: textDark, background: '#FBF6EC', border: `1px solid ${border}`, padding: '3px 9px', borderRadius: 7, fontFamily: "var(--font-texte)", fontWeight: 500 }}>
-                                  🔍 {m.sources.length} doc{m.sources.length > 1 ? 's' : ''}
+                                  {m.sources.length} doc{m.sources.length > 1 ? 's' : ''}
                                 </span>
                               )}
                               {m.nbPassages !== undefined && (
@@ -631,7 +629,7 @@ export default function CoursIAPage() {
                               )}
                               {(m.tReflexion !== undefined || enCours) && (
                                 <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, color: textDark, background: '#FBF6EC', border: `1px solid ${border}`, padding: '3px 9px', borderRadius: 7, fontFamily: "var(--font-texte)", fontWeight: 500 }}>
-                                  ✏️ Rédaction
+                                  Rédaction
                                 </span>
                               )}
                             </div>
@@ -653,11 +651,11 @@ export default function CoursIAPage() {
                         {m.tReflexion !== undefined && (
                           <div style={{ display: 'flex', gap: 8, padding: '0 24px 18px', flexWrap: 'wrap' }}>
                             <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: textMid, background: '#FBF6EC', border: `1px solid ${border}`, padding: '6px 11px', borderRadius: 6 }}>
-                              ⚡ Premier mot en <strong style={{ fontFamily: "var(--font-texte)", fontWeight: 600, color: textDark, marginLeft: 3 }}>{fmtSec(m.tReflexion)}</strong>
+                              Premier mot en <strong style={{ fontFamily: "var(--font-texte)", fontWeight: 600, color: textDark, marginLeft: 3 }}>{fmtSec(m.tReflexion)}</strong>
                             </span>
                             {m.tRedaction !== undefined && (
                               <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: textMid, background: '#FBF6EC', border: `1px solid ${border}`, padding: '6px 11px', borderRadius: 6 }}>
-                                ✏️ Rédigé en <strong style={{ fontFamily: "var(--font-texte)", fontWeight: 600, color: textDark, marginLeft: 3 }}>{fmtSec(m.tRedaction)}</strong>
+                                Rédigé en <strong style={{ fontFamily: "var(--font-texte)", fontWeight: 600, color: textDark, marginLeft: 3 }}>{fmtSec(m.tRedaction)}</strong>
                               </span>
                             )}
                           </div>
@@ -673,7 +671,7 @@ export default function CoursIAPage() {
                             {m.sources.map((s, j) => (
                               <span key={j} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, background: coralBg, color: coralDark, padding: '4px 10px', borderRadius: 8, fontWeight: 600, border: `1px solid ${coralBorder}` }}>
                                 <span style={{ width: 17, height: 17, borderRadius: 5, background: j === 0 ? coral : '#FCE6DE', color: j === 0 ? '#fff' : coralDark, fontFamily: "var(--font-texte)", fontSize: 10, fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{j + 1}</span>
-                                📄 {s}
+                                {s}
                               </span>
                             ))}
                           </div>
@@ -703,7 +701,7 @@ export default function CoursIAPage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#FFFEFB', border: `1.5px solid ${border}`, borderRadius: 6, padding: '9px 9px 9px 16px', boxShadow: `0 1px 2px rgba(60,40,20,.05), 0 16px 38px -24px rgba(60,40,20,.22)` }}>
                   {documentsSelectionnes.length > 0 && (
                     <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, fontSize: 12, fontWeight: 600, color: coralDark, background: coralBg, padding: '5px 10px', borderRadius: 9, border: `1px solid ${coralBorder}`, whiteSpace: 'nowrap', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      📄 {documentsSelectionnes.length === 1 ? (docs.find(d => d.id === documentsSelectionnes[0])?.nom ?? '…') : `${documentsSelectionnes.length} documents`}
+                      {documentsSelectionnes.length === 1 ? (docs.find(d => d.id === documentsSelectionnes[0])?.nom ?? '…') : `${documentsSelectionnes.length} documents`}
                     </span>
                   )}
                   <input
@@ -737,7 +735,7 @@ export default function CoursIAPage() {
                     )}
                   </span>
                   <span style={{ fontSize: 12, color: textMuted, fontFamily: "var(--font-texte)" }}>
-                    ⚠️ Assistant propulsé par Claude (Anthropic) — recoupez avec vos cours, n&apos;y inscrivez pas d&apos;informations personnelles.
+                    Assistant propulsé par Claude (Anthropic) — recoupez avec vos cours, n&apos;y inscrivez pas d&apos;informations personnelles.
                   </span>
                 </div>
               </div>

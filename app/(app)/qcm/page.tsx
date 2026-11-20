@@ -143,14 +143,14 @@ export default function QcmPage() {
     return (
       <div style={{ paddingTop: 34, maxWidth: 720, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
         <button onClick={retour} style={{ background: 'none', border: 'none', color: 'var(--c-annotation-clair)', fontSize: 13, cursor: 'pointer', padding: 0, marginBottom: 12 }}>← Tous les QCM</button>
-        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 24, margin: '0 0 4px' }}>{actif ? actif.titre : '🎯 Mes erreurs'}</h1>
+        <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 24, margin: '0 0 4px' }}>{actif ? actif.titre : 'Mes erreurs'}</h1>
         {actif?.matiere && <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginBottom: 16 }}>{actif.matiere}</div>}
         {modeErreurs && <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginBottom: 16 }}>Rejoue les questions que tu as déjà ratées. Une bonne réponse les retire de ta liste.</div>}
 
         {tousValides && (
           <div style={{ background: score === questions.length ? '#ECF7F0' : 'var(--c-papier-chaud)', border: `1px solid ${score === questions.length ? '#BFE6CF' : '#F2D9A0'}`, borderRadius: 6, padding: 18, marginBottom: 18, textAlign: 'center' }}>
             <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 28 }}>{score} / {questions.length}</div>
-            <div style={{ fontSize: 14, color: 'var(--c-texte-doux)', marginTop: 4 }}>{score === questions.length ? '🎉 Sans faute !' : 'Revois les explications ci-dessous.'}</div>
+            <div style={{ fontSize: 14, color: 'var(--c-texte-doux)', marginTop: 4 }}>{score === questions.length ? 'Sans faute.' : 'Revois les explications ci-dessous.'}</div>
           </div>
         )}
 
@@ -164,7 +164,7 @@ export default function QcmPage() {
                 <div key={q.id} style={{ background: '#FFFEFB', border: `1px solid ${v ? (bonne ? '#BFE6CF' : 'var(--c-accent-bord)') : 'var(--c-filet)'}`, borderRadius: 6, padding: 18 }}>
                   {q.cas && <div style={{ fontSize: 13.5, color: 'var(--c-texte-doux)', marginBottom: 10, background: 'var(--c-papier)', borderRadius: 6, padding: '10px 12px', lineHeight: 1.5, borderLeft: '3px solid var(--c-filet-fort)' }}>{q.cas}</div>}
                   <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 10 }}>
-                    {qi + 1}. {q.enonce} {v && <span style={{ fontSize: 13 }}>{bonne ? '✅' : '❌'}</span>}
+                    {qi + 1}. {q.enonce} {v && <span style={{ fontSize: 12.5, fontWeight: 600, marginLeft: 6, color: bonne ? '#0F6E56' : 'var(--c-accent)' }}>{bonne ? 'Juste' : 'Faux'}</span>}
                   </div>
                   <input
                     value={saisies[q.id] || ''}
@@ -183,7 +183,7 @@ export default function QcmPage() {
                       <b>Réponse :</b> {q.reponse_affichee || q.reponses_ok[0]}
                     </div>
                   )}
-                  {v && q.explication && <div style={{ fontSize: 13, color: 'var(--c-texte-doux)', marginTop: 8, background: 'var(--c-papier)', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}>💡 {q.explication}</div>}
+                  {v && q.explication && <div style={{ fontSize: 13, color: 'var(--c-texte-doux)', marginTop: 8, background: 'var(--c-papier)', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}><b style={{ fontWeight: 600, color: 'var(--c-encre)' }}>Explication.</b> {q.explication}</div>}
                   {!v && boutonValider(q)}
                 </div>
               )
@@ -194,9 +194,9 @@ export default function QcmPage() {
             return (
               <div key={q.id} style={{ background: '#FFFEFB', border: `1px solid ${v ? (bonne ? '#BFE6CF' : 'var(--c-accent-bord)') : 'var(--c-filet)'}`, borderRadius: 6, padding: 18 }}>
                 <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>
-                  {qi + 1}. {q.enonce} {v && <span style={{ fontSize: 13 }}>{bonne ? '✅' : '❌'}</span>}
+                  {qi + 1}. {q.enonce} {v && <span style={{ fontSize: 12.5, fontWeight: 600, marginLeft: 6, color: bonne ? '#0F6E56' : 'var(--c-accent)' }}>{bonne ? 'Juste' : 'Faux'}</span>}
                 </div>
-                {multi && <div style={{ fontSize: 12, color: v ? 'var(--c-annotation-clair)' : '#0F6E56', fontWeight: 600, marginBottom: 8 }}>☑ Plusieurs réponses possibles</div>}
+                {multi && <div style={{ fontSize: 12, color: v ? 'var(--c-annotation-clair)' : '#0F6E56', fontWeight: 600, marginBottom: 8 }}>Plusieurs réponses possibles</div>}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginTop: 8 }}>
                   {q.options.map((o, oi) => {
                     const sel = choisi.has(oi)
@@ -216,7 +216,7 @@ export default function QcmPage() {
                     )
                   })}
                 </div>
-                {v && q.explication && <div style={{ fontSize: 13, color: 'var(--c-texte-doux)', marginTop: 10, background: 'var(--c-papier)', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}>💡 {q.explication}</div>}
+                {v && q.explication && <div style={{ fontSize: 13, color: 'var(--c-texte-doux)', marginTop: 10, background: 'var(--c-papier)', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}><b style={{ fontWeight: 600, color: 'var(--c-encre)' }}>Explication.</b> {q.explication}</div>}
                 {!v && boutonValider(q)}
               </div>
             )
@@ -244,20 +244,19 @@ export default function QcmPage() {
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 20px' }}>Entraîne-toi avec des QCM auto-corrigés. Chaque QCM terminé compte dans ton activité.</p>
 
       {nbErreurs > 0 && (
-        <button onClick={jouerErreurs} style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 14, background: 'var(--c-accent-pale)', border: '1px solid var(--c-accent-bord)', borderRadius: 6, padding: '14px 18px', marginBottom: 18, cursor: 'pointer', fontFamily: font }}>
-          <span style={{ fontSize: 26 }}>🎯</span>
+        <button onClick={jouerErreurs} style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 14, background: '#FFFEFB', border: '1px solid var(--c-filet)', borderTop: '3px solid var(--c-accent)', borderRadius: 6, padding: '14px 18px', marginBottom: 18, cursor: 'pointer', fontFamily: font }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: '#C0392B' }}>Réviser mes erreurs</div>
+            <div style={{ fontFamily: 'var(--font-titre)', fontSize: 19, fontWeight: 600, color: 'var(--c-encre)' }}>Réviser mes erreurs</div>
             <div style={{ fontSize: 12.5, color: 'var(--c-annotation)' }}>{nbErreurs} question{nbErreurs > 1 ? 's' : ''} ratée{nbErreurs > 1 ? 's' : ''} à revoir, tous QCM confondus.</div>
           </div>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#C0392B' }}>Commencer →</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-accent)' }}>Commencer</span>
         </button>
       )}
 
       {matieres.length > 0 && (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
-          <button onClick={() => setFiltre('')} style={{ padding: '6px 12px', borderRadius: 999, cursor: 'pointer', fontSize: 12.5, fontWeight: 700, fontFamily: font, background: filtre === '' ? 'var(--c-accent)' : '#fff', color: filtre === '' ? '#fff' : 'var(--c-annotation)', border: `1px solid ${filtre === '' ? 'var(--c-accent)' : 'var(--c-filet)'}` }}>Tous</button>
-          {matieres.map(m => <button key={m} onClick={() => setFiltre(m)} style={{ padding: '6px 12px', borderRadius: 999, cursor: 'pointer', fontSize: 12.5, fontWeight: 700, fontFamily: font, background: filtre === m ? 'var(--c-accent)' : '#fff', color: filtre === m ? '#fff' : 'var(--c-annotation)', border: `1px solid ${filtre === m ? 'var(--c-accent)' : 'var(--c-filet)'}` }}>{m}</button>)}
+          <button onClick={() => setFiltre('')} style={{ padding: '6px 12px', borderRadius: 4, cursor: 'pointer', fontSize: 13.5, fontWeight: 600, fontFamily: font, background: filtre === '' ? 'var(--c-encre)' : 'transparent', color: filtre === '' ? 'var(--c-papier)' : 'var(--c-annotation)', border: `1px solid ${filtre === '' ? 'var(--c-accent)' : 'var(--c-filet)'}` }}>Tous</button>
+          {matieres.map(m => <button key={m} onClick={() => setFiltre(m)} style={{ padding: '6px 12px', borderRadius: 4, cursor: 'pointer', fontSize: 13.5, fontWeight: 600, fontFamily: font, background: filtre === m ? 'var(--c-encre)' : 'transparent', color: filtre === m ? 'var(--c-papier)' : 'var(--c-annotation)', border: `1px solid ${filtre === m ? 'var(--c-accent)' : 'var(--c-filet)'}` }}>{m}</button>)}
         </div>
       )}
 
@@ -265,19 +264,18 @@ export default function QcmPage() {
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : visibles.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
-          <div style={{ fontSize: 30, marginBottom: 8 }}>✅</div>Aucun QCM disponible pour l&apos;instant.
+          Aucun QCM disponible pour l&apos;instant.
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
           {visibles.map(q => (
             <button key={q.id} onClick={() => jouer(q)} style={{ textAlign: 'left', background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18, cursor: 'pointer', fontFamily: font }}>
-              <div style={{ width: 44, height: 44, borderRadius: 6, background: q.type === 'libre' ? '#FBEAF0' : '#FCEFD3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 12 }}>{q.type === 'libre' ? '✍️' : '✅'}</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--c-encre)' }}>{q.titre}</div>
+              <div style={{ fontFamily: 'var(--font-titre)', fontSize: 19, fontWeight: 600, color: 'var(--c-encre)', lineHeight: 1.25 }}>{q.titre}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, flexWrap: 'wrap' }}>
                 {q.matiere && <span style={{ fontSize: 12.5, color: 'var(--c-annotation-clair)' }}>{q.matiere}</span>}
-                {q.type === 'libre' && <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.03em', color: '#7A1A3E', background: '#FBEAF0', borderRadius: 999, padding: '2px 8px' }}>RÉPONSE LIBRE</span>}
+                {q.type === 'libre' && <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--c-annotation)', border: '1px solid var(--c-filet-fort)', borderRadius: 4, padding: '0 6px' }}>Réponse libre</span>}
               </div>
-              <div style={{ marginTop: 12, fontSize: 12.5, fontWeight: 700, color: '#E8A11E' }}>Commencer →</div>
+              <div style={{ marginTop: 12, fontSize: 14, fontWeight: 600, color: 'var(--c-accent)' }}>Commencer</div>
             </button>
           ))}
         </div>

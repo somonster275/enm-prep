@@ -8,32 +8,32 @@ const FONT = "var(--font-texte)"
 const DISPLAY = "var(--font-titre)"
 
 // Outils pour réviser en solo (cœur de la mémorisation).
-const REVISER: { emoji: string; titre: string; desc: string }[] = [
-  { emoji: '🗂️', titre: 'Fiches en répétition espacée', desc: 'Chaque fiche revient au bon moment, juste avant que tu l\'oublies. C\'est le cœur de codex.' },
-  { emoji: '🔀', titre: 'Révision mixte', desc: 'Mélange des fiches de toutes les matières dans une même session (entrelacement).' },
-  { emoji: '✏️', titre: 'Brouillon', desc: 'Rédige ta réponse de mémoire avant de retourner la carte, puis compare.' },
-  { emoji: '✅', titre: 'QCM & révision des erreurs', desc: 'Entraîne-toi sur des QCM auto-corrigés. codex retient tes erreurs et te les fait rejouer.' },
-  { emoji: '📕', titre: 'Carnet d\'erreurs', desc: 'Toutes les fiches que tu maîtrises mal sont regroupées pour les revoir en priorité.' },
-  { emoji: '⭐', titre: 'Favoris', desc: 'Marque les fiches clés d\'une étoile et révise-les en une session dédiée.' },
+const REVISER: { titre: string; desc: string }[] = [
+  { titre: 'Fiches en répétition espacée', desc: 'Chaque fiche revient au bon moment, juste avant que tu l\'oublies. C\'est le cœur de codex.' },
+  { titre: 'Révision mixte', desc: 'Mélange des fiches de toutes les matières dans une même session (entrelacement).' },
+  { titre: 'Brouillon', desc: 'Rédige ta réponse de mémoire avant de retourner la carte, puis compare.' },
+  { titre: 'QCM & révision des erreurs', desc: 'Entraîne-toi sur des QCM auto-corrigés. codex retient tes erreurs et te les fait rejouer.' },
+  { titre: 'Carnet d\'erreurs', desc: 'Toutes les fiches que tu maîtrises mal sont regroupées pour les revoir en priorité.' },
+  { titre: 'Favoris', desc: 'Marque les fiches clés d\'une étoile et révise-les en une session dédiée.' },
 ]
 
 // Outils collaboratifs — mis en valeur dans un bloc dédié.
-const COLLABORATIF: { emoji: string; titre: string; desc: string }[] = [
-  { emoji: '⚔️', titre: 'Duel', desc: 'Affronte d\'autres candidats en temps réel sur les mêmes questions — chrono, classement live et historique de tes matchs.' },
-  { emoji: '🤝', titre: 'Entraide', desc: 'Un annuaire entre candidats : trouve quelqu\'un prêt à t\'aider sur une matière, ou propose ton aide.' },
-  { emoji: '💬', titre: 'Forum Q&R', desc: 'Pose une question à la communauté, réponds à celles des autres. Tu es notifié·e quand on te répond.' },
-  { emoji: '📚', titre: 'Annales partagées', desc: 'Sujets et corrigés mis en commun par les candidats, classés par matière.' },
-  { emoji: '🏆', titre: 'Classement & défi', desc: 'Un défi de la semaine et un classement (anonyme) pour garder la motivation, ensemble.' },
+const COLLABORATIF: { titre: string; desc: string }[] = [
+  { titre: 'Duel', desc: 'Affronte d\'autres candidats en temps réel sur les mêmes questions — chrono, classement live et historique de tes matchs.' },
+  { titre: 'Entraide', desc: 'Un annuaire entre candidats : trouve quelqu\'un prêt à t\'aider sur une matière, ou propose ton aide.' },
+  { titre: 'Forum Q&R', desc: 'Pose une question à la communauté, réponds à celles des autres. Tu es notifié·e quand on te répond.' },
+  { titre: 'Annales partagées', desc: 'Sujets et corrigés mis en commun par les candidats, classés par matière.' },
+  { titre: 'Classement & défi', desc: 'Un défi de la semaine et un classement (anonyme) pour garder la motivation, ensemble.' },
 ]
 
 // Outils qui accompagnent au quotidien.
-const ACCOMPAGNER: { emoji: string; titre: string; desc: string }[] = [
-  { emoji: '🤖', titre: 'Coach', desc: 'Un tuteur qui connaît ta progression et t\'aide à organiser tes révisions.' },
-  { emoji: '🎓', titre: 'Questions de cours', desc: 'Pose une question, obtiens une réponse sourcée sur la base de cours.' },
-  { emoji: '🔍', titre: 'Recherche globale', desc: 'Retrouve d\'un coup une fiche, un QCM, une vidéo, une annale ou un sujet du forum.' },
-  { emoji: '🎬', titre: 'Vidéos', desc: 'Des vidéos sélectionnées par matière, à regarder directement dans codex.' },
-  { emoji: '📅', titre: 'Calendrier', desc: 'Tes cours de la fac et les événements de la prépa au même endroit, synchronisés.' },
-  { emoji: '🔔', titre: 'Notifications', desc: 'Tu es prévenu·e dès qu\'on répond à ta question ou qu\'un événement t\'attend.' },
+const ACCOMPAGNER: { titre: string; desc: string }[] = [
+  { titre: 'Coach', desc: 'Un tuteur qui connaît ta progression et t\'aide à organiser tes révisions.' },
+  { titre: 'Questions de cours', desc: 'Pose une question, obtiens une réponse sourcée sur la base de cours.' },
+  { titre: 'Recherche globale', desc: 'Retrouve d\'un coup une fiche, un QCM, une vidéo, une annale ou un sujet du forum.' },
+  { titre: 'Vidéos', desc: 'Des vidéos sélectionnées par matière, à regarder directement dans codex.' },
+  { titre: 'Calendrier', desc: 'Tes cours de la fac et les événements de la prépa au même endroit, synchronisés.' },
+  { titre: 'Notifications', desc: 'Tu es prévenu·e dès qu\'on répond à ta question ou qu\'un événement t\'attend.' },
 ]
 
 const MARCHE: { titre: string; desc: string }[] = [
@@ -52,12 +52,12 @@ const MARCHE_PAS: { titre: string; desc: string }[] = [
   { titre: 'Le bachotage de dernière minute', desc: 'On retient sur le moment puis on oublie vite : inutile pour un concours qui teste sur la durée.' },
 ]
 
-function GrilleOutils({ items }: { items: { emoji: string; titre: string; desc: string }[] }) {
+function GrilleOutils({ items }: { items: { titre: string; desc: string }[] }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
       {items.map(o => (
         <div key={o.titre} style={{ background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '12px 14px' }}>
-          <div style={{ fontSize: 14, fontWeight: 700 }}>{o.emoji} {o.titre}</div>
+          <div style={{ fontSize: 14.5, fontWeight: 600 }}>{o.titre}</div>
           <div style={{ fontSize: 12.5, color: 'var(--c-annotation)', marginTop: 3, lineHeight: 1.5 }}>{o.desc}</div>
         </div>
       ))}
@@ -75,14 +75,13 @@ export default function MethodeContenu() {
 
       {/* Origine : un projet d'étudiant, entre pairs. */}
       <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '14px 16px', margin: '0 0 24px' }}>
-        <span style={{ fontSize: 22, flexShrink: 0 }}>🎓</span>
         <div style={{ fontSize: 13.5, color: '#5C5448', lineHeight: 1.55 }}>
           <b>Conçu par un étudiant en classe préparatoire à l&apos;ENM</b>, pour les candidats au concours.
         </div>
       </div>
 
       {/* Réviser (solo) */}
-      <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 17, margin: '0 0 12px' }}>📖 Réviser, efficacement</div>
+      <div style={{ fontFamily: DISPLAY, fontWeight: 600, fontSize: 17, margin: '0 0 12px' }}>Réviser, efficacement</div>
       <div style={{ marginBottom: 26 }}><GrilleOutils items={REVISER} /></div>
 
       {/* Collaboratif — bloc mis en valeur */}
@@ -96,7 +95,7 @@ export default function MethodeContenu() {
             Le cœur de codex
           </div>
           <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 21, lineHeight: 1.2, marginBottom: 6 }}>
-            🤝 Réviser ensemble, c&apos;est tenir la distance
+            Réviser ensemble, c&apos;est tenir la distance
           </div>
           <p style={{ fontSize: 14, color: '#6E5A50', lineHeight: 1.55, margin: '0 0 16px', maxWidth: 540 }}>
             Préparer un concours seul·e, c&apos;est dur. Ici, tu avances avec les autres : on se challenge, on s&apos;entraide,
@@ -107,11 +106,11 @@ export default function MethodeContenu() {
       </div>
 
       {/* Accompagner */}
-      <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 17, margin: '0 0 12px' }}>🧭 Toujours là pour t&apos;aider</div>
+      <div style={{ fontFamily: DISPLAY, fontWeight: 600, fontSize: 17, margin: '0 0 12px' }}>Toujours là pour t&apos;aider</div>
       <div style={{ marginBottom: 30 }}><GrilleOutils items={ACCOMPAGNER} /></div>
 
       {/* Ce qui marche */}
-      <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 17, margin: '0 0 12px', color: '#0F6E56' }}>✅ Ce qui marche</div>
+      <div style={{ fontFamily: DISPLAY, fontWeight: 600, fontSize: 17, margin: '0 0 12px', color: '#0F6E56' }}>Ce qui marche</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 26 }}>
         {MARCHE.map(m => (
           <div key={m.titre} style={{ display: 'flex', gap: 12, background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 6, padding: '12px 14px' }}>
@@ -125,7 +124,7 @@ export default function MethodeContenu() {
       </div>
 
       {/* Ce qui ne marche pas */}
-      <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 17, margin: '0 0 12px', color: '#C0392B' }}>❌ Ce qui ne marche pas</div>
+      <div style={{ fontFamily: DISPLAY, fontWeight: 600, fontSize: 17, margin: '0 0 12px', color: '#C0392B' }}>Ce qui ne marche pas</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {MARCHE_PAS.map(m => (
           <div key={m.titre} style={{ display: 'flex', gap: 12, background: '#FCEEEA', border: '1px solid var(--c-accent-bord)', borderRadius: 6, padding: '12px 14px' }}>

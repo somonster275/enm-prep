@@ -82,7 +82,7 @@ export default function HistoriqueDuels() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 22 }}>
             {[
               { l: 'Matchs joués', v: stats.joues, c: 'var(--c-encre)' },
-              { l: 'Victoires 🥇', v: stats.victoires, c: 'var(--c-accent)' },
+              { l: 'Victoires', v: stats.victoires, c: 'var(--c-accent)' },
               { l: 'Bonnes réponses', v: `${stats.tauxJustes}%`, c: '#0F6E56' },
             ].map(s => (
               <div key={s.l} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 16, textAlign: 'center' }}>
@@ -95,7 +95,7 @@ export default function HistoriqueDuels() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {lignes.map(l => (
               <div key={l.matchId} style={{ display: 'flex', alignItems: 'center', gap: 14, background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '12px 16px' }}>
-                <span style={{ fontSize: 18, width: 30, textAlign: 'center' }}>{l.rang === 1 ? '🥇' : l.rang === 2 ? '🥈' : l.rang === 3 ? '🥉' : `#${l.rang}`}</span>
+                <span style={{ fontFamily: 'var(--font-titre)', fontSize: 17, fontWeight: 600, width: 30, textAlign: 'center' }}>{l.rang === 1 ? '1er' : `${l.rang}e`}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14.5, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.titre}</div>
                   <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)' }}>{dateFr(l.date)} · {l.justes}/{l.total} bonnes · {l.nb} joueur{l.nb > 1 ? 's' : ''}</div>

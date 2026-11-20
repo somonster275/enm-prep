@@ -236,7 +236,6 @@ export default function SalleDuel() {
   // ===================== RENDU =====================
   if (introuvable) return (
     <div style={{ paddingTop: 60, textAlign: 'center', fontFamily: FONT, color: 'var(--c-encre)' }}>
-      <div style={{ fontSize: 40, marginBottom: 10 }}>🔍</div>
       <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 22 }}>Salon introuvable</div>
       <p style={{ color: 'var(--c-annotation)', fontSize: 14 }}>Le code « {codeStr} » ne correspond à aucun match.</p>
       <button onClick={() => router.push('/duel')} style={{ marginTop: 10, padding: '11px 22px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>Retour aux duels</button>
@@ -295,7 +294,6 @@ export default function SalleDuel() {
   if (fini || match.statut === 'termine') return (
     <div style={{ paddingTop: 34, maxWidth: 560, margin: '0 auto', fontFamily: FONT, color: 'var(--c-encre)' }}>
       <div style={{ textAlign: 'center', marginBottom: 22 }}>
-        <div style={{ fontSize: 46 }}>🏁</div>
         <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 26 }}>Match terminé</div>
         <div style={{ fontSize: 14, color: 'var(--c-annotation)' }}>{match.titre} · {total} questions</div>
       </div>
@@ -305,7 +303,7 @@ export default function SalleDuel() {
             display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 6,
             background: j.user_id === uid ? 'var(--c-accent-pale)' : '#fff', border: `1px solid ${j.user_id === uid ? 'var(--c-accent-bord)' : 'var(--c-filet)'}`,
           }}>
-            <span style={{ fontSize: 20, fontWeight: 800, width: 36, textAlign: 'center' }}>{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}</span>
+            <span style={{ fontFamily: 'var(--font-titre)', fontSize: 18, fontWeight: 600, width: 36, textAlign: 'center' }}>{i === 0 ? '1er' : `${i + 1}e`}</span>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 700, fontSize: 15 }}>{j.pseudo}{j.user_id === uid && ' (toi)'}</div>
               <div style={{ fontSize: 12.5, color: 'var(--c-annotation-clair)' }}>{j.justes}/{total} bonnes réponses</div>
@@ -325,7 +323,6 @@ export default function SalleDuel() {
             {/* Bandeau : erreurs rangées en révision */}
             {(correction.nbFichesRangees > 0 || correction.nbQcmRangees > 0) ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--c-accent-pale)', border: '1px solid var(--c-accent-bord)', borderRadius: 6, padding: '12px 16px', marginBottom: 16 }}>
-                <span style={{ fontSize: 22 }}>📌</span>
                 <div style={{ fontSize: 13.5, color: '#A8453B', lineHeight: 1.45 }}>
                   <b>{correction.nbErreurs} erreur{correction.nbErreurs > 1 ? 's' : ''}</b> rangée{correction.nbErreurs > 1 ? 's' : ''} dans tes cartes à réviser
                   {correction.nbFichesRangees > 0 && <> · <a href="/carnet" style={{ color: '#C0392B', fontWeight: 700 }}>voir mon carnet →</a></>}
@@ -334,7 +331,7 @@ export default function SalleDuel() {
               </div>
             ) : (
               <div style={{ background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 6, padding: '12px 16px', marginBottom: 16, fontSize: 13.5, color: '#0E5A47' }}>
-                🎉 Aucune erreur — rien à ranger en révision, bravo !
+                Aucune erreur, rien à ranger en révision.
               </div>
             )}
 
@@ -343,7 +340,7 @@ export default function SalleDuel() {
                 <div key={i} style={{ background: '#FFFEFB', border: `1px solid ${c.juste ? '#BFE6CF' : 'var(--c-accent-bord)'}`, borderRadius: 6, padding: 16 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
                     <div style={{ fontSize: 14.5, fontWeight: 700, lineHeight: 1.4 }}>{i + 1}. {c.enonce}</div>
-                    <span style={{ flexShrink: 0, fontSize: 13 }}>{c.juste ? '✅' : '❌'}</span>
+                    <span style={{ flexShrink: 0, fontSize: 12.5, fontWeight: 600, width: 34, color: c.juste ? '#0F6E56' : 'var(--c-accent)' }}>{c.juste ? 'Juste' : 'Faux'}</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {c.options.map((t, oi) => {
@@ -413,7 +410,7 @@ export default function SalleDuel() {
       <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 22, marginBottom: 16 }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: q.cat === 'fiche' ? '#0F6E56' : '#8A5A10', marginBottom: 8 }}>{q.cat === 'fiche' ? 'FICHE' : 'QCM'}</div>
         <div style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.4, marginBottom: 4 }}>{q.enonce}</div>
-        {multi && <div style={{ fontSize: 12, color: '#0F6E56', fontWeight: 600, marginTop: 6 }}>☑ Plusieurs réponses possibles</div>}
+        {multi && <div style={{ fontSize: 12, color: '#0F6E56', fontWeight: 600, marginTop: 6 }}>Plusieurs réponses possibles</div>}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 18 }}>

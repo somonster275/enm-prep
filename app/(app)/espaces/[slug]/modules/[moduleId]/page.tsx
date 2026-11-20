@@ -129,8 +129,8 @@ export default function ModulePage() {
       parent_id: moduleId,
       ordre: sousModules.length + 1,
     }).select().single()
-    if (error) { afficherMsg('❌ Erreur : ' + error.message); return }
-    if (data) { setSousModules(s => [...s, data]); setNomSousModule(''); setCreatingSousModule(false); afficherMsg('✅ Sous-module créé') }
+    if (error) { afficherMsg('Erreur : ' + error.message); return }
+    if (data) { setSousModules(s => [...s, data]); setNomSousModule(''); setCreatingSousModule(false); afficherMsg('Sous-module créé') }
   }
 
   const supprimerSousModule = async (mod: Module) => {
@@ -141,7 +141,7 @@ export default function ModulePage() {
     if (nb > 0) await supabase.from('fiches').update({ deleted_at: now }).eq('module_id', mod.id)
     if (!(await ecrire(supabase.from('modules').update({ deleted_at: now }).eq('id', mod.id).select('id')))) return
     setSousModules(s => s.filter(m => m.id !== mod.id))
-    afficherMsg('✅ Sous-module mis à la corbeille')
+    afficherMsg('Sous-module mis à la corbeille')
   }
 
   const deplacerModule = async () => {
@@ -152,12 +152,12 @@ export default function ModulePage() {
     const descendants = getDescendantIds(moduleId)
     const idsToUpdate = [moduleId, ...descendants]
     const { error: espErr } = await supabase.from('modules').update({ espace_id: moveEspaceId }).in('id', idsToUpdate)
-    if (espErr) { afficherMsg('❌ Erreur : ' + espErr.message); setMoving(false); return }
+    if (espErr) { afficherMsg('Erreur : ' + espErr.message); setMoving(false); return }
 
     // Met à jour le parent du module déplacé
     const newParent = moveParentId || null
     const { error: parErr } = await supabase.from('modules').update({ parent_id: newParent }).eq('id', moduleId)
-    if (parErr) { afficherMsg('❌ Erreur : ' + parErr.message); setMoving(false); return }
+    if (parErr) { afficherMsg('Erreur : ' + parErr.message); setMoving(false); return }
 
     setMoving(false)
     setShowMove(false)
@@ -171,10 +171,10 @@ export default function ModulePage() {
   const sauvegarderFiche = async () => {
     if (!editFiche || !question || !reponse) return
     const { error } = await supabase.from('fiches').update({ question, reponse, tags: tagsFiche }).eq('id', editFiche.id)
-    if (error) { afficherMsg('❌ Erreur : ' + error.message); return }
+    if (error) { afficherMsg('Erreur : ' + error.message); return }
     setFiches(f => f.map(fc => fc.id === editFiche.id ? { ...fc, question, reponse, tags: tagsFiche } : fc))
     setEditFiche(null); setQuestion(''); setReponse(''); setTagsFiche([])
-    afficherMsg('✅ Fiche modifiée')
+    afficherMsg('Fiche modifiée')
   }
 
   const supprimerFiche = async (id: string) => {
@@ -188,7 +188,7 @@ export default function ModulePage() {
   const basculerSuspension = async (fiche: Fiche) => {
     const nouveau = !fiche.suspendu
     const { error } = await supabase.from('fiches').update({ suspendu: nouveau }).eq('id', fiche.id)
-    if (error) { afficherMsg('❌ Erreur : ' + error.message); return }
+    if (error) { afficherMsg('Erreur : ' + error.message); return }
     setFiches(f => f.map(fc => fc.id === fiche.id ? { ...fc, suspendu: nouveau } : fc))
     afficherMsg(nouveau ? '⏸️ Fiche suspendue (retirée des révisions)' : '▶️ Fiche réactivée')
   }
@@ -338,7 +338,7 @@ export default function ModulePage() {
       </div>
 
       {msg && (
-        <div style={{ fontSize: 13, padding: '10px 14px', borderRadius: 6, marginBottom: 16, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63', background: msg.startsWith('❌') ? 'var(--c-accent-pale)' : '#DDF3EE' }}>{msg}</div>
+        <div style={{ fontSize: 13, padding: '10px 14px', borderRadius: 6, marginBottom: 16, color: msg.startsWith('Erreur') ? 'var(--c-accent)' : '#0E7C63', background: msg.startsWith('Erreur') ? 'var(--c-accent-pale)' : '#DDF3EE' }}>{msg}</div>
       )}
 
       {/* ===== SOUS-MODULES ===== */}
@@ -412,7 +412,7 @@ export default function ModulePage() {
       {(cours.length > 0 || isAdmin) && (
         <div style={{ marginBottom: 32 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 18 }}>📘 Cours</div>
+            <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 22 }}>Cours</div>
             {isAdmin && <Link href="/cours" style={{ fontSize: 13, fontWeight: 600, color: '#3B82D9', textDecoration: 'none' }}>+ Ajouter</Link>}
           </div>
           {cours.length === 0 ? (
@@ -423,7 +423,7 @@ export default function ModulePage() {
                 <Link key={c.id} href={`/cours?c=${c.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, fontWeight: 600 }}>
-                      <span>{c.type === 'pdf' ? '📕' : '📘'}</span>{c.titre}
+                      {c.titre}{c.type === 'pdf' && <span style={{ fontSize: 12, color: 'var(--c-annotation)', fontWeight: 400 }}>PDF</span>}
                     </div>
                     <span style={{ fontSize: 12, color: '#3B82D9', fontWeight: 600, flexShrink: 0 }}>Consulter →</span>
                   </div>

@@ -118,14 +118,12 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
     return (
       <div style={{ paddingTop: 34, maxWidth: 560, margin: '0 auto', fontFamily: FONT, color: 'var(--c-encre)' }}>
         <div style={{ textAlign: 'center', marginBottom: 20 }}>
-          <div style={{ fontSize: 46 }}>🏁</div>
           <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 26 }}>Duel terminé</div>
           <div style={{ fontSize: 14, color: 'var(--c-annotation)' }}>{match.titre} · {total} questions</div>
         </div>
 
         {/* Ton score */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 6, background: 'var(--c-accent-pale)', border: '1px solid var(--c-accent-bord)', marginBottom: 10 }}>
-          <span style={{ fontSize: 22 }}>🧑‍⚖️</span>
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: 15 }}>Toi</div>
             <div style={{ fontSize: 12.5, color: 'var(--c-annotation-clair)' }}>{mesJustes}/{total} bonnes réponses</div>
@@ -140,7 +138,7 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
           </div>
         ) : adversaires.map(a => (
           <div key={a.user_id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 6, background: '#FFFEFB', border: '1px solid var(--c-filet)', marginBottom: 8 }}>
-            <span style={{ fontSize: 22 }}>{a.termine ? (a.score > monScore ? '👑' : '🎓') : '⌛'}</span>
+            <span style={{ fontSize: 12.5, fontWeight: 600, width: 64, color: 'var(--c-annotation)' }}>{a.termine ? (a.score > monScore ? 'Devant' : 'Derrière') : 'En cours'}</span>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 700, fontSize: 15 }}>{a.pseudo}</div>
               <div style={{ fontSize: 12.5, color: 'var(--c-annotation-clair)' }}>{a.termine ? `${a.justes}/${total} bonnes réponses` : 'n\'a pas encore terminé'}</div>
@@ -152,7 +150,7 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
         {/* Inviter */}
         <button onClick={() => navigator.clipboard?.writeText(`${location.origin}/duel/${match.code}`)}
           style={{ width: '100%', marginTop: 12, height: 44, border: '1px solid var(--c-filet-fort)', borderRadius: 6, background: '#FFFEFB', color: 'var(--c-annotation)', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
-          🔗 Copier le lien du défi (code {match.code})
+          Copier le lien du défi (code {match.code})
         </button>
 
         {/* Débrief : cartes interrogées + rangement des erreurs */}
@@ -163,7 +161,6 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
             <>
               {(correction.nbFichesRangees > 0 || correction.nbQcmRangees > 0) ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--c-accent-pale)', border: '1px solid var(--c-accent-bord)', borderRadius: 6, padding: '12px 16px', marginBottom: 16 }}>
-                  <span style={{ fontSize: 22 }}>📌</span>
                   <div style={{ fontSize: 13.5, color: '#A8453B', lineHeight: 1.45 }}>
                     <b>{correction.nbErreurs} erreur{correction.nbErreurs > 1 ? 's' : ''}</b> rangée{correction.nbErreurs > 1 ? 's' : ''} dans tes cartes à réviser
                     {correction.nbFichesRangees > 0 && <> · <a href="/carnet" style={{ color: '#C0392B', fontWeight: 700 }}>voir mon carnet →</a></>}
@@ -172,7 +169,7 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
                 </div>
               ) : (
                 <div style={{ background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 6, padding: '12px 16px', marginBottom: 16, fontSize: 13.5, color: '#0E5A47' }}>
-                  🎉 Aucune erreur — rien à ranger en révision, bravo !
+                  Aucune erreur, rien à ranger en révision.
                 </div>
               )}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -180,7 +177,7 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
                   <div key={i} style={{ background: '#FFFEFB', border: `1px solid ${c.juste ? '#BFE6CF' : 'var(--c-accent-bord)'}`, borderRadius: 6, padding: 16 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
                       <div style={{ fontSize: 14.5, fontWeight: 700, lineHeight: 1.4 }}>{i + 1}. {c.enonce}</div>
-                      <span style={{ flexShrink: 0, fontSize: 13 }}>{c.juste ? '✅' : '❌'}</span>
+                      <span style={{ flexShrink: 0, fontSize: 12.5, fontWeight: 600, width: 34, color: c.juste ? '#0F6E56' : 'var(--c-accent)' }}>{c.juste ? 'Juste' : 'Faux'}</span>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {c.options.map((t, oi) => {
@@ -242,12 +239,12 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
       <div style={{ height: 8, background: 'var(--c-filet)', borderRadius: 999, overflow: 'hidden', marginBottom: 18 }}>
         <div style={{ height: '100%', width: `${(nbRepondu / total) * 100}%`, background: '#2DAE83', borderRadius: 999, transition: 'width .25s' }} />
       </div>
-      <div style={{ fontSize: 11.5, color: 'var(--c-annotation-clair)', marginBottom: 14 }}>🕒 Duel asynchrone — joue à ton rythme, ton adversaire fera de même sous 48 h.</div>
+      <div style={{ fontSize: 11.5, color: 'var(--c-annotation-clair)', marginBottom: 14 }}>Duel asynchrone — joue à ton rythme, ton adversaire fera de même sous 48 h.</div>
 
       <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 22, marginBottom: 16 }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: q.cat === 'fiche' ? '#0F6E56' : '#8A5A10', marginBottom: 8 }}>{q.cat === 'fiche' ? 'FICHE' : 'QCM'}</div>
         <div style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.4 }}>{q.enonce}</div>
-        {q.multi && <div style={{ fontSize: 12, color: '#0F6E56', fontWeight: 600, marginTop: 6 }}>☑ Plusieurs réponses possibles</div>}
+        {q.multi && <div style={{ fontSize: 12, color: '#0F6E56', fontWeight: 600, marginTop: 6 }}>Plusieurs réponses possibles</div>}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 18 }}>
@@ -274,7 +271,7 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
       {verrou && rep ? (
         <>
           <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 15, color: rep.juste ? '#0F6E56' : '#C0392B', marginBottom: 12 }}>
-            {rep.juste ? '✅ Bonne réponse !' : '❌ Raté — la bonne réponse est en vert.'}
+            {rep.juste ? 'Bonne réponse.' : 'Raté : la bonne réponse est en vert.'}
           </div>
           <button onClick={suivant} style={{ width: '100%', height: 50, border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
             {idx + 1 >= total ? 'Voir mes résultats →' : 'Question suivante →'}

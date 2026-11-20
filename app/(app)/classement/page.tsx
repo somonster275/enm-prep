@@ -23,7 +23,7 @@ export default function ClassementPage() {
   const objectif = config?.objectif || 150
   const pct = Math.min(100, Math.round((mes / objectif) * 100))
 
-  const medaille = (rang: number) => rang === 1 ? '🥇' : rang === 2 ? '🥈' : rang === 3 ? '🥉' : `#${rang}`
+  const medaille = (rang: number) => rang === 1 ? '1er' : `${rang}e`
 
   return (
     <div style={{ paddingTop: 34, maxWidth: 680, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
@@ -54,7 +54,7 @@ export default function ClassementPage() {
                 <div style={{ width: `${pct}%`, height: '100%', background: 'var(--c-accent)', borderRadius: 999 }} />
               </div>
               <div style={{ fontSize: 13, color: '#5C4A22', marginTop: 10, fontWeight: 600 }}>
-                {pct >= 100 ? '🎉 Défi accompli, bravo !' : `Plus que ${Math.max(0, objectif - mes)} cartes pour relever le défi.`}
+                {pct >= 100 ? 'Défi accompli.' : `Plus que ${Math.max(0, objectif - mes)} cartes pour relever le défi.`}
               </div>
             </>
           )}

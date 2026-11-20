@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { parseTags } from '@/lib/tags'
 
 type Res = { id: string; titre: string; sous: string; href: string }
-type Groupe = { cle: string; label: string; icone: string; couleur: string; items: Res[] }
+type Groupe = { cle: string; label: string; couleur: string; items: Res[] }
 
 const stripHtml = (s: string) => (s || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
 
@@ -42,19 +42,19 @@ export default function RecherchePage() {
       sous: [r.modules?.espaces?.nom, r.modules?.nom].filter(Boolean).join(' › ') || stripHtml(r.reponse).slice(0, 90),
       href: r.modules?.espaces ? `/espaces/${r.modules.espaces.slug}/modules/${r.module_id}` : '#',
     }))
-    if (ff.length) g.push({ cle: 'fiches', label: 'Fiches', icone: '🗂️', couleur: '#A3122A', items: ff })
+    if (ff.length) g.push({ cle: 'fiches', label: 'Fiches', couleur: '#A3122A', items: ff })
 
     const qq = (qcms.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'QCM', href: '/qcm' }))
-    if (qq.length) g.push({ cle: 'qcm', label: 'QCM', icone: '✅', couleur: '#E8A11E', items: qq })
+    if (qq.length) g.push({ cle: 'qcm', label: 'QCM', couleur: '#E8A11E', items: qq })
 
     const mm = (medias.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: [r.espaces?.nom, stripHtml(r.description || '').slice(0, 70)].filter(Boolean).join(' · ') || 'Vidéo / audio', href: '/media' }))
-    if (mm.length) g.push({ cle: 'media', label: 'Audio & Vidéo', icone: '🎬', couleur: '#3B82D9', items: mm })
+    if (mm.length) g.push({ cle: 'media', label: 'Audio & Vidéo', couleur: '#3B82D9', items: mm })
 
     const aa = (annales.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'Annale', href: '/annales' }))
-    if (aa.length) g.push({ cle: 'annales', label: 'Annales', icone: '📚', couleur: '#1A56C4', items: aa })
+    if (aa.length) g.push({ cle: 'annales', label: 'Annales', couleur: '#1A56C4', items: aa })
 
     const pp = (forum.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'Forum', href: '/forum' }))
-    if (pp.length) g.push({ cle: 'forum', label: 'Forum', icone: '💬', couleur: '#0F6E56', items: pp })
+    if (pp.length) g.push({ cle: 'forum', label: 'Forum', couleur: '#0F6E56', items: pp })
 
     setGroupes(g)
     setLoading(false)
@@ -76,13 +76,13 @@ export default function RecherchePage() {
       sous: [r.modules?.espaces?.nom, r.modules?.nom].filter(Boolean).join(' › ') || stripHtml(r.reponse).slice(0, 90),
       href: r.modules?.espaces ? `/espaces/${r.modules.espaces.slug}/modules/${r.module_id}` : '#',
     }))
-    if (ff.length) g.push({ cle: 'fiches', label: 'Fiches', icone: '🗂️', couleur: '#A3122A', items: ff })
+    if (ff.length) g.push({ cle: 'fiches', label: 'Fiches', couleur: '#A3122A', items: ff })
     const qq = (qcms.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'QCM', href: '/qcm' }))
-    if (qq.length) g.push({ cle: 'qcm', label: 'QCM', icone: '✅', couleur: '#E8A11E', items: qq })
+    if (qq.length) g.push({ cle: 'qcm', label: 'QCM', couleur: '#E8A11E', items: qq })
     const mm = (medias.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.espaces?.nom || 'Vidéo / audio', href: r.url || '/media' }))
-    if (mm.length) g.push({ cle: 'media', label: 'Audio & Vidéo', icone: '🎬', couleur: '#3B82D9', items: mm })
+    if (mm.length) g.push({ cle: 'media', label: 'Audio & Vidéo', couleur: '#3B82D9', items: mm })
     const cc = (cours.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'Cours', href: `/cours?c=${r.id}` }))
-    if (cc.length) g.push({ cle: 'cours', label: 'Cours', icone: '📘', couleur: '#3B82D9', items: cc })
+    if (cc.length) g.push({ cle: 'cours', label: 'Cours', couleur: '#3B82D9', items: cc })
     setGroupes(g)
     setLoading(false)
   }
@@ -113,7 +113,6 @@ export default function RecherchePage() {
             {groupes.map(grp => (
               <div key={grp.cle}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span>{grp.icone}</span>
                   <span style={{ fontWeight: 700, fontSize: 15 }}>{grp.label}</span>
                   <span style={{ fontSize: 12, color: 'var(--c-annotation-clair)' }}>· {grp.items.length}</span>
                 </div>
