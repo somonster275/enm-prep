@@ -196,7 +196,10 @@ export default function SalleDuel() {
   // --- Actions ---
   const lancer = async () => {
     if (!match) return
-    await supabase.from('matchs').update({ statut: 'en_cours', started_at: new Date().toISOString() }).eq('id', match.id)
+    await fetch('/api/duel/lancer', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: match.code }),
+    }).catch(() => {})
   }
 
   const quitter = async (confirmer = false) => {

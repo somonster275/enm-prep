@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 37).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 38).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -109,6 +109,14 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 
 ## Journal des sessions
 
+### 2026-11-20 (suite 38) — Migration 0043 (durcissements scan ECC) + route /api/duel/lancer
+- **Migration `0043_durcissement_scan_ecc.sql`** (à exécuter APRÈS le déploiement du code) : supprime la policy
+  `matchs_update` ; `revoke execute` de `nom_affichage` aux clients (les triggers SECURITY DEFINER l'appellent toujours) ;
+  `incr_nouvelles` borné (-1/+1, J-1..J+1) ; doublons `activite_jours` fusionnés + index unique `(utilisateur_id, jour)`
+  et `incr_activite` en `on conflict`. Testée deux fois de suite sur Postgres 16 local avec auth.uid() simulé.
+- Nouvelle route `app/api/duel/lancer` (hôte seul, statut `attente` → `en_cours`, heure fixée par le serveur) ;
+  `duel/[code]/page.tsx` l'appelle au lieu de l'update client.
+
 ### 2026-11-20 (suite 37) — Scan ECC (6 agents Everything Claude Code) + correctifs sans Supabase
 - Scan via le dépôt ECC (agents security, database, typescript, react, silent-failure, rag) — rapport dans la conversation.
 - Corrigé (code seul, aucune migration) :
@@ -120,8 +128,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   - `compte/supprimer` : erreurs vérifiées (table absente tolérée), compte auth supprimé avant le profil ;
   - admin : impossible de supprimer ou de changer le rôle d'un autre admin ;
   - `cours/question` : quota rendu atomique via la valeur renvoyée par `incr_ia_usage` (refus si > limite).
-- **Reste à faire, nécessite Supabase** : `matchs_update` (hôte modifie chrono/mode), `incr_nouvelles` sans bornes ni revoke,
-  unique `(utilisateur_id, jour)` sur `activite_jours`, `revoke execute` sur `nom_affichage`.
+- Points Supabase traités en suite 38 (migration 0043).
 - Reste aussi (code) : SSRF par redirection/DNS, en-têtes de sécurité, décalage UTC/Paris, chunking des longs PDF,
   ~30 écritures client sans contrôle d'erreur, accessibilité clavier de la révision.
 
