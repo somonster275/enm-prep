@@ -109,7 +109,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 
 ## Journal des sessions
 
-### 2026-11-20 (suite 39) — Reste du scan ECC (code) + migration 0044 (index, à exécuter)
+### 2026-11-20 (suite 39) — Reste du scan ECC (code) + migration 0044 (index, exécutée)
 - Serveur : `lib/fetch-public.ts` (IP résolue + redirections revérifiées) pour actualités, planning, import QCM ;
   en-têtes de sécurité dans `next.config.ts` (frame-ancestors, nosniff, HSTS ; pas de CSP complète) ;
   `lib/jour.ts` (`jourParis`) pour quota IA, coach, classement ; `ymd` local côté client (calendrier, dashboard) ;
@@ -125,7 +125,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   par utilisateur ; liens `lienSur` ; canaux duel non ouverts après démontage.
 - Accessibilité : raccourcis de révision laissent Espace/Entrée aux boutons ; `lib/a11y.ts` (`activable`) sur les
   div cliquables ; `lib/useEchap.ts` + `role="dialog"` sur 4 modales ; `Btn` de RichEditor sorti du rendu + aria-labels.
-- **Migration `0044_index_recherche.sql`** : `match_cours_chunks` réécrite en plpgsql avec `set_config('hnsw.ef_search', 200, local)` (`alter function ... set` est refusé sur Supabase : 42501), GIN plein-texte,
+- **Migration `0044_index_recherche.sql`** (exécutée par le user) : `match_cours_chunks` réécrite en plpgsql avec `set_config('hnsw.ef_search', 200, local)` (`alter function ... set` est refusé sur Supabase : 42501), GIN plein-texte,
   index de FK, suppression de 2 index en double, check `pauses` (NOT VALID). Testée 2× sur Postgres 16 (vector simulé).
 - Non traité (faible) : plafond global du formulaire contact, toasts `setTimeout` non annulés, `any` restants,
   agrégations dashboard/classement en JS, pagination `admin/qcm`, exhaustive-deps du duel.
