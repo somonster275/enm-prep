@@ -1,6 +1,49 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 24).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 25).
+
+## ▶ À REPRENDRE — tâches restantes de l'audit du 2026-11-20
+
+> **Nouvelle session : commencer ici.** Audit complet fait avec le skill `ponytail-audit` (session « suite 23 »).
+> Déjà corrigé et en production : faille `profils` (élévation en admin, mig 0037), fiches/modules lisibles sans
+> compte (0037), documents personnels lisibles par tous + suppression impossible + doc supprimé encore utilisé
+> par l'IA (mig 0038, route `/api/cours/supprimer`). Migrations 0037 et 0038 **exécutées** par le user.
+> Ordre conseillé ci-dessous. Workflow : branche de travail → `tsc` + `build` → PR → le user merge (le push
+> direct sur `main` est bloqué par la session) → migration SQL donnée au user si besoin.
+
+1. **Plafond Supabase de 1 000 lignes** (le plus important). Base = 1 536 fiches. Ces requêtes chargent toutes
+   les fiches sans pagination et sont donc tronquées en silence :
+   - `app/(app)/dashboard/page.tsx` (~l.51, `fiches` pour les stats par matière / couverture) ;
+   - `app/(app)/espaces/[slug]/revision/page.tsx` (~l.93, révision mixte : ~536 fiches n'apparaissent jamais) ;
+   - `app/api/tuteur/route.ts` (~l.66, bilan du coach « X fiches au total ») ;
+   - `progression` d'un étudiant (dashboard, révision mixte, tuteur) dès qu'il dépasse 1 000 fiches travaillées.
+   Piste : révision mixte = ne charger que les dues / paginer avec `.range()` ; compteurs = petite fonction SQL
+   (RPC) qui renvoie les totaux par espace au lieu de rapatrier les lignes.
+2. **Formulaires publics sans limite** : `app/api/contact/route.ts` et `app/api/acces/demande/route.ts` (sans
+   auth) envoient un email Resend à chaque appel → spam possible, quota Resend (100/j en gratuit) épuisé.
+   `nom`/`message` de la demande d'accès sans limite de taille. Piste : plafond global (ex. 20/h) en comptant
+   les lignes récentes ; pour le contact, une petite table des messages ; tronquer les champs.
+3. ~~Doc personnel supprimé encore utilisé~~ → FAIT (0038).
+4. **Note de révision perdue sans erreur** : `revision/page.tsx` `rateCard` (~l.219) ignore l'erreur de
+   l'upsert `progression` (réseau coupé / session expirée) → lire `{ error }`, afficher un message, ne pas avancer.
+5. **Annuler gonfle l'activité** : `annuler()` (~l.239) ne décompte pas `enregistrerActivite` → ajouter
+   `enregistrerActivite(userId, -1)` (la RPC `incr_activite` accepte un delta négatif). Lié : la policy
+   `activite_jours_update` laisse un étudiant fixer son compteur à la main (classement faussable).
+6. **Mot de passe entre admins** : `app/api/admin/changer-mot-de-passe/route.ts` — le commentaire dit « staff
+   seulement, jamais les lecteurs » mais rien n'est vérifié ; un admin peut changer le mot de passe d'un autre
+   admin. Idem `supprimer-utilisateur`. Ajouter la vérification de `cible.role`.
+7. **Export RGPD incomplet** : `app/api/compte/exporter/route.ts` n'exporte pas favoris, coach_messages,
+   contributions, qcm_resultats, qcm_reponses, pauses, matchs/match_reponses, cours_documents personnels.
+8. **Aucun test** sur `lib/spaced-repetition.ts` et `calculerStreak` (`lib/streaks.ts`, pauses) → un petit
+   fichier `node --test`, sans nouvelle dépendance.
+9. **Coach IA** (`app/api/tuteur/route.ts`) : messages sans limite de taille, pas de plafond quotidien (seulement
+   20/min) → `.slice(0, 4000)` par message + quota jour via `consommer_quota`.
+10. **Code mort** : `components/Sidebar.tsx` (jamais importé), `meilleurStreak` (`lib/streaks.ts`, jamais appelé),
+    dépendances `@supabase/auth-helpers-nextjs`, `pdf-parse`, `@types/dompurify` inutilisées (~-215 lignes).
+11. **Fuseau horaire** : `app/api/classement/route.ts` (lundi) et `app/api/tuteur/route.ts` (aujourd'hui) en UTC,
+    alors que `activite_jours.jour` est en date locale → utiliser `Europe/Paris`.
+- Mineur, laissé tel quel : `espaces.lecture_espaces` (rôle public, noms des matières seulement) ;
+  `/api/admin/qcm/fetch` suit les redirections (anti-SSRF contournable, admin seulement).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +151,11 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 25) — Clôture de session, feuille de route
+- PR #3 mergée et migration 0038 exécutée ; le user a vérifié le site (OK). Build Vercel vert (preview du même
+  arbre que `main`). codexprepa.com n'est pas joignable depuis la session cloud (réseau) : vérif par le user.
+- Ajout de la section **« ▶ À REPRENDRE »** en tête de ce fichier : tâches restantes de l'audit, reprise au n°1.
 
 ### 2026-11-20 (suite 24) — Documents personnels réellement privés
 - Migration **0037 exécutée** par le user (vérifié via pg_policies) ; les 3 admins sont légitimes
