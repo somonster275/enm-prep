@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 29).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 30).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,13 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 30) — Audit tâche 6 : code mort supprimé
+- Supprimés (aucun usage vérifié par grep) : `components/Sidebar.tsx`, `meilleurStreak` (`lib/streaks.ts`),
+  dépendances `@supabase/auth-helpers-nextjs` et `pdf-parse` (l'import PDF passe par `unpdf`).
+- Audit de la suite 23 : les 6 tâches principales sont traitées (PR #5 à #10). Restent ouverts : compteur
+  `activite_jours` falsifiable (policy `activite_jours_update` + `incr_activite` qui accepte tout delta, donc
+  classement trichable), `espaces.lecture_espaces` (faible enjeu), double appui en révision.
 
 ### 2026-11-20 (suite 29) — Audit tâche 5 : export RGPD complet
 - `/api/compte/exporter` exporte désormais **27 tables** (avant 8) : + coach_messages, favoris, QCM (résultats,
