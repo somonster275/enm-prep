@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useEchap } from '@/lib/useEchap'
 
 export default function ComptePage() {
   const [email, setEmail] = useState('')
@@ -62,6 +63,7 @@ export default function ComptePage() {
   const [suppOuvert, setSuppOuvert] = useState(false)
   const [confirmTxt, setConfirmTxt] = useState('')
   const [suppLoading, setSuppLoading] = useState(false)
+  useEchap(suppOuvert, () => { if (!suppLoading) setSuppOuvert(false) })
   const [suppErr, setSuppErr] = useState('')
 
   const supprimerCompte = async () => {
@@ -185,7 +187,7 @@ export default function ComptePage() {
       {/* Modal de confirmation de suppression */}
       {suppOuvert && (
         <div onClick={() => !suppLoading && setSuppOuvert(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(40,30,20,.45)', zIndex: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 18, padding: 24, width: '100%', maxWidth: 440, fontFamily: "'Hanken Grotesk', sans-serif", color: '#2A2018' }}>
+          <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Supprimer mon compte" style={{ background: '#fff', borderRadius: 18, padding: 24, width: '100%', maxWidth: 440, fontFamily: "'Hanken Grotesk', sans-serif", color: '#2A2018' }}>
             <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 6 }}>Supprimer mon compte</div>
             <div style={{ fontSize: 14, color: '#8A7E68', lineHeight: 1.5, marginBottom: 14 }}>
               Cette action est <b>irréversible</b>. Toutes tes données (progression, notes, fiche d&apos;entraide,

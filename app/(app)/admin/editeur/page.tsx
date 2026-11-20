@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
 import type { Espace, Module, Fiche } from '@/types'
 import RichEditor from '@/components/RichEditor'
 import GenerateurFiches from '@/components/GenerateurFiches'
@@ -106,7 +106,7 @@ export default function Editeur() {
 
   const supprimerFiche = async (id: string) => {
     if (!confirm('Mettre cette fiche à la corbeille ?')) return
-    await supabase.from('fiches').update({ deleted_at: new Date().toISOString() }).eq('id', id)
+    if (!(await ecrire(supabase.from('fiches').update({ deleted_at: new Date().toISOString() }).eq('id', id).select('id')))) return
     setFiches(f => f.filter(fc => fc.id !== id))
   }
 

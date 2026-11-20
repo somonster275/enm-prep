@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
 
 type Entree = {
   user_id: string
@@ -73,7 +73,7 @@ export default function EntraidePage() {
 
   const retirer = async () => {
     if (!confirm('Retirer ta fiche de l’annuaire d’entraide ?')) return
-    await supabase.from('entraide').delete().eq('user_id', userId)
+    if (!(await ecrire(supabase.from('entraide').delete().eq('user_id', userId).select('id')))) return
     setContact(''); setMatieres(''); setMessage('')
     setMsg(null); setFormOuvert(false)
     charger()

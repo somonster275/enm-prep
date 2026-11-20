@@ -1,6 +1,6 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
 
 type Source = { id: string; nom: string; url: string; couleur: string }
 type Article = {
@@ -97,7 +97,7 @@ export default function ActualitesPage() {
 
   const supprimerSource = async (id: string) => {
     if (!confirm('Retirer cette source ?')) return
-    await supabase.from('sources_actualites').delete().eq('id', id)
+    if (!(await ecrire(supabase.from('sources_actualites').delete().eq('id', id).select('id')))) return
     const srcs = await chargerSources()
     synchroniser(srcs)
   }

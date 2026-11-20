@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Espace } from '@/types'
 import Link from 'next/link'
+import { useEchap } from '@/lib/useEchap'
 
 const COULEURS = [
   '#DC4A2B', '#E8A11E', '#0F6E56', '#2563EB', '#7C3AED',
@@ -57,6 +58,8 @@ function ModalAjoutEspace({ onFermer, onAjoute }: { onFermer: () => void; onAjou
     onFermer()
   }
 
+  useEchap(true, onFermer) // la modale n'est montée que lorsqu'elle est ouverte
+
   const champ: React.CSSProperties = {
     width: '100%', height: 44, border: '1.5px solid #EADFC9', borderRadius: 10,
     padding: '0 12px', background: '#FFFBF2', fontSize: 14, outline: 'none',
@@ -65,7 +68,7 @@ function ModalAjoutEspace({ onFermer, onAjoute }: { onFermer: () => void; onAjou
 
   return (
     <div onClick={onFermer} style={{ position: 'fixed', inset: 0, background: 'rgba(40,30,20,.45)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-      <div onClick={e => e.stopPropagation()} style={{
+      <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" style={{
         background: '#fff', borderRadius: 20, width: '100%', maxWidth: 520,
         fontFamily: font, color: '#2A2018', boxShadow: '0 30px 80px -30px rgba(40,30,20,.5)',
         maxHeight: '90vh', overflowY: 'auto',

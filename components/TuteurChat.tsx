@@ -58,7 +58,8 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
 
   const persister = async (role: 'user' | 'assistant', contenu: string) => {
     if (!userId || !contenu.trim()) return
-    await supabase.from('coach_messages').insert({ user_id: userId, role, contenu })
+    const { error } = await supabase.from('coach_messages').insert({ user_id: userId, role, contenu })
+    if (error) console.error('Message du coach non sauvegardé :', error.message)
   }
 
   const ajouterTache = async (cle: string, contenu: string) => {
@@ -97,6 +98,7 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
     const reader = res.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ''
+    let reponse = '' // texte reçu, persisté une seule fois à la fin (jamais depuis un setter React, qui peut s'exécuter deux fois)
     try {
       while (true) {
         const { done, value } = await reader.read()
@@ -109,13 +111,15 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
           if (p === '[DONE]') continue
           try {
             const obj = JSON.parse(p)
+            if (obj.token) reponse += obj.token
+            if (obj.error) reponse = ''
             if (obj.token) setMessages(m => { const c = [...m]; c[c.length - 1] = { ...c[c.length - 1], contenu: c[c.length - 1].contenu + obj.token }; return c })
             if (obj.error) setMessages(m => { const c = [...m]; c[c.length - 1] = { ...c[c.length - 1], contenu: '⚠️ ' + obj.error }; return c })
-          } catch {}
+          } catch { /* ligne SSE incomplète : ignorée */ }
         }
       }
-    } catch {}
-    setMessages(m => { const last = m[m.length - 1]; if (last?.role === 'assistant' && last.contenu) persister('assistant', last.contenu); return m })
+    } catch { /* flux coupé (arrêt manuel ou réseau) : on garde ce qui est arrivé */ }
+    if (reponse) persister('assistant', reponse)
     setLoading(false); abortRef.current = null
   }
 

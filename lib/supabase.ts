@@ -12,6 +12,24 @@ export const getSupabaseAdmin = () => {
   return createClient(supabaseUrl, serviceKey)
 }
 
+/**
+ * Écriture côté client vérifiée. La requête doit finir par `.select('id')` : un refus RLS ne renvoie
+ * pas d'erreur, seulement 0 ligne. Prévient l'utilisateur et renvoie false si rien n'a été écrit.
+ * `vide: true` quand 0 ligne est un résultat normal (purge, module sans fiche…).
+ */
+export async function ecrire(
+  q: PromiseLike<{ data: unknown[] | null; error: { message: string } | null }>,
+  { vide = false }: { vide?: boolean } = {},
+): Promise<boolean> {
+  const { data, error } = await q
+  if (error || (!vide && !data?.length)) {
+    console.error('Écriture refusée :', error?.message ?? '0 ligne (droits insuffisants ?)')
+    if (typeof window !== 'undefined') window.alert("L'opération n'a pas pu être enregistrée. Vérifie ta connexion ou tes droits, puis réessaie.")
+    return false
+  }
+  return true
+}
+
 // PostgREST plafonne chaque réponse à 1 000 lignes : on enchaîne les pages.
 // `page(de, a)` doit appliquer `.range(de, a)` sur une requête triée (ordre stable).
 const PAGE = 1000

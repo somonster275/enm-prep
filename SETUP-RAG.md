@@ -50,8 +50,11 @@ personnels (`portee = 'personnel'` + `created_by = lui`).
   backfill qui embed les `cours_chunks` existants).
 - **Coût embeddings** : un coût unique Voyage à l'import (négligeable par document,
   à surveiller sur des centaines de documents).
-- **Seuil de pertinence** : on renvoie les 8 passages les plus proches sans seuil de
-  similarité ; on pourra filtrer plus tard si des réponses hors-sujet apparaissent.
+- **Seuil de pertinence** : sur les 8 passages les plus proches, seuls ceux de similarité
+  ≥ 0.4 sont gardés (`SEUIL_SIMILARITE`, `app/api/cours/question/route.ts`) ; `hnsw.ef_search = 200`
+  (migration 0044) évite qu'un filtre matière/documents ne vide les résultats.
+- **Mes documents** : recherche plein-texte en « ou » (index GIN, migration 0044), triée en JS par
+  nombre de mots de la question présents ; découpage `lib/chunker.ts` (≈ 800 caractères max).
 
 ## Ménage (fait le 2026-06-26)
 

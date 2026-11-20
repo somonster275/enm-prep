@@ -76,9 +76,14 @@ export async function POST(request: NextRequest) {
       qcm_id: qcm.id, enonce: q.enonce, options: q.options, explication: q.explication || null, ordre: i,
     }))
     const { error: eR } = await admin.from('qcm_questions').insert(rows)
-    if (eR) return NextResponse.json({ error: eR.message }, { status: 500 })
+    if (eR) {
+      await admin.from('qcm').delete().eq('id', qcm.id) // pas de QCM vide laissé en base
+      return NextResponse.json({ error: eR.message }, { status: 500 })
+    }
   }
 
-  await admin.from('contributions').update({ statut: 'approuve' }).eq('id', id)
+  // shortcut: si cette écriture échoue, le contenu existe déjà ; l'admin est prévenu pour ne pas réapprouver.
+  const { error: eS } = await admin.from('contributions').update({ statut: 'approuve' }).eq('id', id)
+  if (eS) return NextResponse.json({ error: `Contenu créé, mais statut non mis à jour (${eS.message}) : ne pas réapprouver.` }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

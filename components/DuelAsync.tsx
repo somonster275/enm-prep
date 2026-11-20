@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { enregistrerActivite } from '@/lib/streaks'
+import { activable } from '@/lib/a11y'
 
 const FONT = "'Hanken Grotesk', sans-serif"
 const DISPLAY = "'Bricolage Grotesque', sans-serif"
@@ -193,7 +194,7 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
                         const cle = `${i}-${oi}`
                         const ouvert = deplie.has(cle)
                         return (
-                          <div key={oi} onClick={() => tronquee && basculer(cle)} style={{ border: `1.5px solid ${bd}`, background: bg, borderRadius: 10, padding: '9px 12px', fontSize: 13.5, color: col, cursor: tronquee ? 'pointer' : 'default' }}>
+                          <div key={oi} {...activable} onClick={() => tronquee && basculer(cle)} style={{ border: `1.5px solid ${bd}`, background: bg, borderRadius: 10, padding: '9px 12px', fontSize: 13.5, color: col, cursor: tronquee ? 'pointer' : 'default' }}>
                             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
                               <span style={{ flex: 1, whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{ouvert ? complet : t}</span>
                               {estCorrect && <span style={{ fontSize: 11, fontWeight: 800, color: '#0F6E56', flexShrink: 0 }}>BONNE RÉPONSE</span>}

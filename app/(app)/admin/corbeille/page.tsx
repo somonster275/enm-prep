@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
 const RETENTION_JOURS = 30
@@ -37,8 +37,8 @@ export default function CorbeillePage() {
   const charger = async () => {
     // Purge automatique de tout ce qui dépasse 30 jours
     const cutoff = new Date(Date.now() - RETENTION_JOURS * MS_JOUR).toISOString()
-    await supabase.from('fiches').delete().not('deleted_at', 'is', null).lt('deleted_at', cutoff)
-    await supabase.from('modules').delete().not('deleted_at', 'is', null).lt('deleted_at', cutoff)
+    await ecrire(supabase.from('fiches').delete().not('deleted_at', 'is', null).lt('deleted_at', cutoff).select('id'), { vide: true })
+    await ecrire(supabase.from('modules').delete().not('deleted_at', 'is', null).lt('deleted_at', cutoff).select('id'), { vide: true })
 
     const [{ data: mods }, { data: fchs }] = await Promise.all([
       supabase.from('modules').select('*, espaces(nom, slug)').not('deleted_at', 'is', null).order('deleted_at', { ascending: false }),
@@ -82,15 +82,15 @@ export default function CorbeillePage() {
     const ids = [mod.id, ...descendantsSupprimes(mod.id)]
     // Si le parent n'existe plus / est en corbeille, on remonte le module à la racine
     const parentActif = mod.parent_id ? !modules.find(m => m.id === mod.parent_id) : true
-    await supabase.from('modules').update({ deleted_at: null, ...(parentActif ? {} : { parent_id: null }) }).eq('id', mod.id)
+    if (!(await ecrire(supabase.from('modules').update({ deleted_at: null, ...(parentActif ? {} : { parent_id: null }) }).eq('id', mod.id).select('id')))) return
     if (ids.length > 1) await supabase.from('modules').update({ deleted_at: null }).in('id', ids.slice(1))
-    await supabase.from('fiches').update({ deleted_at: null }).in('module_id', ids)
+    if (!(await ecrire(supabase.from('fiches').update({ deleted_at: null }).in('module_id', ids).select('id'), { vide: true }))) return
     afficherMsg('✅ Module restauré')
     await charger()
   }
 
   const restaurerFiche = async (f: FicheSupprimee) => {
-    await supabase.from('fiches').update({ deleted_at: null }).eq('id', f.id)
+    if (!(await ecrire(supabase.from('fiches').update({ deleted_at: null }).eq('id', f.id).select('id')))) return
     afficherMsg('✅ Fiche restaurée')
     await charger()
   }
@@ -98,23 +98,23 @@ export default function CorbeillePage() {
   const supprimerDefinitivementModule = async (mod: ModuleSupprime) => {
     if (!confirm(`Supprimer DÉFINITIVEMENT "${mod.nom}" et son contenu ? Cette action est irréversible.`)) return
     const ids = [mod.id, ...descendantsSupprimes(mod.id)]
-    await supabase.from('fiches').delete().in('module_id', ids)
-    await supabase.from('modules').delete().in('id', ids)
+    if (!(await ecrire(supabase.from('fiches').delete().in('module_id', ids).select('id'), { vide: true }))) return
+    if (!(await ecrire(supabase.from('modules').delete().in('id', ids).select('id')))) return
     afficherMsg('🗑️ Module supprimé définitivement')
     await charger()
   }
 
   const supprimerDefinitivementFiche = async (f: FicheSupprimee) => {
     if (!confirm('Supprimer DÉFINITIVEMENT cette fiche ? Cette action est irréversible.')) return
-    await supabase.from('fiches').delete().eq('id', f.id)
+    if (!(await ecrire(supabase.from('fiches').delete().eq('id', f.id).select('id')))) return
     afficherMsg('🗑️ Fiche supprimée définitivement')
     await charger()
   }
 
   const viderCorbeille = async () => {
     if (!confirm('Vider entièrement la corbeille ? Tout sera supprimé définitivement.')) return
-    await supabase.from('fiches').delete().not('deleted_at', 'is', null)
-    await supabase.from('modules').delete().not('deleted_at', 'is', null)
+    if (!(await ecrire(supabase.from('fiches').delete().not('deleted_at', 'is', null).select('id'), { vide: true }))) return
+    if (!(await ecrire(supabase.from('modules').delete().not('deleted_at', 'is', null).select('id'), { vide: true }))) return
     afficherMsg('🗑️ Corbeille vidée')
     await charger()
   }

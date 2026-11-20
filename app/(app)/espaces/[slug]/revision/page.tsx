@@ -291,7 +291,9 @@ export default function RevisionPage() {
       const t = e.target as HTMLElement | null
       if (t && (t.tagName === 'TEXTAREA' || t.tagName === 'INPUT' || t.isContentEditable)) return
       if (done) return
-      if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); setFlipped(f => !f); return }
+      // Sur un bouton, un lien ou une liste, Espace/Entrée gardent leur action native (accès clavier).
+      const natif = t && (t.tagName === 'BUTTON' || t.tagName === 'A' || t.tagName === 'SELECT')
+      if (!natif && (e.code === 'Space' || e.code === 'Enter')) { e.preventDefault(); setFlipped(f => !f); return }
       if ((e.key === 'z' || e.key === 'Z' || e.code === 'Backspace') && lastAction) { e.preventDefault(); annuler(); return }
       if (flipped && ['1', '2', '3', '4'].includes(e.key)) { e.preventDefault(); rateCard(parseInt(e.key, 10) - 1) }
     }
@@ -487,7 +489,8 @@ export default function RevisionPage() {
         </div>
       ) : (
         <>
-        <div onClick={() => setFlipped(f => !f)} style={{
+        <div onClick={() => setFlipped(f => !f)} role="button" tabIndex={0} aria-pressed={flipped}
+          aria-label={flipped ? 'Carte retournée : réponse affichée' : 'Retourner la carte pour voir la réponse'} style={{
           background: '#fff', border: '1px solid #F0E7D6', borderRadius: 18,
           padding: '2rem', minHeight: 240, cursor: 'pointer', marginBottom: '1rem',
           display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative',

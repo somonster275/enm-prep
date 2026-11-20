@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
 
 type Note = { id: string; contenu: string; fait: boolean; created_at: string }
 
@@ -26,11 +26,11 @@ export default function NotesWidget({ titre = 'Mes tâches' }: { titre?: string 
     if (!error && data) { setNotes(ns => [data as Note, ...ns]); setTexte('') }
   }
   const basculer = async (n: Note) => {
-    await supabase.from('notes').update({ fait: !n.fait }).eq('id', n.id)
+    if (!(await ecrire(supabase.from('notes').update({ fait: !n.fait }).eq('id', n.id).select('id')))) return
     setNotes(ns => ns.map(x => x.id === n.id ? { ...x, fait: !x.fait } : x).sort((a, b) => Number(a.fait) - Number(b.fait)))
   }
   const supprimer = async (id: string) => {
-    await supabase.from('notes').delete().eq('id', id)
+    if (!(await ecrire(supabase.from('notes').delete().eq('id', id).select('id')))) return
     setNotes(ns => ns.filter(x => x.id !== id))
   }
 

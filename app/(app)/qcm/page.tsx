@@ -113,10 +113,11 @@ export default function QcmPage() {
     const next = new Set(valides); next.add(q.id)
     setValides(next)
     if (uid) {
-      await supabase.from('qcm_reponses').upsert(
+      const { error } = await supabase.from('qcm_reponses').upsert(
         [{ user_id: uid, question_id: q.id, qcm_id: q.qcm_id, juste: estBonne(q) }],
         { onConflict: 'user_id,question_id' }
       )
+      if (error) console.error('Réponse QCM non enregistrée (carnet d\'erreurs) :', error.message)
     }
     // Dernière question validée → finalisation (une seule fois).
     if (questions.every(x => next.has(x.id))) await finaliser()

@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Fiche } from '@/types'
+import { activable } from '@/lib/a11y'
 
 type FicheGen = { question: string; reponse: string; selected: boolean }
 
@@ -53,7 +54,7 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
 
   return (
     <div style={{ background: '#FFF8EE', border: '1px solid #F2D9A0', borderRadius: 16, padding: '1.1rem 1.25rem', marginBottom: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setOuvert(o => !o)}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} {...activable} aria-expanded={ouvert} onClick={() => setOuvert(o => !o)}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
           <span style={{ fontSize: 18 }}>✨</span>
           <span style={{ fontWeight: 700, fontSize: 14.5, color: '#8A5A10' }}>Générer des fiches avec l&apos;IA</span>

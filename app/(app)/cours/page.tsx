@@ -123,9 +123,13 @@ function CoursContenu() {
 
   const supprimer = async (id: string) => {
     if (!confirm('Supprimer ce cours ?')) return
+    // Ligne + fichier du bucket public (sinon le cours resterait téléchargeable par son adresse).
+    const res = await fetch('/api/admin/cours/supprimer', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }),
+    }).catch(() => null)
+    if (!res?.ok) { alert('Suppression impossible, réessaie.'); return }
     setListe(l => l.filter(c => c.id !== id))
     if (actif?.id === id) setActif(null)
-    await supabase.from('cours').delete().eq('id', id)
   }
 
   const ouvrir = (c: Cours) => { setActif(c); setRemarque(''); setRemarqueOk(false); window.scrollTo({ top: 0 }) }

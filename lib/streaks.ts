@@ -15,7 +15,8 @@ export function ymd(d: Date): string {
 export async function enregistrerActivite(_userId: string, n = 1): Promise<void> {
   const jour = ymd(new Date())
   // Incrément ATOMIQUE côté serveur (RPC incr_activite, migrations 0035/0039 : seule écriture permise).
-  await supabase.rpc('incr_activite', { p_jour: jour, p_delta: n })
+  const { error } = await supabase.rpc('incr_activite', { p_jour: jour, p_delta: n })
+  if (error) console.error('Activité du jour non enregistrée :', error.message)
 }
 
 /** Période de pause (mode vacances) : les jours entre `debut` et `fin` (inclus) ne cassent pas la série. */

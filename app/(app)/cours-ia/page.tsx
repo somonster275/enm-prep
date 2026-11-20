@@ -22,12 +22,13 @@ type Message = {
 
 const fmtSec = (s: number) => s.toFixed(1).replace('.', ',') + ' s'
 type Mode = 'officiel' | 'personnel'
-const cleLS = (m: Mode) => `cours-ia-messages-${m}`
+// Clé par utilisateur : sur un poste partagé, le compte suivant ne voit pas l'historique du précédent.
+const cleLS = (m: Mode, u: string) => `cours-ia-messages-${u}-${m}`
 const TTL_MS = 24 * 60 * 60 * 1000
 
-function chargerDepuisLS(m: Mode): Message[] {
+function chargerDepuisLS(m: Mode, u: string): Message[] {
   try {
-    const raw = localStorage.getItem(cleLS(m))
+    const raw = localStorage.getItem(cleLS(m, u))
     if (!raw) return []
     const parsed: Message[] = JSON.parse(raw)
     const limite = Date.now() - TTL_MS
@@ -35,10 +36,10 @@ function chargerDepuisLS(m: Mode): Message[] {
   } catch { return [] }
 }
 
-function sauvegarderDansLS(m: Mode, msgs: Message[]) {
+function sauvegarderDansLS(m: Mode, u: string, msgs: Message[]) {
   try {
     const limite = Date.now() - TTL_MS
-    localStorage.setItem(cleLS(m), JSON.stringify(msgs.filter(msg => msg.ts > limite)))
+    localStorage.setItem(cleLS(m, u), JSON.stringify(msgs.filter(msg => msg.ts > limite)))
   } catch { /* quota exceeded */ }
 }
 
@@ -109,7 +110,8 @@ export default function CoursIAPage() {
   useEffect(() => {
     if (!userId) return
     setDocumentsSelectionnes([])
-    setMessages(chargerDepuisLS(mode))
+    try { localStorage.removeItem(`cours-ia-messages-${mode}`) } catch { /* ancienne clé partagée */ }
+    setMessages(chargerDepuisLS(mode, userId))
     chargerDocs(mode, userId)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, userId])
@@ -160,7 +162,7 @@ export default function CoursIAPage() {
     const q = question.trim()
     setQuestion('')
     const msgUser: Message = { role: 'user', contenu: q, ts: Date.now() }
-    setMessages(m => { const next = [...m, msgUser]; sauvegarderDansLS(mode, next); return next })
+    setMessages(m => { const next = [...m, msgUser]; sauvegarderDansLS(mode, userId, next); return next })
     setLoading(true)
     setPhase('recherche')
 
@@ -179,13 +181,13 @@ export default function CoursIAPage() {
         signal: controller.signal,
       })
     } catch {
-      setMessages(m => { const next = [...m, { role: 'assistant' as const, contenu: '⏹️ Génération interrompue.', interrompu: true, ts: Date.now() }]; sauvegarderDansLS(mode, next); return next })
+      setMessages(m => { const next = [...m, { role: 'assistant' as const, contenu: '⏹️ Génération interrompue.', interrompu: true, ts: Date.now() }]; sauvegarderDansLS(mode, userId, next); return next })
       setLoading(false); setPhase('idle'); abortRef.current = null
       return
     }
 
     if (!res.ok || !res.body) {
-      setMessages(m => { const next = [...m, { role: 'assistant' as const, contenu: "Erreur lors de la connexion à l'IA.", ts: Date.now() }]; sauvegarderDansLS(mode, next); return next })
+      setMessages(m => { const next = [...m, { role: 'assistant' as const, contenu: "Erreur lors de la connexion à l'IA.", ts: Date.now() }]; sauvegarderDansLS(mode, userId, next); return next })
       setLoading(false); setPhase('idle'); abortRef.current = null
       return
     }
@@ -258,7 +260,7 @@ export default function CoursIAPage() {
           contenu: last.contenu || (controller.signal.aborted ? '⏹️ Génération interrompue.' : last.contenu),
         }
       }
-      sauvegarderDansLS(mode, copy)
+      sauvegarderDansLS(mode, userId, copy)
       return copy
     })
     setLoading(false); setPhase('idle'); abortRef.current = null
@@ -693,7 +695,7 @@ export default function CoursIAPage() {
                   <span style={{ fontSize: 12, color: textMuted, fontFamily: "'Space Grotesk', sans-serif" }}>
                     ⏳ Conversations conservées <strong style={{ fontWeight: 600 }}>24 h</strong> dans ce navigateur.{' '}
                     {messages.length > 0 && (
-                      <button onClick={() => { localStorage.removeItem(cleLS(mode)); setMessages([]) }} style={{ background: 'none', border: 'none', color: coral, fontSize: 12, cursor: 'pointer', textDecoration: 'underline', fontFamily: "'Space Grotesk', sans-serif", padding: 0, fontWeight: 600 }}>
+                      <button onClick={() => { localStorage.removeItem(cleLS(mode, userId)); setMessages([]) }} style={{ background: 'none', border: 'none', color: coral, fontSize: 12, cursor: 'pointer', textDecoration: 'underline', fontFamily: "'Space Grotesk', sans-serif", padding: 0, fontWeight: 600 }}>
                         Effacer
                       </button>
                     )}

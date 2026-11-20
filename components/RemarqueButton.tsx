@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useEchap } from '@/lib/useEchap'
 
 const FONT = "'Hanken Grotesk', sans-serif"
 
@@ -12,6 +13,7 @@ export default function RemarqueButton({ ficheId, style }: { ficheId: string; st
   const [err, setErr] = useState('')
 
   const fermer = () => { setOpen(false); setMessage(''); setStatut(''); setErr('') }
+  useEchap(open, fermer)
 
   const envoyer = async () => {
     if (!message.trim()) { setErr('Écris ta remarque.'); return }
@@ -41,7 +43,7 @@ export default function RemarqueButton({ ficheId, style }: { ficheId: string; st
 
       {open && (
         <div onClick={fermer} style={{ position: 'fixed', inset: 0, background: 'rgba(40,30,20,.42)', zIndex: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div onClick={e => { e.stopPropagation() }} style={{ background: '#fff', borderRadius: 18, padding: 24, width: '100%', maxWidth: 460, fontFamily: FONT, color: '#2A2018', boxShadow: '0 24px 60px -30px rgba(40,30,20,.5)' }}>
+          <div onClick={e => { e.stopPropagation() }} role="dialog" aria-modal="true" aria-label="Signaler une remarque sur la fiche" style={{ background: '#fff', borderRadius: 18, padding: 24, width: '100%', maxWidth: 460, fontFamily: FONT, color: '#2A2018', boxShadow: '0 24px 60px -30px rgba(40,30,20,.5)' }}>
             {statut === 'ok' ? (
               <div style={{ textAlign: 'center', padding: '8px 0' }}>
                 <div style={{ fontSize: 30, marginBottom: 6 }}>✅</div>

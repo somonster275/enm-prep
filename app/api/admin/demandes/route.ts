@@ -44,7 +44,8 @@ export async function POST(request: NextRequest) {
   const maj = { traite_at: new Date().toISOString(), traite_par: g.user.id }
 
   if (action === 'refuser') {
-    await admin.from('demandes_acces').update({ statut: 'refuse', ...maj }).eq('id', id)
+    const { error } = await admin.from('demandes_acces').update({ statut: 'refuse', ...maj }).eq('id', id)
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json({ ok: true, statut: 'refuse' })
   }
 

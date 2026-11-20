@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import type { Espace, Module, Fiche, Progression } from '@/types'
 import { scoreGlobal, estDue } from '@/lib/spaced-repetition'
 import Link from 'next/link'
+import { lienSur } from '@/lib/url-publique'
 
 type ToolItem = { id: string; titre: string; url: string | null; type?: string | null }
 
@@ -198,7 +199,7 @@ export default function EspacePage() {
                       {it.titre}
                       {it.type && <span style={{ fontSize: 11, color: '#8A7E68', marginLeft: 8 }}>· {it.type}</span>}
                     </div>
-                    {it.url && <a href={it.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: t.accent, textDecoration: 'none', fontWeight: 600, flexShrink: 0 }}>Ouvrir →</a>}
+                    {lienSur(it.url) && <a href={lienSur(it.url)!} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: t.accent, textDecoration: 'none', fontWeight: 600, flexShrink: 0 }}>Ouvrir →</a>}
                   </div>
                 ))}
               </div>

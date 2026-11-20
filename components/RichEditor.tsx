@@ -13,6 +13,20 @@ type Props = {
 const COULEURS_TEXTE = ['#2A2018', '#DC4A2B', '#D94A30', '#0E7C63', '#1D4ED8', '#BE185D']
 const COULEURS_SURLIGNAGE = ['#FFF3A3', '#C8F5DE', '#FAD9D0', '#D9E4FF', '#F3D9FB']
 
+// Hors du composant : défini dans le rendu, il était recréé (démonté/remonté) à chaque frappe.
+const Btn = ({ onClick, title, children, active }: { onClick: () => void; title: string; children: React.ReactNode; active?: boolean }) => (
+  <button
+    type="button" title={title} aria-label={title}
+    onMouseDown={e => { e.preventDefault(); onClick() }}
+    style={{
+      minWidth: 32, height: 32, padding: '0 8px', borderRadius: 7,
+      border: '1px solid #EADFC9', background: active ? '#FCE3D3' : '#fff',
+      color: '#2A2018', cursor: 'pointer', fontSize: 14, fontFamily: "'Hanken Grotesk', sans-serif",
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+    }}
+  >{children}</button>
+)
+
 export default function RichEditor({ value, onChange, placeholder, minHeight = 120 }: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const [showColors, setShowColors] = useState(false)
@@ -47,18 +61,6 @@ export default function RichEditor({ value, onChange, placeholder, minHeight = 1
   const font = "'Hanken Grotesk', sans-serif"
   const fileRef = useRef<HTMLInputElement>(null)
 
-  const Btn = ({ onClick, title, children, active }: { onClick: () => void; title: string; children: React.ReactNode; active?: boolean }) => (
-    <button
-      type="button" title={title}
-      onMouseDown={e => { e.preventDefault(); onClick() }}
-      style={{
-        minWidth: 32, height: 32, padding: '0 8px', borderRadius: 7,
-        border: '1px solid #EADFC9', background: active ? '#FCE3D3' : '#fff',
-        color: '#2A2018', cursor: 'pointer', fontSize: 14, fontFamily: font,
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      }}
-    >{children}</button>
-  )
 
   return (
     <div style={{ border: '1.5px solid #EADFC9', borderRadius: 10, overflow: 'hidden', background: '#fff' }}>
@@ -77,7 +79,7 @@ export default function RichEditor({ value, onChange, placeholder, minHeight = 1
           {showColors && (
             <div style={{ position: 'absolute', top: 36, left: 0, zIndex: 30, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 10, padding: 8, boxShadow: '0 6px 18px -6px rgba(40,30,60,.2)', display: 'flex', gap: 6 }}>
               {COULEURS_TEXTE.map(c => (
-                <button key={c} type="button" onMouseDown={e => { e.preventDefault(); cmd('foreColor', c); setShowColors(false) }}
+                <button key={c} type="button" aria-label={`Couleur ${c}`} onMouseDown={e => { e.preventDefault(); cmd('foreColor', c); setShowColors(false) }}
                   style={{ width: 22, height: 22, borderRadius: '50%', background: c, border: '2px solid #fff', boxShadow: '0 0 0 1px #EADFC9', cursor: 'pointer' }} />
               ))}
             </div>
@@ -90,11 +92,11 @@ export default function RichEditor({ value, onChange, placeholder, minHeight = 1
           {showHighlight && (
             <div style={{ position: 'absolute', top: 36, left: 0, zIndex: 30, background: '#fff', border: '1px solid #F0E7D6', borderRadius: 10, padding: 8, boxShadow: '0 6px 18px -6px rgba(40,30,60,.2)', display: 'flex', gap: 6, alignItems: 'center' }}>
               {COULEURS_SURLIGNAGE.map(c => (
-                <button key={c} type="button" onMouseDown={e => { e.preventDefault(); cmd('hiliteColor', c); setShowHighlight(false) }}
+                <button key={c} type="button" aria-label={`Surlignage ${c}`} onMouseDown={e => { e.preventDefault(); cmd('hiliteColor', c); setShowHighlight(false) }}
                   style={{ width: 22, height: 22, borderRadius: 6, background: c, border: '1px solid #EADFC9', cursor: 'pointer' }} />
               ))}
               <button type="button" onMouseDown={e => { e.preventDefault(); cmd('hiliteColor', 'transparent'); setShowHighlight(false) }}
-                title="Retirer le surlignage"
+                title="Retirer le surlignage" aria-label="Retirer le surlignage"
                 style={{ width: 22, height: 22, borderRadius: 6, background: '#fff', border: '1px solid #EADFC9', cursor: 'pointer', fontSize: 12 }}>✕</button>
             </div>
           )}
@@ -115,7 +117,7 @@ export default function RichEditor({ value, onChange, placeholder, minHeight = 1
       <div
         ref={ref}
         className="rich-editor"
-        contentEditable
+        contentEditable role="textbox" aria-multiline="true" aria-label={placeholder || "Texte de la fiche"}
         suppressContentEditableWarning
         data-placeholder={placeholder || 'Saisis ton texte…'}
         onInput={emit}

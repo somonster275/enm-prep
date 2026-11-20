@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 38).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 39).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,27 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 39) — Reste du scan ECC (code) + migration 0044 (index, à exécuter)
+- Serveur : `lib/fetch-public.ts` (IP résolue + redirections revérifiées) pour actualités, planning, import QCM ;
+  en-têtes de sécurité dans `next.config.ts` (frame-ancestors, nosniff, HSTS ; pas de CSP complète) ;
+  `lib/jour.ts` (`jourParis`) pour quota IA, coach, classement ; `ymd` local côté client (calendrier, dashboard) ;
+  coach : 401 sans session ; messages d'erreur génériques sur les routes étudiantes/publiques (détail en console) ;
+  upload : liste blanche d'extensions ; bucket `cours` dans storage/init ; proxy : boucle de cookies corrigée ;
+  contributions (QCM vide supprimé, statut vérifié), refus de demande vérifié ; `CHATBOT_PROVIDER` validé.
+- RAG : `lib/chunker.ts` (redécoupe les longs paragraphes, chevauchement plafonné en caractères — testé) ;
+  `maxDuration = 300` + timeout Voyage 30 s ; recherche perso en « ou » + tri JS ; extraits en balises `<extrait>`
+  + consigne anti-injection ; images bloquées dans ReactMarkdown (cours-ia, coach) ; generer-fiches ≤ 100 000 car.
+- Client : `ecrire()` dans `lib/supabase.ts` (`.select('id')` obligatoire : refus RLS = 0 ligne) sur ~30 écritures,
+  mise à jour de l'écran APRÈS l'écriture ; suppression de cours via `app/api/admin/cours/supprimer` (ligne + fichier) ;
+  coach : réponse persistée une fois hors setter ; TopNav ne recrée plus le profil sur erreur ; historique cours-ia
+  par utilisateur ; liens `lienSur` ; canaux duel non ouverts après démontage.
+- Accessibilité : raccourcis de révision laissent Espace/Entrée aux boutons ; `lib/a11y.ts` (`activable`) sur les
+  div cliquables ; `lib/useEchap.ts` + `role="dialog"` sur 4 modales ; `Btn` de RichEditor sorti du rendu + aria-labels.
+- **Migration `0044_index_recherche.sql`** : `hnsw.ef_search = 200` sur `match_cours_chunks`, GIN plein-texte,
+  index de FK, suppression de 2 index en double, check `pauses` (NOT VALID). Testée 2× sur Postgres 16 (vector simulé).
+- Non traité (faible) : plafond global du formulaire contact, toasts `setTimeout` non annulés, `any` restants,
+  agrégations dashboard/classement en JS, pagination `admin/qcm`, exhaustive-deps du duel.
 
 ### 2026-11-20 (suite 38) — Migration 0043 (durcissements scan ECC) + route /api/duel/lancer
 - **Migration `0043_durcissement_scan_ecc.sql`** (exécutée par le user, avant le déploiement du code : lancement de duel cassé quelques minutes) : supprime la policy

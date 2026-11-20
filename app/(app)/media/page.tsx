@@ -1,9 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
 import type { Espace } from '@/types'
 import TagsInput from '@/components/TagsInput'
 import TagsEditeur from '@/components/TagsEditeur'
+import { lienSur } from '@/lib/url-publique'
 
 type Media = {
   id: string
@@ -120,7 +121,7 @@ export default function MediaPage() {
 
   const supprimer = async (id: string) => {
     if (!confirm('Mettre à la corbeille ?')) return
-    await supabase.from('medias').update({ deleted_at: new Date().toISOString() }).eq('id', id)
+    if (!(await ecrire(supabase.from('medias').update({ deleted_at: new Date().toISOString() }).eq('id', id).select('id')))) return
     setItems(it => it.filter(i => i.id !== id))
   }
 
@@ -229,8 +230,8 @@ export default function MediaPage() {
                   )}
                   {it.description && <p style={{ fontSize: 13.5, color: '#6E6456', lineHeight: 1.55, margin: '2px 0 0', whiteSpace: 'pre-wrap' }}>{it.description}</p>}
                   <TagsEditeur table="medias" id={it.id} initial={it.tags} accent={ACCENT} canEdit={isAdmin} />
-                  {!yid && it.url && !estAudio(it.url) && (
-                    <a href={it.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: ACCENT, fontWeight: 600, textDecoration: 'none', marginTop: 2 }}>Ouvrir le lien →</a>
+                  {!yid && it.url && lienSur(it.url) && !estAudio(it.url) && (
+                    <a href={lienSur(it.url)!} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: ACCENT, fontWeight: 600, textDecoration: 'none', marginTop: 2 }}>Ouvrir le lien →</a>
                   )}
                   <button onClick={() => toggleVu(it.id)} style={{
                     alignSelf: 'flex-start', marginTop: 6, padding: '5px 12px', borderRadius: 9, cursor: 'pointer', fontSize: 12.5, fontWeight: 700, fontFamily: FONT,

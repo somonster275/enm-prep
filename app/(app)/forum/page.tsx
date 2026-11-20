@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
+import { activable } from '@/lib/a11y'
 
 type Question = { id: string; user_id: string; auteur: string | null; matiere: string | null; titre: string; corps: string | null; created_at: string }
 type Reponse = { id: string; question_id: string; user_id: string; auteur: string | null; corps: string; created_at: string }
@@ -75,12 +76,12 @@ export default function ForumPage() {
 
   const supprimerQuestion = async (id: string) => {
     if (!confirm('Supprimer cette question et ses réponses ?')) return
+    if (!(await ecrire(supabase.from('forum_questions').delete().eq('id', id).select('id')))) return
     setQuestions(qs => qs.filter(q => q.id !== id))
-    await supabase.from('forum_questions').delete().eq('id', id)
   }
   const supprimerReponse = async (qid: string, id: string) => {
+    if (!(await ecrire(supabase.from('forum_reponses').delete().eq('id', id).select('id')))) return
     setReponses(r => ({ ...r, [qid]: (r[qid] || []).filter(x => x.id !== id) }))
-    await supabase.from('forum_reponses').delete().eq('id', id)
   }
 
   const font = "'Hanken Grotesk', sans-serif"
@@ -135,7 +136,7 @@ export default function ForumPage() {
             return (
               <div key={q.id} style={{ background: '#fff', border: '1px solid #F0E7D6', borderRadius: 16, padding: 18 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                  <div onClick={() => ouvrirFil(q.id)} style={{ flex: 1, cursor: 'pointer' }}>
+                  <div {...activable} onClick={() => ouvrirFil(q.id)} style={{ flex: 1, cursor: 'pointer' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
                       {q.matiere && <span style={{ fontSize: 11.5, fontWeight: 700, color: '#0F6E56', background: '#ECF7F0', padding: '2px 8px', borderRadius: 999 }}>{q.matiere}</span>}
                       <span style={{ fontSize: 12, color: '#9A8D72' }}>{q.auteur || 'Étudiant'} · {dateFr(q.created_at)}</span>

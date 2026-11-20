@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
 import type { Espace, Module, Fiche, Profil } from '@/types'
 import { scoreGlobal, estDue } from '@/lib/spaced-repetition'
 import Link from 'next/link'
@@ -139,7 +139,7 @@ export default function ModulePage() {
     if (!confirm(`Mettre "${mod.nom}"${nb > 0 ? ` et ses ${nb} fiches` : ''} à la corbeille ?`)) return
     const now = new Date().toISOString()
     if (nb > 0) await supabase.from('fiches').update({ deleted_at: now }).eq('module_id', mod.id)
-    await supabase.from('modules').update({ deleted_at: now }).eq('id', mod.id)
+    if (!(await ecrire(supabase.from('modules').update({ deleted_at: now }).eq('id', mod.id).select('id')))) return
     setSousModules(s => s.filter(m => m.id !== mod.id))
     afficherMsg('✅ Sous-module mis à la corbeille')
   }
@@ -179,7 +179,7 @@ export default function ModulePage() {
 
   const supprimerFiche = async (id: string) => {
     if (!confirm('Mettre cette fiche à la corbeille ?')) return
-    await supabase.from('fiches').update({ deleted_at: new Date().toISOString() }).eq('id', id)
+    if (!(await ecrire(supabase.from('fiches').update({ deleted_at: new Date().toISOString() }).eq('id', id).select('id')))) return
     setFiches(f => f.filter(fc => fc.id !== id))
   }
 
@@ -197,8 +197,8 @@ export default function ModulePage() {
     const now = new Date().toISOString()
     // Soft delete récursif : ce module + tous ses descendants + leurs fiches
     const ids = [moduleId, ...getDescendantIds(moduleId)]
-    await supabase.from('fiches').update({ deleted_at: now }).in('module_id', ids)
-    await supabase.from('modules').update({ deleted_at: now }).in('id', ids)
+    if (!(await ecrire(supabase.from('fiches').update({ deleted_at: now }).in('module_id', ids).select('id'), { vide: true }))) return
+    if (!(await ecrire(supabase.from('modules').update({ deleted_at: now }).in('id', ids).select('id')))) return
     router.push(`/espaces/${slug}`)
   }
 

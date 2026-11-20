@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { enregistrerActivite } from '@/lib/streaks'
 import DuelAsync from '@/components/DuelAsync'
+import { activable } from '@/lib/a11y'
 
 // Le paquet public ne contient PAS les bonnes réponses (correction côté serveur).
 type MatchQuestionPub = { enonce: string; options: { t: string; full?: string }[]; cat: 'qcm' | 'fiche'; multi: boolean }
@@ -66,6 +67,7 @@ export default function SalleDuel() {
   useEffect(() => {
     let canalMatch: ReturnType<typeof supabase.channel> | null = null
     let canalJoueurs: ReturnType<typeof supabase.channel> | null = null
+    let annule = false // page quittée pendant le chargement : ne pas ouvrir de canaux orphelins
 
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
@@ -91,6 +93,7 @@ export default function SalleDuel() {
         idxRef.current = Math.max(0, cur)
       }
       chargerJoueurs(mm.id)
+      if (annule) return
 
       canalMatch = supabase.channel(`match-${mm.id}`)
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'matchs', filter: `id=eq.${mm.id}` },
@@ -103,7 +106,7 @@ export default function SalleDuel() {
         .subscribe()
     }
     load()
-    return () => { if (canalMatch) supabase.removeChannel(canalMatch); if (canalJoueurs) supabase.removeChannel(canalJoueurs) }
+    return () => { annule = true; if (canalMatch) supabase.removeChannel(canalMatch); if (canalJoueurs) supabase.removeChannel(canalJoueurs) }
   }, [codeStr, chargerJoueurs])
 
   // --- Envoie la réponse au serveur, qui corrige et met à jour le score ---
@@ -356,7 +359,7 @@ export default function SalleDuel() {
                       return (
                         <div
                           key={oi}
-                          onClick={() => tronquee && basculerDeplie(cle)}
+                          {...activable} onClick={() => tronquee && basculerDeplie(cle)}
                           style={{ border: `1.5px solid ${bd}`, background: bg, borderRadius: 10, padding: '9px 12px', fontSize: 13.5, color: col, cursor: tronquee ? 'pointer' : 'default' }}
                         >
                           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>

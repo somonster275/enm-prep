@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
 
 type Astuce = { id: string; user_id: string; auteur: string | null; texte: string; created_at: string }
 const FONT = "'Hanken Grotesk', sans-serif"
@@ -34,8 +34,8 @@ export default function AstucesFiche({ ficheId, uid, auteur, isAdmin }: { ficheI
   }
 
   const supprimer = async (id: string) => {
+    if (!(await ecrire(supabase.from('astuces').delete().eq('id', id).select('id')))) return
     setItems(it => (it || []).filter(x => x.id !== id))
-    await supabase.from('astuces').delete().eq('id', id)
   }
 
   const n = items?.length ?? 0

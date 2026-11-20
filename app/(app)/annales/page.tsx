@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
 
 type Annale = { id: string; user_id: string; auteur: string | null; titre: string; type: string | null; matiere: string | null; url: string; created_at: string }
 
@@ -60,8 +60,8 @@ export default function AnnalesPage() {
   }
 
   const supprimer = async (id: string) => {
+    if (!(await ecrire(supabase.from('annales').delete().eq('id', id).select('id')))) return
     setListe(l => l.filter(a => a.id !== id))
-    await supabase.from('annales').delete().eq('id', id)
   }
 
   const font = "'Hanken Grotesk', sans-serif"

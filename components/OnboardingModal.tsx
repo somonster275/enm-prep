@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import MethodeContenu from './MethodeContenu'
+import { useEchap } from '@/lib/useEchap'
 
 const FONT = "'Hanken Grotesk', sans-serif"
 
@@ -26,12 +27,13 @@ export default function OnboardingModal() {
     try { if (uid) localStorage.setItem(`codex-onboarding-vu-${uid}`, '1') } catch {}
     setShow(false)
   }
+  useEchap(show, fermer)
 
   if (!show) return null
 
   return (
     <div onClick={fermer} style={{ position: 'fixed', inset: 0, background: 'rgba(40,30,20,.5)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-      <div onClick={e => e.stopPropagation()} style={{
+      <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Bienvenue" style={{
         background: '#fff', borderRadius: 20, width: '100%', maxWidth: 620, maxHeight: '88vh',
         display: 'flex', flexDirection: 'column', fontFamily: FONT, color: '#2A2018',
         boxShadow: '0 30px 80px -30px rgba(40,30,20,.6)', overflow: 'hidden',

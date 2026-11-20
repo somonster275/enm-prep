@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
 import { ymd } from '@/lib/streaks'
 
 type PauseRow = { id: string; debut: string; fin: string }
@@ -62,7 +62,7 @@ export default function ModeVacances({ onChange }: { onChange?: () => void }) {
   }
 
   const reprendre = async (id: string) => {
-    await supabase.from('pauses').delete().eq('id', id)
+    if (!(await ecrire(supabase.from('pauses').delete().eq('id', id).select('id')))) return
     await charger()
     onChange?.()
   }

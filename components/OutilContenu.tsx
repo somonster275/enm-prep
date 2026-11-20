@@ -1,10 +1,11 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
 import { televerser } from '@/lib/televerser'
 import type { Espace } from '@/types'
 import TagsInput from '@/components/TagsInput'
 import TagsEditeur from '@/components/TagsEditeur'
+import { lienSur } from '@/lib/url-publique'
 
 type Props = {
   table: string            // 'mindmaps' | 'medias' | 'qcm'
@@ -112,7 +113,7 @@ export default function OutilContenu({ table, accent, icone, titre, description,
 
   const supprimer = async (id: string) => {
     if (!confirm('Mettre à la corbeille ?')) return
-    await supabase.from(table).update({ deleted_at: new Date().toISOString() }).eq('id', id)
+    if (!(await ecrire(supabase.from(table).update({ deleted_at: new Date().toISOString() }).eq('id', id).select('id')))) return
     setItems(it => it.filter(i => i.id !== id))
   }
 
@@ -226,7 +227,7 @@ export default function OutilContenu({ table, accent, icone, titre, description,
                       #{it.espaces.nom}
                     </span>
                   )}
-                  {it.url && <a href={it.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: accent, textDecoration: 'none', fontWeight: 600 }}>Ouvrir →</a>}
+                  {lienSur(it.url) && <a href={lienSur(it.url)!} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: accent, textDecoration: 'none', fontWeight: 600 }}>Ouvrir →</a>}
                 </div>
                 <TagsEditeur table={table} id={it.id} initial={it.tags} accent={accent} canEdit={isAdmin} />
               </div>

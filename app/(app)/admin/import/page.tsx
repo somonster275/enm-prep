@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Espace, Module } from '@/types'
+import { activable } from '@/lib/a11y'
 
 type CartePreview = { question: string; reponse: string }
 type Etape = 'upload' | 'preview' | 'import' | 'done'
@@ -325,7 +326,7 @@ export default function ImportPage() {
           <div
             onDragOver={e => e.preventDefault()}
             onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFichier(f) }}
-            onClick={() => !parsing && fileRef.current?.click()}
+            {...activable} onClick={() => !parsing && fileRef.current?.click()}
             style={{
               border: '2px dashed #F2C4B5', borderRadius: 12, padding: '2.5rem',
               textAlign: 'center', cursor: parsing ? 'wait' : 'pointer', background: '#FFFBF2',

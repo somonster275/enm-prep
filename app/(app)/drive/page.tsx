@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
 
 type Lien = {
   id: string
@@ -127,8 +127,8 @@ export default function DrivePage() {
   }
 
   const supprimer = async (id: string) => {
+    if (!(await ecrire(supabase.from('drive_liens').delete().eq('id', id).select('id')))) return
     setLiens(ls => ls.filter(l => l.id !== id))
-    await supabase.from('drive_liens').delete().eq('id', id)
   }
 
   const champ: React.CSSProperties = {

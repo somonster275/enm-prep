@@ -1,8 +1,9 @@
 'use client'
 import { useEffect, useMemo, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, ecrire } from '@/lib/supabase'
 import NotesWidget from '@/components/NotesWidget'
 import { ymd } from '@/lib/streaks'
+import { activable } from '@/lib/a11y'
 
 type Evenement = {
   id: string
@@ -237,7 +238,7 @@ export default function CalendrierPage() {
 
   const supprimer = async (id: string) => {
     if (!confirm('Supprimer cet événement ?')) return
-    await supabase.from('evenements').delete().eq('id', id)
+    if (!(await ecrire(supabase.from('evenements').delete().eq('id', id).select('id')))) return
     setEvenements(prev => prev.filter(e => e.id !== id))
   }
 
@@ -253,7 +254,7 @@ export default function CalendrierPage() {
 
   const supprimerFlux = async (id: string) => {
     if (!confirm('Retirer ce flux du calendrier ?')) return
-    await supabase.from('calendrier_flux').delete().eq('id', id)
+    if (!(await ecrire(supabase.from('calendrier_flux').delete().eq('id', id).select('id')))) return
     const list = await chargerFlux(true)
     chargerPlanning(list)
   }
@@ -441,7 +442,7 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
               const hasPast = key < todayKey
               return (
                 <div key={i}
-                  onClick={() => setJourSelectionne(isSelected ? null : key)}
+                  {...activable} onClick={() => setJourSelectionne(isSelected ? null : key)}
                   style={{
                     minHeight: 56, minWidth: 0, borderRadius: 10, padding: '6px 4px 4px',
                     background: isSelected ? '#FCEFD3' : isToday ? '#FFF4E6' : '#FAFAF8',
@@ -538,7 +539,7 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
               const isEvToday = ev.date_debut === todayKey
               const diff = Math.round((d.getTime() - new Date(todayKey).getTime()) / 86400000)
               return (
-                <div key={ev.id} onClick={() => {
+                <div key={ev.id} {...activable} onClick={() => {
                   const [a, mo] = ev.date_debut.split('-').map(Number)
                   setAnnee(a); setMois(mo - 1); setJourSelectionne(ev.date_debut)
                 }} style={{
