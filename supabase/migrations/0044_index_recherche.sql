@@ -1,5 +1,5 @@
 -- 0044 — Index et recherche (scan ECC). Ré-exécutable sans erreur, aucune donnée modifiée.
---  1) Recherche vectorielle filtrée (matière / documents choisis) : HNSW filtre APRÈS avoir pris
+--  1) Recherche vectorielle filtrée (fonction réécrite à l'identique + set_config) (matière / documents choisis) : HNSW filtre APRÈS avoir pris
 --     ef_search candidats (40 par défaut) → avec un filtre, il pouvait ne rester aucun passage.
 --  2) Recherche plein-texte « Mes documents » : index GIN (sinon parcours complet de la table).
 --  3) Clés étrangères sans index (suppressions en cascade, propager_nom, jointures).
@@ -7,7 +7,43 @@
 --  5) pauses : fin >= debut (NOT VALID : n'échoue pas sur d'éventuelles lignes existantes).
 
 -- 1) ---------------------------------------------------------------
-alter function public.match_cours_chunks(vector, int, uuid, uuid[]) set hnsw.ef_search = 200;
+-- `alter function ... set hnsw.ef_search` est refusé sur Supabase (paramètre réservé au superutilisateur) :
+-- la fonction le règle elle-même pour sa transaction (set_config local), ce qui est permis à tout rôle.
+create or replace function public.match_cours_chunks(
+  query_embedding  vector(1024),
+  match_count      int default 8,
+  filtre_espace    uuid default null,
+  filtre_documents uuid[] default null
+)
+returns table (
+  contenu       text,
+  document_id   uuid,
+  document_nom  text,
+  similarite    float
+)
+language plpgsql
+as $$
+begin
+  begin
+    perform set_config('hnsw.ef_search', '200', true);
+  exception when others then null; -- réglage indisponible : la recherche marche quand même (40 candidats)
+  end;
+  return query
+  select
+    c.contenu,
+    d.id   as document_id,
+    d.nom  as document_nom,
+    (1 - (c.embedding <=> query_embedding))::float as similarite
+  from public.cours_chunks c
+  join public.cours_documents d on d.id = c.document_id
+  where d.portee = 'officiel'
+    and d.deleted_at is null
+    and c.embedding is not null
+    and (filtre_espace    is null or d.espace_id  = filtre_espace)
+    and (filtre_documents is null or c.document_id = any(filtre_documents))
+  order by c.embedding <=> query_embedding
+  limit match_count;
+end $$;
 
 -- 2) ---------------------------------------------------------------
 create index if not exists cours_chunks_fts_idx
