@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 41).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 42).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,17 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 42) — ECC production-audit + test-coverage
+- **production-audit** (méthode ECC, preuves locales) : 62/100 « risqué ». Bloquants : projet Supabase en plan gratuit
+  (déjà mis en pause en juillet ; pas de sauvegarde exploitable) et schéma non reconstructible depuis le dépôt (tables
+  de base créées hors migrations, pas de 0001). À suivre : pas de CI (push main = déploiement), pas de suivi d'erreurs
+  (logs Vercel Hobby très courts), pas de `app/error.tsx` / `global-error.tsx`, 3 comptes admin, Voyage gratuit.
+- **test-coverage** : `npm test` = `node --import tsx --experimental-test-module-mocks --test tests/*.test.ts`.
+  `tests/logique.test.ts` (QCM, duel, tags, progression, escapeHtml, limite, melange, ecrire) et `tests/routes.test.ts`
+  (fausse base Supabase via `mock.module` : duel/repondre, duel/lancer, compte/supprimer, admin/supprimer-utilisateur,
+  admin/utilisateurs, cours/indexer). 28 tests ; vérifié qu'ils échouent si on retire le contrôle d'inscription au duel
+  ou la protection des admins. Couverture des fichiers testés ≈ 82 % lignes (≈ 40 routes et les pages restent sans test).
 
 ### 2026-11-20 (suite 41) — Recherche hybride base ENM + migration 0046
 - Constat : clé Voyage sur l'offre gratuite (limite de débit après 64 passages) → 2227 passages ≈ 1 h d'indexation.
