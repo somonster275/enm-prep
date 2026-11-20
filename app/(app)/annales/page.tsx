@@ -109,8 +109,7 @@ export default function AnnalesPage() {
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : visibles.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
-          <div style={{ fontSize: 30, marginBottom: 8 }}>📚</div>Aucun document partagé pour l&apos;instant.
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>Aucun document partagé pour l&apos;instant.
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>

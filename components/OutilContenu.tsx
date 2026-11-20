@@ -10,7 +10,6 @@ import { lienSur } from '@/lib/url-publique'
 type Props = {
   table: string            // 'mindmaps' | 'medias' | 'qcm'
   accent: string
-  icone: string
   titre: string
   description: string
   withType?: boolean       // média : audio / vidéo
@@ -30,7 +29,7 @@ type Item = {
   espaces: { nom: string; slug: string; couleur: string } | null
 }
 
-export default function OutilContenu({ table, accent, icone, titre, description, withType, lienLabel = 'Lien', acceptFichier, bucketStorage }: Props) {
+export default function OutilContenu({ table, accent, titre, description, withType, lienLabel = 'Lien', acceptFichier, bucketStorage }: Props) {
   const [isAdmin, setIsAdmin] = useState(false)
   const [espaces, setEspaces] = useState<Espace[]>([])
   const [items, setItems] = useState<Item[]>([])
@@ -89,7 +88,7 @@ export default function OutilContenu({ table, accent, icone, titre, description,
   const uploadFichier = async (): Promise<string | null> => {
     if (!fichier || !bucketStorage) return null
     try { return await televerser(fichier, bucketStorage) }
-    catch (e) { afficherMsg('❌ Upload échoué : ' + (e instanceof Error ? e.message : String(e))); return null }
+    catch (e) { afficherMsg('Erreur : envoi échoué : ' + (e instanceof Error ? e.message : String(e))); return null }
   }
 
   const ajouter = async () => {
@@ -104,10 +103,10 @@ export default function OutilContenu({ table, accent, icone, titre, description,
     if (withType) payload.type = type
     const { error } = await supabase.from(table).insert(payload)
     setUploading(false)
-    if (error) { afficherMsg('❌ ' + error.message); return }
+    if (error) { afficherMsg('Erreur : ' + error.message); return }
     setNom(''); setUrl(''); setTags([]); setFichier(null)
     if (fileRef.current) fileRef.current.value = ''
-    afficherMsg('✅ Ajouté')
+    afficherMsg('Ajouté')
     charger()
   }
 
@@ -127,7 +126,6 @@ export default function OutilContenu({ table, accent, icone, titre, description,
   return (
     <div style={{ paddingTop: '34px', maxWidth: 900, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 6 }}>
-        <div style={{ width: 48, height: 48, borderRadius: 6, background: accent + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>{icone}</div>
         <div style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 28 }}>{titre}</div>
       </div>
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '0 0 28px' }}>{description}</p>
@@ -172,7 +170,7 @@ export default function OutilContenu({ table, accent, icone, titre, description,
                   fontSize: 12, fontWeight: 600, color: accent, cursor: 'pointer', whiteSpace: 'nowrap',
                   background: fichier ? accent + '10' : 'var(--c-papier)', flexShrink: 0,
                 }}>
-                  {fichier ? `📎 ${fichier.name.length > 20 ? fichier.name.slice(0, 18) + '…' : fichier.name}` : 'Choisir un fichier'}
+                  {fichier ? `${fichier.name.length > 20 ? fichier.name.slice(0, 18) + '…' : fichier.name}` : 'Choisir un fichier'}
                   <input
                     ref={fileRef}
                     type="file"
@@ -202,7 +200,7 @@ export default function OutilContenu({ table, accent, icone, titre, description,
               {uploading ? 'Envoi en cours…' : 'Ajouter'}
             </button>
           </div>
-          {msg && <div style={{ fontSize: 13, marginTop: 10, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
+          {msg && <div style={{ fontSize: 13, marginTop: 10, color: msg.startsWith('Erreur') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
         </div>
       )}
 

@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 51).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 52).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,17 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 52) — Refonte design : fin du nettoyage des emoji (admin + pages restantes)
+- `main` à jour jusqu'à `49f5c11` (poussé sur demande). Ce lot : sur la branche.
+- Emoji décoratifs retirés partout sauf : sélecteur d'icône admin (`espaces/page.tsx`), ✓ ✕ ★ ☆ ✎, un commentaire.
+- Messages d'état : préfixes ✅/🗑️ supprimés, ❌/⚠️ → « Erreur : … » ; tous les tests `msg.startsWith('❌')`
+  → `startsWith('Erreur')` ; corbeille : rouge si `/supprim|vidée/.test(msg)`. Replis « Erreur : Erreur lors de… »
+  reformulés (« création impossible », etc.).
+- Champs supprimés : `icone` (Drive `FOURNISSEURS`, `TOOLS` de la page matière, prop de `OutilContenu` + mind-maps),
+  `emoji` (`Approfondir`). Tuiles d'icône d'en-tête retirées (actualités, calendrier, média, compte, cours, outils) ;
+  sous-titres qui avaient `margin-left: 56px` pour s'aligner sur la tuile → remis à 0.
+- Bouton image de `RichEditor` : « Image » au lieu de 🖼️.
 
 ### 2026-11-20 (suite 51) — Refonte design : nettoyage des emoji (pages étudiantes)
 - Emoji décoratifs retirés (≈290 → 176) : page module, QCM (tuiles de type, 🎯, 🎉, ✅/❌ → « Juste »/« Faux »,

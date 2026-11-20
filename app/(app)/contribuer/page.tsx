@@ -127,7 +127,7 @@ export default function ContribuerPage() {
           <button key={t} onClick={() => { setType(t); setMessage(null) }} style={{
             padding: '9px 18px', borderRadius: 999, cursor: 'pointer', fontSize: 13.5, fontWeight: 700, fontFamily: FONT,
             border: `1.5px solid ${type === t ? 'var(--c-accent)' : 'var(--c-filet-fort)'}`, background: type === t ? 'var(--c-accent)' : '#fff', color: type === t ? '#fff' : 'var(--c-annotation)',
-          }}>{t === 'fiche' ? '📇 Une fiche' : '✅ Un QCM'}</button>
+          }}>{t === 'fiche' ? 'Une fiche' : 'Un QCM'}</button>
         ))}
       </div>
 
@@ -204,7 +204,6 @@ export default function ContribuerPage() {
               const s = STATUT_LABEL[c.statut] || STATUT_LABEL.nouveau
               return (
                 <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '11px 16px' }}>
-                  <span style={{ fontSize: 18 }}>{c.type === 'qcm' ? '✅' : '📇'}</span>
                   <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{c.titre || (c.type === 'qcm' ? 'QCM' : 'Fiche')}</span>
                   <span style={{ fontSize: 11.5, fontWeight: 700, color: s.c, background: s.bg, borderRadius: 999, padding: '3px 10px' }}>{s.t}</span>
                 </div>

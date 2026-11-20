@@ -340,7 +340,6 @@ export default function ImportPage() {
               </>
             ) : (
               <>
-                <div style={{ fontSize: 36, marginBottom: 10 }}>📂</div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-encre)', marginBottom: 4 }}>
                   Glisse le fichier ici ou clique pour l'ouvrir
                 </div>
@@ -358,7 +357,7 @@ export default function ImportPage() {
 
           {erreur && (
             <div style={{ marginTop: 14, fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '10px 14px', borderRadius: 6 }}>
-              ❌ {erreur}
+              {erreur}
             </div>
           )}
 
@@ -394,7 +393,7 @@ export default function ImportPage() {
                   <div style={{ fontWeight: 600, color: 'var(--c-encre)', marginBottom: 3 }}>{htmlToText(c.question)}</div>
                   <div style={{ color: 'var(--c-annotation)', lineHeight: 1.5 }}>
                     {htmlToText(c.reponse).slice(0, 140)}{htmlToText(c.reponse).length > 140 ? '…' : ''}
-                    {/^.*<img/i.test(c.reponse) || /<img/i.test(c.question) ? <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--c-accent)', fontWeight: 600 }}>🖼️ image</span> : null}
+                    {/^.*<img/i.test(c.reponse) || /<img/i.test(c.question) ? <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--c-accent)', fontWeight: 600 }}>image</span> : null}
                   </div>
                 </div>
               ))}
@@ -469,7 +468,6 @@ export default function ImportPage() {
       {/* ÉTAPE 4 — Terminé */}
       {etape === 'done' && (
         <div style={{ ...card, textAlign: 'center', padding: '3rem' }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>{importResult.erreurs === 0 ? '🎉' : '⚠️'}</div>
           <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 24, marginBottom: 8 }}>
             {importResult.erreurs === 0 ? 'Import réussi !' : 'Import partiel'}
           </div>

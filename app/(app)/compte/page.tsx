@@ -40,7 +40,7 @@ export default function ComptePage() {
     setSavingId(false)
     const json = await res.json().catch(() => ({}))
     if (!res.ok) { setMsgId({ type: 'err', texte: json.error || 'Une erreur est survenue.' }); return }
-    setMsgId({ type: 'ok', texte: 'Identité mise à jour ✅' })
+    setMsgId({ type: 'ok', texte: 'Identité mise à jour' })
   }
 
   const changerMdp = async () => {
@@ -52,7 +52,7 @@ export default function ComptePage() {
     setLoading(false)
     if (error) { setMessage({ type: 'err', texte: error.message }); return }
     setMdp(''); setMdp2('')
-    setMessage({ type: 'ok', texte: 'Mot de passe modifié ✅ — tu vas être déconnecté pour des raisons de sécurité.' })
+    setMessage({ type: 'ok', texte: 'Mot de passe modifié — tu vas être déconnecté pour des raisons de sécurité.' })
     setTimeout(async () => {
       await supabase.auth.signOut()
       window.location.href = '/login'
@@ -147,7 +147,6 @@ export default function ComptePage() {
       {/* Widget ENT Paris 1 */}
       <div style={{ ...carte, marginTop: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 6, background: '#EEF2FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>🎓</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 15, fontWeight: 700 }}>ENT — Université Paris 1</div>
             <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginTop: 2 }}>Ton environnement numérique de travail (Panthéon-Sorbonne).</div>

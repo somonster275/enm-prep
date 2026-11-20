@@ -230,9 +230,9 @@ export default function CalendrierPage() {
       heure: fHeure || null, type: fType, couleur: couleurType(fType),
     })
     setSaving(false)
-    if (error) { afficherMsg('❌ ' + error.message); return }
+    if (error) { afficherMsg('Erreur : ' + error.message); return }
     setShowForm(false)
-    afficherMsg('✅ Événement ajouté')
+    afficherMsg('Événement ajouté')
     charger()
   }
 
@@ -245,9 +245,9 @@ export default function CalendrierPage() {
   const ajouterFlux = async () => {
     if (!flNom.trim() || !flUrl.trim()) return
     const { error } = await supabase.from('calendrier_flux').insert({ nom: flNom.trim(), url: flUrl.trim(), couleur: '#6366F1' })
-    if (error) { afficherMsg('❌ ' + error.message); return }
+    if (error) { afficherMsg('Erreur : ' + error.message); return }
     setFlNom(''); setFlUrl('')
-    afficherMsg('✅ Flux ajouté')
+    afficherMsg('Flux ajouté')
     const list = await chargerFlux(true)
     chargerPlanning(list)
   }
@@ -275,11 +275,10 @@ export default function CalendrierPage() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 6, background: '#A3122A22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📅</div>
             <div style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 26 }}>Calendrier</div>
             {syncPlan && <span style={{ fontSize: 12, color: '#6366F1', fontWeight: 600 }}>↻ synchro planning…</span>}
           </div>
-          <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '6px 0 0 56px' }}>Vos cours de la fac et les événements de la prépa, au même endroit.</p>
+          <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '6px 0 0' }}>Vos cours de la fac et les événements de la prépa, au même endroit.</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           {isAdmin && (
@@ -324,7 +323,7 @@ CREATE POLICY "ev_write" ON evenements FOR ALL TO authenticated
         </div>
       )}
 
-      {msg && <div style={{ fontSize: 13, marginBottom: 16, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63', background: msg.startsWith('❌') ? 'var(--c-accent-pale)' : '#E6F7F2', padding: '10px 14px', borderRadius: 6 }}>{msg}</div>}
+      {msg && <div style={{ fontSize: 13, marginBottom: 16, color: msg.startsWith('Erreur') ? 'var(--c-accent)' : '#0E7C63', background: msg.startsWith('Erreur') ? 'var(--c-accent-pale)' : '#E6F7F2', padding: '10px 14px', borderRadius: 6 }}>{msg}</div>}
 
       {/* Gestion des flux planning (admin) */}
       {isAdmin && showFlux && (
@@ -498,11 +497,11 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
                         <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-encre)' }}>{ev.titre}</div>
                         {(ev.heure || ev.fin) && (
                           <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginTop: 2 }}>
-                            🕐 {ev.heure}{ev.fin ? ` – ${ev.fin}` : ''}
+                            {ev.heure}{ev.fin ? ` – ${ev.fin}` : ''}
                           </div>
                         )}
-                        {ev.lieu && <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginTop: 2 }}>📍 {ev.lieu}</div>}
-                        {ev.intervenant && <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginTop: 2 }}>👤 {ev.intervenant}</div>}
+                        {ev.lieu && <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginTop: 2 }}>{ev.lieu}</div>}
+                        {ev.intervenant && <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginTop: 2 }}>{ev.intervenant}</div>}
                         {ev.description && <div style={{ fontSize: 12, color: '#5A4E3A', marginTop: 4 }}>{ev.description}</div>}
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
                           <span style={{ fontSize: 10, fontWeight: 600, color: ev.couleur, background: ev.couleur + '20', padding: '2px 7px', borderRadius: 999 }}>

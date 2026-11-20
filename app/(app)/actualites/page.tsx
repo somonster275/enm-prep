@@ -88,9 +88,9 @@ export default function ActualitesPage() {
   const ajouterSource = async () => {
     if (!nom.trim() || !url.trim()) return
     const { error } = await supabase.from('sources_actualites').insert({ nom: nom.trim(), url: url.trim(), couleur })
-    if (error) { afficherMsg('❌ ' + error.message); return }
+    if (error) { afficherMsg('Erreur : ' + error.message); return }
     setNom(''); setUrl(''); setCouleur(COULEURS[(sources.length + 1) % COULEURS.length])
-    afficherMsg('✅ Source ajoutée')
+    afficherMsg('Source ajoutée')
     const srcs = await chargerSources()
     synchroniser(srcs)
   }
@@ -124,10 +124,9 @@ export default function ActualitesPage() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 6, background: '#A3122A22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📰</div>
             <div style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 26 }}>Actualités</div>
           </div>
-          <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '6px 0 0 56px' }}>L'actualité juridique de la semaine, en direct des sites de référence.</p>
+          <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '6px 0 0' }}>L'actualité juridique de la semaine, en direct des sites de référence.</p>
         </div>
         {!tableManquante && sources.length > 0 && (
           <button onClick={() => synchroniser(sources)} disabled={sync} style={{
@@ -196,13 +195,13 @@ CREATE POLICY "src_write" ON sources_actualites FOR ALL TO authenticated
               opacity: (!nom.trim() || !url.trim()) ? 0.5 : 1, whiteSpace: 'nowrap',
             }}>Ajouter</button>
           </div>
-          {msg && <div style={{ fontSize: 13, marginTop: 12, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
+          {msg && <div style={{ fontSize: 13, marginTop: 12, color: msg.startsWith('Erreur') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
         </div>
       )}
 
       {erreurs.length > 0 && (
         <div style={{ fontSize: 12, color: '#9A7A2A', background: '#FCF3DD', padding: '10px 14px', borderRadius: 6, marginBottom: 18 }}>
-          ⚠️ {erreurs.join(' · ')}
+          {erreurs.join(' · ')}
         </div>
       )}
 

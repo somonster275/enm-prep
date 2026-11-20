@@ -51,24 +51,24 @@ export default function Editeur() {
     const { data, error } = await supabase.from('modules')
       .insert({ espace_id: espaceId, nom: nomModule.trim(), ordre })
       .select().single()
-    if (error) { afficherMsg('❌ Erreur : ' + error.message); return }
+    if (error) { afficherMsg('Erreur : ' + error.message); return }
     if (data) {
       setModules(m => [...m, data])
       setModuleId(data.id)
       setNomModule('')
       setCreatingModule(false)
-      afficherMsg('✅ Module créé')
+      afficherMsg('Module créé')
     }
   }
 
   const renommerModule = async (mod: Module) => {
     if (!editNomModule.trim()) return
     const { error } = await supabase.from('modules').update({ nom: editNomModule.trim() }).eq('id', mod.id)
-    if (error) { afficherMsg('❌ Erreur : ' + error.message); return }
+    if (error) { afficherMsg('Erreur : ' + error.message); return }
     setModules(ms => ms.map(m => m.id === mod.id ? { ...m, nom: editNomModule.trim() } : m))
     setEditModule(null)
     setEditNomModule('')
-    afficherMsg('✅ Module renommé')
+    afficherMsg('Module renommé')
   }
 
   const supprimerModule = async (mod: Module) => {
@@ -82,24 +82,24 @@ export default function Editeur() {
     // Soft delete : marque les fiches puis le module
     if (nbFiches > 0) await supabase.from('fiches').update({ deleted_at: now }).eq('module_id', mod.id)
     const { error } = await supabase.from('modules').update({ deleted_at: now }).eq('id', mod.id)
-    if (error) { afficherMsg('❌ Erreur : ' + error.message); return }
+    if (error) { afficherMsg('Erreur : ' + error.message); return }
     setModules(ms => ms.filter(m => m.id !== mod.id))
     if (moduleId === mod.id) { setModuleId(''); setFiches([]) }
-    afficherMsg('✅ Module mis à la corbeille')
+    afficherMsg('Module mis à la corbeille')
   }
 
   const sauvegarder = async () => {
     if (!question || !reponse || !moduleId) return
     if (editFiche) {
       const { error } = await supabase.from('fiches').update({ question, reponse, updated_at: new Date().toISOString() }).eq('id', editFiche.id)
-      if (error) { afficherMsg('❌ Erreur : ' + error.message); return }
+      if (error) { afficherMsg('Erreur : ' + error.message); return }
       setFiches(f => f.map(fc => fc.id === editFiche.id ? { ...fc, question, reponse } : fc))
-      afficherMsg('✅ Fiche modifiée')
+      afficherMsg('Fiche modifiée')
     } else {
       const { data, error } = await supabase.from('fiches').insert({ module_id: moduleId, question, reponse }).select().single()
-      if (error) { afficherMsg('❌ Erreur : ' + error.message); return }
+      if (error) { afficherMsg('Erreur : ' + error.message); return }
       if (data) setFiches(f => [...f, data])
-      afficherMsg('✅ Fiche ajoutée')
+      afficherMsg('Fiche ajoutée')
     }
     setQuestion(''); setReponse(''); setEditFiche(null)
   }
@@ -116,8 +116,8 @@ export default function Editeur() {
   const labelStyle: React.CSSProperties = { fontSize: 12, display: 'block', marginBottom: 6, color: 'var(--c-annotation)', fontWeight: 600 }
   const msgStyle: React.CSSProperties = {
     fontSize: 13, padding: '8px 12px', borderRadius: 8, marginBottom: 12,
-    color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63',
-    background: msg.startsWith('❌') ? 'var(--c-accent-pale)' : '#DDF3EE',
+    color: msg.startsWith('Erreur') ? 'var(--c-accent)' : '#0E7C63',
+    background: msg.startsWith('Erreur') ? 'var(--c-accent-pale)' : '#DDF3EE',
   }
 
   return (

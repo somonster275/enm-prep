@@ -10,9 +10,9 @@ import { lienSur } from '@/lib/url-publique'
 type ToolItem = { id: string; titre: string; url: string | null; type?: string | null }
 
 const TOOLS = [
-  { key: 'mindmaps', titre: 'Mind maps', icone: '🧠', accent: '#2DAE83', href: '/mind-maps' },
-  { key: 'medias', titre: 'Audio & Vidéo', icone: '🎧', accent: '#3B82D9', href: '/media' },
-  { key: 'qcm', titre: 'QCM', icone: '✅', accent: '#E8A11E', href: '/qcm' },
+  { key: 'mindmaps', titre: 'Mind maps', accent: '#2DAE83', href: '/mind-maps' },
+  { key: 'medias', titre: 'Audio & Vidéo', accent: '#3B82D9', href: '/media' },
+  { key: 'qcm', titre: 'QCM', accent: '#E8A11E', href: '/qcm' },
 ] as const
 
 export default function EspacePage() {

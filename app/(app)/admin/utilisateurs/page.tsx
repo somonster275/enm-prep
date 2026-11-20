@@ -45,7 +45,7 @@ export default function AdminUtilisateurs() {
 
   const changerMotDePasse = async (id: string) => {
     const valeur = mdpEdit?.valeur || ''
-    if (valeur.length < 6) { setMessage('❌ Mot de passe trop court (6 caractères minimum).'); return }
+    if (valeur.length < 6) { setMessage('Erreur : mot de passe trop court (6 caractères minimum).'); return }
     setMdpLoading(true); setMessage('')
     const res = await fetch('/api/admin/changer-mot-de-passe', {
       method: 'POST',
@@ -54,9 +54,9 @@ export default function AdminUtilisateurs() {
     })
     const json = await res.json().catch(() => ({}))
     setMdpLoading(false)
-    if (!res.ok) { setMessage('❌ ' + (json.error || 'Erreur')); return }
+    if (!res.ok) { setMessage('Erreur : ' + (json.error || 'action impossible')); return }
     setMdpEdit(null)
-    setMessage('✅ Mot de passe modifié')
+    setMessage('Mot de passe modifié')
     setTimeout(() => setMessage(''), 3000)
   }
 
@@ -69,9 +69,9 @@ export default function AdminUtilisateurs() {
       body: JSON.stringify({ id }),
     })
     const json = await res.json().catch(() => ({}))
-    if (!res.ok) { setMessage('❌ ' + (json.error || 'Erreur lors de la suppression')); return }
+    if (!res.ok) { setMessage('Erreur : ' + (json.error || 'suppression impossible')); return }
     setUtilisateurs(u => u.filter(p => p.id !== id))
-    setMessage('✅ Compte supprimé')
+    setMessage('Compte supprimé')
     setTimeout(() => setMessage(''), 3000)
   }
 
@@ -84,9 +84,9 @@ export default function AdminUtilisateurs() {
     })
     const json = await res.json().catch(() => ({}))
     setTraitement('')
-    if (!res.ok) { setMessage('❌ ' + (json.error || 'Erreur lors du traitement')); return }
+    if (!res.ok) { setMessage('Erreur : ' + (json.error || 'traitement impossible')); return }
     if (action === 'approuver') {
-      setMessage(`✅ Invitation envoyée à ${json.email || ''} — la personne va recevoir un email pour créer son mot de passe.`)
+      setMessage(`Invitation envoyée à ${json.email || ''} — la personne va recevoir un email pour créer son mot de passe.`)
       rechargerUtilisateurs()
     } else {
       setMessage('Demande refusée.')
@@ -103,8 +103,8 @@ export default function AdminUtilisateurs() {
       body: JSON.stringify({ email, nom, motDePasse, role })
     })
     const json = await res.json().catch(() => ({}))
-    if (!res.ok) { setMessage('❌ ' + (json.error || 'Erreur lors de la création')); setLoading(false); return }
-    setMessage('✅ Utilisateur créé avec succès')
+    if (!res.ok) { setMessage('Erreur : ' + (json.error || 'création impossible')); setLoading(false); return }
+    setMessage('Utilisateur créé avec succès')
     setEmail(''); setNom(''); setMotDePasse(''); setLoading(false)
     rechargerUtilisateurs()
     setTimeout(() => setMessage(''), 3000)
@@ -116,7 +116,7 @@ export default function AdminUtilisateurs() {
     })
     if (!res.ok) {
       const json = await res.json().catch(() => ({}))
-      setMessage('❌ ' + (json.error || 'Changement de rôle impossible'))
+      setMessage('Erreur : ' + (json.error || 'Changement de rôle impossible'))
       setTimeout(() => setMessage(''), 4000)
       return
     }
@@ -183,7 +183,7 @@ export default function AdminUtilisateurs() {
             </select>
           </div>
         </div>
-        {message && <div style={{ fontSize: 13, color: message.startsWith('❌') ? 'var(--c-accent)' : '#0F6E56', marginBottom: 10 }}>{message}</div>}
+        {message && <div style={{ fontSize: 13, color: message.startsWith('Erreur') ? 'var(--c-accent)' : '#0F6E56', marginBottom: 10 }}>{message}</div>}
         <button onClick={creerUtilisateur} disabled={loading}
           style={{ padding: '10px 20px', borderRadius: 8, background: '#534AB7', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: loading ? 0.7 : 1 }}>
           {loading ? 'Création...' : 'Créer le compte'}

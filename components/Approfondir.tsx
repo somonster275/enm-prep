@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 
 const FONT = "var(--font-texte)"
 
-type Lien = { titre: string; href: string; emoji: string; label: string }
+type Lien = { titre: string; href: string; label: string }
 
 // Affiche les ressources (vidéo, audio, cours, QCM, mind map) qui partagent un
 // tag avec la fiche en cours — pour varier les supports de révision. Chaque lien
@@ -28,14 +28,14 @@ export default function Approfondir({ tags }: { tags: string[] }) {
       const out: Lien[] = []
       for (const m of (med.data || []) as { id: string; titre: string; url: string | null; type: string | null }[]) {
         const audio = m.type === 'audio'
-        out.push({ titre: m.titre, href: m.url || '/media', emoji: audio ? '🎧' : '🎬', label: audio ? 'Audio' : 'Vidéo' })
+        out.push({ titre: m.titre, href: m.url || '/media', label: audio ? 'Audio' : 'Vidéo' })
       }
       for (const m of (mind.data || []) as { id: string; titre: string; url: string | null }[])
-        out.push({ titre: m.titre, href: m.url || '/mind-maps', emoji: '🧠', label: 'Mind map' })
+        out.push({ titre: m.titre, href: m.url || '/mind-maps', label: 'Mind map' })
       for (const c of (cours.data || []) as { id: string; titre: string; type: string | null }[])
-        out.push({ titre: c.titre, href: `/cours?c=${c.id}`, emoji: c.type === 'pdf' ? '📕' : '📘', label: 'Cours' })
+        out.push({ titre: c.titre, href: `/cours?c=${c.id}`, label: 'Cours' })
       for (const q of (qcm.data || []) as { id: string; titre: string }[])
-        out.push({ titre: q.titre, href: `/qcm?id=${q.id}`, emoji: '✅', label: 'QCM' })
+        out.push({ titre: q.titre, href: `/qcm?id=${q.id}`, label: 'QCM' })
       if (!annule) setLiens(out)
     }
     charger()
@@ -50,7 +50,6 @@ export default function Approfondir({ tags }: { tags: string[] }) {
         width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px',
         background: '#F6F1FD', border: 'none', cursor: 'pointer', fontFamily: FONT, textAlign: 'left',
       }}>
-        <span style={{ fontSize: 18 }}>🔎</span>
         <span style={{ flex: 1, fontWeight: 800, fontSize: 14.5, color: '#5B3FA6' }}>
           Approfondir <span style={{ fontWeight: 600, color: '#8A7CB0' }}>· {liens.length} ressource{liens.length > 1 ? 's' : ''} liée{liens.length > 1 ? 's' : ''}</span>
         </span>
@@ -63,7 +62,6 @@ export default function Approfondir({ tags }: { tags: string[] }) {
               display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 6,
               border: '1px solid var(--c-filet)', background: 'var(--c-papier)', textDecoration: 'none', color: 'var(--c-encre)',
             }}>
-              <span style={{ fontSize: 18, flexShrink: 0 }}>{l.emoji}</span>
               <span style={{ flex: 1, fontSize: 13.5, fontWeight: 600 }}>{l.titre}</span>
               <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--c-annotation-clair)', flexShrink: 0 }}>{l.label} ↗</span>
             </a>

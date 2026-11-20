@@ -12,13 +12,13 @@ type Lien = {
 }
 
 // Fournisseurs reconnus : libellé, emoji, teinte de fond du badge.
-const FOURNISSEURS: Record<string, { label: string; icone: string; bg: string; fg: string }> = {
-  google:   { label: 'Google Drive', icone: '📁', bg: '#E8F0FE', fg: '#1A56C4' },
-  icloud:   { label: 'iCloud Drive', icone: '☁️', bg: '#EAF4FF', fg: '#0A84C2' },
-  dropbox:  { label: 'Dropbox',      icone: '📦', bg: '#E8F1FE', fg: '#0061FF' },
-  onedrive: { label: 'OneDrive',     icone: '🗂️', bg: '#E9F1FB', fg: '#0A4FB4' },
-  notion:   { label: 'Notion',       icone: '📝', bg: '#F1F0EE', fg: '#37352F' },
-  autre:    { label: 'Lien',         icone: '🔗', bg: '#F1ECE1', fg: 'var(--c-texte-doux)' },
+const FOURNISSEURS: Record<string, { label: string; bg: string; fg: string }> = {
+  google:   { label: 'Google Drive', bg: '#E8F0FE', fg: '#1A56C4' },
+  icloud:   { label: 'iCloud Drive', bg: '#EAF4FF', fg: '#0A84C2' },
+  dropbox:  { label: 'Dropbox',      bg: '#E8F1FE', fg: '#0061FF' },
+  onedrive: { label: 'OneDrive',     bg: '#E9F1FB', fg: '#0A4FB4' },
+  notion:   { label: 'Notion',       bg: '#F1F0EE', fg: '#37352F' },
+  autre:    { label: 'Lien',         bg: '#F1ECE1', fg: 'var(--c-texte-doux)' },
 }
 
 // Devine le fournisseur à partir de l'URL.
@@ -151,7 +151,6 @@ export default function DrivePage() {
       {/* ───────── Google Drive (connexion + navigation) ───────── */}
       <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 20, marginBottom: 26 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: gConnecte ? 16 : 6 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 6, background: '#E8F0FE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📁</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 15, fontWeight: 700 }}>Google Drive</div>
             <div style={{ fontSize: 12.5, color: 'var(--c-annotation)' }}>
@@ -208,7 +207,6 @@ export default function DrivePage() {
                   const dossier = f.mimeType === DOSSIER_MIME
                   return (
                     <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderTop: i > 0 ? '1px solid #F5EEE0' : 'none' }}>
-                      <span style={{ fontSize: 18 }}>{dossier ? '📁' : '📄'}</span>
                       {dossier ? (
                         <button onClick={() => ouvrirDossier(f)} style={{
                           flex: 1, textAlign: 'left', border: 'none', background: 'transparent', cursor: 'pointer',
@@ -245,7 +243,7 @@ export default function DrivePage() {
               onKeyDown={e => { if (e.key === 'Enter') ajouter() }} style={{ ...champ, paddingRight: apercu ? 132 : 14 }} />
             {apercu && (
               <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', fontSize: 12, fontWeight: 700, color: apercu.fg, background: apercu.bg, padding: '5px 10px', borderRadius: 999 }}>
-                {apercu.icone} {apercu.label}
+                {apercu.label}
               </span>
             )}
           </div>
@@ -267,7 +265,6 @@ export default function DrivePage() {
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : liens.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
-          <div style={{ fontSize: 30, marginBottom: 8 }}>🗂️</div>
           <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--c-texte-doux)' }}>Aucun lien pour l&apos;instant.</div>
           <div style={{ fontSize: 13, marginTop: 4 }}>Ajoute le lien partagé de ton dossier de cours ci-dessus.</div>
         </div>
@@ -278,7 +275,6 @@ export default function DrivePage() {
             return (
               <div key={l.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18, display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  <div style={{ width: 42, height: 42, borderRadius: 6, background: f.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icone}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 15, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.titre}</div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: f.fg, marginTop: 2 }}>{f.label}</div>

@@ -113,9 +113,9 @@ export default function MediaPage() {
       description: description.trim() || null, tags,
     })
     setSaving(false)
-    if (error) { afficherMsg('❌ ' + error.message); return }
+    if (error) { afficherMsg('Erreur : ' + error.message); return }
     setTitre(''); setUrl(''); setDescription(''); setTags([]); setFormOuvert(false)
-    afficherMsg('✅ Ajouté')
+    afficherMsg('Ajouté')
     charger()
   }
 
@@ -137,7 +137,6 @@ export default function MediaPage() {
     <div style={{ paddingTop: 34, maxWidth: 860, margin: '0 auto', fontFamily: FONT, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 6, background: ACCENT + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>🎬</div>
           <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 28 }}>Audio & Vidéo</div>
         </div>
         {isAdmin && !tableManquante && !formOuvert && (
@@ -172,16 +171,16 @@ export default function MediaPage() {
             <TagsInput value={tags} onChange={setTags} accent={ACCENT} />
           </div>
           <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)' }}>
-            💡 Sur YouTube, mets la vidéo en <strong>« Non répertoriée »</strong> (pas « Privée » : une vidéo privée ne peut pas être lue ici). Seuls ceux qui ont le lien y accèdent.
+            Sur YouTube, mets la vidéo en <strong>« Non répertoriée »</strong> (pas « Privée » : une vidéo privée ne peut pas être lue ici). Seuls ceux qui ont le lien y accèdent.
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={ajouter} disabled={!titre.trim() || !espaceId || !url.trim() || saving} style={{ height: 44, padding: '0 22px', borderRadius: 6, background: ACCENT, color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: FONT, opacity: (!titre.trim() || !espaceId || !url.trim() || saving) ? 0.5 : 1 }}>{saving ? 'Ajout…' : 'Ajouter'}</button>
             <button onClick={() => setFormOuvert(false)} style={{ height: 44, padding: '0 16px', borderRadius: 6, background: '#FFFEFB', color: 'var(--c-texte-doux)', border: '1.5px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 14, fontWeight: 600, fontFamily: FONT }}>Annuler</button>
           </div>
-          {msg && <div style={{ fontSize: 13, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
+          {msg && <div style={{ fontSize: 13, color: msg.startsWith('Erreur') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
         </div>
       )}
-      {isAdmin && !formOuvert && msg && <div style={{ fontSize: 13, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63', marginBottom: 16 }}>{msg}</div>}
+      {isAdmin && !formOuvert && msg && <div style={{ fontSize: 13, color: msg.startsWith('Erreur') ? 'var(--c-accent)' : '#0E7C63', marginBottom: 16 }}>{msg}</div>}
 
       {/* Filtre matière */}
       {matieres.length > 0 && (

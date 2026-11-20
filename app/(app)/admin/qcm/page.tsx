@@ -135,7 +135,7 @@ export default function AdminQcmPage() {
     setSaving(false)
     const j = await res.json().catch(() => ({}))
     if (!res.ok) { setMsg({ type: 'err', texte: j.error || 'Erreur' }); return }
-    setMsg({ type: 'ok', texte: `QCM enregistré (${j.nb} questions) ✅` })
+    setMsg({ type: 'ok', texte: `QCM enregistré (${j.nb} questions)` })
     setTitre(''); setMatiere(''); setTags([]); setBrut(''); setQuestions([]); setQuestionsLibre([]); setTypeImport('choix'); chargerListe()
   }
 
@@ -180,7 +180,7 @@ export default function AdminQcmPage() {
           <button onClick={() => fileRef.current?.click()} style={{
             height: 44, padding: '0 20px', border: '1px solid var(--c-filet-fort)', borderRadius: 6, background: 'var(--c-papier-teinte)',
             color: '#5C4A22', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: font, whiteSpace: 'nowrap',
-          }}>📄 Importer un fichier HTML</button>
+          }}>Importer un fichier HTML</button>
           <input ref={fileRef} type="file" accept=".html,.htm,.txt,text/html,text/plain" style={{ display: 'none' }}
             onChange={e => importerFichier(e.target.files?.[0] || null)} />
         </div>

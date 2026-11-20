@@ -65,7 +65,7 @@ export default function AdminRemarques() {
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : visibles.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
-          {filtre === 'nouveau' ? 'Aucune remarque à traiter. 🎉' : 'Aucune remarque pour l’instant.'}
+          {filtre === 'nouveau' ? 'Aucune remarque à traiter.' : 'Aucune remarque pour l’instant.'}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>

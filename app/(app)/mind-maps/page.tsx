@@ -6,7 +6,6 @@ export default function MindMapsPage() {
     <OutilContenu
       table="mindmaps"
       accent="#2DAE83"
-      icone="🧠"
       titre="Mind maps"
       description="Cartes mentales et schémas de synthèse, classés par matière (#)."
       lienLabel="Lien vers l'image / le PDF"

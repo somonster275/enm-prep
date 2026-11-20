@@ -37,7 +37,7 @@ export default function AdminDefiPage() {
     setSaving(false)
     const json = await res.json().catch(() => ({}))
     if (!res.ok) { setMsg({ type: 'err', texte: json.error || 'Erreur' }); return }
-    setMsg({ type: 'ok', texte: 'Défi de la semaine mis à jour ✅' })
+    setMsg({ type: 'ok', texte: 'Défi de la semaine mis à jour' })
   }
 
   const font = "var(--font-texte)"
@@ -60,8 +60,8 @@ export default function AdminDefiPage() {
       <p style={{ fontSize: 14.5, color: 'var(--c-annotation)', margin: '8px 0 22px' }}>Choisis le défi qui s&apos;affiche aux étudiants sur la page Classement.</p>
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-        {carteType('fiches', '🎯 Fiches révisées', 'Objectif chiffré, mesuré automatiquement, avec barre de progression et classement.')}
-        {carteType('libre', '✍️ Défi libre', 'Un défi de ton choix (rédiger un cas pratique, ficher un chapitre…), affiché comme une annonce.')}
+        {carteType('fiches', 'Fiches révisées', 'Objectif chiffré, mesuré automatiquement, avec barre de progression et classement.')}
+        {carteType('libre', 'Défi libre', 'Un défi de ton choix (rédiger un cas pratique, ficher un chapitre…), affiché comme une annonce.')}
       </div>
 
       <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>

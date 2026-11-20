@@ -43,7 +43,7 @@ export default function AstucesFiche({ ficheId, uid, auteur, isAdmin }: { ficheI
   return (
     <div style={{ marginTop: 12, borderTop: '1px solid #F5EEE0', paddingTop: 10 }}>
       <button onClick={toggle} style={{ background: 'none', border: 'none', color: '#8A5A10', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', padding: 0, fontFamily: FONT }}>
-        💡 Astuces{open ? '' : (items !== null && n ? ` (${n})` : '')} {open ? '▴' : '▾'}
+        Astuces{open ? '' : (items !== null && n ? ` (${n})` : '')} {open ? '▴' : '▾'}
       </button>
 
       {open && (
@@ -56,7 +56,6 @@ export default function AstucesFiche({ ficheId, uid, auteur, isAdmin }: { ficheI
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
               {items.map(a => (
                 <div key={a.id} style={{ display: 'flex', gap: 8, background: 'var(--c-papier-chaud)', border: '1px solid #F2D9A0', borderRadius: 6, padding: '8px 10px' }}>
-                  <span style={{ flexShrink: 0 }}>💡</span>
                   <div style={{ flex: 1, fontSize: 13, lineHeight: 1.45, color: '#3A3226' }}>
                     {a.texte}
                     <span style={{ color: 'var(--c-discret)', fontSize: 11, marginLeft: 6 }}>— {a.auteur || 'Étudiant'}</span>

@@ -180,11 +180,11 @@ function CoursContenu() {
 
       {/* Remarque (comme pour les fiches) */}
       <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18 }}>
-        <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>💬 Une remarque sur ce cours ?</div>
+        <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Une remarque sur ce cours ?</div>
         <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginBottom: 10 }}>Erreur, passage peu clair, question… ton retour est envoyé à l&apos;équipe.</div>
         {remarqueOk ? (
           <div style={{ background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 6, padding: '12px 14px', fontSize: 13.5, color: '#0E5A47' }}>
-            ✅ Merci, ta remarque a bien été envoyée.
+            Merci, ta remarque a bien été envoyée.
             <button onClick={() => setRemarqueOk(false)} style={{ marginLeft: 10, background: 'none', border: 'none', color: '#0F6E56', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>En ajouter une autre</button>
           </div>
         ) : (
@@ -226,7 +226,7 @@ function CoursContenu() {
             )}
           </div>
           <label style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', borderRadius: 6, border: `1.5px dashed ${fichier ? 'var(--c-accent)' : 'var(--c-filet-fort)'}`, background: fichier ? '#FFF4F2' : 'var(--c-papier)', color: fichier ? 'var(--c-accent)' : 'var(--c-annotation)', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}>
-            {fichier ? `📎 ${fichier.name}` : 'Choisir un fichier (PDF ou Word)…'}
+            {fichier ? fichier.name : 'Choisir un fichier (PDF ou Word)…'}
             <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style={{ display: 'none' }}
               onChange={e => setFichier(e.target.files?.[0] || null)} />
           </label>
@@ -255,15 +255,13 @@ function CoursContenu() {
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : visibles.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
-          <div style={{ fontSize: 30, marginBottom: 8 }}>📘</div>Aucun cours pour l&apos;instant.
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>Aucun cours pour l&apos;instant.
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
           {visibles.map(c => (
             <div key={c.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18, display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                <span style={{ width: 40, height: 40, borderRadius: 6, background: estPdf(c) ? '#FCEEEA' : '#E8F0FE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{estPdf(c) ? '📕' : '📘'}</span>
                 {c.matiere && <span style={{ fontSize: 11.5, fontWeight: 600, color: '#8A5A10', background: '#FCEFD3', padding: '2px 9px', borderRadius: 999 }}>{c.matiere}</span>}
                 {isAdmin && <button onClick={() => supprimer(c.id)} title="Supprimer" style={{ marginLeft: 'auto', border: 'none', background: 'transparent', color: 'var(--c-discret-clair)', cursor: 'pointer', fontSize: 14 }}>✕</button>}
               </div>

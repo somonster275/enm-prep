@@ -114,7 +114,7 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
             if (obj.token) reponse += obj.token
             if (obj.error) reponse = ''
             if (obj.token) setMessages(m => { const c = [...m]; c[c.length - 1] = { ...c[c.length - 1], contenu: c[c.length - 1].contenu + obj.token }; return c })
-            if (obj.error) setMessages(m => { const c = [...m]; c[c.length - 1] = { ...c[c.length - 1], contenu: '⚠️ ' + obj.error }; return c })
+            if (obj.error) setMessages(m => { const c = [...m]; c[c.length - 1] = { ...c[c.length - 1], contenu: 'Erreur : ' + obj.error }; return c })
           } catch { /* ligne SSE incomplète : ignorée */ }
         }
       }
@@ -159,7 +159,7 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
                 </div>
                 {taches.length > 0 && (
                   <div style={{ background: 'var(--c-papier-chaud)', border: '1px solid #F2D9A0', borderRadius: 6, padding: '10px 12px' }}>
-                    <div style={{ fontSize: 11.5, fontWeight: 700, color: '#8A5A10', marginBottom: 8 }}>📝 Tâches proposées</div>
+                    <div style={{ fontSize: 11.5, fontWeight: 700, color: '#8A5A10', marginBottom: 8 }}>Tâches proposées</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {taches.map((t, j) => {
                         const cle = `${i}-${j}`

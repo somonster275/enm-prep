@@ -66,7 +66,7 @@ export default function EntraidePage() {
     }, { onConflict: 'user_id' })
     setSaving(false)
     if (error) { setMsg({ type: 'err', texte: error.message }); return }
-    setMsg({ type: 'ok', texte: 'Ta fiche d’entraide est publiée ✅' })
+    setMsg({ type: 'ok', texte: 'Ta fiche d’entraide est publiée' })
     setFormOuvert(false)
     charger()
   }
@@ -142,7 +142,6 @@ export default function EntraidePage() {
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : liste.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
-          <div style={{ fontSize: 30, marginBottom: 8 }}>🤝</div>
           <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--c-texte-doux)' }}>Personne pour l&apos;instant.</div>
           <div style={{ fontSize: 13, marginTop: 4 }}>Sois le premier à proposer ton aide !</div>
         </div>

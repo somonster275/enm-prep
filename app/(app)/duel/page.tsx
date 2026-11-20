@@ -136,8 +136,8 @@ export default function DuelAccueil() {
         {/* Type de duel : temps réel (ensemble, live) ou asynchrone (chacun sous 48 h) */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
           {([
-            { k: 'live', t: '⚡ Temps réel', d: 'Ensemble, en direct' },
-            { k: 'async', t: '🕒 Asynchrone', d: 'Chacun joue sous 48 h' },
+            { k: 'live', t: 'Temps réel', d: 'Ensemble, en direct' },
+            { k: 'async', t: 'Asynchrone', d: 'Chacun joue sous 48 h' },
           ] as const).map(o => (
             <button key={o.k} onClick={() => setMode(o.k)} style={{
               flex: '1 1 200px', textAlign: 'left', cursor: 'pointer', fontFamily: FONT,

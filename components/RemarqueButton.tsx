@@ -38,7 +38,7 @@ export default function RemarqueButton({ ficheId, style }: { ficheId: string; st
           border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: FONT,
           whiteSpace: 'nowrap', ...style,
         }}>
-        💬 Faire une remarque
+        Faire une remarque
       </button>
 
       {open && (
@@ -46,7 +46,6 @@ export default function RemarqueButton({ ficheId, style }: { ficheId: string; st
           <div onClick={e => { e.stopPropagation() }} role="dialog" aria-modal="true" aria-label="Signaler une remarque sur la fiche" style={{ background: '#FFFEFB', borderRadius: 6, padding: 24, width: '100%', maxWidth: 460, fontFamily: FONT, color: 'var(--c-encre)', boxShadow: '0 24px 60px -30px rgba(40,30,20,.5)' }}>
             {statut === 'ok' ? (
               <div style={{ textAlign: 'center', padding: '8px 0' }}>
-                <div style={{ fontSize: 30, marginBottom: 6 }}>✅</div>
                 <div style={{ fontWeight: 800, fontSize: 17 }}>Remarque envoyée !</div>
                 <div style={{ fontSize: 13.5, color: 'var(--c-annotation)', marginTop: 6 }}>L&apos;administrateur la verra et en tiendra compte si besoin. Merci !</div>
                 <button onClick={fermer} style={{ marginTop: 18, height: 44, padding: '0 24px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>Fermer</button>

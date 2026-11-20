@@ -85,13 +85,13 @@ export default function CorbeillePage() {
     if (!(await ecrire(supabase.from('modules').update({ deleted_at: null, ...(parentActif ? {} : { parent_id: null }) }).eq('id', mod.id).select('id')))) return
     if (ids.length > 1) await supabase.from('modules').update({ deleted_at: null }).in('id', ids.slice(1))
     if (!(await ecrire(supabase.from('fiches').update({ deleted_at: null }).in('module_id', ids).select('id'), { vide: true }))) return
-    afficherMsg('✅ Module restauré')
+    afficherMsg('Module restauré')
     await charger()
   }
 
   const restaurerFiche = async (f: FicheSupprimee) => {
     if (!(await ecrire(supabase.from('fiches').update({ deleted_at: null }).eq('id', f.id).select('id')))) return
-    afficherMsg('✅ Fiche restaurée')
+    afficherMsg('Fiche restaurée')
     await charger()
   }
 
@@ -100,14 +100,14 @@ export default function CorbeillePage() {
     const ids = [mod.id, ...descendantsSupprimes(mod.id)]
     if (!(await ecrire(supabase.from('fiches').delete().in('module_id', ids).select('id'), { vide: true }))) return
     if (!(await ecrire(supabase.from('modules').delete().in('id', ids).select('id')))) return
-    afficherMsg('🗑️ Module supprimé définitivement')
+    afficherMsg('Module supprimé définitivement')
     await charger()
   }
 
   const supprimerDefinitivementFiche = async (f: FicheSupprimee) => {
     if (!confirm('Supprimer DÉFINITIVEMENT cette fiche ? Cette action est irréversible.')) return
     if (!(await ecrire(supabase.from('fiches').delete().eq('id', f.id).select('id')))) return
-    afficherMsg('🗑️ Fiche supprimée définitivement')
+    afficherMsg('Fiche supprimée définitivement')
     await charger()
   }
 
@@ -115,7 +115,7 @@ export default function CorbeillePage() {
     if (!confirm('Vider entièrement la corbeille ? Tout sera supprimé définitivement.')) return
     if (!(await ecrire(supabase.from('fiches').delete().not('deleted_at', 'is', null).select('id'), { vide: true }))) return
     if (!(await ecrire(supabase.from('modules').delete().not('deleted_at', 'is', null).select('id'), { vide: true }))) return
-    afficherMsg('🗑️ Corbeille vidée')
+    afficherMsg('Corbeille vidée')
     await charger()
   }
 
@@ -150,12 +150,11 @@ export default function CorbeillePage() {
       </p>
 
       {msg && (
-        <div style={{ fontSize: 13, padding: '10px 14px', borderRadius: 6, marginBottom: 16, color: msg.startsWith('🗑️') ? 'var(--c-accent)' : '#0E7C63', background: msg.startsWith('🗑️') ? 'var(--c-accent-pale)' : '#DDF3EE' }}>{msg}</div>
+        <div style={{ fontSize: 13, padding: '10px 14px', borderRadius: 6, marginBottom: 16, color: /supprim|vidée/.test(msg) ? 'var(--c-accent)' : '#0E7C63', background: /supprim|vidée/.test(msg) ? 'var(--c-accent-pale)' : '#DDF3EE' }}>{msg}</div>
       )}
 
       {vide ? (
         <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--c-annotation-clair)' }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>🗑️</div>
           <div style={{ fontSize: 15 }}>La corbeille est vide.</div>
         </div>
       ) : (

@@ -44,7 +44,6 @@ export default function CarnetPage() {
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : items.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
-          <div style={{ fontSize: 30, marginBottom: 8 }}>✅</div>
           <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--c-texte-doux)' }}>Ton carnet est vide.</div>
           <div style={{ fontSize: 13, marginTop: 4 }}>Tu n&apos;as rien raté récemment — continue comme ça !</div>
         </div>

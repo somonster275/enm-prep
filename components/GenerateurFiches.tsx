@@ -23,7 +23,7 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
   const champ: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 6, border: '1.5px solid var(--c-filet-fort)', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: 'var(--c-papier)', outline: 'none' }
 
   const generer = async () => {
-    if (!texte.trim()) { setMsg('❌ Indique un sujet ou colle un texte de cours.'); return }
+    if (!texte.trim()) { setMsg('Erreur : indique un sujet ou colle un texte de cours.'); return }
     setLoading(true); setMsg(''); setItems([])
     const res = await fetch('/api/ia/generer-fiches', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -31,7 +31,7 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
     })
     const json = await res.json().catch(() => ({}))
     setLoading(false)
-    if (!res.ok) { setMsg('❌ ' + (json.error || 'Erreur de génération')); return }
+    if (!res.ok) { setMsg('Erreur : ' + (json.error || 'génération impossible')); return }
     setItems((json.fiches || []).map((f: { question: string; reponse: string }) => ({ ...f, selected: true })))
   }
 
@@ -40,15 +40,15 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
 
   const ajouter = async () => {
     const choisies = items.filter(it => it.selected && it.question.trim() && it.reponse.trim())
-    if (choisies.length === 0) { setMsg('❌ Aucune fiche sélectionnée.'); return }
+    if (choisies.length === 0) { setMsg('Erreur : aucune fiche sélectionnée.'); return }
     setSaving(true); setMsg('')
     const rows = choisies.map(c => ({ module_id: moduleId, question: c.question.trim(), reponse: c.reponse.trim() }))
     const { data, error } = await supabase.from('fiches').insert(rows).select()
     setSaving(false)
-    if (error) { setMsg('❌ ' + error.message); return }
+    if (error) { setMsg('Erreur : ' + error.message); return }
     onAjoutees((data as Fiche[]) || [])
     setItems([]); setTexte('')
-    setMsg(`✅ ${rows.length} fiche${rows.length > 1 ? 's' : ''} ajoutée${rows.length > 1 ? 's' : ''} au module.`)
+    setMsg(`${rows.length} fiche${rows.length > 1 ? 's' : ''} ajoutée${rows.length > 1 ? 's' : ''} au module.`)
     setTimeout(() => setMsg(''), 4000)
   }
 
@@ -56,7 +56,6 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
     <div style={{ background: 'var(--c-papier-chaud)', border: '1px solid #F2D9A0', borderRadius: 6, padding: '1.1rem 1.25rem', marginBottom: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} {...activable} aria-expanded={ouvert} onClick={() => setOuvert(o => !o)}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-          <span style={{ fontSize: 18 }}>✨</span>
           <span style={{ fontWeight: 700, fontSize: 14.5, color: '#8A5A10' }}>Générer des fiches avec l&apos;IA</span>
         </div>
         <span style={{ color: 'var(--c-discret)', fontSize: 13 }}>{ouvert ? '▲' : '▼'}</span>
@@ -78,7 +77,7 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
             </button>
           </div>
 
-          {msg && <div style={{ fontSize: 13, marginBottom: 10, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
+          {msg && <div style={{ fontSize: 13, marginBottom: 10, color: msg.startsWith('Erreur') ? 'var(--c-accent)' : '#0E7C63' }}>{msg}</div>}
 
           {items.length > 0 && (
             <div>

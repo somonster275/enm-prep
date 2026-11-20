@@ -106,7 +106,7 @@ export default function RichEditor({ value, onChange, placeholder, minHeight = 1
 
         <Btn onClick={() => cmd('insertUnorderedList')} title="Liste à puces">≔</Btn>
         <Btn onClick={() => cmd('insertOrderedList')} title="Liste numérotée">1.</Btn>
-        <Btn onClick={() => fileRef.current?.click()} title="Insérer une image">🖼️</Btn>
+        <Btn onClick={() => fileRef.current?.click()} title="Insérer une image">Image</Btn>
         <Btn onClick={() => cmd('removeFormat')} title="Effacer la mise en forme">⌫</Btn>
 
         <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }}

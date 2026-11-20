@@ -69,8 +69,7 @@ export default function AdminContributions() {
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : visibles.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
-          <div style={{ fontSize: 30, marginBottom: 8 }}>📭</div>Aucune proposition {filtre === 'nouveau' ? 'à traiter' : ''}.
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>Aucune proposition {filtre === 'nouveau' ? 'à traiter' : ''}.
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -79,7 +78,6 @@ export default function AdminContributions() {
             return (
               <div key={c.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 18 }}>{c.type === 'qcm' ? '✅' : '📇'}</span>
                   <span style={{ fontWeight: 800, fontSize: 15 }}>{c.titre || (c.type === 'qcm' ? 'QCM' : 'Fiche')}</span>
                   <span style={{ fontSize: 11.5, fontWeight: 700, color: s.c, background: s.bg, borderRadius: 999, padding: '3px 10px' }}>{s.t}</span>
                   <span style={{ flex: 1 }} />
@@ -102,7 +100,7 @@ export default function AdminContributions() {
                             <div key={oi} style={{ color: o.c ? '#0E5A47' : '#5C5448', fontWeight: o.c ? 700 : 400 }}>{o.c ? '✓' : '•'} {o.t}</div>
                           ))}
                         </div>
-                        {q.explication && <div style={{ marginTop: 6, fontSize: 12.5, color: 'var(--c-texte-doux)' }}>💡 {q.explication}</div>}
+                        {q.explication && <div style={{ marginTop: 6, fontSize: 12.5, color: 'var(--c-texte-doux)' }}>{q.explication}</div>}
                       </div>
                     ))}
                   </div>
