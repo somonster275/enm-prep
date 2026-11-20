@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 39).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 40).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,13 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 40) — Questions base ENM sans réponse : migration 0045
+- Cause probable : 0044 a réécrit `match_cours_chunks` en plpgsql ; `RETURN QUERY` exige des types exacts et
+  `cours_documents.nom` / `cours_chunks.contenu` (tables d'avant les migrations) peuvent être en varchar →
+  « structure of query does not match function result type » à chaque question (reproduit en local).
+- **Migration `0045_match_cours_types.sql`** : mêmes requête + set_config, colonnes castées (`::text`, `::uuid`, `::float`).
+- `cours-ia` affiche maintenant le message d'erreur du serveur (et le code HTTP) au lieu d'un texte générique.
 
 ### 2026-11-20 (suite 39) — Reste du scan ECC (code) + migration 0044 (index, exécutée)
 - Serveur : `lib/fetch-public.ts` (IP résolue + redirections revérifiées) pour actualités, planning, import QCM ;

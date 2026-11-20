@@ -187,7 +187,9 @@ export default function CoursIAPage() {
     }
 
     if (!res.ok || !res.body) {
-      setMessages(m => { const next = [...m, { role: 'assistant' as const, contenu: "Erreur lors de la connexion à l'IA.", ts: Date.now() }]; sauvegarderDansLS(mode, userId, next); return next })
+      const json = await res.json().catch(() => ({}))
+      const contenu = '⚠️ ' + (json.error || `Erreur lors de la connexion à l'IA (${res.status}).`)
+      setMessages(m => { const next = [...m, { role: 'assistant' as const, contenu, ts: Date.now() }]; sauvegarderDansLS(mode, userId, next); return next })
       setLoading(false); setPhase('idle'); abortRef.current = null
       return
     }
