@@ -14,3 +14,11 @@
   avant `create policy`) et garder le code résilient tant qu'elles ne sont pas passées. Toujours donner
   le SQL à copier à l'utilisateur.
 - Échanger avec l'utilisateur en français.
+
+## graphify (graphe du code)
+
+- Le graphe du projet est construit au démarrage de chaque session cloud dans `graphify-out/` (ignoré par git).
+- Pour une question d'architecture ou une modification qui touche plusieurs parties de l'application, consulter
+  d'abord le graphe (`graphify query "<question>"`, `graphify path "A" "B"`, `graphify explain "X"`).
+  Pour une recherche ciblée, chercher directement dans le code.
+- Après une modification de code, lancer `graphify update .` (local, sans coût) si le graphe a servi dans la session.

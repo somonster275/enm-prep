@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 21).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 22).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,19 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 22) — graphify branché automatiquement sur le projet
+- **graphify** (github.com/Graphify-Labs/graphify, paquet PyPI `graphifyy[sql]`) : graphe de connaissances du
+  code (AST local, sans LLM, ~10 s, 847 nœuds incl. migrations SQL). **Mode léger choisi** : une courte consigne
+  dans `CLAUDE.md` (graphe pour les questions d'architecture / transverses, grep pour le ciblé), **pas de hooks**.
+  Mesure faite : sur 170 fichiers, une `graphify query` coûte ~1 600 tokens contre ~100 pour un grep ciblé, donc le
+  mode imposé (hooks PreToolUse via `graphify claude install`) était contre-productif. À réactiver quand le code
+  aura beaucoup grossi (plusieurs centaines de fichiers). `graphify-out/` est dans `.gitignore`.
+- **Environnement cloud « Default »** : script de démarrage qui installe graphify, enregistre le skill utilisateur
+  et lance `graphify update .` dans `enm-prep` (en `|| true`, n'empêche jamais le démarrage).
+- Skills **ponytail** importés sur le compte claude.ai (pas dans le repo, à la demande du user).
+- Tentative de Claude Code en local sur le Mac abandonnée (app desktop trop ancienne pour les modèles récents) :
+  on reste en sessions cloud.
 
 ### 2026-11-20 (suite 21) — Reprise après 4 mois : sécurité, Supabase, modèle Claude, verrou contributions
 **État constaté** : aucun commit depuis le 5 juillet ; build OK. **Projet Supabase en PAUSE** (plan gratuit,
