@@ -38,6 +38,11 @@ export async function POST(req: NextRequest) {
     admin.from('match_solutions').select('*').eq('match_id', m.id).maybeSingle(),
     admin.from('match_reponses').select('*').eq('match_id', m.id).eq('user_id', user.id),
   ])
+  // Async : pas d'horloge commune, donc on exige que CE joueur ait répondu à tout,
+  // sinon il obtiendrait les bonnes réponses avant de jouer.
+  if (m.mode === 'async' && (reps || []).length < total) {
+    return NextResponse.json({ error: 'Termine ta partie pour voir la correction' }, { status: 409 })
+  }
   const solutions: number[][] = sol?.solutions || []
   const origines: Origine[] = sol?.origines || []
   const optionsFull: string[][] = sol?.options_full || []

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { extraireTexte } from '@/lib/extraire-texte'
 import type { Espace } from '@/types'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -123,12 +124,14 @@ export default function CoursIAPage() {
   const importerDoc = async () => {
     if (!fichier) return
     setUploading(true)
-    const form = new FormData()
-    form.append('fichier', fichier)
-    if (mode === 'officiel' && espaceDoc) form.append('espace_id', espaceDoc)
-    form.append('portee', mode)
-    const res = await fetch('/api/cours/upload', { method: 'POST', body: form })
-    const json = await res.json()
+    let texte: string
+    try { texte = await extraireTexte(fichier) }
+    catch (e) { setUploading(false); affMsg('❌ ' + (e instanceof Error ? e.message : String(e))); return }
+    const res = await fetch('/api/cours/upload', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nom: fichier.name, texte, espace_id: mode === 'officiel' ? espaceDoc || null : null, portee: mode }),
+    })
+    const json = await res.json().catch(() => ({ error: res.status === 413 ? 'Document trop long' : 'Envoi impossible' }))
     setUploading(false)
     if (!res.ok) { affMsg('❌ ' + json.error); return }
     affMsg(`✅ ${json.chunks} passages indexés`)
