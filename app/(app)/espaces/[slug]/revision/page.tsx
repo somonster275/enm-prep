@@ -255,6 +255,7 @@ export default function RevisionPage() {
       setTimeout(() => setToast(null), 4000)
       return
     }
+    enregistrerActivite(userId, -1) // retire la carte annulée de l'activité du jour (série, objectif, classement)
     if (etaitNouvelle) marquerNouvellesVues(-1) // recrédite la nouvelle carte annulée
     setProgressions(prev => { const c = { ...prev }; if (prevProg) c[ficheId] = prevProg; else delete c[ficheId]; return c })
     setSessionStats(s => { const n = [...s]; if (n[bouton] > 0) n[bouton]--; return n })
