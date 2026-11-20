@@ -120,7 +120,8 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   QCM alors que `qcm_delete` vise l'admin seul ; `matchs_update` laisse l'hôte modifier son match (statut, horaires) ;
   les bonnes réponses d'un duel restent lisibles par un tricheur dans `fiches` / `qcm_questions` (révision libre) ;
   4 policies redondantes sur `progression` (dont `progression_own`, rôle public, qui couvre aussi DELETE).
-- Pas encore vérifié : tables dont le RLS serait DÉSACTIVÉ (absentes de pg_policies) et policies du Storage.
+- Vérifié par le user : aucune table `public` sans RLS (`pg_tables … not rowsecurity` → 0 ligne).
+  Reste non vérifié : policies du Storage (buckets `cours`, `medias`, `mindmaps`, `qcm`).
 
 ### 2026-11-20 (suite 35) — Audit v3 : les 7 points restants
 - **Premiers tests du projet** : `npm test` (`tsx --test tests/*.test.ts`, `tsx` en devDependency) — paliers et
