@@ -110,7 +110,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 ## Journal des sessions
 
 ### 2026-11-20 (suite 38) — Migration 0043 (durcissements scan ECC) + route /api/duel/lancer
-- **Migration `0043_durcissement_scan_ecc.sql`** (à exécuter APRÈS le déploiement du code) : supprime la policy
+- **Migration `0043_durcissement_scan_ecc.sql`** (exécutée par le user, avant le déploiement du code : lancement de duel cassé quelques minutes) : supprime la policy
   `matchs_update` ; `revoke execute` de `nom_affichage` aux clients (les triggers SECURITY DEFINER l'appellent toujours) ;
   `incr_nouvelles` borné (-1/+1, J-1..J+1) ; doublons `activite_jours` fusionnés + index unique `(utilisateur_id, jour)`
   et `incr_activite` en `on conflict`. Testée deux fois de suite sur Postgres 16 local avec auth.uid() simulé.
