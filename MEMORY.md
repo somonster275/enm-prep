@@ -126,6 +126,10 @@ compte propriétaire du projet `hoduewjiaowlvhkngoum` (sinon écran « Create an
   message explicite (stream) ou erreur (chatIA). Pas de `temperature`/prefill dans le code (tous deux refusés).
 - **Contributions verrouillées** : migration **`0036_contributions_verrou.sql`** retire la policy `contrib_insert`
   → insertion UNIQUEMENT via `/api/contributions` (service_role), qui applique **10 propositions / 24 h**.
+- ⚠️ **Deux projets Vercel nommés `enm-prep`** : celui qui sert codexprepa.com est relié à GitHub (déploiement auto
+  sur push `main`, coche verte sur le commit `795fe2b` du 2026-11-20). L'autre (équipe « somonster275's… », Hobby)
+  n'a que 4 déploiements CLI du 18 mai : **obsolète, à ne pas confondre** (suppression conseillée). Pour retrouver
+  le bon : icône de statut d'un commit sur GitHub → Details « Vercel ».
 - Reste côté user : crédits API (Anthropic/Voyage/DeepSeek), `CHATBOT_PROVIDER=anthropic` sur Vercel (RGPD
   DeepSeek), relancer les étudiants, enrichir la base ENM, revoir les 3 admins. Le user veut une copie locale :
   `git clone`/`git pull` sur son Mac (les secrets ne sont pas dans Git → `vercel env pull .env.local`).
