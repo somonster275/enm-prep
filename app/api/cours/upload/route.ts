@@ -22,26 +22,8 @@ function chunker(texte: string, taille = 800, chevauchement = 100): string[] {
   return chunks.filter(c => c.length > 30)
 }
 
-async function extraireTexte(fichier: File): Promise<string> {
-  const type = fichier.type
-  if (type === 'text/plain' || fichier.name.endsWith('.txt')) {
-    return fichier.text()
-  }
-  if (type === 'application/pdf' || fichier.name.endsWith('.pdf')) {
-    const { extractText } = await import('unpdf')
-    const buf = new Uint8Array(await fichier.arrayBuffer())
-    return await extractText(buf, { mergePages: true }).then(r => r.text)
-  }
-  const isDocx = type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || fichier.name.endsWith('.docx')
-  const isDoc = type === 'application/msword' || fichier.name.endsWith('.doc')
-  if (isDocx || isDoc) {
-    const mammoth = await import('mammoth')
-    const buf = Buffer.from(await fichier.arrayBuffer())
-    const result = await mammoth.extractRawText({ buffer: buf })
-    return result.value
-  }
-  throw new Error(`Format non supporté : ${type || fichier.name}`)
-}
+// Texte maximal accepté (le corps de requête Vercel est limité à 4,5 Mo).
+const TEXTE_MAX = 4_000_000
 
 export async function POST(request: NextRequest) {
   // --- Identité (session/cookies, jamais le user_id fourni par le client) ---
@@ -53,24 +35,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Clé service role manquante' }, { status: 500 })
   }
 
-  const form = await request.formData()
-  const fichier = form.get('fichier') as File | null
-  const espaceId = (form.get('espace_id') as string) || null
-  const portee = (form.get('portee') as string) === 'personnel' ? 'personnel' : 'officiel'
+  // Le texte est extrait dans le navigateur (lib/extraire-texte.ts) : seul le texte arrive ici.
+  const body = await request.json().catch(() => ({}))
+  const nom = String(body.nom || '').trim().slice(0, 200)
+  const texte = typeof body.texte === 'string' ? body.texte : ''
+  const espaceId = typeof body.espace_id === 'string' && body.espace_id ? body.espace_id : null
+  const portee = body.portee === 'personnel' ? 'personnel' : 'officiel'
 
-  if (!fichier) return NextResponse.json({ error: 'Fichier manquant' }, { status: 400 })
+  if (!nom || !texte.trim()) return NextResponse.json({ error: 'Aucun texte extrait du fichier' }, { status: 400 })
+  if (texte.length > TEXTE_MAX) return NextResponse.json({ error: 'Document trop long' }, { status: 413 })
 
   // --- Droits ---
   // La base ENM (officiel) n'est alimentée que par les admins.
   if (portee === 'officiel' && !(await estAdmin(user.id))) {
     return NextResponse.json({ error: 'Réservé aux administrateurs' }, { status: 403 })
-  }
-
-  let texte: string
-  try {
-    texte = await extraireTexte(fichier)
-  } catch (e) {
-    return NextResponse.json({ error: String(e) }, { status: 422 })
   }
 
   const chunks = chunker(texte)
@@ -79,7 +57,7 @@ export async function POST(request: NextRequest) {
   const { data: doc, error: docErr } = await admin
     .from('cours_documents')
     .insert({
-      nom: fichier.name,
+      nom,
       // Un document personnel n'est pas rattaché à une matière ENM.
       espace_id: portee === 'officiel' ? (espaceId || null) : null,
       nb_chunks: chunks.length,

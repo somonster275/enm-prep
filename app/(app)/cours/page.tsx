@@ -2,6 +2,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { televerser as envoyerFichier } from '@/lib/televerser'
 import TagsInput from '@/components/TagsInput'
 import TagsEditeur from '@/components/TagsEditeur'
 
@@ -95,13 +96,10 @@ function CoursContenu() {
     if (!fichier) { setErreur('Choisis un fichier PDF ou Word.'); return }
     setSaving(true)
     try {
-      // 1) Upload du fichier dans le bucket « cours » (route staff, service role).
-      const form = new FormData()
-      form.append('fichier', fichier)
-      form.append('bucket', 'cours')
-      const up = await fetch('/api/storage/upload', { method: 'POST', body: form })
-      const uj = await up.json().catch(() => ({}))
-      if (!up.ok || !uj.url) { setErreur(uj.error || 'Échec de l\'envoi du fichier.'); setSaving(false); return }
+      // 1) Envoi direct du fichier dans le bucket « cours » (adresse signée, route staff).
+      let fichierUrl: string
+      try { fichierUrl = await envoyerFichier(fichier, 'cours') }
+      catch (e) { setErreur(e instanceof Error ? e.message : "Échec de l'envoi du fichier."); setSaving(false); return }
 
       // 2) Enregistrement du cours.
       const nom = fichier.name
@@ -110,7 +108,7 @@ function CoursContenu() {
       const { error } = await supabase.from('cours').insert({
         titre: titre.trim().slice(0, 160), description: description.trim() || null,
         matiere: nomMatiere, espace_id: espaceId || null, module_id: moduleId || null,
-        tags, fichier_url: uj.url, fichier_nom: nom, type, created_by: uid,
+        tags, fichier_url: fichierUrl, fichier_nom: nom, type, created_by: uid,
       })
       if (error) { setErreur(error.message); setSaving(false); return }
       setTitre(''); setDescription(''); setEspaceId(''); setModuleId(''); setTags([]); setFichier(null); setFormOuvert(false)

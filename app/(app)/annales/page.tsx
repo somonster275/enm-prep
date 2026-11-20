@@ -125,7 +125,7 @@ export default function AnnalesPage() {
                 </div>
                 <div style={{ fontSize: 15, fontWeight: 700 }}>{a.titre}</div>
                 <div style={{ fontSize: 12, color: '#9A8D72', marginTop: 3 }}>Partagé par {a.auteur || 'un étudiant'}</div>
-                <a href={a.url} target="_blank" rel="noopener noreferrer" style={{ marginTop: 12, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '1.5px solid #EADFC9', borderRadius: 11, background: '#FFFBF2', color: '#2A2018', fontSize: 13.5, fontWeight: 700, textDecoration: 'none' }}>
+                <a href={/^https?:\/\//i.test(a.url) ? a.url : undefined} target="_blank" rel="noopener noreferrer" style={{ marginTop: 12, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, border: '1.5px solid #EADFC9', borderRadius: 11, background: '#FFFBF2', color: '#2A2018', fontSize: 13.5, fontWeight: 700, textDecoration: 'none' }}>
                   Ouvrir ↗
                 </a>
               </div>

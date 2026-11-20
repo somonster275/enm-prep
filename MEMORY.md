@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 33).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 34).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,27 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 34) — Audit v3 : 5 corrections prioritaires (migration 0041, À EXÉCUTER)
+- Nouvel audit complet (`/ponytail-audit`, 12 constats). Corrigés ici les 5 prioritaires :
+  1. **Lien piégé dans les annales** (XSS : `javascript:` enregistré via l'API REST, exécuté au clic d'un autre
+     utilisateur) : migration **0041** (`check (url ~* '^https?://') not valid`) + la page n'affiche le lien que s'il
+     commence par http(s).
+  2. **Duel asynchrone** : `/api/duel/correction` exige que le joueur ait répondu à toutes les questions (avant :
+     corrigé complet disponible avant de jouer, et progression remise « À revoir »).
+  3. **Coûts IA** : question « Questions de cours » coupée à 2 000 caractères, messages du coach à 4 000, et coach
+     limité à 200 messages / 24 h (`consommer_quota`, action `coach_jour`) en plus des 20 / minute.
+  4. **Fichiers > 4,5 Mo** (limite de corps Vercel) : `lib/televerser.ts` envoie le fichier directement à Supabase
+     Storage via `createSignedUploadUrl` (route `/api/storage/upload` ne renvoie plus qu'une adresse signée) ;
+     « Questions de cours » extrait le texte DANS LE NAVIGATEUR (`lib/extraire-texte.ts`, unpdf + mammoth, testé avec
+     Playwright sur un PDF de 2 pages et un .docx) et `/api/cours/upload` reçoit du JSON (texte ≤ 4 M caractères).
+  5. **Suppression de compte** : efface aussi les documents personnels (`cours_chunks` puis `cours_documents`) ;
+     migration 0041 met `on delete set null` sur `demandes_acces.traite_par` (supprimer un admin échouait).
+- Restent de l'audit v3 : classement tronqué à 1 000 lignes (~140 actifs/semaine), routes `actualites`/`planning` qui
+  vont chercher n'importe quelle URL (cache sans limite), aucun test sur `spaced-repetition`/`streaks`, changement de
+  mot de passe admin sans contrôle de rôle, ordre de suppression d'un utilisateur, repli mort dans
+  `enregistrerActivite`, `@types/dompurify` inutile. Non vérifié : RLS des tables anciennes (`medias`, `mindmaps`…).
+- Piège : `next dev` réécrit le bloc de `AGENTS.md` ; ne pas le committer avec le reste.
 
 ### 2026-11-20 (suite 33) — Matières réservées aux connectés (migration 0040, exécutée par le user)
 - **Migration `0040_espaces_connectes.sql`** : supprime `lecture_espaces` (rôle public, lisible sans compte),

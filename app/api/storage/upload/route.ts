@@ -20,34 +20,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Réservé au staff' }, { status: 403 })
   }
 
-  const form = await request.formData()
-  const fichier = form.get('fichier') as File | null
-  const bucket = form.get('bucket') as string | null
-
-  if (!fichier || !bucket) {
+  // Le fichier ne transite plus par ici : on renvoie une adresse d'envoi signée.
+  const { bucket, nom, taille } = await request.json().catch(() => ({}))
+  if (!bucket || !nom) {
     return NextResponse.json({ error: 'Paramètres manquants' }, { status: 400 })
   }
   // Seuls les buckets applicatifs connus sont autorisés (pas de cible arbitraire).
   if (!['mindmaps', 'medias', 'qcm', 'cours'].includes(bucket)) {
     return NextResponse.json({ error: 'Bucket non autorisé' }, { status: 400 })
   }
-  if (fichier.size > TAILLE_MAX) {
+  if (Number(taille) > TAILLE_MAX) {
     return NextResponse.json({ error: 'Fichier trop volumineux (50 Mo max)' }, { status: 413 })
   }
 
-  const ext = fichier.name.split('.').pop()
+  const ext = String(nom).split('.').pop()?.replace(/[^a-z0-9]/gi, '').slice(0, 10) || 'bin'
   const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-  const buffer = Buffer.from(await fichier.arrayBuffer())
-
-  const { error } = await admin.storage.from(bucket).upload(path, buffer, {
-    contentType: fichier.type,
-    upsert: false,
-  })
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  const { data: signe, error } = await admin.storage.from(bucket).createSignedUploadUrl(path)
+  if (error || !signe) {
+    return NextResponse.json({ error: error?.message || 'Envoi impossible' }, { status: 500 })
   }
 
   const { data } = admin.storage.from(bucket).getPublicUrl(path)
-  return NextResponse.json({ url: data.publicUrl })
+  return NextResponse.json({ path: signe.path, token: signe.token, url: data.publicUrl })
 }

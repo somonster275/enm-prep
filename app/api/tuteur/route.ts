@@ -49,6 +49,13 @@ export async function POST(request: NextRequest) {
     if (ok === false) {
       return NextResponse.json({ error: 'Trop de messages — attends une minute avant de continuer.' }, { status: 429 })
     }
+    // Plafond quotidien : sans lui, 20 messages/minute laissent passer des milliers de messages par jour.
+    const { data: okJour } = await getSupabaseAdmin().rpc('consommer_quota', {
+      p_user: user0.id, p_action: 'coach_jour', p_max: 200, p_fenetre: '24 hours',
+    })
+    if (okJour === false) {
+      return NextResponse.json({ error: "Tu as atteint la limite de 200 messages au coach pour aujourd'hui. Reviens demain." }, { status: 429 })
+    }
   }
 
   // Contexte temps réel : date, compte à rebours, planning ET progression de l'étudiant.
@@ -144,7 +151,7 @@ export async function POST(request: NextRequest) {
     .filter((m: { role?: string; content?: string }) => m && m.content)
     .map((m: { role?: string; content?: string }): Msg => ({
       role: m.role === 'assistant' ? 'assistant' : 'user',
-      content: String(m.content),
+      content: String(m.content).slice(0, 4000), // plafond de taille (coût IA)
     }))
     .slice(-20)
 

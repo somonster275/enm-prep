@@ -27,6 +27,15 @@ export async function POST() {
     del('google_drive_tokens', 'user_id', user.id),
   ])
   if (user.email) await del('demandes_acces', 'email', user.email)
+
+  // Documents importés « Mes documents » : passages (texte intégral) puis documents.
+  const { data: docs } = await admin.from('cours_documents').select('id').eq('created_by', user.id).eq('portee', 'personnel')
+  const docIds = (docs || []).map(d => d.id as string)
+  if (docIds.length) {
+    const { error: e1 } = await admin.from('cours_chunks').delete().in('document_id', docIds)
+    const { error: e2 } = e1 ? { error: e1 } : await admin.from('cours_documents').delete().in('id', docIds)
+    if (e2) return NextResponse.json({ error: 'Suppression des documents impossible, réessaie.' }, { status: 500 })
+  }
   await del('profils', 'id', user.id)
 
   // Supprime le compte d'authentification lui-même.

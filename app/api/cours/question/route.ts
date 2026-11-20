@@ -52,7 +52,9 @@ function messageSSE(message: string): Response {
 }
 
 export async function POST(request: NextRequest) {
-  const { question, espace_id, document_ids, portee: porteeBrut } = await request.json()
+  const { question: questionBrute, espace_id, document_ids, portee: porteeBrut } = await request.json()
+  // Plafond de taille : l'IA est facturée à la longueur du texte envoyé.
+  const question = String(questionBrute || '').slice(0, 2000)
   const portee = porteeBrut === 'personnel' ? 'personnel' : 'officiel'
   const document_ids_array: string[] = Array.isArray(document_ids) && document_ids.length > 0 ? document_ids : []
   if (!question?.trim()) return NextResponse.json({ error: 'Question manquante' }, { status: 400 })

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { televerser } from '@/lib/televerser'
 import type { Espace } from '@/types'
 import TagsInput from '@/components/TagsInput'
 import TagsEditeur from '@/components/TagsEditeur'
@@ -86,13 +87,8 @@ export default function OutilContenu({ table, accent, icone, titre, description,
 
   const uploadFichier = async (): Promise<string | null> => {
     if (!fichier || !bucketStorage) return null
-    const form = new FormData()
-    form.append('fichier', fichier)
-    form.append('bucket', bucketStorage)
-    const res = await fetch('/api/storage/upload', { method: 'POST', body: form })
-    const json = await res.json()
-    if (!res.ok || json.error) { afficherMsg('❌ Upload échoué : ' + (json.error ?? res.statusText)); return null }
-    return json.url as string
+    try { return await televerser(fichier, bucketStorage) }
+    catch (e) { afficherMsg('❌ Upload échoué : ' + (e instanceof Error ? e.message : String(e))); return null }
   }
 
   const ajouter = async () => {
