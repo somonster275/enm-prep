@@ -115,7 +115,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   Requête d'export + mode d'emploi : `supabase/README-schema.md` (à refaire après chaque migration).
 - Constats de l'export : `activite_jours` avait DÉJÀ une clé primaire (utilisateur_id, jour) → l'index unique de 0043
   était inutile ; l'index GIN de 0044 doublait `cours_chunks_to_tsvector_idx`. **Migration `0047_index_doublons.sql`**
-  (à exécuter) les supprime. `pgvector` est installé dans le schéma public (à laisser tel quel).
+  (exécutée par le user) les supprime. `pgvector` est installé dans le schéma public (à laisser tel quel).
 
 ### 2026-11-20 (suite 42) — ECC production-audit + test-coverage
 - **production-audit** (méthode ECC, preuves locales) : 62/100 « risqué ». Bloquants : projet Supabase en plan gratuit
