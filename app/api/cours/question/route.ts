@@ -42,6 +42,38 @@ function scoreMots(question: string, contenu: string): number {
   return tsquery(question).split(' | ').filter(m => c.includes(m.slice(0, -2))).length
 }
 
+// Recherche par mots, classée par pertinence en base (RPC recherche_mots_cours, migration 0046).
+// Tant que 0046 n'est pas passée : requête directe + classement JS sur 40 passages (moins fin).
+async function rechercheMots(
+  admin: ReturnType<typeof getSupabaseAdmin>, question: string, portee: 'officiel' | 'personnel',
+  userId: string | null, espace: string | null, docs: string[] | null,
+): Promise<Extrait[]> {
+  const q = tsquery(question)
+  if (!q) return []
+  const { data, error } = await admin.rpc('recherche_mots_cours', {
+    p_query: q, p_portee: portee, p_user: userId, filtre_espace: espace, filtre_documents: docs, match_count: 8,
+  })
+  if (!error) return ((data || []) as { contenu: string; document_nom: string }[]).map(r => ({ contenu: r.contenu, nom: r.document_nom }))
+  console.warn('recherche_mots_cours indisponible (migration 0046 ?) :', error.message)
+
+  let req = admin.from('cours_chunks')
+    .select('contenu, cours_documents!inner(nom, created_by, portee, espace_id, deleted_at)')
+    .eq('cours_documents.portee', portee)
+    .is('cours_documents.deleted_at', null)
+    .textSearch('contenu', q, { config: 'french' })
+    .limit(40)
+  if (portee === 'personnel') req = req.eq('cours_documents.created_by', userId!)
+  if (espace) req = req.eq('cours_documents.espace_id', espace)
+  if (docs) req = req.in('document_id', docs)
+  const { data: lignes } = await req
+  return ((lignes || []) as { contenu: string; cours_documents: { nom: string } | { nom: string }[] }[])
+    .map(c => {
+      const doc = Array.isArray(c.cours_documents) ? c.cours_documents[0] : c.cours_documents
+      return { contenu: c.contenu, nom: doc?.nom ?? 'Document' }
+    })
+    .sort((a, b) => scoreMots(question, b.contenu) - scoreMots(question, a.contenu)).slice(0, 8)
+}
+
 // Le client lit TOUJOURS un flux SSE (res.body.getReader) : un simple
 // NextResponse.json ne s'afficherait pas. Ce helper renvoie un message
 // « one-shot » au format SSE (sources vides puis un seul token = le message).
@@ -94,50 +126,39 @@ export async function POST(request: NextRequest) {
 
   let extraits: Extrait[] = []
 
+  const filtreDocs = document_ids_array.length > 0 ? document_ids_array : null
+
   if (portee === 'officiel') {
-    // ---- BASE ENM : recherche SÉMANTIQUE (embeddings + pgvector) ----
-    let vecteur: number[]
-    try {
-      vecteur = await embedQuestion(question)
-    } catch (e) {
-      console.error('cours/question embedding:', e)
-      return NextResponse.json({ error: 'Recherche momentanément indisponible, réessaie.' }, { status: 502 })
+    // ---- BASE ENM : recherche HYBRIDE ----
+    // Par le sens (embeddings Voyage) pour les passages déjà indexés, et par les mots pour tous :
+    // un document fraîchement importé est interrogeable avant la fin du calcul des embeddings,
+    // et une limite de débit Voyage ne bloque plus la question.
+    let vecteur: number[] | null = null
+    try { vecteur = await embedQuestion(question) } catch (e) { console.error('cours/question embedding (repli mots):', e) }
+    const [sem, mots] = await Promise.all([
+      vecteur
+        ? admin.rpc('match_cours_chunks', {
+            query_embedding: toVector(vecteur), match_count: 8,
+            filtre_espace: espace_id || null, filtre_documents: filtreDocs,
+          })
+        : Promise.resolve({ data: [], error: null }),
+      rechercheMots(admin, question, 'officiel', null, espace_id || null, filtreDocs),
+    ])
+    if (sem.error) console.error('cours/question sémantique:', sem.error.message)
+    // Garde-fou anti hors-sujet : seuls les passages assez proches sémantiquement.
+    const pertinents = ((sem.data || []) as { contenu: string; document_nom: string; similarite: number }[])
+      .filter(r => (r.similarite ?? 0) >= SEUIL_SIMILARITE)
+      .map(r => ({ contenu: r.contenu, nom: r.document_nom }))
+    const vus = new Set(pertinents.map(e => e.contenu))
+    extraits = [...pertinents, ...mots.filter(e => !vus.has(e.contenu))].slice(0, 8)
+    if (extraits.length === 0) {
+      return messageSSE("Je n'ai pas trouvé d'information pertinente sur cette question dans la base ENM (ou dans les documents sélectionnés). Reformule avec les termes du cours.")
     }
-    const { data, error } = await admin.rpc('match_cours_chunks', {
-      query_embedding: toVector(vecteur),
-      match_count: 8,
-      filtre_espace: espace_id || null,
-      filtre_documents: document_ids_array.length > 0 ? document_ids_array : null,
-    })
-    if (error) { console.error('cours/question:', error.message); return NextResponse.json({ error: 'Erreur serveur, réessaie.' }, { status: 500 }) }
-    const rows = (data || []) as { contenu: string; document_nom: string; similarite: number }[]
-    if (rows.length === 0) {
-      return messageSSE("Je n'ai trouvé aucun passage sur ce sujet dans la base ENM (ou dans les documents sélectionnés).")
-    }
-    // Garde-fou anti hors-sujet : on ne garde que les passages assez proches sémantiquement.
-    const pertinents = rows.filter(r => (r.similarite ?? 0) >= SEUIL_SIMILARITE)
-    if (pertinents.length === 0) {
-      return messageSSE("Je n'ai pas trouvé d'information pertinente sur cette question dans la base ENM. Reformule, ou pose une question couverte par le programme importé.")
-    }
-    extraits = pertinents.map(r => ({ contenu: r.contenu, nom: r.document_nom }))
   } else {
     // ---- MES DOCUMENTS : recherche plein-texte, restreinte à l'étudiant ----
-    const query = tsquery(question)
-    let req = admin
-      .from('cours_chunks')
-      .select('contenu, position, cours_documents!inner(id, nom, created_by, portee)')
-      .eq('cours_documents.portee', 'personnel')
-      .eq('cours_documents.created_by', user!.id)
-      .is('cours_documents.deleted_at', null)
-      .textSearch('contenu', query, { config: 'french' })
-      .limit(40)
-    if (document_ids_array.length > 0) req = req.in('document_id', document_ids_array)
-
-    const { data: chunks } = await req
-
-    // Plus de repli aléatoire : si la recherche ne trouve rien, on NE répond PAS sur
-    // des passages arbitraires (garantie anti hors-sujet). Message adapté au contexte.
-    if (!chunks || chunks.length === 0) {
+    extraits = await rechercheMots(admin, question, 'personnel', user!.id, null, filtreDocs)
+    // Pas de repli aléatoire : rien trouvé = on ne répond pas sur des passages arbitraires.
+    if (extraits.length === 0) {
       const { count } = await admin
         .from('cours_documents')
         .select('id', { count: 'exact', head: true })
@@ -147,17 +168,6 @@ export async function POST(request: NextRequest) {
         : "Je n'ai pas trouvé de passage correspondant à ta question dans tes documents. Reformule ou vérifie que c'est le bon fichier."
       return messageSSE(msg)
     }
-
-    extraits = (chunks || []).map((c: { contenu: string; cours_documents: { nom: string } | { nom: string }[] }) => {
-      const doc = Array.isArray(c.cours_documents) ? c.cours_documents[0] : c.cours_documents
-      return { contenu: c.contenu, nom: doc?.nom ?? 'Document' }
-    }).sort((a, b) => scoreMots(question, b.contenu) - scoreMots(question, a.contenu)).slice(0, 8)
-  }
-
-  if (extraits.length === 0) {
-    return messageSSE(portee === 'personnel'
-      ? "Je n'ai pas trouvé d'information dans tes documents."
-      : "Aucun document de cours n'a encore été importé dans la base ENM.")
   }
 
   // On s'engage à répondre → incrément ATOMIQUE du quota (RPC, migration 0035) : plus de

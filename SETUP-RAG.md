@@ -53,8 +53,13 @@ personnels (`portee = 'personnel'` + `created_by = lui`).
 - **Seuil de pertinence** : sur les 8 passages les plus proches, seuls ceux de similarité
   ≥ 0.4 sont gardés (`SEUIL_SIMILARITE`, `app/api/cours/question/route.ts`) ; `hnsw.ef_search = 200`
   (migration 0044) évite qu'un filtre matière/documents ne vide les résultats.
-- **Mes documents** : recherche plein-texte en « ou » (index GIN, migration 0044), triée en JS par
-  nombre de mots de la question présents ; découpage `lib/chunker.ts` (≈ 800 caractères max).
+- **Recherche hybride (base ENM)** : passages trouvés par le sens (embeddings, seuil 0.4) ET par les mots
+  (`recherche_mots_cours`, plein-texte français classé par `ts_rank_cd`, migration 0046) ; fusion, sens d'abord,
+  8 passages max. Un document est interrogeable par mots dès l'import, avant la fin des embeddings, et une
+  limite de débit Voyage sur la question ne bloque plus la réponse.
+- **Mes documents** : la même recherche par mots, restreinte à l'auteur. Découpage `lib/chunker.ts` (≈ 800 car.).
+- **Indexation** : passages enregistrés à l'import, embeddings calculés ensuite par lots de 32 via
+  `/api/cours/indexer` (bouton « Reprendre »). Offre gratuite Voyage ≈ 10 000 tokens/min : très lent sur un gros document.
 
 ## Ménage (fait le 2026-06-26)
 
