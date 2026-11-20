@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 31).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 32).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,10 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 32) — Révision : double appui ignoré
+- `revision/page.tsx` : `rateCard` et `annuler` enrobés par `verrouille()` (verrou `useRef`, libéré dans un
+  `finally`) : un 2ᵉ appui (clic ou touche 1-4 / Z) pendant l'enregistrement est ignoré, plus de double notation.
 
 ### 2026-11-20 (suite 31) — Classement non falsifiable (migration 0039, exécutée par le user)
 - **Migration `0039_activite_verrou.sql`** (à exécuter par le user) : supprime TOUTES les policies héritées

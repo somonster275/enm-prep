@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase, toutesLesLignes } from '@/lib/supabase'
 import { useParams, useSearchParams } from 'next/navigation'
 import type { Fiche, Progression, Espace, Module } from '@/types'
@@ -197,7 +197,15 @@ export default function RevisionPage() {
   // En dessous de ce seuil, la carte revient dans la session en cours (1 min, 15 min…).
   const SEUIL_REQUEUE = 30 // minutes
 
-  const rateCard = async (bouton: number) => {
+  // Verrou synchrone (un state arriverait trop tard) : un double appui pendant l'enregistrement est ignoré.
+  const enregistrement = useRef(false)
+  const verrouille = <A extends unknown[]>(fn: (...a: A) => Promise<void>) => async (...a: A) => {
+    if (enregistrement.current) return
+    enregistrement.current = true
+    try { await fn(...a) } finally { enregistrement.current = false }
+  }
+
+  const rateCard = verrouille(async (bouton: number) => {
     if (!userId || !deck[idx]) return
     const fiche = deck[idx]
     // Mémorise l'état d'avant pour pouvoir annuler.
@@ -241,10 +249,10 @@ export default function RevisionPage() {
     setFlipped(false)
     if (idx + 1 < deck.length + (requeue ? 1 : 0)) setIdx(i => i + 1)
     else setDone(true)
-  }
+  })
 
   // Annule la dernière note : restaure la progression et revient à la carte.
-  const annuler = async () => {
+  const annuler = verrouille(async () => {
     if (!lastAction || !userId) return
     const { ficheId, prevProg, idxBefore, requeued, bouton, etaitNouvelle } = lastAction
     const { error } = prevProg
@@ -269,7 +277,7 @@ export default function RevisionPage() {
     setDone(false)
     setFlipped(true)
     setLastAction(null)
-  }
+  })
 
   // Raccourcis clavier : Espace/Entrée = retourner, 1-4 = noter, Z = annuler.
   useEffect(() => {
