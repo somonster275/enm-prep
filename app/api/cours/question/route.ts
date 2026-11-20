@@ -116,6 +116,7 @@ export async function POST(request: NextRequest) {
       .select('contenu, position, cours_documents!inner(id, nom, created_by, portee)')
       .eq('cours_documents.portee', 'personnel')
       .eq('cours_documents.created_by', user!.id)
+      .is('cours_documents.deleted_at', null)
       .textSearch('contenu', query, { config: 'french' })
       .limit(8)
     if (document_ids_array.length > 0) req = req.in('document_id', document_ids_array)

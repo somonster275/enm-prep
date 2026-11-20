@@ -139,7 +139,14 @@ export default function CoursIAPage() {
 
   const supprimerDoc = async (id: string) => {
     if (!confirm('Supprimer ce document et tous ses passages ?')) return
-    await supabase.from('cours_documents').update({ deleted_at: new Date().toISOString() }).eq('id', id)
+    const res = await fetch('/api/cours/supprimer', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }),
+    })
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}))
+      affMsg('❌ ' + (json.error || 'Suppression impossible'))
+      return
+    }
     setDocs(d => d.filter(x => x.id !== id))
   }
 

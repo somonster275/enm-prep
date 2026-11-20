@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 23).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 24).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,18 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 24) — Documents personnels réellement privés
+- Migration **0037 exécutée** par le user (vérifié via pg_policies) ; les 3 admins sont légitimes
+  (2 comptes de Théo avec le même email de profil + Nora Caffin).
+- **FUITE corrigée** : `cc_select` / `cd_select` (using true) laissaient tout étudiant connecté lire le TEXTE
+  INTÉGRAL des documents personnels des autres (`cours_chunks`) via l'API REST. **Migration
+  `0038_documents_personnels_prives.sql`** : officiel lisible par tous, personnel par son auteur seul ;
+  `cd_write` / `cc_write` limités à la base officielle (admin/éditeur).
+- Nouvelle route **`/api/cours/supprimer`** : document personnel → suppression DÉFINITIVE par son auteur
+  (passages puis document) ; officiel → corbeille, admin seul. Avant, un lecteur ne pouvait pas supprimer
+  (RLS) et l'échec était silencieux. `/api/cours/question` filtre désormais `deleted_at` en mode personnel.
+- Reste ouvert : `espaces.lecture_espaces` (rôle public, noms des matières seulement, faible enjeu).
 
 ### 2026-11-20 (suite 23) — Audit ponytail + FAILLE profils (élévation en admin) corrigée
 - **Audit complet** (`/ponytail-audit`) : 11 constats, rapport donné au user. Principaux restants à traiter :
