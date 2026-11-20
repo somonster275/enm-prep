@@ -19,7 +19,13 @@ export default function AdminUtilisateurs() {
 
   const [monId, setMonId] = useState('')
 
-  const rechargerUtilisateurs = () => supabase.from('profils').select('*').then(({ data }) => setUtilisateurs(data || []))
+  // Liste via le serveur : le RLS ne laisse un client lire que son propre profil.
+  const rechargerUtilisateurs = async () => {
+    const res = await fetch('/api/admin/utilisateurs')
+    if (!res.ok) return
+    const json = await res.json().catch(() => ({ utilisateurs: [] }))
+    setUtilisateurs(json.utilisateurs || [])
+  }
   const chargerDemandes = async () => {
     const res = await fetch('/api/admin/demandes')
     if (!res.ok) return
@@ -100,12 +106,20 @@ export default function AdminUtilisateurs() {
     if (!res.ok) { setMessage('❌ ' + (json.error || 'Erreur lors de la création')); setLoading(false); return }
     setMessage('✅ Utilisateur créé avec succès')
     setEmail(''); setNom(''); setMotDePasse(''); setLoading(false)
-    supabase.from('profils').select('*').then(({ data }) => setUtilisateurs(data || []))
+    rechargerUtilisateurs()
     setTimeout(() => setMessage(''), 3000)
   }
 
   const changerRole = async (id: string, newRole: string) => {
-    await supabase.from('profils').update({ role: newRole }).eq('id', id)
+    const res = await fetch('/api/admin/utilisateurs', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, role: newRole }),
+    })
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}))
+      setMessage('❌ ' + (json.error || 'Changement de rôle impossible'))
+      setTimeout(() => setMessage(''), 4000)
+      return
+    }
     setUtilisateurs(u => u.map(p => p.id === id ? { ...p, role: newRole as any } : p))
   }
 

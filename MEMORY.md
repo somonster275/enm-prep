@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 22).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 23).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,23 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 23) — Audit ponytail + FAILLE profils (élévation en admin) corrigée
+- **Audit complet** (`/ponytail-audit`) : 11 constats, rapport donné au user. Principaux restants à traiter :
+  plafond Supabase de 1 000 lignes (dashboard / révision mixte / coach chargent toutes les fiches, or 1 536 en
+  base), formulaires publics `/api/contact` + `/api/acces/demande` sans limite, recherche « Mes documents » qui
+  ne filtre pas `deleted_at`, note de révision perdue sans erreur, annulation qui ne décompte pas l'activité,
+  export RGPD incomplet, code mort (`components/Sidebar.tsx`, `meilleurStreak`, deps `auth-helpers`, `pdf-parse`).
+- **RLS vérifiées par le user (pg_policies)** : `profils.profil_own` (ALL, sans with_check) permettait à tout
+  utilisateur de modifier son propre `role` → passer admin via l'API REST. **Migration `0037_profils_verrou.sql`** :
+  select/insert self uniquement (insert forcé à `lecteur`), plus aucune écriture client ; suppression des policies
+  `lecture_fiches` / `lecture_modules` (lisibles SANS compte avec la clé anon).
+- Nouvelle route **`/api/admin/utilisateurs`** (GET liste, POST rôle, service_role, admin only, pas sur soi-même) ;
+  la page `admin/utilisateurs` l'utilise (avant : la liste ne montrait que l'admin lui-même à cause du RLS).
+- Autres constats RLS à traiter : `cours_documents.cd_select = true` (tout étudiant voit les noms des documents
+  personnels des autres ; `cours_chunks` non vérifié), `cd_write` réservé admin/éditeur → la suppression d'un
+  document personnel par un lecteur échoue en silence ; `activite_jours_update` laisse un étudiant fixer son
+  compteur (classement).
 
 ### 2026-11-20 (suite 22) — graphify branché automatiquement sur le projet
 - **graphify** (github.com/Graphify-Labs/graphify, paquet PyPI `graphifyy[sql]`) : graphe de connaissances du
