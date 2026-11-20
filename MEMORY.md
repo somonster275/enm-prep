@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 24).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 25).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,16 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 25) — Audit tâche 1 : plafond Supabase de 1 000 lignes
+- Nouveau helper **`toutesLesLignes(page)`** dans `lib/supabase.ts` : enchaîne les `.range()` par pages de 1 000
+  (requête triée obligatoire pour un ordre stable). Branché sur les chargements de TOUTE la table `fiches`
+  (dashboard, coach `/api/tuteur`, révision mixte) et sur la `progression` complète de l'utilisateur au même endroit
+  (triée par `fiche_id`, unique avec `utilisateur_id`). Avant : seules les 1 000 premières fiches sur 1 536 comptaient.
+- Non traité (risque plus faible) : requêtes par espace/module (`.in('module_id', …)`, `.in('fiche_id', ids)`) qui
+  dépasseraient aussi 1 000 lignes ou la longueur d'URL si un seul espace grossit beaucoup.
+- Tâches suivantes de l'audit (suite 23) : formulaires publics sans limite, note de révision perdue sans erreur,
+  annulation qui ne décompte pas l'activité, export RGPD incomplet, code mort.
 
 ### 2026-11-20 (suite 24) — Documents personnels réellement privés
 - Migration **0037 exécutée** par le user (vérifié via pg_policies) ; les 3 admins sont légitimes

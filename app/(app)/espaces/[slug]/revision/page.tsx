@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, toutesLesLignes } from '@/lib/supabase'
 import { useParams, useSearchParams } from 'next/navigation'
 import type { Fiche, Progression, Espace, Module } from '@/types'
 import { NIVEAUX, PALIER_MAX, prochaineRevision, intervalleMinutes, palierApres, formatIntervalle, estDue } from '@/lib/spaced-repetition'
@@ -90,11 +90,11 @@ export default function RevisionPage() {
         setModuleLabel('Toutes matières')
         // Colonnes ciblées (pas de select('*')) : la révision mixte charge toute la
         // table fiches, autant limiter la charge utile au strict nécessaire.
-        const { data: fich } = await supabase.from('fiches')
+        const { data: fich } = await toutesLesLignes((de, a) => supabase.from('fiches')
           .select('id, module_id, question, reponse, tags, suspendu, created_at')
-          .is('deleted_at', null).eq('suspendu', false)
+          .is('deleted_at', null).eq('suspendu', false).order('id').range(de, a))
         const fichList = (fich || []) as Fiche[]
-        const { data: prog } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id)
+        const { data: prog } = await toutesLesLignes<Progression>((de, a) => supabase.from('progression').select('*').eq('utilisateur_id', user.id).order('fiche_id').range(de, a))
         const progMap: Record<string, Progression> = {}
         ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
         setProgressions(progMap)
