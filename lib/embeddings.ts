@@ -48,6 +48,7 @@ async function fetchEmbeddings(textes: string[], type: VoyageInputType): Promise
 export async function embed(
   textes: string[],
   type: VoyageInputType = 'document',
+  MAX_TENTATIVES = 6, // 1 = pas d'attente sur 429 (l'appelant réessaie lui-même)
 ): Promise<number[][]> {
   if (!VOYAGE_API_KEY) {
     throw new Error('VOYAGE_API_KEY manquante (voir .env.local.example)')
@@ -55,7 +56,6 @@ export async function embed(
   if (textes.length === 0) return []
 
   // Retry avec backoff exponentiel sur 429 (free tier : 3 RPM)
-  const MAX_TENTATIVES = 6
   let attente = 20_000 // 20 s pour passer sous la fenêtre de 1 min
   for (let i = 0; i < MAX_TENTATIVES; i++) {
     const result = await fetchEmbeddings(textes, type)

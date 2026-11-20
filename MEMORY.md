@@ -115,6 +115,11 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   « structure of query does not match function result type » à chaque question (reproduit en local).
 - **Migration `0045_match_cours_types.sql`** : mêmes requête + set_config, colonnes castées (`::text`, `::uuid`, `::float`).
 - `cours-ia` affiche maintenant le message d'erreur du serveur (et le code HTTP) au lieu d'un texte générique.
+- **Vraie cause côté import** : « Manuel Admin SEQUENCE.docx » = 2227 passages, 0 enregistré. L'upload calculait tous les
+  embeddings (≈ 140 appels Voyage) AVANT d'insérer les passages → fonction Vercel tuée, document laissé vide.
+  Désormais : `cours/upload` insère les passages sans embedding (lots de 500) et renvoie `aIndexer` ; la page boucle
+  sur `app/api/cours/indexer` (admin, 32 passages/appel, `embed(..., 1)` sans attente serveur ; 429 → la page attend
+  20 s, 15 fois max) ; bouton « Reprendre » par document officiel. Le document vide doit être supprimé puis réimporté.
 
 ### 2026-11-20 (suite 39) — Reste du scan ECC (code) + migration 0044 (index, exécutée)
 - Serveur : `lib/fetch-public.ts` (IP résolue + redirections revérifiées) pour actualités, planning, import QCM ;

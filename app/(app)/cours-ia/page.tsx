@@ -134,12 +134,39 @@ export default function CoursIAPage() {
       body: JSON.stringify({ nom: fichier.name, texte, espace_id: mode === 'officiel' ? espaceDoc || null : null, portee: mode }),
     })
     const json = await res.json().catch(() => ({ error: res.status === 413 ? 'Document trop long' : 'Envoi impossible' }))
-    setUploading(false)
-    if (!res.ok) { affMsg('❌ ' + json.error); return }
-    affMsg(`✅ ${json.chunks} passages indexés`)
+    if (!res.ok) { setUploading(false); affMsg('❌ ' + json.error); return }
     setFichier(null); setEspaceDoc('')
     if (fileRef.current) fileRef.current.value = ''
     chargerDocs(mode, userId)
+    if (json.aIndexer) await indexerDoc(json.id, json.chunks)
+    else affMsg(`✅ ${json.chunks} passages indexés`)
+    setUploading(false)
+  }
+
+  // Base ENM : embeddings calculés par lots (un appel serveur par lot) pour ne jamais dépasser le délai
+  // d'une fonction Vercel. Reprenable : seuls les passages encore sans embedding sont traités.
+  const indexerDoc = async (id: string, total: number) => {
+    let attentes = 0
+    for (;;) {
+      const res = await fetch('/api/cours/indexer', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }),
+      }).catch(() => null)
+      const json = res ? await res.json().catch(() => ({})) : {}
+      if (res?.ok) {
+        attentes = 0
+        if (json.restants === 0) { affMsg(`✅ ${total} passages indexés`); return }
+        setMsg(`⏳ Indexation : ${Math.max(0, total - json.restants)} / ${total} passages — garde la page ouverte`)
+        continue
+      }
+      if (json.attendre && attentes < 15) {
+        attentes++
+        setMsg('⏳ Limite de débit Voyage atteinte : reprise dans 20 s — garde la page ouverte')
+        await new Promise(r => setTimeout(r, 20_000))
+        continue
+      }
+      setMsg(`❌ Indexation interrompue (${json.error || 'connexion perdue'}). Clique sur « Reprendre » à côté du document.`)
+      return
+    }
   }
 
   const supprimerDoc = async (id: string) => {
@@ -407,7 +434,14 @@ export default function CoursIAPage() {
                           <span style={{ color: textMuted, marginLeft: 8, fontFamily: "'Space Grotesk', sans-serif", fontSize: 12 }}>· {d.nb_chunks} passages</span>
                           {d.espaces && <span style={{ marginLeft: 8, fontSize: 11, background: d.espaces.couleur + '20', color: d.espaces.couleur, padding: '1px 6px', borderRadius: 10, fontWeight: 600 }}>#{d.espaces.nom}</span>}
                         </div>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                        {mode === 'officiel' && isAdmin && (
+                          <button onClick={async () => { setUploading(true); await indexerDoc(d.id, d.nb_chunks); setUploading(false) }} disabled={uploading}
+                            title="Calcule les embeddings des passages qui n'en ont pas encore"
+                            style={{ background: '#E6F4EF', color: '#0E7C63', border: 'none', borderRadius: 7, padding: '4px 10px', fontSize: 11, cursor: 'pointer', fontWeight: 600 }}>Reprendre</button>
+                        )}
                         <button onClick={() => supprimerDoc(d.id)} style={{ background: '#FCE9E3', color: '#D94A30', border: 'none', borderRadius: 7, padding: '4px 10px', fontSize: 11, cursor: 'pointer', fontWeight: 600 }}>Supprimer</button>
+                        </div>
                       </div>
                     ))}
                   </div>

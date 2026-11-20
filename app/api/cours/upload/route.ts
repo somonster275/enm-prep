@@ -1,13 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { utilisateurCourant, estAdmin } from '@/lib/auth-serveur'
-import { embed, toVector } from '@/lib/embeddings'
 import { chunker } from '@/lib/chunker'
-
-// Les embeddings d'un gros document (attentes de rate-limit Voyage comprises) dépassent le délai par défaut.
-export const maxDuration = 300
-
-const LOT_EMBED = 16 // passages par appel (réduit pour respecter le rate-limit Voyage free tier)
 
 // Texte maximal accepté (le corps de requête Vercel est limité à 4,5 Mo).
 const TEXTE_MAX = 4_000_000
@@ -57,36 +51,18 @@ export async function POST(request: NextRequest) {
   if (docErr || !doc) { console.error('cours/upload:', docErr?.message); return NextResponse.json({ error: 'Enregistrement impossible, réessaie.' }, { status: 500 }) }
 
   // --- Embeddings : uniquement pour la base ENM (officiel) ---
-  let embeddings: (string | null)[] = chunks.map(() => null)
-  if (portee === 'officiel') {
-    try {
-      const out: string[] = []
-      for (let i = 0; i < chunks.length; i += LOT_EMBED) {
-        const lot = chunks.slice(i, i + LOT_EMBED)
-        const vecteurs = await embed(lot, 'document')
-        for (const v of vecteurs) out.push(toVector(v))
-      }
-      embeddings = out
-    } catch (e) {
-      // On annule le document pour ne pas laisser une base ENM sans embeddings.
+  // Passages enregistrés SANS embedding : pour un gros document, les calculer ici dépassait le temps
+  // maximal d'une fonction Vercel (document laissé vide). La page appelle ensuite /api/cours/indexer par lots.
+  const rows = chunks.map((c, i) => ({ document_id: doc.id, contenu: c, position: i, embedding: null }))
+  for (let i = 0; i < rows.length; i += 500) {
+    const { error: chunkErr } = await admin.from('cours_chunks').insert(rows.slice(i, i + 500))
+    if (chunkErr) {
+      await admin.from('cours_chunks').delete().eq('document_id', doc.id)
       await admin.from('cours_documents').delete().eq('id', doc.id)
-      console.error('cours/upload embeddings:', e)
-      return NextResponse.json({ error: 'Indexation momentanément indisponible, réessaie.' }, { status: 502 })
+      console.error('cours/upload chunks:', chunkErr.message)
+      return NextResponse.json({ error: 'Enregistrement impossible, réessaie.' }, { status: 500 })
     }
   }
 
-  const rows = chunks.map((c, i) => ({
-    document_id: doc.id,
-    contenu: c,
-    position: i,
-    embedding: embeddings[i],
-  }))
-  const { error: chunkErr } = await admin.from('cours_chunks').insert(rows)
-  if (chunkErr) {
-    await admin.from('cours_documents').delete().eq('id', doc.id)
-    console.error('cours/upload chunks:', chunkErr.message)
-    return NextResponse.json({ error: 'Enregistrement impossible, réessaie.' }, { status: 500 })
-  }
-
-  return NextResponse.json({ id: doc.id, chunks: chunks.length, portee })
+  return NextResponse.json({ id: doc.id, chunks: chunks.length, portee, aIndexer: portee === 'officiel' })
 }
