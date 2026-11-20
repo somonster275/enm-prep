@@ -353,8 +353,7 @@ export default function RevisionPage() {
     const reviseToutHref = `/espaces/${slug}/revision?mode=tout${moduleFilter ? `&module=${moduleFilter}` : ''}`
     return (
     <div style={{ padding: '3rem', textAlign: 'center', maxWidth: 480, margin: '0 auto', fontFamily: font }}>
-      <div style={{ fontSize: 40, marginBottom: 12 }}>{aJour ? '✅' : '📭'}</div>
-      <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 22, margin: '0 0 8px' }}>{aJour ? 'Tu es à jour !' : 'Aucune fiche à réviser'}</h2>
+      <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 30, letterSpacing: '-.015em', margin: '0 0 10px' }}>{aJour ? 'Tu es à jour !' : 'Aucune fiche à réviser'}</h2>
       <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '0 0 2rem' }}>
         {aJour
           ? 'Plus rien à réviser ici pour le moment — tes cartes reviendront automatiquement au bon moment pour ancrer ta mémoire. Reviens un peu plus tard.'
@@ -362,19 +361,19 @@ export default function RevisionPage() {
       </p>
       {aJour && nouvellesEnAttente > 0 && (
         <p style={{ fontSize: 12.5, color: '#7C5CBF', margin: '-1.25rem 0 2rem', fontWeight: 600 }}>
-          🌱 {nouvellesEnAttente} nouvelle{nouvellesEnAttente > 1 ? 's' : ''} carte{nouvellesEnAttente > 1 ? 's' : ''} en réserve — tu as atteint ta limite du jour. Elles arriveront les prochains jours pour ne pas te surcharger.
+          {nouvellesEnAttente} nouvelle{nouvellesEnAttente > 1 ? 's' : ''} carte{nouvellesEnAttente > 1 ? 's' : ''} en réserve — tu as atteint ta limite du jour. Elles arriveront les prochains jours pour ne pas te surcharger.
         </p>
       )}
       <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
         {aJour && !mixte && (
           <Link href={reviseToutHref} style={{
-            padding: '12px 24px', borderRadius: 12, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)',
-            textDecoration: 'none', fontSize: 14, fontWeight: 700, fontFamily: font, border: '1px solid var(--c-filet-fort)',
+            padding: '12px 22px', borderRadius: 6, background: 'transparent', color: 'var(--c-encre)',
+            textDecoration: 'none', fontSize: 14.5, fontWeight: 600, fontFamily: font, border: '1px solid var(--c-filet-fort)',
           }}>Réviser quand même</Link>
         )}
         <Link href={retourHref} style={{
-          padding: '12px 24px', borderRadius: 12, background: 'var(--c-accent)', color: '#fff',
-          textDecoration: 'none', fontSize: 14, fontWeight: 700, fontFamily: font,
+          padding: '12px 22px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff',
+          textDecoration: 'none', fontSize: 14.5, fontWeight: 600, fontFamily: font,
         }}>Retour</Link>
       </div>
     </div>
@@ -387,19 +386,18 @@ export default function RevisionPage() {
     const tauxReussite = totalNotes > 0 ? Math.round((reussies / totalNotes) * 100) : 0
     return (
     <div style={{ padding: '3rem', textAlign: 'center', maxWidth: 500, margin: '0 auto', fontFamily: font }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
-      <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 26, marginBottom: 8 }}>Session terminée</div>
+      <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 32, letterSpacing: '-.015em', marginBottom: 8 }}>Session terminée</div>
       <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '0 0 1.25rem' }}>{deck.length} fiche{deck.length > 1 ? 's' : ''} révisée{deck.length > 1 ? 's' : ''}</p>
       {nouvellesEnAttente > 0 && (
         <p style={{ fontSize: 12.5, color: '#7C5CBF', margin: '-0.75rem 0 1.25rem', fontWeight: 600 }}>
-          🌱 {nouvellesEnAttente} nouvelle{nouvellesEnAttente > 1 ? 's' : ''} carte{nouvellesEnAttente > 1 ? 's' : ''} en réserve pour les prochains jours.
+          {nouvellesEnAttente} nouvelle{nouvellesEnAttente > 1 ? 's' : ''} carte{nouvellesEnAttente > 1 ? 's' : ''} en réserve pour les prochains jours.
         </p>
       )}
       {/* Recap par bouton */}
       {totalNotes > 0 && (
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
           {NIVEAUX.map((n, i) => sessionStats[i] > 0 && (
-            <div key={i} style={{ background: n.bg, color: n.couleur, borderRadius: 10, padding: '6px 14px', fontSize: 13, fontWeight: 700 }}>
+            <div key={i} style={{ background: '#FFFEFB', color: 'var(--c-encre)', border: '1px solid var(--c-filet)', borderTop: `3px solid ${n.couleur}`, borderRadius: 4, padding: '6px 14px', fontSize: 13.5, fontWeight: 600 }}>
               {n.label} × {sessionStats[i]}
             </div>
           ))}
@@ -412,21 +410,19 @@ export default function RevisionPage() {
       )}
       {streak !== null && streak > 0 && (
         <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 8, margin: '0 0 2rem',
-          fontWeight: 700, fontSize: 15, color: 'var(--c-accent)', background: 'var(--c-accent-pale)',
-          padding: '10px 18px', borderRadius: 999,
+          margin: '0 0 2rem', fontFamily: 'var(--font-titre)', fontSize: 18,
         }}>
-          🔥 {streak} jour{streak > 1 ? 's' : ''} d'affilée
+          <b style={{ fontWeight: 600 }}>{streak} jour{streak > 1 ? 's' : ''}</b> d&apos;affilée
         </div>
       )}
       <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
         <button onClick={() => { setIdx(0); setFlipped(false); setDone(false); setSessionStats([0,0,0,0]) }} style={{
-          padding: '12px 22px', borderRadius: 10, background: espace.couleur, color: '#fff',
-          border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: font,
+          padding: '12px 22px', borderRadius: 6, background: 'var(--c-encre)', color: 'var(--c-papier)',
+          border: 'none', cursor: 'pointer', fontSize: 14.5, fontWeight: 600, fontFamily: font,
         }}>Recommencer</button>
         <Link href={retourHref} style={{
-          padding: '12px 22px', borderRadius: 10, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)',
-          textDecoration: 'none', fontSize: 14, fontFamily: font, border: '1px solid var(--c-filet-fort)',
+          padding: '12px 22px', borderRadius: 6, background: 'transparent', color: 'var(--c-encre)', fontWeight: 600,
+          textDecoration: 'none', fontSize: 14.5, fontFamily: font, border: '1px solid var(--c-filet-fort)',
         }}>Retour</Link>
       </div>
     </div>
@@ -442,37 +438,31 @@ export default function RevisionPage() {
       {toast && (
         <div style={{
           position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
-          background: 'var(--c-encre)', color: '#fff', borderRadius: 12, padding: '10px 20px',
+          background: 'var(--c-encre)', color: 'var(--c-papier)', borderRadius: 6, padding: '10px 20px',
           fontSize: 14, fontWeight: 600, zIndex: 999, whiteSpace: 'nowrap',
           pointerEvents: 'none', opacity: 0.92, boxShadow: '0 4px 16px rgba(0,0,0,.25)',
         }}>{toast}</div>
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Link href={retourHref} style={{ fontSize: 13, color: 'var(--c-annotation-clair)', textDecoration: 'none' }}>← Retour</Link>
+        <Link href={retourHref} style={{ fontSize: 14, color: 'var(--c-annotation)', textDecoration: 'none' }}>← Retour</Link>
         <div style={{ textAlign: 'right' }}>
-          {moduleLabel && <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginBottom: 2 }}>{moduleLabel}</div>}
-          <span style={{ fontSize: 13, color: 'var(--c-annotation)', fontWeight: 600 }}>{idx + 1} / {deck.length}</span>
+          <span style={{ fontSize: 14, color: 'var(--c-annotation)', fontVariantNumeric: 'tabular-nums' }}><b style={{ color: 'var(--c-encre)', fontWeight: 600 }}>{idx + 1}</b> sur {deck.length}</span>
         </div>
       </div>
 
-      <div style={{ height: 6, background: 'var(--c-filet)', borderRadius: 999, marginBottom: '1.5rem', overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: `${((idx + 1) / deck.length) * 100}%`, background: espace.couleur, borderRadius: 999, transition: 'width 0.3s' }} />
+      <div style={{ height: 3, background: 'var(--c-filet)', marginBottom: '1.5rem', overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${((idx + 1) / deck.length) * 100}%`, background: 'var(--c-encre)', transition: 'width 0.3s' }} />
       </div>
 
-      {prog && (
-        <div style={{ marginBottom: 8, textAlign: 'right', fontSize: 11, color: '#999' }}>
-          Échelon <span style={{ color: espace.couleur, fontWeight: 700 }}>{Math.min(prog.palier ?? 0, PALIER_MAX)}/{PALIER_MAX}</span>
-        </div>
-      )}
 
       {editing ? (
         /* ===== MODE ÉDITION ===== */
-        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18, padding: '1.5rem', marginBottom: '1rem' }}>
-          <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Question</div>
+        <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 4, padding: '1.5rem', marginBottom: '1rem' }}>
+          <div style={{ fontSize: 14, color: 'var(--c-annotation)', marginBottom: 8, fontWeight: 600 }}>Question</div>
           <div style={{ marginBottom: 18 }}>
             <RichEditor value={editQ} onChange={setEditQ} placeholder="Question…" minHeight={80} />
           </div>
-          <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Réponse</div>
+          <div style={{ fontSize: 14, color: 'var(--c-annotation)', marginBottom: 8, fontWeight: 600 }}>Réponse</div>
           <div style={{ marginBottom: 18 }}>
             <RichEditor value={editR} onChange={setEditR} placeholder="Réponse…" minHeight={140} />
           </div>
@@ -491,32 +481,40 @@ export default function RevisionPage() {
         <>
         <div onClick={() => setFlipped(f => !f)} role="button" tabIndex={0} aria-pressed={flipped}
           aria-label={flipped ? 'Carte retournée : réponse affichée' : 'Retourner la carte pour voir la réponse'} style={{
-          background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18,
-          padding: '2rem', minHeight: 240, cursor: 'pointer', marginBottom: '1rem',
-          display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative',
+          background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 4,
+          boxShadow: '0 1px 0 var(--c-filet), 0 18px 40px -24px rgba(33,28,25,.35)',
+          minHeight: 280, cursor: 'pointer', marginBottom: '1rem', overflow: 'hidden',
+          display: 'flex', flexDirection: 'column', position: 'relative',
         }}>
+          {/* marge rouge d'une fiche bristol */}
+          <div aria-hidden style={{ position: 'absolute', left: 36, top: 0, bottom: 0, width: 1, background: 'rgba(163,18,42,.3)' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '13px 20px 11px 52px', fontSize: 13, flexWrap: 'wrap', color: 'var(--c-annotation)', borderBottom: '1px solid var(--c-filet)' }}>
+            <span><b style={{ color: 'var(--c-accent)', fontWeight: 600 }}>{espace.nom}</b>{moduleLabel && <> {moduleLabel}</>}</span>
+            {prog && <span style={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }} title="Échelon dans l'échelonnage">Échelon {Math.min(prog.palier ?? 0, PALIER_MAX)} sur {PALIER_MAX}</span>}
+          </div>
+          <div style={{ padding: '1.5rem 1.75rem 56px 52px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           {isAdmin ? (
             <button onClick={e => { e.stopPropagation(); ouvrirEdition() }} style={{
-              position: 'absolute', top: 14, right: 14, padding: '6px 12px', borderRadius: 8,
-              background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)', border: '1px solid var(--c-filet-fort)',
+              position: 'absolute', bottom: 10, right: 12, padding: '4px 10px', borderRadius: 4,
+              background: 'transparent', color: 'var(--c-annotation)', border: '1px solid var(--c-filet-fort)',
               cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font,
             }}>✎ Éditer</button>
           ) : (
-            <div style={{ position: 'absolute', top: 14, right: 14 }}>
+            <div style={{ position: 'absolute', bottom: 10, right: 12 }}>
               <RemarqueButton ficheId={card.id} />
             </div>
           )}
           {!flipped ? (
             <>
-              <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Question — cliquez pour voir la réponse</div>
-              <RichContent html={card.question} style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--c-encre)' }} />
+              <RichContent html={card.question} style={{ fontFamily: 'var(--font-titre)', fontSize: 22, lineHeight: 1.35, color: 'var(--c-encre)' }} />
             </>
           ) : (
             <>
-              <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Réponse</div>
-              <RichContent html={card.reponse} style={{ fontSize: 15, lineHeight: 1.8, color: 'var(--c-encre)' }} />
+              <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginBottom: 12 }}>Réponse</div>
+              <RichContent html={card.reponse} style={{ fontFamily: 'var(--font-titre)', fontSize: 18, lineHeight: 1.65, color: 'var(--c-encre)' }} />
             </>
           )}
+          </div>
         </div>
         {/* Approfondir : autres supports (vidéo, audio, cours, QCM…) du même tag.
             Apparaît une fois la réponse révélée pour varier les supports. */}
@@ -531,12 +529,12 @@ export default function RevisionPage() {
             <button onClick={() => setBrouillonOuvert(true)} style={{
               width: '100%', padding: '11px', borderRadius: 12, border: '1px dashed #E3D6BE',
               background: '#FFFDF8', color: 'var(--c-annotation)', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: font,
-            }}>✏️ Ouvrir un brouillon</button>
+            }}>Ouvrir un brouillon</button>
           ) : (
             <div style={{ border: '1px solid var(--c-filet)', borderRadius: 12, background: '#fff', padding: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--c-annotation)', textTransform: 'uppercase', letterSpacing: '.06em' }}>
-                  ✏️ Brouillon {flipped && <span style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 400, color: 'var(--c-discret)' }}>— compare avec la réponse</span>}
+                <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-encre)' }}>
+                  Brouillon {flipped && <span style={{ fontWeight: 400, color: 'var(--c-annotation)' }}>— compare avec la réponse</span>}
                 </span>
                 <button onClick={() => setBrouillonOuvert(false)} title="Fermer" style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--c-discret-clair)', fontSize: 16, lineHeight: 1, padding: 0 }}>✕</button>
               </div>
@@ -551,19 +549,19 @@ export default function RevisionPage() {
 
       {editing ? null : flipped ? (
         <div>
-          <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginBottom: 12, textAlign: 'center' }}>Comment évaluez-vous votre réponse ?</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
+          <div style={{ fontSize: 14, color: 'var(--c-annotation)', marginBottom: 10 }}>Saviez-vous la réponse ?</div>
+          <div className="no-collapse" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 8 }}>
             {NIVEAUX.map((n, i) => {
               const palierCarte = prog?.palier ?? 0
               const mins = intervalleMinutes(i, palierCarte)
               return (
                 <button key={n.label} onClick={() => rateCard(i)} style={{
-                  padding: '12px 4px', borderRadius: 12, border: `1px solid ${n.couleur}33`,
-                  background: n.bg, color: n.couleur, cursor: 'pointer', fontSize: 13, fontWeight: 700,
+                  padding: '11px 4px 10px', borderRadius: 6, border: '1px solid var(--c-filet)', borderTop: `3px solid ${n.couleur}`,
+                  background: '#FFFEFB', color: 'var(--c-encre)', cursor: 'pointer', fontSize: 14, fontWeight: 600,
                   lineHeight: 1.3, fontFamily: font,
                 }}>
                   {n.label}
-                  <div style={{ fontSize: 11, fontWeight: 400, opacity: 0.8, marginTop: 3 }}>
+                  <div style={{ fontSize: 12, fontWeight: 400, color: 'var(--c-annotation)', marginTop: 3 }}>
                     {formatIntervalle(mins)}
                   </div>
                 </button>
@@ -573,8 +571,8 @@ export default function RevisionPage() {
         </div>
       ) : (
         <button onClick={() => setFlipped(true)} style={{
-          width: '100%', padding: '14px', borderRadius: 12, background: espace.couleur,
-          color: '#fff', border: 'none', cursor: 'pointer', fontSize: 15, fontWeight: 700, fontFamily: font,
+          width: '100%', padding: '14px', borderRadius: 6, background: 'var(--c-encre)',
+          color: 'var(--c-papier)', border: 'none', cursor: 'pointer', fontSize: 15.5, fontWeight: 600, fontFamily: font,
         }}>
           Voir la réponse
         </button>
@@ -589,7 +587,7 @@ export default function RevisionPage() {
             </span>
           )}
           {lastAction && (
-            <button onClick={annuler} style={{ marginLeft: 'auto', fontSize: 12.5, fontWeight: 700, color: 'var(--c-annotation)', background: 'var(--c-papier-teinte)', border: '1px solid var(--c-filet-fort)', borderRadius: 9, padding: '7px 14px', cursor: 'pointer', fontFamily: font }}>
+            <button onClick={annuler} style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 600, color: 'var(--c-encre)', background: 'transparent', border: '1px solid var(--c-filet-fort)', borderRadius: 6, padding: '7px 14px', cursor: 'pointer', fontFamily: font }}>
               ↶ Annuler la dernière note
             </button>
           )}
@@ -606,7 +604,6 @@ export default function RevisionPage() {
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
             fontFamily: font, color: 'var(--c-annotation)', fontSize: 12, fontWeight: 700,
           }}>
-          <span style={{ fontSize: 16 }}>✏️</span>
           <span style={{ writingMode: 'vertical-rl', letterSpacing: '.08em' }}>Brouillon</span>
         </button>
       )}
@@ -619,7 +616,7 @@ export default function RevisionPage() {
           display: 'flex', flexDirection: 'column', padding: 14, fontFamily: font,
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--c-annotation)', textTransform: 'uppercase', letterSpacing: '.06em' }}>✏️ Brouillon</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-encre)' }}>Brouillon</span>
             <button onClick={() => setBrouillonOuvert(false)} title="Fermer" style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--c-discret-clair)', fontSize: 16, lineHeight: 1, padding: 0 }}>✕</button>
           </div>
           <textarea

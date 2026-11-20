@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 47).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 48).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,20 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 48) — Refonte design : navigation + page de révision
+- **`components/TopNav.tsx`** (style seul, mêmes liens/menus) : fond #FFFEFB, page active = soulignement rouge
+  (`inset 0 -2px 0 var(--c-accent)`) au lieu de la pastille jaune #FCEFD3, menus déroulants rayon 6, série en texte
+  (« 7 jours d'affilée », sans 🔥), avatar encre ; tiroir mobile : actif = filet rouge à gauche, intitulés de
+  section en casse normale (plus de RESSOURCES en capitales).
+- **Révision** (`espaces/[slug]/revision/page.tsx`, logique intacte) : carte = fiche bristol (marge rouge, en-tête
+  matière + module + « Échelon x sur 5 », question 22 px et réponse 18 px en Newsreader), boutons Éditer/Remarque en
+  bas à droite de la carte, « Voir la réponse » en encre, notation façon accueil (filet coloré en haut, 2×2 sur mobile),
+  barre de progression fine encre, « 1 sur 86 ». Écrans « à jour » et « session terminée » sans emoji. Brouillon :
+  intitulés sans capitales ni ✏️.
+- Vérifié avec le faux Supabase local (cf. suite 47), desktop + mobile + tiroir mobile.
+- ⚠️ Piège : tuer `next dev` pendant l'écriture laisse `.next/dev/types/routes.d.ts` cassé → `tsc` échoue
+  (TS2306). Supprimer `.next/dev` puis relancer.
 
 ### 2026-11-20 (suite 47) — Refonte design : étape 4 (connexion + dashboard)
 - **Connexion** (`app/(auth)/login/page.tsx`) : panneau gauche encre + logo sur aplat jaune + article 111-3 C. pén.
