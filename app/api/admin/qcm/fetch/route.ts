@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { utilisateurCourant, estAdmin } from '@/lib/auth-serveur'
+import { urlPublique } from '@/lib/url-publique'
+import { fetchPublic } from '@/lib/fetch-public'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,22 +18,11 @@ export async function POST(request: NextRequest) {
   let cible: URL
   try { cible = new URL(url.trim()) } catch { return NextResponse.json({ error: 'URL invalide' }, { status: 400 }) }
 
-  // On n'autorise que le web public (anti-SSRF : pas de localhost / IP privées).
-  if (!/^https?:$/.test(cible.protocol)) {
-    return NextResponse.json({ error: 'Seules les URL http(s) sont acceptées.' }, { status: 400 })
-  }
-  const host = cible.hostname.toLowerCase()
-  const prive =
-    host === 'localhost' || host === '0.0.0.0' || host.endsWith('.local') ||
-    /^127\./.test(host) || /^10\./.test(host) || /^192\.168\./.test(host) ||
-    /^169\.254\./.test(host) || /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
-    host === '[::1]'
-  if (prive) return NextResponse.json({ error: 'Adresse non autorisée.' }, { status: 400 })
+  if (!urlPublique(cible.toString())) return NextResponse.json({ error: 'Adresse non autorisée.' }, { status: 400 })
 
   try {
-    const res = await fetch(cible.toString(), {
+    const res = await fetchPublic(cible.toString(), {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; codex-qcm-import)', Accept: 'text/html' },
-      redirect: 'follow',
       signal: AbortSignal.timeout(15000),
     })
     if (!res.ok) return NextResponse.json({ error: `La page a répondu ${res.status}.` }, { status: 502 })

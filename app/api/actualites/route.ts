@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { urlPublique, lienSur } from '@/lib/url-publique'
+import { fetchPublic } from '@/lib/fetch-public'
 
 // Récupère et parse des flux RSS / Atom côté serveur (contourne le CORS du navigateur).
 // Entrée  : { feeds: [{ url, nom, couleur }] }
@@ -113,7 +114,7 @@ export async function POST(request: NextRequest) {
       const url = urlPublique(feed?.url)
       if (!url) { if (feed?.url) erreurs.push(`${feed.nom} : adresse refusée`); return [] }
       try {
-        const res = await fetch(url, {
+        const res = await fetchPublic(url, {
           headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CodexActu/1.0)', Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*' },
           next: { revalidate: 600 }, // 10 min de cache serveur
         })

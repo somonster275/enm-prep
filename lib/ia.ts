@@ -47,7 +47,7 @@ const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat'
 const DEEPSEEK_URL = (process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com') + '/chat/completions'
 
 /** Provider du chatbot/coach (configurable, DeepSeek par défaut). */
-export const CHATBOT_PROVIDER = (process.env.CHATBOT_PROVIDER || 'deepseek').toLowerCase() as Provider
+export const CHATBOT_PROVIDER: Provider = process.env.CHATBOT_PROVIDER?.toLowerCase() === 'anthropic' ? 'anthropic' : 'deepseek'
 
 /** Provider réellement utilisé : repli sur Claude si DeepSeek demandé sans clé. */
 function effectif(provider: Provider): Provider {

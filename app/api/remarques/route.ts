@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   const { error } = await admin.from('remarques_fiches').insert({
     fiche_id: ficheId, user_id: user.id, message: msg.slice(0, 2000),
   })
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('remarques:', error.message); return NextResponse.json({ error: 'Erreur serveur, réessaie.' }, { status: 500 }) }
 
   // Notification email — non bloquante : la remarque est enregistrée même si l'email échoue.
   try {

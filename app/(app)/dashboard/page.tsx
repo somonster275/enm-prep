@@ -5,7 +5,7 @@ import type { Espace, Progression, Profil } from '@/types'
 import { estDue } from '@/lib/spaced-repetition'
 import {
   chargerActivite, calculerStreak, derniers7Jours, cartesAujourdhui, OBJECTIF_QUOTIDIEN,
-  chargerPauses, type Pause,
+  chargerPauses, ymd, type Pause,
 } from '@/lib/streaks'
 import { calculerProgression } from '@/lib/progression'
 import Link from 'next/link'
@@ -250,8 +250,7 @@ export default function Dashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {evenements.map(ev => {
                 const d = new Date(ev.date_debut + 'T12:00:00')
-                const todayKey = new Date().toISOString().slice(0, 10)
-                const diff = Math.round((d.getTime() - new Date(todayKey).getTime()) / 86400000)
+                const diff = Math.round((d.getTime() - new Date(ymd(new Date()) + 'T12:00:00').getTime()) / 86400000)
                 return (
                   <Link key={ev.id} href="/calendrier" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <div style={{ borderLeft: `3px solid ${ev.couleur}`, paddingLeft: 10, paddingTop: 2, paddingBottom: 2 }}>

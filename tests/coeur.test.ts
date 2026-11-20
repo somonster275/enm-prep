@@ -5,6 +5,9 @@ import { intervalleMinutes, palierApres, PALIER_MAX } from '../lib/spaced-repeti
 import { calculerStreak, ymd } from '../lib/streaks'
 import { urlPublique, lienSur } from '../lib/url-publique'
 import { toutesLesLignes } from '../lib/supabase'
+import { ipPrivee } from '../lib/fetch-public'
+import { chunker } from '../lib/chunker'
+import { jourParis } from '../lib/jour'
 
 const J = 1440
 const jour = (decalage: number) => { const d = new Date(); d.setDate(d.getDate() - decalage); return ymd(d) }
@@ -46,4 +49,28 @@ test('pagination Supabase : récupère tout au-delà de 1 000 lignes', async () 
     const { data } = await toutesLesLignes(async (de, a) => ({ data: tout.slice(de, a + 1), error: null }))
     assert.deepEqual(data, tout)
   }
+})
+
+test('anti-SSRF : IP résolues privées refusées', () => {
+  for (const ip of ['127.0.0.1', '10.1.2.3', '169.254.169.254', '172.16.0.1', '192.168.1.1', '100.64.0.1', '0.0.0.0', '::1', 'fd00::1', 'fe80::1', '::ffff:127.0.0.1'])
+    assert.equal(ipPrivee(ip), true, ip)
+  for (const ip of ['8.8.8.8', '172.32.0.1', '2606:4700::1111']) assert.equal(ipPrivee(ip), false, ip)
+})
+
+test('découpage RAG : aucun passage géant, même sans paragraphes', () => {
+  const phrase = 'Le juge des libertés statue sur la détention provisoire. '
+  const pdf = Array.from({ length: 400 }, () => phrase).join('\n') // \n simples, comme un PDF
+  const bloc = 'x'.repeat(5000)                                      // aucune ponctuation
+  for (const t of [pdf, bloc]) {
+    const c = chunker(t)
+    assert.ok(c.length > 5)
+    assert.ok(c.every(x => x.length <= 1000), String(Math.max(...c.map(x => x.length))))
+  }
+  assert.deepEqual(chunker('Court paragraphe de plus de trente caractères.'), ['Court paragraphe de plus de trente caractères.'])
+})
+
+test('jour en France : minuit-2 h ne retombe pas sur la veille', () => {
+  assert.equal(jourParis(new Date('2026-11-20T23:30:00Z')), '2026-11-21') // 0 h 30 à Paris (hiver)
+  assert.equal(jourParis(new Date('2026-07-14T22:30:00Z')), '2026-07-15') // 0 h 30 à Paris (été)
+  assert.equal(jourParis(new Date('2026-11-20T12:00:00Z')), '2026-11-20')
 })

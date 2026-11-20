@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import NotesWidget from '@/components/NotesWidget'
+import { ymd } from '@/lib/streaks'
 
 type Evenement = {
   id: string
@@ -63,9 +64,7 @@ function couleurType(type: string) {
 function labelType(type: string) {
   return TYPES.find(t => t.value === type)?.label ?? type
 }
-function dateToKey(d: Date) {
-  return d.toISOString().slice(0, 10)
-}
+const dateToKey = ymd // date locale : toISOString() donnait la veille entre 0 h et 2 h
 function premierJourSemaine(year: number, month: number) {
   return (new Date(year, month, 1).getDay() + 6) % 7 // lundi = 0
 }

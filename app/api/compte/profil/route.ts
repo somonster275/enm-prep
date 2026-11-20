@@ -21,6 +21,6 @@ export async function POST(request: NextRequest) {
     .update({ nom: nomPropre || null, prenom: prenomPropre || null })
     .eq('id', user.id)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('compte/profil:', error.message); return NextResponse.json({ error: 'Erreur serveur, réessaie.' }, { status: 500 }) }
   return NextResponse.json({ ok: true })
 }

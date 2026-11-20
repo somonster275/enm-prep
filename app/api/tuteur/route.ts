@@ -4,6 +4,7 @@ import { getSupabaseAdmin, toutesLesLignes } from '@/lib/supabase'
 import { utilisateurCourant } from '@/lib/auth-serveur'
 import { estDue, PALIER_MAX } from '@/lib/spaced-repetition'
 import { calculerProgression } from '@/lib/progression'
+import { jourParis } from '@/lib/jour'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,7 +43,8 @@ export async function POST(request: NextRequest) {
 
   // Rate-limiting persistant (partagé entre instances) : max 20 messages / minute.
   const user0 = await utilisateurCourant()
-  if (user0) {
+  if (!user0) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+  {
     const { data: ok } = await getSupabaseAdmin().rpc('consommer_quota', {
       p_user: user0.id, p_action: 'coach', p_max: 20, p_fenetre: '1 minute',
     })
@@ -64,8 +66,8 @@ export async function POST(request: NextRequest) {
     const user = await utilisateurCourant()
     if (user) {
       const admin = getSupabaseAdmin()
-      const today = new Date().toISOString().slice(0, 10)
-      const il7j = new Date(); il7j.setDate(il7j.getDate() - 6)
+      const today = jourParis()
+      const il7j = jourParis(new Date(Date.now() - 6 * 86_400_000))
 
       const [profilRes, evRes, espRes, fichesRes, progRes, actRes, notesRes, modsRes] = await Promise.all([
         admin.from('profils').select('prenom, nom').eq('id', user.id).single(),
@@ -73,7 +75,7 @@ export async function POST(request: NextRequest) {
         admin.from('espaces').select('id, nom').order('ordre'),
         toutesLesLignes((de, a) => admin.from('fiches').select('id, module_id, modules(espace_id)').is('deleted_at', null).eq('suspendu', false).order('id').range(de, a)),
         toutesLesLignes((de, a) => admin.from('progression').select('fiche_id, palier, prochaine_revision').eq('utilisateur_id', user.id).order('fiche_id').range(de, a)),
-        admin.from('activite_jours').select('jour, cartes').eq('utilisateur_id', user.id).gte('jour', il7j.toISOString().slice(0, 10)),
+        admin.from('activite_jours').select('jour, cartes').eq('utilisateur_id', user.id).gte('jour', il7j),
         admin.from('notes').select('contenu').eq('user_id', user.id).eq('fait', false).limit(20),
         admin.from('modules').select('id').is('deleted_at', null),
       ])
@@ -169,7 +171,8 @@ export async function POST(request: NextRequest) {
         }
         controller.enqueue(encoder.encode('data: [DONE]\n\n'))
       } catch (e) {
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: String(e) })}\n\n`))
+        console.error('tuteur:', e)
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Le coach est momentanément indisponible, réessaie.' })}\n\n`))
       }
       controller.close()
     },

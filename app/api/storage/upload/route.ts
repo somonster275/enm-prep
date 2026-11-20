@@ -3,6 +3,8 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 import { utilisateurCourant } from '@/lib/auth-serveur'
 
 const TAILLE_MAX = 50 * 1024 * 1024 // 50 Mo
+const EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'avif', 'mp3', 'm4a', 'wav', 'ogg', 'mp4', 'webm', 'mov',
+  'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'odt', 'odp', 'ods', 'txt', 'csv']
 
 export async function POST(request: NextRequest) {
   let admin
@@ -33,11 +35,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Fichier trop volumineux (50 Mo max)' }, { status: 413 })
   }
 
-  const ext = String(nom).split('.').pop()?.replace(/[^a-z0-9]/gi, '').slice(0, 10) || 'bin'
+  // Buckets publics : pas de html / svg / js, qui s'exécuteraient sur le domaine de stockage.
+  const ext = String(nom).split('.').pop()?.toLowerCase() || ''
+  if (!EXTENSIONS.includes(ext)) {
+    return NextResponse.json({ error: 'Type de fichier non autorisé' }, { status: 415 })
+  }
   const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
   const { data: signe, error } = await admin.storage.from(bucket).createSignedUploadUrl(path)
   if (error || !signe) {
-    return NextResponse.json({ error: error?.message || 'Envoi impossible' }, { status: 500 })
+    console.error('storage/upload:', error?.message)
+    return NextResponse.json({ error: 'Envoi impossible' }, { status: 500 })
   }
 
   const { data } = admin.storage.from(bucket).getPublicUrl(path)

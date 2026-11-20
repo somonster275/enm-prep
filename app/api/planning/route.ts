@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { urlPublique } from '@/lib/url-publique'
+import { fetchPublic } from '@/lib/fetch-public'
 
 /**
  * Récupère un planning extraplanning (ex. IEJ Panthéon) rendu en HTML, côté serveur
@@ -94,7 +95,7 @@ async function recupererFeed(feed: Feed): Promise<Ev[]> {
 
   const tous: Ev[] = []
   // GET initial (mois courant) + capture du cookie de session
-  let res = await fetch(feed.url, { headers: { 'User-Agent': UA }, cache: 'no-store' })
+  let res = await fetchPublic(feed.url, { headers: { 'User-Agent': UA }, cache: 'no-store' })
   if (!res.ok) return []
   let cookie = (res.headers.get('set-cookie') || '').split(',').map(c => c.split(';')[0].trim()).filter(Boolean).join('; ')
   let html = await res.text()
@@ -112,7 +113,7 @@ async function recupererFeed(feed: Feed): Promise<Ev[]> {
     form.set('__SCROLLPOSITIONY', '0')
     form.set('ctl00$ContentPlaceHolder1$HiddenFieldDate', champCache(html, 'ctl00$ContentPlaceHolder1$HiddenFieldDate'))
     try {
-      res = await fetch(feed.url, {
+      res = await fetchPublic(feed.url, {
         method: 'POST',
         headers: {
           'User-Agent': UA,
@@ -148,7 +149,7 @@ export async function POST(request: NextRequest) {
 
   const resultats = await Promise.all(feeds.map(f => {
     const url = urlPublique(f?.url)
-    return url ? recupererFeed({ ...f, url }) : Promise.resolve([])
+    return url ? recupererFeed({ ...f, url }).catch(() => []) : Promise.resolve([])
   }))
   const evenements = resultats.flat().sort((a, b) =>
     (a.date_debut + a.heure).localeCompare(b.date_debut + b.heure)

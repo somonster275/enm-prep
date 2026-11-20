@@ -1,7 +1,6 @@
 // Le serveur va chercher des flux (actualités, planning) dont l'adresse vient de l'utilisateur :
 // on refuse tout ce qui n'est pas une adresse web publique (réseau local, machine elle-même…).
-// shortcut: vérifie le nom écrit, pas l'IP résolue par le DNS (un domaine qui pointe vers une IP
-// privée passe), et une redirection n'est pas revérifiée ; suffisant sur Vercel sans réseau interne.
+// Ne vérifie que le nom écrit : côté serveur, passer par fetchPublic (lib/fetch-public.ts) qui vérifie l'IP et les redirections.
 export function urlPublique(brute: unknown): string | null {
   let u: URL
   try { u = new URL(String(brute)) } catch { return null }

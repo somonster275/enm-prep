@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   const { error } = await admin.from('cours_remarques').insert({
     cours_id: coursId, user_id: user.id, message: msg.slice(0, 2000),
   })
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('cours/remarque:', error.message); return NextResponse.json({ error: 'Erreur serveur, réessaie.' }, { status: 500 }) }
 
   // Notification email — non bloquante.
   try {

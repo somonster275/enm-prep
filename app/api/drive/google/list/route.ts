@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
     const files = await googleListFiles(token, folderId)
     return NextResponse.json({ files })
   } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 500 })
+    console.error('drive/google/list:', e)
+    return NextResponse.json({ error: 'Google Drive momentanément inaccessible, réessaie.' }, { status: 500 })
   }
 }

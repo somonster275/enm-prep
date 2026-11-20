@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin, toutesLesLignes } from '@/lib/supabase'
 import { utilisateurCourant } from '@/lib/auth-serveur'
+import { jourParis } from '@/lib/jour'
 
 export const dynamic = 'force-dynamic'
 
 // Début de la semaine ISO (lundi) au format YYYY-MM-DD.
 function lundiDeLaSemaine(): string {
-  const d = new Date()
-  const jour = (d.getDay() + 6) % 7 // 0 = lundi
-  d.setDate(d.getDate() - jour)
+  const d = new Date(jourParis() + 'T12:00:00Z')
+  d.setUTCDate(d.getUTCDate() - (d.getUTCDay() + 6) % 7) // recule jusqu'au lundi
   return d.toISOString().slice(0, 10)
 }
 

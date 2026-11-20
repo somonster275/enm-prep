@@ -32,13 +32,14 @@ async function fetchEmbeddings(textes: string[], type: VoyageInputType): Promise
       Authorization: `Bearer ${VOYAGE_API_KEY}`,
     },
     body: JSON.stringify({ model: VOYAGE_MODEL, input: textes, input_type: type }),
+    signal: AbortSignal.timeout(30_000),
   })
   if (res.status === 429) {
     // Renvoie null pour signaler un rate-limit
     return null as unknown as number[][]
   }
   if (!res.ok) {
-    throw new Error(`Erreur Voyage (${res.status}) : ${await res.text()}`)
+    throw new Error(`Erreur Voyage (${res.status}) : ${(await res.text()).slice(0, 300)}`)
   }
   const json = (await res.json()) as VoyageResponse
   return json.data.sort((a, b) => a.index - b.index).map((d) => d.embedding)

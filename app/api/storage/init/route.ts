@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { utilisateurCourant } from '@/lib/auth-serveur'
 
-const BUCKETS = ['mindmaps', 'medias', 'qcm']
+const BUCKETS = ['mindmaps', 'medias', 'qcm', 'cours']
 
 export async function POST() {
   let admin

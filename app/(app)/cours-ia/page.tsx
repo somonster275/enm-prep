@@ -604,7 +604,7 @@ export default function CoursIAPage() {
                         <div style={{ padding: '20px 24px 18px', fontSize: 15, lineHeight: 1.68, color: '#3A3226' }}>
                           {m.contenu ? (
                             <div className="md-response codex-response">
-                              <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.contenu}</ReactMarkdown>
+                              <ReactMarkdown remarkPlugins={[remarkGfm]} disallowedElements={['img']} unwrapDisallowed>{m.contenu}</ReactMarkdown>
                             </div>
                           ) : (
                             <span style={{ color: '#C2B7A0', fontStyle: 'italic' }}>En attente de la réponse…</span>

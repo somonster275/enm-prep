@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
   const { error } = await admin.from('demandes_acces').insert({
     nom: nomPropre, email: mail, message: messagePropre,
   })
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('acces/demande:', error.message); return NextResponse.json({ error: 'Erreur serveur, réessaie.' }, { status: 500 }) }
 
   // Notification email — non bloquante : la demande est enregistrée même si l'email échoue.
   try {

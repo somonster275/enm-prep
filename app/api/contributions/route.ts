@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
   const { error } = await admin.from('contributions').insert({
     user_id: user.id, type, statut: 'nouveau', titre, matiere, espace_id, module_id, payload,
   })
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('contributions:', error.message); return NextResponse.json({ error: 'Erreur serveur, réessaie.' }, { status: 500 }) }
 
   // Notification email — non bloquante.
   try {

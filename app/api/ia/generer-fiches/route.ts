@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
   const { texte, nombre } = await request.json().catch(() => ({}))
   const sujet = String(texte || '').trim()
   if (!sujet) return NextResponse.json({ error: 'Sujet ou texte manquant' }, { status: 400 })
+  if (sujet.length > 100_000) return NextResponse.json({ error: 'Texte trop long (100 000 caractères max)' }, { status: 413 })
   const n = Math.min(20, Math.max(1, parseInt(String(nombre), 10) || 8))
 
   // Modèle, effort, repli et gestion des refus centralisés dans lib/ia.ts.
