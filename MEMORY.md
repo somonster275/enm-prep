@@ -109,7 +109,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 
 ## Journal des sessions
 
-### 2026-11-20 (suite 33) — Matières réservées aux connectés (migration 0040, À EXÉCUTER)
+### 2026-11-20 (suite 33) — Matières réservées aux connectés (migration 0040, exécutée par le user)
 - **Migration `0040_espaces_connectes.sql`** : supprime `lecture_espaces` (rôle public, lisible sans compte),
   crée `espaces_select_connectes` (select, authenticated). Vérifié : aucune page publique ne lit `espaces`.
 - Classement « +1 en boucle » (jusqu'à 1 000/jour) **laissé volontairement** : classement anonyme, faible enjeu ;
