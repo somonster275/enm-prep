@@ -94,22 +94,6 @@ export function calculerStreak(activite: Record<string, number>, pauses: Pause[]
   return streak
 }
 
-/** Plus longue série historique sur la fenêtre chargée. */
-export function meilleurStreak(activite: Record<string, number>): number {
-  const jours = Object.keys(activite).filter(j => activite[j] > 0).sort()
-  let best = 0, cur = 0, prev: Date | null = null
-  for (const j of jours) {
-    const d = new Date(j + 'T00:00:00')
-    if (prev) {
-      const diff = Math.round((d.getTime() - prev.getTime()) / 86400000)
-      cur = diff === 1 ? cur + 1 : 1
-    } else cur = 1
-    best = Math.max(best, cur)
-    prev = d
-  }
-  return best
-}
-
 /** Les 7 derniers jours (du plus ancien au plus récent) pour le graphique momentum. */
 export function derniers7Jours(activite: Record<string, number>) {
   const lettres = ['D', 'L', 'M', 'M', 'J', 'V', 'S'] // dimanche → samedi
