@@ -48,7 +48,7 @@ export default function AdminRemarques() {
     <div style={{ paddingTop: 34, maxWidth: 820, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, flexWrap: 'wrap', gap: 10 }}>
         <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 26, margin: 0 }}>Remarques des étudiants</h1>
-        <div style={{ display: 'flex', gap: 6, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 11, padding: 3 }}>
+        <div style={{ display: 'flex', gap: 6, background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 3 }}>
           {(['nouveau', 'tous'] as const).map(f => (
             <button key={f} onClick={() => setFiltre(f)} style={{
               padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: font,
@@ -64,13 +64,13 @@ export default function AdminRemarques() {
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : visibles.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
           {filtre === 'nouveau' ? 'Aucune remarque à traiter. 🎉' : 'Aucune remarque pour l’instant.'}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {visibles.map(r => (
-            <div key={r.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18, opacity: r.statut === 'traite' ? 0.65 : 1 }}>
+            <div key={r.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18, opacity: r.statut === 'traite' ? 0.65 : 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
                 <div style={{ fontSize: 13, color: 'var(--c-annotation)' }}>
                   <span style={{ fontWeight: 700, color: 'var(--c-encre)' }}>{auteurNom(r.auteur)}</span>
@@ -85,7 +85,7 @@ export default function AdminRemarques() {
 
               {/* Fiche concernée */}
               {r.fiches?.question && (
-                <div style={{ background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 10, padding: '10px 12px', marginBottom: 10 }}>
+                <div style={{ background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '10px 12px', marginBottom: 10 }}>
                   <div style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--c-discret)', letterSpacing: '.06em', marginBottom: 4 }}>FICHE CONCERNÉE</div>
                   <RichContent html={r.fiches.question} style={{ fontSize: 13, color: 'var(--c-texte-doux)', lineHeight: 1.5 }} />
                 </div>

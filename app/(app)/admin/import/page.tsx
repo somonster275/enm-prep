@@ -278,11 +278,11 @@ export default function ImportPage() {
   }
 
   const font = "var(--font-texte)"
-  const card: React.CSSProperties = { background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: '1.5rem', marginBottom: 16 }
-  const inp: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid var(--c-filet-fort)', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: 'var(--c-papier)', outline: 'none' }
+  const card: React.CSSProperties = { background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '1.5rem', marginBottom: 16 }
+  const inp: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 6, border: '1.5px solid var(--c-filet-fort)', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: 'var(--c-papier)', outline: 'none' }
   const lbl: React.CSSProperties = { fontSize: 12, display: 'block', marginBottom: 6, color: 'var(--c-annotation)', fontWeight: 600 }
-  const btnP: React.CSSProperties = { padding: '11px 24px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: font }
-  const btnS: React.CSSProperties = { padding: '11px 18px', borderRadius: 10, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)', border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 14, fontFamily: font }
+  const btnP: React.CSSProperties = { padding: '11px 24px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: font }
+  const btnS: React.CSSProperties = { padding: '11px 18px', borderRadius: 6, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)', border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 14, fontFamily: font }
 
   const steps = ['Fichier', 'Aperçu', 'Destination', 'Terminé']
   const stepIdx = etape === 'upload' ? 0 : etape === 'preview' ? 1 : etape === 'import' ? 2 : 3
@@ -328,7 +328,7 @@ export default function ImportPage() {
             onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFichier(f) }}
             {...activable} onClick={() => !parsing && fileRef.current?.click()}
             style={{
-              border: '2px dashed #F2C4B5', borderRadius: 12, padding: '2.5rem',
+              border: '2px dashed #F2C4B5', borderRadius: 6, padding: '2.5rem',
               textAlign: 'center', cursor: parsing ? 'wait' : 'pointer', background: 'var(--c-papier)',
             }}
           >
@@ -357,20 +357,20 @@ export default function ImportPage() {
           </div>
 
           {erreur && (
-            <div style={{ marginTop: 14, fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '10px 14px', borderRadius: 10 }}>
+            <div style={{ marginTop: 14, fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '10px 14px', borderRadius: 6 }}>
               ❌ {erreur}
             </div>
           )}
 
           <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <div style={{ padding: '14px 16px', background: 'var(--c-papier-teinte)', borderRadius: 10, fontSize: 13, color: 'var(--c-annotation)', lineHeight: 1.6 }}>
+            <div style={{ padding: '14px 16px', background: 'var(--c-papier-teinte)', borderRadius: 6, fontSize: 13, color: 'var(--c-annotation)', lineHeight: 1.6 }}>
               <strong style={{ color: 'var(--c-encre)' }}>Export .apkg</strong><br />
               1. Anki → clic droit sur un paquet<br />
               2. <strong>Exporter</strong><br />
               3. Format : <strong>Paquet Anki (.apkg)</strong><br />
               4. Clique Exporter
             </div>
-            <div style={{ padding: '14px 16px', background: 'var(--c-papier-teinte)', borderRadius: 10, fontSize: 13, color: 'var(--c-annotation)', lineHeight: 1.6 }}>
+            <div style={{ padding: '14px 16px', background: 'var(--c-papier-teinte)', borderRadius: 6, fontSize: 13, color: 'var(--c-annotation)', lineHeight: 1.6 }}>
               <strong style={{ color: 'var(--c-encre)' }}>Export .txt</strong><br />
               1. Anki → Fichier → Exporter<br />
               2. Format : <strong>Notes in Plain Text</strong><br />
@@ -390,7 +390,7 @@ export default function ImportPage() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 340, overflowY: 'auto' }}>
               {cartes.slice(0, 50).map((c, i) => (
-                <div key={i} style={{ padding: '10px 12px', background: 'var(--c-papier-teinte)', borderRadius: 10, fontSize: 13 }}>
+                <div key={i} style={{ padding: '10px 12px', background: 'var(--c-papier-teinte)', borderRadius: 6, fontSize: 13 }}>
                   <div style={{ fontWeight: 600, color: 'var(--c-encre)', marginBottom: 3 }}>{htmlToText(c.question)}</div>
                   <div style={{ color: 'var(--c-annotation)', lineHeight: 1.5 }}>
                     {htmlToText(c.reponse).slice(0, 140)}{htmlToText(c.reponse).length > 140 ? '…' : ''}

@@ -125,7 +125,7 @@ export default function ActualitesPage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 44, height: 44, borderRadius: 6, background: '#A3122A22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📰</div>
-            <div style={{ fontFamily: display, fontWeight: 800, fontSize: 26 }}>Actualités</div>
+            <div style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 26 }}>Actualités</div>
           </div>
           <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '6px 0 0 56px' }}>L'actualité juridique de la semaine, en direct des sites de référence.</p>
         </div>

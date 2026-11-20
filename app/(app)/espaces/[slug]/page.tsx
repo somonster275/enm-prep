@@ -76,33 +76,32 @@ export default function EspacePage() {
           <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)', marginBottom: 6 }}>
             <Link href="/espaces" style={{ color: 'var(--c-annotation-clair)', textDecoration: 'none' }}>Espaces</Link> / {espace.nom}
           </div>
-          <h1 style={{ fontFamily: display, fontSize: 26, fontWeight: 800, margin: '0 0 4px', color: espace.couleur }}>
+          <h1 style={{ fontFamily: display, fontSize: 36, fontWeight: 'var(--titre-poids)', letterSpacing: '-.015em', margin: '0 0 4px', color: 'var(--c-encre)', borderLeft: `6px solid ${espace.couleur}`, paddingLeft: 14 }}>
             {espace.nom}
           </h1>
           <p style={{ fontSize: 14, color: 'var(--c-annotation-clair)', margin: 0 }}>{modules.length} module{modules.length > 1 ? 's' : ''}</p>
         </div>
         {score > 0 && (
-          <div style={{ textAlign: 'center', background: espace.couleur + '18', borderRadius: 14, padding: '14px 22px' }}>
-            <div style={{ fontSize: 30, fontWeight: 800, color: espace.couleur, fontFamily: display }}>{score}%</div>
-            <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)' }}>Fiches maîtrisées</div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 32, fontWeight: 600, color: 'var(--c-encre)', fontFamily: display, fontVariantNumeric: 'tabular-nums' }}>{score} %</div>
+            <div style={{ fontSize: 13, color: 'var(--c-annotation)' }}>de maîtrise</div>
           </div>
         )}
       </div>
 
       {/* ===== FICHES ===== */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-        <span style={{ fontSize: 20 }}>🗂️</span>
-        <h2 style={{ fontFamily: display, fontWeight: 800, fontSize: 20, margin: 0 }}>Fiches</h2>
+        <h2 style={{ fontFamily: display, fontWeight: 600, fontSize: 24, margin: 0 }}>Fiches</h2>
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: '1rem' }}>
         <Link href={`/espaces/${slug}/revision`} style={{
-          flex: 1, padding: '12px', borderRadius: 10, background: espace.couleur, color: '#fff',
-          fontSize: 13, fontWeight: 700, textDecoration: 'none', textAlign: 'center', fontFamily: font,
+          flex: 1, padding: '12px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff',
+          fontSize: 14.5, fontWeight: 600, textDecoration: 'none', textAlign: 'center', fontFamily: font,
         }}>Réviser ({due} dues)</Link>
         <Link href={`/espaces/${slug}/revision?mode=tout`} style={{
-          flex: 1, padding: '12px', borderRadius: 10, background: '#fff', color: 'var(--c-annotation)',
-          fontSize: 13, textDecoration: 'none', textAlign: 'center', fontFamily: font,
+          flex: 1, padding: '12px', borderRadius: 6, background: 'transparent', color: 'var(--c-encre)', fontWeight: 600,
+          fontSize: 14.5, textDecoration: 'none', textAlign: 'center', fontFamily: font,
           border: '1px solid var(--c-filet)',
         }}>Tout réviser (aléatoire)</Link>
       </div>
@@ -117,16 +116,16 @@ export default function EspacePage() {
           const maitrisees = progMod.filter(p => (p.palier ?? 0) >= 4).length
           return (
             <Link key={mod.id} href={`/espaces/${slug}/modules/${mod.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '1rem 1.25rem', cursor: 'pointer' }}>
+              <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '1rem 1.25rem', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div style={{ fontSize: 14, fontWeight: 600 }}>{mod.nom}</div>
                   <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                    {dueMod > 0 && <span style={{ fontSize: 11, padding: '2px 8px', background: '#FAEEDA', color: '#854F0B', borderRadius: 20 }}>{dueMod} à revoir</span>}
-                    <span style={{ fontSize: 13, fontWeight: 700, color: espace.couleur }}>{scoreMod}%</span>
+                    {dueMod > 0 && <span style={{ fontSize: 12, fontWeight: 600, padding: '0 6px', background: 'var(--c-surligneur)', color: 'var(--c-encre)', borderRadius: 2 }}>{dueMod} à revoir</span>}
+                    <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--c-encre)', fontVariantNumeric: 'tabular-nums' }}>{scoreMod} %</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CCC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                   </div>
                 </div>
-                <div style={{ height: 4, background: '#F1E4CE', borderRadius: 4, overflow: 'hidden', marginBottom: 8 }}>
+                <div style={{ height: 4, background: 'var(--c-filet)', borderRadius: 2, overflow: 'hidden', marginBottom: 8 }}>
                   <div style={{ height: '100%', width: `${scoreMod}%`, background: espace.couleur, borderRadius: 4 }} />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--c-annotation-clair)' }}>
@@ -148,8 +147,7 @@ export default function EspacePage() {
       <div style={{ marginBottom: 32 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 20 }}>📘</span>
-            <h2 style={{ fontFamily: display, fontWeight: 800, fontSize: 20, margin: 0 }}>Cours</h2>
+            <h2 style={{ fontFamily: display, fontWeight: 600, fontSize: 24, margin: 0 }}>Cours</h2>
           </div>
           {isAdmin && <Link href="/cours" style={{ fontSize: 13, fontWeight: 600, color: '#3B82D9', textDecoration: 'none' }}>+ Ajouter</Link>}
         </div>
@@ -159,9 +157,9 @@ export default function EspacePage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {cours.map(c => (
               <Link key={c.id} href={`/cours?c=${c.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, fontWeight: 600 }}>
-                    <span>{c.type === 'pdf' ? '📕' : '📘'}</span>{c.titre}
+                    {c.titre}{c.type === 'pdf' && <span style={{ fontSize: 12, color: 'var(--c-annotation)', fontWeight: 400 }}>PDF</span>}
                   </div>
                   <span style={{ fontSize: 12, color: '#3B82D9', fontWeight: 600, flexShrink: 0 }}>Consulter →</span>
                 </div>
@@ -178,8 +176,7 @@ export default function EspacePage() {
           <div key={t.key} style={{ marginBottom: 32 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 20 }}>{t.icone}</span>
-                <h2 style={{ fontFamily: display, fontWeight: 800, fontSize: 20, margin: 0 }}>{t.titre}</h2>
+                <h2 style={{ fontFamily: display, fontWeight: 600, fontSize: 24, margin: 0 }}>{t.titre}</h2>
               </div>
               {isAdmin && (
                 <Link href={t.href} style={{
@@ -194,7 +191,7 @@ export default function EspacePage() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {items.map(it => (
-                  <div key={it.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                  <div key={it.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
                     <div style={{ fontSize: 14, fontWeight: 600 }}>
                       {it.titre}
                       {it.type && <span style={{ fontSize: 11, color: 'var(--c-annotation)', marginLeft: 8 }}>· {it.type}</span>}

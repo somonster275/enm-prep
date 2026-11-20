@@ -146,7 +146,7 @@ export default function AdminQcmPage() {
   }
 
   const font = "var(--font-texte)"
-  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: font }
+  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: font }
 
   return (
     <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
@@ -155,7 +155,7 @@ export default function AdminQcmPage() {
         Importe ton QCM depuis un <b>lien</b>, ou colle-le en <b>texte</b> ou en <b>HTML</b>, puis vérifie les bonnes réponses avant d&apos;enregistrer.
       </p>
 
-      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18, display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+      <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18, display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <input value={titre} onChange={e => setTitre(e.target.value)} placeholder="Titre du QCM" style={{ ...champ, flex: '2 1 220px' }} />
           <select value={matiere} onChange={e => setMatiere(e.target.value)} style={{ ...champ, flex: '1 1 160px' }}>
@@ -173,12 +173,12 @@ export default function AdminQcmPage() {
             onKeyDown={e => { if (e.key === 'Enter') importerLien() }}
             style={{ ...champ, flex: '3 1 240px' }} />
           <button onClick={importerLien} disabled={chargementLien} style={{
-            height: 44, padding: '0 20px', border: '1px solid var(--c-filet-fort)', borderRadius: 11, background: 'var(--c-papier-teinte)',
+            height: 44, padding: '0 20px', border: '1px solid var(--c-filet-fort)', borderRadius: 6, background: 'var(--c-papier-teinte)',
             color: '#5C4A22', fontSize: 14, fontWeight: 700, cursor: chargementLien ? 'wait' : 'pointer',
             fontFamily: font, opacity: chargementLien ? 0.7 : 1, whiteSpace: 'nowrap',
           }}>{chargementLien ? 'Chargement…' : '↓ Importer le lien'}</button>
           <button onClick={() => fileRef.current?.click()} style={{
-            height: 44, padding: '0 20px', border: '1px solid var(--c-filet-fort)', borderRadius: 11, background: 'var(--c-papier-teinte)',
+            height: 44, padding: '0 20px', border: '1px solid var(--c-filet-fort)', borderRadius: 6, background: 'var(--c-papier-teinte)',
             color: '#5C4A22', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: font, whiteSpace: 'nowrap',
           }}>📄 Importer un fichier HTML</button>
           <input ref={fileRef} type="file" accept=".html,.htm,.txt,text/html,text/plain" style={{ display: 'none' }}
@@ -195,7 +195,7 @@ export default function AdminQcmPage() {
           Format texte : <code>Q:</code> pour une question, <code>-</code> pour une option, <code>*</code> en fin de ligne pour la bonne réponse, <code>&gt;</code> pour une explication. Sont aussi acceptés : le HTML (listes, boutons radio) et les <b>quiz à réponse libre</b> (fichier interactif où l&apos;étudiant tape sa réponse).
         </div>
         <div>
-          <button onClick={analyser} style={{ height: 44, padding: '0 22px', border: 'none', borderRadius: 11, background: 'var(--c-encre)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>Analyser</button>
+          <button onClick={analyser} style={{ height: 44, padding: '0 22px', border: 'none', borderRadius: 6, background: 'var(--c-encre)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>Analyser</button>
         </div>
       </div>
 
@@ -205,7 +205,7 @@ export default function AdminQcmPage() {
           <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 10 }}>Prévisualisation ({questions.length} questions) — coche les bonnes réponses</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {questions.map((q, qi) => (
-              <div key={qi} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 14, padding: 14 }}>
+              <div key={qi} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 14 }}>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                   <textarea value={q.enonce} onChange={e => majEnonce(qi, e.target.value)} rows={2} style={{ ...champ, flex: 1, resize: 'vertical', fontWeight: 600 }} />
                   <button onClick={() => supprQuestion(qi)} title="Supprimer" style={{ border: 'none', background: 'transparent', color: 'var(--c-discret-clair)', cursor: 'pointer', fontSize: 16 }}>✕</button>
@@ -225,7 +225,7 @@ export default function AdminQcmPage() {
             ))}
           </div>
           {msg && <div style={{ fontSize: 13.5, color: msg.type === 'ok' ? '#0F6E56' : 'var(--c-accent)', marginTop: 12 }}>{msg.texte}</div>}
-          <button onClick={enregistrer} disabled={saving} style={{ marginTop: 14, height: 48, padding: '0 26px', border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: font }}>{saving ? 'Enregistrement…' : 'Enregistrer le QCM'}</button>
+          <button onClick={enregistrer} disabled={saving} style={{ marginTop: 14, height: 48, padding: '0 26px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: font }}>{saving ? 'Enregistrement…' : 'Enregistrer le QCM'}</button>
         </div>
       )}
       {/* Prévisualisation éditable — QCM avancé (réponse libre) */}
@@ -238,7 +238,7 @@ export default function AdminQcmPage() {
           <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginBottom: 12 }}>L&apos;étudiant tapera sa réponse. Elle sera comparée aux <b>réponses acceptées</b> (une par ligne) — accents, casse et ponctuation sont ignorés.</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {questionsLibre.map((q, qi) => (
-              <div key={qi} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 14, padding: 14 }}>
+              <div key={qi} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 14 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                   <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--c-annotation-clair)' }}>Question {qi + 1}</span>
                   <button onClick={() => supprLibre(qi)} title="Supprimer" style={{ border: 'none', background: 'transparent', color: 'var(--c-discret-clair)', cursor: 'pointer', fontSize: 16 }}>✕</button>
@@ -257,7 +257,7 @@ export default function AdminQcmPage() {
             ))}
           </div>
           {msg && <div style={{ fontSize: 13.5, color: msg.type === 'ok' ? '#0F6E56' : 'var(--c-accent)', marginTop: 12 }}>{msg.texte}</div>}
-          <button onClick={enregistrer} disabled={saving} style={{ marginTop: 14, height: 48, padding: '0 26px', border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: font }}>{saving ? 'Enregistrement…' : 'Enregistrer le QCM avancé'}</button>
+          <button onClick={enregistrer} disabled={saving} style={{ marginTop: 14, height: 48, padding: '0 26px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: font }}>{saving ? 'Enregistrement…' : 'Enregistrer le QCM avancé'}</button>
         </div>
       )}
       {questions.length === 0 && questionsLibre.length === 0 && msg && <div style={{ fontSize: 13.5, color: msg.type === 'ok' ? '#0F6E56' : 'var(--c-accent)', marginBottom: 16 }}>{msg.texte}</div>}
@@ -269,7 +269,7 @@ export default function AdminQcmPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {liste.map(q => (
-            <div key={q.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '12px 14px' }}>
+            <div key={q.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '12px 14px' }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
                   {q.titre}

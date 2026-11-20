@@ -69,7 +69,7 @@ export default function AdminContributions() {
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : visibles.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
           <div style={{ fontSize: 30, marginBottom: 8 }}>📭</div>Aucune proposition {filtre === 'nouveau' ? 'à traiter' : ''}.
         </div>
       ) : (
@@ -77,7 +77,7 @@ export default function AdminContributions() {
           {visibles.map(c => {
             const s = STATUT[c.statut] || STATUT.nouveau
             return (
-              <div key={c.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18 }}>
+              <div key={c.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
                   <span style={{ fontSize: 18 }}>{c.type === 'qcm' ? '✅' : '📇'}</span>
                   <span style={{ fontWeight: 800, fontSize: 15 }}>{c.titre || (c.type === 'qcm' ? 'QCM' : 'Fiche')}</span>
@@ -88,14 +88,14 @@ export default function AdminContributions() {
 
                 {/* Aperçu du contenu */}
                 {c.type === 'fiche' ? (
-                  <div style={{ background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 10, padding: 12, fontSize: 13.5, lineHeight: 1.5 }}>
+                  <div style={{ background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 12, fontSize: 13.5, lineHeight: 1.5 }}>
                     <div style={{ fontWeight: 700 }}>Q. {c.payload.question}</div>
                     <div style={{ color: '#5C5448', marginTop: 6, whiteSpace: 'pre-wrap' }}>R. {c.payload.reponse}</div>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {(c.payload.questions || []).map((q, i) => (
-                      <div key={i} style={{ background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 10, padding: 12, fontSize: 13.5 }}>
+                      <div key={i} style={{ background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 12, fontSize: 13.5 }}>
                         <div style={{ fontWeight: 700, marginBottom: 6 }}>{i + 1}. {q.enonce}</div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                           {q.options.map((o, oi) => (

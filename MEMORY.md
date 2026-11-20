@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 49).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 50).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,19 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 50) — Refonte design : pages des matières + rattrapage de la passe
+- `espaces/page.tsx` : titre « Vos matières » ; Révision mixte / Carnet / Favoris / Recherche = une bande de 4 liens
+  texte (mixte surligné d'un filet rouge en haut ; séparateurs verticaux → horizontaux sur mobile via `<style>`) ;
+  matières = cartes avec tranche de `espace.couleur` à gauche, nom en Newsreader, sans emoji (le champ `icone` reste
+  en base et dans la modale d'ajout, il n'est juste plus affiché). Modale d'ajout inchangée.
+- `espaces/[slug]/page.tsx` : titre encre avec filet de la couleur de la matière, maîtrise « 50 % de maîtrise » sans
+  pastille, titres de section sans emoji, « x à revoir » en surligneur, boutons rayon 6.
+- ⚠️ La passe mécanique de la suite 49 avait **raté les fichiers à 2+ niveaux** (`app/(app)/**/page.tsx` sans globstar
+  = 1 niveau). Relancée avec `find` sur tout `app/(app)` + `components` (11 fichiers de plus). Titres en `fontFamily:
+  display` + `fontWeight: 800` passés à `var(--titre-poids)` (9 titres).
+- Reste : ~290 emoji dans ~30 fichiers (MethodeContenu, cours-ia, DuelAsync, qcm, modules, admin…), dont une partie
+  fonctionnelle (✓ ✕ ★, sélecteur d'icône admin) → à traiter page par page, pas par script.
 
 ### 2026-11-20 (suite 49) — Refonte design : composants restants + passe d'harmonisation
 - Poussé sur `main` (demande du user) jusqu'à `bf55e82` ; ce lot est sur la branche `claude/beautiful-noether-faylt4`.

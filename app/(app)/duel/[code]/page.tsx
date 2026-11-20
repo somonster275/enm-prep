@@ -239,7 +239,7 @@ export default function SalleDuel() {
       <div style={{ fontSize: 40, marginBottom: 10 }}>🔍</div>
       <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 22 }}>Salon introuvable</div>
       <p style={{ color: 'var(--c-annotation)', fontSize: 14 }}>Le code « {codeStr} » ne correspond à aucun match.</p>
-      <button onClick={() => router.push('/duel')} style={{ marginTop: 10, padding: '11px 22px', border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>Retour aux duels</button>
+      <button onClick={() => router.push('/duel')} style={{ marginTop: 10, padding: '11px 22px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>Retour aux duels</button>
     </div>
   )
   if (!match) return <div style={{ paddingTop: 40, textAlign: 'center', color: 'var(--c-annotation-clair)', fontFamily: FONT }}>Chargement…</div>
@@ -254,10 +254,10 @@ export default function SalleDuel() {
   // ---- LOBBY ----
   if (match.statut === 'attente') return (
     <div style={{ paddingTop: 34, maxWidth: 620, margin: '0 auto', fontFamily: FONT, color: 'var(--c-encre)' }}>
-      <div style={{ background: '#FFC02E', borderRadius: 20, padding: 26, textAlign: 'center', marginBottom: 22, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ background: '#FFC02E', borderRadius: 6, padding: 26, textAlign: 'center', marginBottom: 22, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', width: 140, height: 140, borderRadius: '50%', background: '#FFCE54', right: -40, top: -50 }} />
         <div style={{ position: 'relative' }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: '#7A5E14' }}>Code du salon</div>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.1em', color: '#7A5E14' }}>Code du salon</div>
           <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 46, letterSpacing: 8, margin: '6px 0 4px' }}>{match.code}</div>
           <div style={{ fontSize: 13.5, color: '#5C4A22', fontWeight: 600 }}>{match.titre} · {total} questions · {match.secondes_par_question}s/question</div>
         </div>
@@ -265,11 +265,11 @@ export default function SalleDuel() {
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 17 }}>Joueurs ({joueurs.length})</div>
-        <button onClick={() => { navigator.clipboard?.writeText(`${location.origin}/duel/${match.code}`) }} style={{ border: '1px solid var(--c-filet-fort)', background: '#fff', color: 'var(--c-annotation)', borderRadius: 9, padding: '6px 12px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>Copier le lien</button>
+        <button onClick={() => { navigator.clipboard?.writeText(`${location.origin}/duel/${match.code}`) }} style={{ border: '1px solid var(--c-filet-fort)', background: '#FFFEFB', color: 'var(--c-annotation)', borderRadius: 9, padding: '6px 12px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>Copier le lien</button>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 22 }}>
         {joueurs.map(j => (
-          <div key={j.user_id} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '11px 16px' }}>
+          <div key={j.user_id} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '11px 16px' }}>
             <span style={{ width: 30, height: 30, borderRadius: '50%', background: 'var(--c-accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13 }}>{j.pseudo.slice(0, 1).toUpperCase()}</span>
             <span style={{ flex: 1, fontWeight: 600, fontSize: 14.5 }}>{j.pseudo}{j.user_id === uid && ' (toi)'}</span>
             {j.user_id === match.hote_id && <span style={{ fontSize: 11.5, fontWeight: 700, color: '#8A5A10', background: '#FCEFD3', padding: '2px 9px', borderRadius: 999 }}>Hôte</span>}
@@ -278,14 +278,14 @@ export default function SalleDuel() {
       </div>
 
       {estHote ? (
-        <button onClick={lancer} disabled={joueurs.length < 2} style={{ width: '100%', height: 52, border: 'none', borderRadius: 14, background: 'var(--c-accent)', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', opacity: joueurs.length < 2 ? 0.5 : 1, fontFamily: FONT }}>
+        <button onClick={lancer} disabled={joueurs.length < 2} style={{ width: '100%', height: 52, border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', opacity: joueurs.length < 2 ? 0.5 : 1, fontFamily: FONT }}>
           {joueurs.length < 2 ? 'En attente d\'un second joueur…' : 'Lancer le match →'}
         </button>
       ) : (
         <div style={{ textAlign: 'center', color: 'var(--c-annotation)', fontSize: 14, padding: '14px 0' }}>En attente du lancement par l&apos;hôte…</div>
       )}
 
-      <button onClick={() => quitter(false)} style={{ width: '100%', marginTop: 10, height: 44, border: '1px solid var(--c-filet-fort)', borderRadius: 12, background: 'transparent', color: 'var(--c-annotation-clair)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>
+      <button onClick={() => quitter(false)} style={{ width: '100%', marginTop: 10, height: 44, border: '1px solid var(--c-filet-fort)', borderRadius: 6, background: 'transparent', color: 'var(--c-annotation-clair)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>
         {estHote ? 'Annuler le salon' : 'Quitter le salon'}
       </button>
     </div>
@@ -302,7 +302,7 @@ export default function SalleDuel() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {classement.map((j, i) => (
           <div key={j.user_id} style={{
-            display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 14,
+            display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 6,
             background: j.user_id === uid ? 'var(--c-accent-pale)' : '#fff', border: `1px solid ${j.user_id === uid ? 'var(--c-accent-bord)' : 'var(--c-filet)'}`,
           }}>
             <span style={{ fontSize: 20, fontWeight: 800, width: 36, textAlign: 'center' }}>{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}</span>
@@ -324,7 +324,7 @@ export default function SalleDuel() {
           <>
             {/* Bandeau : erreurs rangées en révision */}
             {(correction.nbFichesRangees > 0 || correction.nbQcmRangees > 0) ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--c-accent-pale)', border: '1px solid var(--c-accent-bord)', borderRadius: 12, padding: '12px 16px', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--c-accent-pale)', border: '1px solid var(--c-accent-bord)', borderRadius: 6, padding: '12px 16px', marginBottom: 16 }}>
                 <span style={{ fontSize: 22 }}>📌</span>
                 <div style={{ fontSize: 13.5, color: '#A8453B', lineHeight: 1.45 }}>
                   <b>{correction.nbErreurs} erreur{correction.nbErreurs > 1 ? 's' : ''}</b> rangée{correction.nbErreurs > 1 ? 's' : ''} dans tes cartes à réviser
@@ -333,14 +333,14 @@ export default function SalleDuel() {
                 </div>
               </div>
             ) : (
-              <div style={{ background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 12, padding: '12px 16px', marginBottom: 16, fontSize: 13.5, color: '#0E5A47' }}>
+              <div style={{ background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 6, padding: '12px 16px', marginBottom: 16, fontSize: 13.5, color: '#0E5A47' }}>
                 🎉 Aucune erreur — rien à ranger en révision, bravo !
               </div>
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {correction.correction.map((c, i) => (
-                <div key={i} style={{ background: '#fff', border: `1px solid ${c.juste ? '#BFE6CF' : 'var(--c-accent-bord)'}`, borderRadius: 14, padding: 16 }}>
+                <div key={i} style={{ background: '#FFFEFB', border: `1px solid ${c.juste ? '#BFE6CF' : 'var(--c-accent-bord)'}`, borderRadius: 6, padding: 16 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
                     <div style={{ fontSize: 14.5, fontWeight: 700, lineHeight: 1.4 }}>{i + 1}. {c.enonce}</div>
                     <span style={{ flexShrink: 0, fontSize: 13 }}>{c.juste ? '✅' : '❌'}</span>
@@ -360,7 +360,7 @@ export default function SalleDuel() {
                         <div
                           key={oi}
                           {...activable} onClick={() => tronquee && basculerDeplie(cle)}
-                          style={{ border: `1.5px solid ${bd}`, background: bg, borderRadius: 10, padding: '9px 12px', fontSize: 13.5, color: col, cursor: tronquee ? 'pointer' : 'default' }}
+                          style={{ border: `1.5px solid ${bd}`, background: bg, borderRadius: 6, padding: '9px 12px', fontSize: 13.5, color: col, cursor: tronquee ? 'pointer' : 'default' }}
                         >
                           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
                             <span style={{ flex: 1, whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{ouvert ? complet : t}</span>
@@ -385,7 +385,7 @@ export default function SalleDuel() {
       </div>
 
       <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
-        <button onClick={() => router.push('/duel')} style={{ flex: 1, height: 48, border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>Nouveau duel</button>
+        <button onClick={() => router.push('/duel')} style={{ flex: 1, height: 48, border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>Nouveau duel</button>
       </div>
     </div>
   )
@@ -410,7 +410,7 @@ export default function SalleDuel() {
         <div style={{ height: '100%', width: `${pctTemps}%`, background: reste <= 5 ? 'var(--c-accent)' : '#2DAE83', borderRadius: 999, transition: 'width .25s linear' }} />
       </div>
 
-      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18, padding: 22, marginBottom: 16 }}>
+      <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 22, marginBottom: 16 }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: q.cat === 'fiche' ? '#0F6E56' : '#8A5A10', marginBottom: 8 }}>{q.cat === 'fiche' ? 'FICHE' : 'QCM'}</div>
         <div style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.4, marginBottom: 4 }}>{q.enonce}</div>
         {multi && <div style={{ fontSize: 12, color: '#0F6E56', fontWeight: 600, marginTop: 6 }}>☑ Plusieurs réponses possibles</div>}
@@ -424,7 +424,7 @@ export default function SalleDuel() {
             <button key={oi} onClick={() => choisir(oi, multi)} disabled={verrou} style={{
               display: 'flex', alignItems: 'flex-start', gap: 12, textAlign: 'left', cursor: verrou ? 'default' : 'pointer',
               border: `1.5px solid ${sel ? '#E8A11E' : 'var(--c-filet-fort)'}`, background: sel ? '#FCEFD3' : 'var(--c-papier)',
-              borderRadius: 12, padding: '13px 16px', fontSize: 15, fontFamily: FONT, color: 'var(--c-encre)', opacity: verrou && !sel ? 0.6 : 1,
+              borderRadius: 6, padding: '13px 16px', fontSize: 15, fontFamily: FONT, color: 'var(--c-encre)', opacity: verrou && !sel ? 0.6 : 1,
             }}>
               <span style={{ flexShrink: 0, width: 20, height: 20, marginTop: 1, borderRadius: multi ? 5 : '50%', border: `2px solid ${sel ? '#E8A11E' : 'var(--c-discret-clair)'}`, background: sel ? '#E8A11E' : '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12 }}>{sel ? '✓' : ''}</span>
               <span style={{ flex: 1 }}>
@@ -448,14 +448,14 @@ export default function SalleDuel() {
       {verrou ? (
         <div style={{ textAlign: 'center', color: '#0F6E56', fontWeight: 700, fontSize: 14.5 }}>✓ Réponse enregistrée — en attente de la prochaine question…</div>
       ) : (
-        <button onClick={validerManuel} disabled={selection.size === 0} style={{ width: '100%', height: 50, border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: selection.size === 0 ? 0.5 : 1, fontFamily: FONT }}>
+        <button onClick={validerManuel} disabled={selection.size === 0} style={{ width: '100%', height: 50, border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: selection.size === 0 ? 0.5 : 1, fontFamily: FONT }}>
           Valider
         </button>
       )}
 
       {/* Mini classement live */}
       <div style={{ marginTop: 26 }}>
-        <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--c-annotation-clair)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.06em' }}>Classement live</div>
+        <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--c-annotation-clair)', marginBottom: 8, letterSpacing: '.06em' }}>Classement live</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
           {classement.map((j, i) => (
             <div key={j.user_id} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13.5, padding: '7px 12px', borderRadius: 9, background: j.user_id === uid ? 'var(--c-accent-pale)' : '#fff', border: '1px solid var(--c-filet)' }}>

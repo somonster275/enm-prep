@@ -150,7 +150,7 @@ export default function CorbeillePage() {
       </p>
 
       {msg && (
-        <div style={{ fontSize: 13, padding: '10px 14px', borderRadius: 10, marginBottom: 16, color: msg.startsWith('🗑️') ? 'var(--c-accent)' : '#0E7C63', background: msg.startsWith('🗑️') ? 'var(--c-accent-pale)' : '#DDF3EE' }}>{msg}</div>
+        <div style={{ fontSize: 13, padding: '10px 14px', borderRadius: 6, marginBottom: 16, color: msg.startsWith('🗑️') ? 'var(--c-accent)' : '#0E7C63', background: msg.startsWith('🗑️') ? 'var(--c-accent-pale)' : '#DDF3EE' }}>{msg}</div>
       )}
 
       {vide ? (
@@ -168,7 +168,7 @@ export default function CorbeillePage() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {modules.map(mod => (
-                  <div key={mod.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                  <div key={mod.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600 }}>{mod.nom}</div>
                       <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginTop: 2 }}>
@@ -193,7 +193,7 @@ export default function CorbeillePage() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {fiches.map(f => (
-                  <div key={f.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                  <div key={f.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.question}</div>
                       <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginTop: 2 }}>

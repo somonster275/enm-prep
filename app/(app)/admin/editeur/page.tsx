@@ -111,8 +111,8 @@ export default function Editeur() {
   }
 
   const font = "var(--font-texte)"
-  const cardStyle: React.CSSProperties = { background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: '1.25rem', marginBottom: 16 }
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid var(--c-filet-fort)', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: 'var(--c-papier)', outline: 'none' }
+  const cardStyle: React.CSSProperties = { background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '1.25rem', marginBottom: 16 }
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 6, border: '1.5px solid var(--c-filet-fort)', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: 'var(--c-papier)', outline: 'none' }
   const labelStyle: React.CSSProperties = { fontSize: 12, display: 'block', marginBottom: 6, color: 'var(--c-annotation)', fontWeight: 600 }
   const msgStyle: React.CSSProperties = {
     fontSize: 13, padding: '8px 12px', borderRadius: 8, marginBottom: 12,
@@ -140,7 +140,7 @@ export default function Editeur() {
         <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
           {(['fiches', 'modules'] as Onglet[]).map(o => (
             <button key={o} onClick={() => setOnglet(o)} style={{
-              padding: '9px 20px', borderRadius: 10, cursor: 'pointer',
+              padding: '9px 20px', borderRadius: 6, cursor: 'pointer',
               fontSize: 13, fontWeight: 600, fontFamily: font,
               background: onglet === o ? 'var(--c-accent)' : '#fff',
               color: onglet === o ? '#fff' : 'var(--c-annotation)',
@@ -170,7 +170,7 @@ export default function Editeur() {
 
             {/* Formulaire création */}
             {creatingModule && (
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 14, padding: '12px', background: 'var(--c-papier-teinte)', borderRadius: 10 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 14, padding: '12px', background: 'var(--c-papier-teinte)', borderRadius: 6 }}>
                 <input
                   value={nomModule} onChange={e => setNomModule(e.target.value)} autoFocus
                   onKeyDown={e => { if (e.key === 'Enter') creerModule(); if (e.key === 'Escape') { setCreatingModule(false); setNomModule('') } }}
@@ -178,12 +178,12 @@ export default function Editeur() {
                   style={{ ...inputStyle, flex: 1, marginBottom: 0 }}
                 />
                 <button onClick={creerModule} disabled={!nomModule.trim()} style={{
-                  padding: '10px 18px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff',
+                  padding: '10px 18px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff',
                   border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: font,
                   opacity: !nomModule.trim() ? 0.5 : 1,
                 }}>Créer</button>
                 <button onClick={() => { setCreatingModule(false); setNomModule('') }} style={{
-                  padding: '10px 14px', borderRadius: 10, background: '#fff', color: 'var(--c-annotation)',
+                  padding: '10px 14px', borderRadius: 6, background: '#FFFEFB', color: 'var(--c-annotation)',
                   border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 13, fontFamily: font,
                 }}>Annuler</button>
               </div>
@@ -198,7 +198,7 @@ export default function Editeur() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {modules.map(mod => (
                   <div key={mod.id} style={{
-                    padding: '12px 14px', background: 'var(--c-papier-teinte)', borderRadius: 10,
+                    padding: '12px 14px', background: 'var(--c-papier-teinte)', borderRadius: 6,
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
                   }}>
                     {editModule?.id === mod.id ? (
@@ -213,7 +213,7 @@ export default function Editeur() {
                           border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font,
                         }}>Sauver</button>
                         <button onClick={() => setEditModule(null)} style={{
-                          padding: '8px 12px', borderRadius: 8, background: '#fff', color: 'var(--c-annotation)',
+                          padding: '8px 12px', borderRadius: 8, background: '#FFFEFB', color: 'var(--c-annotation)',
                           border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 12, fontFamily: font,
                         }}>Annuler</button>
                       </div>
@@ -225,11 +225,11 @@ export default function Editeur() {
                         </div>
                         <div style={{ display: 'flex', gap: 6 }}>
                           <button onClick={() => { setModuleId(mod.id); setOnglet('fiches') }} style={{
-                            padding: '6px 12px', borderRadius: 8, background: '#fff', color: 'var(--c-accent)',
+                            padding: '6px 12px', borderRadius: 8, background: '#FFFEFB', color: 'var(--c-accent)',
                             border: '1px solid #F2C4B5', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font,
                           }}>Voir les fiches</button>
                           <button onClick={() => { setEditModule(mod); setEditNomModule(mod.nom) }} style={{
-                            padding: '6px 12px', borderRadius: 8, background: '#fff', color: 'var(--c-annotation)',
+                            padding: '6px 12px', borderRadius: 8, background: '#FFFEFB', color: 'var(--c-annotation)',
                             border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 12, fontFamily: font,
                           }}>Renommer</button>
                           <button onClick={() => supprimerModule(mod)} style={{
@@ -262,7 +262,7 @@ export default function Editeur() {
                 </select>
                 {!creatingModule && (
                   <button onClick={() => setCreatingModule(true)} style={{
-                    padding: '10px 14px', borderRadius: 10, background: 'var(--c-papier-teinte)', color: 'var(--c-accent)',
+                    padding: '10px 14px', borderRadius: 6, background: 'var(--c-papier-teinte)', color: 'var(--c-accent)',
                     border: '1px solid #F2C4B5', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: font, whiteSpace: 'nowrap',
                   }}>+ Nouveau module</button>
                 )}
@@ -273,11 +273,11 @@ export default function Editeur() {
                     onKeyDown={e => { if (e.key === 'Enter') creerModule(); if (e.key === 'Escape') { setCreatingModule(false); setNomModule('') } }}
                     placeholder="Nom du module…" style={{ ...inputStyle, flex: 1, marginBottom: 0 }} />
                   <button onClick={creerModule} disabled={!nomModule.trim()} style={{
-                    padding: '10px 16px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff',
+                    padding: '10px 16px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff',
                     border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: font, opacity: !nomModule.trim() ? 0.5 : 1,
                   }}>Créer</button>
                   <button onClick={() => { setCreatingModule(false); setNomModule('') }} style={{
-                    padding: '10px 12px', borderRadius: 10, background: '#fff', color: 'var(--c-annotation)',
+                    padding: '10px 12px', borderRadius: 6, background: '#FFFEFB', color: 'var(--c-annotation)',
                     border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 13, fontFamily: font,
                   }}>✕</button>
                 </div>
@@ -310,7 +310,7 @@ export default function Editeur() {
               {msg && <div style={msgStyle}>{msg}</div>}
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={sauvegarder} disabled={!question || !reponse || !moduleId} style={{
-                  padding: '11px 22px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff',
+                  padding: '11px 22px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff',
                   border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: font,
                   opacity: (!question || !reponse || !moduleId) ? 0.4 : 1,
                 }}>
@@ -318,7 +318,7 @@ export default function Editeur() {
                 </button>
                 {editFiche && (
                   <button onClick={() => { setEditFiche(null); setQuestion(''); setReponse('') }} style={{
-                    padding: '11px 16px', borderRadius: 10, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)',
+                    padding: '11px 16px', borderRadius: 6, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)',
                     border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 13, fontFamily: font,
                   }}>Annuler</button>
                 )}
@@ -335,13 +335,13 @@ export default function Editeur() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {fiches.map(f => (
                   <div key={f.id} style={{
-                    padding: '12px 14px', background: 'var(--c-papier-teinte)', borderRadius: 10,
+                    padding: '12px 14px', background: 'var(--c-papier-teinte)', borderRadius: 6,
                     display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8,
                   }}>
                     <div style={{ flex: 1, fontSize: 13, lineHeight: 1.5 }}>{f.question.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()}</div>
                     <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                       <button onClick={() => { setEditFiche(f); setQuestion(f.question); setReponse(f.reponse); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-                        style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid var(--c-filet-fort)', background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
+                        style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid var(--c-filet-fort)', background: '#FFFEFB', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
                         Modifier
                       </button>
                       <button onClick={() => supprimerFiche(f.id)}

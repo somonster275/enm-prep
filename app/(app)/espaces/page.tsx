@@ -75,7 +75,7 @@ function ModalAjoutEspace({ onFermer, onAjoute }: { onFermer: () => void; onAjou
       }}>
         {/* Header */}
         <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--c-filet)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontFamily: display, fontWeight: 800, fontSize: 20 }}>Nouvel espace de révision</div>
+          <div style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 20 }}>Nouvel espace de révision</div>
           <button onClick={onFermer} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--c-annotation-clair)', lineHeight: 1 }}>✕</button>
         </div>
 
@@ -198,9 +198,9 @@ export default function EspacesPage() {
     <div style={{ paddingTop: '34px', fontFamily: font, color: 'var(--c-encre)' }}>
       <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
-          <div style={{ fontFamily: display, fontWeight: 800, fontSize: 30, letterSpacing: '-.01em' }}>
-            Vos espaces
-          </div>
+          <h1 style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 36, letterSpacing: '-.015em', margin: 0 }}>
+            Vos matières
+          </h1>
           <div style={{ fontSize: 15, color: 'var(--c-annotation)', marginTop: 4 }}>
             {espaces.length} matière{espaces.length > 1 ? 's' : ''} à réviser.
           </div>
@@ -208,99 +208,71 @@ export default function EspacesPage() {
         {estAdmin && (
           <button onClick={() => setModalOuvert(true)} style={{
             display: 'flex', alignItems: 'center', gap: 7, height: 40, padding: '0 18px',
-            border: '1.5px dashed var(--c-accent)', borderRadius: 6, background: '#FFF4F2',
-            color: 'var(--c-accent)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: font,
+            border: '1px solid var(--c-filet-fort)', borderRadius: 6, background: 'transparent',
+            color: 'var(--c-encre)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: font,
           }}>
-            + Ajouter un espace
+            Ajouter une matière
           </button>
         )}
       </div>
 
       {espaces.length === 0 ? (
-        <div style={{ fontSize: 14, color: 'var(--c-annotation-clair)', textAlign: 'center', padding: '4rem 0' }}>
-          Aucun espace pour le moment.
+        <div style={{ fontSize: 15, color: 'var(--c-annotation)', textAlign: 'center', padding: '4rem 0' }}>
+          Aucune matière pour le moment.
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-          {/* Carte « Révision mixte » */}
-          <Link href="/espaces/_/revision?mixte=1" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ background: '#FCEFE9', borderRadius: 6, padding: 22, border: '1.5px solid var(--c-accent-bord)', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ width: 46, height: 46, borderRadius: 6, background: 'var(--c-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>🔀</div>
-              <div style={{ fontWeight: 700, fontSize: 17 }}>Révision mixte</div>
-              <div style={{ fontSize: 13, color: '#A8705F', marginTop: 4 }}>40 fiches dues tirées au hasard, toutes matières mélangées — l&apos;entraînement le plus efficace.</div>
-              <div style={{ marginTop: 16 }}>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#fff', background: 'var(--c-accent)', padding: '3px 10px', borderRadius: 999 }}>Démarrer →</span>
-              </div>
-            </div>
-          </Link>
+        <>
+          {/* Autres façons de réviser : une bande de liens, la révision mixte en tête */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 0, background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, marginBottom: 28 }}>
+            {[
+              { href: '/espaces/_/revision?mixte=1', titre: 'Révision mixte', desc: '40 fiches dues, toutes matières mélangées.', fort: true },
+              { href: '/carnet', titre: "Carnet d'erreurs", desc: 'Vos fiches mal notées, à revoir en priorité.' },
+              { href: '/espaces/_/revision?favoris=1', titre: 'Mes favoris', desc: 'Les fiches que vous avez marquées.' },
+              { href: '/recherche', titre: 'Recherche', desc: 'Retrouver une notion dans toutes les fiches.' },
+            ].map(l => (
+              <Link key={l.href} href={l.href} className="lien-revision" style={{
+                textDecoration: 'none', color: 'inherit', padding: '16px 20px', minWidth: 0,
+                boxShadow: l.fort ? 'inset 0 3px 0 var(--c-accent)' : 'none',
+              }}>
+                <div style={{ fontFamily: display, fontWeight: 600, fontSize: 18, color: l.fort ? 'var(--c-accent)' : 'var(--c-encre)' }}>{l.titre}</div>
+                <div style={{ fontSize: 13.5, color: 'var(--c-annotation)', marginTop: 3, lineHeight: 1.45 }}>{l.desc}</div>
+              </Link>
+            ))}
+          </div>
 
-          {/* Carte « Carnet d'erreurs » */}
-          <Link href="/carnet" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ background: '#FCEEEA', borderRadius: 6, padding: 22, border: '1.5px solid var(--c-accent-bord)', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ width: 46, height: 46, borderRadius: 6, background: '#C0392B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>📕</div>
-              <div style={{ fontWeight: 700, fontSize: 17 }}>Carnet d&apos;erreurs</div>
-              <div style={{ fontSize: 13, color: '#A8705F', marginTop: 4 }}>Tes fiches difficiles (mal notées) rassemblées pour les revoir en priorité.</div>
-              <div style={{ marginTop: 16 }}>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#fff', background: '#C0392B', padding: '3px 10px', borderRadius: 999 }}>Ouvrir →</span>
-              </div>
-            </div>
-          </Link>
+          {/* Les matières : une tranche de couleur par espace, comme un code sur l'étagère */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 14 }}>
+            {espaces.map(espace => (
+              <Link key={espace.id} href={`/espaces/${espace.slug}`} className="carte-matiere" style={{
+                textDecoration: 'none', color: 'inherit', display: 'flex', minWidth: 0,
+                background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, overflow: 'hidden',
+              }}>
+                <span aria-hidden style={{ width: 10, flexShrink: 0, background: espace.couleur }} />
+                <span style={{ padding: '18px 20px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <span style={{ fontFamily: display, fontWeight: 600, fontSize: 21, lineHeight: 1.2 }}>{espace.nom}</span>
+                  {espace.description && <span style={{ fontSize: 14, color: 'var(--c-annotation)', lineHeight: 1.45 }}>{espace.description}</span>}
+                  <span style={{ fontSize: 14, color: 'var(--c-annotation)', marginTop: 8, textDecoration: 'underline', textUnderlineOffset: 3 }}>Ouvrir la matière</span>
+                </span>
+              </Link>
+            ))}
 
-          {/* Carte « Mes favoris » */}
-          <Link href="/espaces/_/revision?favoris=1" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ background: '#FDF3DD', borderRadius: 6, padding: 22, border: '1.5px solid #F0DBA6', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ width: 46, height: 46, borderRadius: 6, background: '#E8A11E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>★</div>
-              <div style={{ fontWeight: 700, fontSize: 17 }}>Mes favoris</div>
-              <div style={{ fontSize: 13, color: '#9A7B33', marginTop: 4 }}>Réviser les fiches que tu as étoilées comme importantes.</div>
-              <div style={{ marginTop: 16 }}>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#fff', background: '#E8A11E', padding: '3px 10px', borderRadius: 999 }}>Réviser →</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Carte « Recherche » */}
-          <Link href="/recherche" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ background: '#FFFEFB', borderRadius: 6, padding: 22, border: '1px solid var(--c-filet)', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ width: 46, height: 46, borderRadius: 6, background: '#EFE7D7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>🔎</div>
-              <div style={{ fontWeight: 700, fontSize: 17 }}>Recherche</div>
-              <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)', marginTop: 4 }}>Retrouver une notion par mot-clé dans toutes les fiches.</div>
-              <div style={{ marginTop: 16 }}>
-                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--c-annotation)', background: 'var(--c-papier-teinte)', padding: '3px 10px', borderRadius: 999, border: '1px solid var(--c-filet-fort)' }}>Ouvrir →</span>
-              </div>
-            </div>
-          </Link>
-
-          {espaces.map(espace => (
-            <Link key={espace.id} href={`/espaces/${espace.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ background: '#FFFEFB', borderRadius: 6, padding: 22, border: '1px solid var(--c-filet)', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
-                <div style={{ width: 46, height: 46, borderRadius: 6, background: espace.couleur + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>
-                  {espace.icone || '📚'}
-                </div>
-                <div style={{ fontWeight: 700, fontSize: 17 }}>{espace.nom}</div>
-                {espace.description && (
-                  <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)', marginTop: 4 }}>{espace.description}</div>
-                )}
-                <div style={{ marginTop: 16 }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: espace.couleur, background: espace.couleur + '18', padding: '3px 10px', borderRadius: 999 }}>Voir le contenu →</span>
-                </div>
-              </div>
-            </Link>
-          ))}
-
-          {/* Card admin : ajouter un espace */}
-          {estAdmin && (
-            <button onClick={() => setModalOuvert(true)} style={{
-              background: 'var(--c-papier)', borderRadius: 6, padding: 22,
-              border: '2px dashed var(--c-filet-fort)', cursor: 'pointer', textAlign: 'left',
-              fontFamily: font, color: 'var(--c-annotation-clair)', display: 'flex', flexDirection: 'column',
-              alignItems: 'flex-start', gap: 8, minHeight: 140,
-            }}>
-              <div style={{ width: 46, height: 46, borderRadius: 6, background: 'var(--c-filet)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>＋</div>
-              <div style={{ fontWeight: 700, fontSize: 16, color: '#5C4A22' }}>Ajouter une matière</div>
-              <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)' }}>Créer un nouvel espace de révision.</div>
-            </button>
-          )}
-        </div>
+            {estAdmin && (
+              <button onClick={() => setModalOuvert(true)} style={{
+                background: 'transparent', borderRadius: 6, padding: '18px 20px',
+                border: '1px dashed var(--c-filet-fort)', cursor: 'pointer', textAlign: 'left',
+                fontFamily: font, display: 'flex', flexDirection: 'column', gap: 4, minHeight: 100,
+              }}>
+                <span style={{ fontFamily: display, fontWeight: 600, fontSize: 19, color: 'var(--c-encre)' }}>Ajouter une matière</span>
+                <span style={{ fontSize: 14, color: 'var(--c-annotation)' }}>Créer un nouvel espace de révision.</span>
+              </button>
+            )}
+          </div>
+          <style>{`
+            .lien-revision + .lien-revision { border-left: 1px solid var(--c-filet) }
+            @media (max-width: 768px) { .lien-revision + .lien-revision { border-left: none; border-top: 1px solid var(--c-filet) } }
+            .lien-revision:hover, .carte-matiere:hover { background: var(--c-papier-teinte) !important }
+          `}</style>
+        </>
       )}
 
       {modalOuvert && (

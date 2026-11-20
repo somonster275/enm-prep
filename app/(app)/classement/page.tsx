@@ -27,7 +27,7 @@ export default function ClassementPage() {
 
   return (
     <div style={{ paddingTop: 34, maxWidth: 680, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
-      <h1 style={{ fontFamily: display, fontWeight: 800, fontSize: 28, margin: 0 }}>Défi de la semaine</h1>
+      <h1 style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 28, margin: 0 }}>Défi de la semaine</h1>
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 24px' }}>
         Un classement <b>anonyme</b> entre candidats, basé sur le nombre de fiches révisées cette semaine. La régularité paie !
       </p>
@@ -47,7 +47,7 @@ export default function ClassementPage() {
             </div>
           ) : (
             <>
-              <div style={{ fontFamily: display, fontWeight: 800, fontSize: 26, marginTop: 8 }}>
+              <div style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 26, marginTop: 8 }}>
                 {mes} <span style={{ fontSize: 18, color: '#5C4A22' }}>/ {objectif} cartes</span>
               </div>
               <div style={{ height: 10, background: 'rgba(0,0,0,.12)', borderRadius: 999, overflow: 'hidden', marginTop: 14, maxWidth: 360 }}>
@@ -62,7 +62,7 @@ export default function ClassementPage() {
       </div>
 
       {/* Classement anonyme */}
-      <div style={{ fontFamily: display, fontWeight: 700, fontSize: 18, marginBottom: 12 }}>
+      <div style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 18, marginBottom: 12 }}>
         Classement de la semaine {data && <span style={{ fontSize: 13, color: 'var(--c-annotation-clair)', fontWeight: 400, fontFamily: font }}>· {data.participants} participant{data.participants > 1 ? 's' : ''}</span>}
       </div>
 

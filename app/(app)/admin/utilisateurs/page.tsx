@@ -129,14 +129,14 @@ export default function AdminUtilisateurs() {
 
       {/* Demandes d'accès en attente */}
       {demandes.length > 0 && (
-        <div style={{ background: '#fff', border: '1px solid #F2D9A0', borderRadius: 12, padding: '1.25rem', marginBottom: '1.5rem' }}>
+        <div style={{ background: '#FFFEFB', border: '1px solid #F2D9A0', borderRadius: 6, padding: '1.25rem', marginBottom: '1.5rem' }}>
           <h2 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 1rem', display: 'flex', alignItems: 'center', gap: 8 }}>
             Demandes d&apos;accès en attente
             <span style={{ background: 'var(--c-accent)', color: '#fff', fontSize: 12, fontWeight: 700, borderRadius: 999, padding: '1px 9px' }}>{demandes.length}</span>
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {demandes.map(d => (
-              <div key={d.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, padding: '12px 14px', background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 10 }}>
+              <div key={d.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, padding: '12px 14px', background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 6 }}>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: 13.5, fontWeight: 600 }}>{d.nom || d.email}</div>
                   <div style={{ fontSize: 12, color: '#888' }}>{d.email}</div>
@@ -144,7 +144,7 @@ export default function AdminUtilisateurs() {
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                   <button onClick={() => traiterDemande(d.id, 'refuser')} disabled={traitement === d.id} style={{
-                    padding: '7px 14px', borderRadius: 8, border: '1px solid #E0D6C2', background: '#fff', color: '#9A5A20', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: traitement === d.id ? 0.6 : 1,
+                    padding: '7px 14px', borderRadius: 8, border: '1px solid #E0D6C2', background: '#FFFEFB', color: '#9A5A20', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: traitement === d.id ? 0.6 : 1,
                   }}>Refuser</button>
                   <button onClick={() => traiterDemande(d.id, 'approuver')} disabled={traitement === d.id} style={{
                     padding: '7px 14px', borderRadius: 8, border: 'none', background: '#0F6E56', color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', opacity: traitement === d.id ? 0.6 : 1,
@@ -156,7 +156,7 @@ export default function AdminUtilisateurs() {
         </div>
       )}
 
-      <div style={{ background: '#fff', border: '0.5px solid #E5E5E5', borderRadius: 12, padding: '1.25rem', marginBottom: '1.5rem' }}>
+      <div style={{ background: '#FFFEFB', border: '0.5px solid #E5E5E5', borderRadius: 6, padding: '1.25rem', marginBottom: '1.5rem' }}>
         <h2 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 1rem' }}>Créer un compte</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
           <div>
@@ -189,7 +189,7 @@ export default function AdminUtilisateurs() {
           {loading ? 'Création...' : 'Créer le compte'}
         </button>
       </div>
-      <div style={{ background: '#fff', border: '0.5px solid #E5E5E5', borderRadius: 12, padding: '1.25rem' }}>
+      <div style={{ background: '#FFFEFB', border: '0.5px solid #E5E5E5', borderRadius: 6, padding: '1.25rem' }}>
         <h2 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 1rem' }}>Utilisateurs ({utilisateurs.length})</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {utilisateurs.map(u => (
@@ -201,7 +201,7 @@ export default function AdminUtilisateurs() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                   <select value={u.role} onChange={e => changerRole(u.id, e.target.value)}
-                    style={{ padding: '5px 10px', borderRadius: 6, border: '1px solid #E0E0E0', fontSize: 12, cursor: 'pointer', background: '#fff' }}>
+                    style={{ padding: '5px 10px', borderRadius: 6, border: '1px solid #E0E0E0', fontSize: 12, cursor: 'pointer', background: '#FFFEFB' }}>
                     <option value="admin">Admin</option>
                     <option value="editeur">Éditeur</option>
                     <option value="lecteur">Lecteur</option>
@@ -235,7 +235,7 @@ export default function AdminUtilisateurs() {
                     {mdpLoading ? '…' : 'Enregistrer'}
                   </button>
                   <button onClick={() => setMdpEdit(null)}
-                    style={{ padding: '8px 14px', borderRadius: 8, background: '#fff', color: 'var(--c-texte-doux)', border: '1px solid #E0E0E0', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    style={{ padding: '8px 14px', borderRadius: 8, background: '#FFFEFB', color: 'var(--c-texte-doux)', border: '1px solid #E0E0E0', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
                     Annuler
                   </button>
                 </div>

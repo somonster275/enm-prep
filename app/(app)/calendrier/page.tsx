@@ -276,7 +276,7 @@ export default function CalendrierPage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 44, height: 44, borderRadius: 6, background: '#A3122A22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📅</div>
-            <div style={{ fontFamily: display, fontWeight: 800, fontSize: 26 }}>Calendrier</div>
+            <div style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 26 }}>Calendrier</div>
             {syncPlan && <span style={{ fontSize: 12, color: '#6366F1', fontWeight: 600 }}>↻ synchro planning…</span>}
           </div>
           <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '6px 0 0 56px' }}>Vos cours de la fac et les événements de la prépa, au même endroit.</p>
@@ -422,7 +422,7 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
         <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 22 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
             <button onClick={() => naviguerMois(-1)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--c-annotation)', padding: '4px 10px' }}>‹</button>
-            <div style={{ fontFamily: display, fontWeight: 800, fontSize: 18 }}>{MOIS_FR[mois]} {annee}</div>
+            <div style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 18 }}>{MOIS_FR[mois]} {annee}</div>
             <button onClick={() => naviguerMois(1)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--c-annotation)', padding: '4px 10px' }}>›</button>
           </div>
 
@@ -526,7 +526,7 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
 
         {/* Colonne droite : à venir */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ fontFamily: display, fontWeight: 800, fontSize: 17, color: 'var(--c-encre)' }}>À venir</div>
+          <div style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 17, color: 'var(--c-encre)' }}>À venir</div>
           {loading ? (
             <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)' }}>Chargement…</div>
           ) : evProchains.length === 0 ? (

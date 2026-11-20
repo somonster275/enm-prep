@@ -128,7 +128,7 @@ export default function OutilContenu({ table, accent, icone, titre, description,
     <div style={{ paddingTop: '34px', maxWidth: 900, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 6 }}>
         <div style={{ width: 48, height: 48, borderRadius: 6, background: accent + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>{icone}</div>
-        <div style={{ fontFamily: display, fontWeight: 800, fontSize: 28 }}>{titre}</div>
+        <div style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 28 }}>{titre}</div>
       </div>
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '0 0 28px' }}>{description}</p>
 

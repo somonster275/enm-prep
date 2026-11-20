@@ -41,10 +41,10 @@ export default function AdminDefiPage() {
   }
 
   const font = "var(--font-texte)"
-  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: font }
+  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: font }
   const carteType = (val: 'fiches' | 'libre', titreC: string, descC: string) => (
     <button onClick={() => setType(val)} style={{
-      flex: 1, textAlign: 'left', padding: 16, borderRadius: 14, cursor: 'pointer', fontFamily: font,
+      flex: 1, textAlign: 'left', padding: 16, borderRadius: 6, cursor: 'pointer', fontFamily: font,
       border: `2px solid ${type === val ? 'var(--c-accent)' : 'var(--c-filet-fort)'}`, background: type === val ? '#FCEFE9' : '#fff',
     }}>
       <div style={{ fontSize: 14.5, fontWeight: 700, color: 'var(--c-encre)' }}>{titreC}</div>
@@ -64,7 +64,7 @@ export default function AdminDefiPage() {
         {carteType('libre', '✍️ Défi libre', 'Un défi de ton choix (rédiger un cas pratique, ficher un chapitre…), affiché comme une annonce.')}
       </div>
 
-      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div>
           <label style={{ fontSize: 12.5, fontWeight: 600, color: '#5C4A22', display: 'block', marginBottom: 6 }}>Titre du défi {type === 'fiches' && '(facultatif)'}</label>
           <input value={titre} onChange={e => setTitre(e.target.value)} placeholder={type === 'fiches' ? 'Ex. « Sprint de révision »' : 'Ex. « Rédige un cas pratique »'} style={champ} />
@@ -96,7 +96,7 @@ export default function AdminDefiPage() {
         {msg && <div style={{ fontSize: 13.5, color: msg.type === 'ok' ? '#0F6E56' : 'var(--c-accent)' }}>{msg.texte}</div>}
 
         <button onClick={enregistrer} disabled={saving} style={{
-          height: 48, border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff',
+          height: 48, border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff',
           fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: font,
         }}>{saving ? 'Enregistrement…' : 'Publier le défi'}</button>
       </div>
