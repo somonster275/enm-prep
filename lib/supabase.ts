@@ -11,3 +11,18 @@ export const getSupabaseAdmin = () => {
   if (!serviceKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY manquante')
   return createClient(supabaseUrl, serviceKey)
 }
+
+// PostgREST plafonne chaque réponse à 1 000 lignes : on enchaîne les pages.
+// `page(de, a)` doit appliquer `.range(de, a)` sur une requête triée (ordre stable).
+const PAGE = 1000
+export async function toutesLesLignes<T>(
+  page: (de: number, a: number) => PromiseLike<{ data: T[] | null; error: unknown }>,
+): Promise<{ data: T[]; error: unknown }> {
+  const lignes: T[] = []
+  for (let de = 0; ; de += PAGE) {
+    const { data, error } = await page(de, de + PAGE - 1)
+    if (error) return { data: lignes, error }
+    lignes.push(...(data || []))
+    if (!data || data.length < PAGE) return { data: lignes, error: null }
+  }
+}
