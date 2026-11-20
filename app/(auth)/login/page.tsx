@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { LogoPoster } from '@/components/Logo'
+import { Logo } from '@/components/Logo'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -70,10 +70,8 @@ export default function LoginPage() {
 
   const inputStyle = (focused: boolean): React.CSSProperties => ({
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    height: 52, border: `1.5px solid ${focused ? 'var(--c-accent)' : 'var(--c-filet-fort)'}`,
-    borderRadius: 14, padding: '0 16px',
-    background: focused ? '#fff' : 'var(--c-papier)',
-    boxShadow: focused ? '0 0 0 4px rgba(163,18,42,.12)' : 'none',
+    height: 48, border: `1px solid ${focused ? 'var(--c-encre)' : 'var(--c-filet-fort)'}`,
+    borderRadius: 6, padding: '0 14px', background: '#FFFEFB',
   })
 
   return (
@@ -83,36 +81,37 @@ export default function LoginPage() {
     }}>
       {/* Panneau gauche — poster de marque (masqué sur mobile) */}
       <div className="hide-mobile" style={{
-        position: 'relative', background: '#C6C4BD', overflow: 'hidden',
-        padding: 52, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
-        color: 'var(--c-encre)',
+        background: 'var(--c-encre)', color: 'var(--c-papier)', padding: 56,
+        display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 40,
       }}>
-        {/* vignette papier */}
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(120% 120% at 50% 40%, rgba(255,255,255,.18), rgba(0,0,0,.06))', pointerEvents: 'none' }} />
-
-        {/* libellés pivotés façon poster */}
-        <div style={{ position: 'absolute', top: 30, right: 30, writingMode: 'vertical-rl', fontSize: 13, letterSpacing: '.12em', color: '#3A352F', fontWeight: 600 }}>prép</div>
-        <div style={{ position: 'absolute', bottom: 30, left: 30, writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontSize: 13, letterSpacing: '.12em', color: '#3A352F', fontWeight: 600 }}>ENM · 2026</div>
-
-        {/* bloc rouge + « codex » qui DÉBORDE des bords, centré, comme le poster */}
-        <LogoPoster width={460} />
+        <span style={{ position: 'relative', display: 'inline-block', alignSelf: 'flex-start', padding: '3px 0' }}>
+          <span style={{ position: 'absolute', left: -10, right: -10, top: '14%', bottom: '10%', background: 'var(--c-surligneur)', borderRadius: 4 }} />
+          <span style={{ position: 'relative' }}><Logo size={40} color="var(--c-encre)" /></span>
+        </span>
+        <blockquote style={{ margin: 0, maxWidth: 460 }}>
+          <p style={{ fontFamily: 'var(--font-titre)', fontSize: 28, lineHeight: 1.35, margin: 0, textWrap: 'balance' }}>
+            « Nul ne peut être puni pour un crime ou pour un délit dont les éléments ne sont pas définis par la loi. »
+          </p>
+          <footer style={{ marginTop: 14, fontSize: 14, opacity: 0.7 }}>Article 111-3 du Code pénal. Une fiche parmi d&apos;autres.</footer>
+        </blockquote>
       </div>
 
       {/* Panneau droit — formulaire */}
-      <div className="login-form bg-grille" style={{ padding: '64px 60px', display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: '#fff' }}>
-        <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 30, letterSpacing: '-.01em' }}>
-          Bon retour 👋
+      <div className="login-form" style={{ padding: '64px 60px', display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: 'var(--c-papier)' }}>
+        <div style={{ width: '100%', maxWidth: 440 }}>
+        <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 34, letterSpacing: '-.015em' }}>
+          Bon retour
         </div>
         <div style={{ fontSize: 15, color: 'var(--c-annotation)', marginTop: 6 }}>
-          Connectez-vous pour continuer vos révisions.
+          Connectez-vous pour reprendre vos révisions.
         </div>
 
         <div style={{ marginTop: 34, display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#5C4A22', marginBottom: 8 }}>Email</div>
+            <label htmlFor="login-email" style={{ display: 'block', fontSize: 14, fontWeight: 600, marginBottom: 7 }}>Email</label>
             <div style={inputStyle(false)}>
               <input
-                type="email" value={email} onChange={e => setEmail(e.target.value)}
+                id="login-email" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="votre@email.fr"
                 style={{ border: 'none', background: 'transparent', fontSize: 15, color: 'var(--c-encre)', outline: 'none', width: '100%', fontFamily: "var(--font-texte)" }}
               />
@@ -120,7 +119,7 @@ export default function LoginPage() {
           </div>
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#5C4A22' }}>Mot de passe</div>
+              <label htmlFor="login-mdp" style={{ fontSize: 14, fontWeight: 600 }}>Mot de passe</label>
               <button onClick={() => { setModeOubli(o => !o); setOEmail(email); setOStatut(''); setOErreur('') }} style={{
                 background: 'none', border: 'none', padding: 0, cursor: 'pointer',
                 color: 'var(--c-annotation-clair)', fontWeight: 600, fontSize: 12.5, fontFamily: "var(--font-texte)",
@@ -128,7 +127,7 @@ export default function LoginPage() {
             </div>
             <div style={inputStyle(false)}>
               <input
-                type={showPassword ? 'text' : 'password'} value={password}
+                id="login-mdp" autoComplete="current-password" type={showPassword ? 'text' : 'password'} value={password}
                 onChange={e => setPassword(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') handleLogin() }}
                 placeholder="••••••••"
@@ -148,18 +147,17 @@ export default function LoginPage() {
         )}
 
         <button onClick={handleLogin} disabled={loading} style={{
-          marginTop: 26, height: 54,
-          fontFamily: "var(--font-texte)", fontWeight: 700, fontSize: 16,
-          color: '#fff', background: 'var(--c-accent)', border: 'none', borderRadius: 14,
+          marginTop: 26, height: 48, width: '100%',
+          fontFamily: "var(--font-texte)", fontWeight: 600, fontSize: 15.5,
+          color: '#fff', background: 'var(--c-accent)', border: 'none', borderRadius: 6,
           cursor: 'pointer', opacity: loading ? 0.7 : 1,
-          boxShadow: '0 12px 24px -10px rgba(163,18,42,.8)',
         }}>
           {loading ? 'Connexion…' : 'Se connecter'}
         </button>
 
         {/* Mot de passe oublié */}
         {modeOubli && (
-          <div style={{ marginTop: 18, background: 'var(--c-papier)', border: '1px solid #EFE7D7', borderRadius: 14, padding: '16px 16px' }}>
+          <div style={{ marginTop: 18, background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '16px 16px' }}>
             {oStatut === 'ok' ? (
               <div style={{ fontSize: 13.5, color: '#0F6E56', textAlign: 'center', lineHeight: 1.5 }}>
                 ✅ Si un compte existe pour cette adresse, un lien de réinitialisation vient d&apos;être envoyé. Ouvre-le pour choisir un nouveau mot de passe.
@@ -170,10 +168,10 @@ export default function LoginPage() {
                 <div style={{ fontSize: 12.5, color: 'var(--c-annotation)', marginBottom: 12 }}>Reçois un lien par email pour en définir un nouveau.</div>
                 <input type="email" value={oEmail} onChange={e => setOEmail(e.target.value)} placeholder="ton@email.fr"
                   onKeyDown={e => { if (e.key === 'Enter') envoyerReset() }}
-                  style={{ width: '100%', height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '0 14px', background: '#fff', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "var(--font-texte)" }} />
+                  style={{ width: '100%', height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '0 14px', background: '#fff', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "var(--font-texte)" }} />
                 {oErreur && <div style={{ marginTop: 10, fontSize: 13, color: 'var(--c-accent)' }}>{oErreur}</div>}
                 <button onClick={envoyerReset} disabled={oStatut === 'envoi'} style={{
-                  marginTop: 12, height: 46, width: '100%', border: 'none', borderRadius: 12,
+                  marginTop: 12, height: 46, width: '100%', border: 'none', borderRadius: 6,
                   background: 'var(--c-accent)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
                   opacity: oStatut === 'envoi' ? 0.7 : 1, fontFamily: "var(--font-texte)",
                 }}>{oStatut === 'envoi' ? 'Envoi…' : 'Envoyer le lien'}</button>
@@ -183,48 +181,49 @@ export default function LoginPage() {
         )}
 
         {/* Demande d'accès lecteur */}
-        <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px solid #EFE7D7' }}>
+        <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px solid var(--c-filet)' }}>
           {!modeDemande && (
             <div style={{ fontSize: 13.5, color: 'var(--c-annotation)', textAlign: 'center' }}>
               Pas encore de compte ?{' '}
               <button onClick={() => { setModeDemande(true); setDErreur('') }} style={{
                 background: 'none', border: 'none', padding: 0, cursor: 'pointer',
                 color: 'var(--c-accent)', fontWeight: 700, fontSize: 13.5, fontFamily: "var(--font-texte)", textDecoration: 'underline',
-              }}>Demander un accès lecteur</button>
+              }}>Demander un accès</button>
             </div>
           )}
 
           {modeDemande && dStatut === 'ok' && (
-            <div style={{ background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 12, padding: '14px 16px', fontSize: 13.5, color: '#0F6E56', textAlign: 'center' }}>
+            <div style={{ background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 6, padding: '14px 16px', fontSize: 13.5, color: '#0F6E56', textAlign: 'center' }}>
               ✅ Demande envoyée ! Un administrateur l'examinera et créera ton accès. Tu seras recontacté(e) par email.
             </div>
           )}
 
           {modeDemande && dStatut !== 'ok' && (
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--c-encre)', marginBottom: 4 }}>Demander un accès lecteur</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--c-encre)', marginBottom: 4 }}>Demander un accès</div>
               <div style={{ fontSize: 12.5, color: 'var(--c-annotation)', marginBottom: 14 }}>Ta demande est envoyée à l'administrateur, qui valide la création de ton compte.</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <input value={dNom} onChange={e => setDNom(e.target.value)} placeholder="Ton nom"
-                  style={{ height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '0 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: "var(--font-texte)" }} />
+                  style={{ height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '0 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: "var(--font-texte)" }} />
                 <input type="email" value={dEmail} onChange={e => setDEmail(e.target.value)} placeholder="Ton email"
-                  style={{ height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '0 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: "var(--font-texte)" }} />
+                  style={{ height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '0 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: "var(--font-texte)" }} />
                 <textarea value={dMessage} onChange={e => setDMessage(e.target.value)} placeholder="Message (facultatif) — qui es-tu, pourquoi cet accès…" rows={2}
-                  style={{ border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '10px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', resize: 'vertical', fontFamily: "var(--font-texte)" }} />
+                  style={{ border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '10px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', resize: 'vertical', fontFamily: "var(--font-texte)" }} />
               </div>
               {dErreur && <div style={{ marginTop: 10, fontSize: 13, color: 'var(--c-accent)' }}>{dErreur}</div>}
               <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
                 <button onClick={() => { setModeDemande(false); setDErreur('') }} style={{
-                  flex: 1, height: 48, border: '1.5px solid var(--c-filet-fort)', background: '#fff', borderRadius: 12,
+                  flex: 1, height: 48, border: '1.5px solid var(--c-filet-fort)', background: '#fff', borderRadius: 6,
                   fontSize: 14, fontWeight: 600, color: 'var(--c-texte-doux)', cursor: 'pointer', fontFamily: "var(--font-texte)",
                 }}>Annuler</button>
                 <button onClick={envoyerDemande} disabled={dStatut === 'envoi'} style={{
-                  flex: 2, height: 48, border: 'none', background: 'var(--c-accent)', color: '#fff', borderRadius: 12,
+                  flex: 2, height: 48, border: 'none', background: 'var(--c-accent)', color: '#fff', borderRadius: 6,
                   fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: dStatut === 'envoi' ? 0.7 : 1, fontFamily: "var(--font-texte)",
                 }}>{dStatut === 'envoi' ? 'Envoi…' : 'Envoyer la demande'}</button>
               </div>
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>

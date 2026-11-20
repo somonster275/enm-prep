@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 46).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 47).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,22 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 47) — Refonte design : étape 4 (connexion + dashboard)
+- **Connexion** (`app/(auth)/login/page.tsx`) : panneau gauche encre + logo sur aplat jaune + article 111-3 C. pén.
+  (remplace le poster gris et ses textes pivotés coupés) ; formulaire sur papier, champs et bouton à bords fins
+  (rayon 6), `<label htmlFor>` + `autoComplete`, plus d'emoji ; « Demander un accès lecteur » → « Demander un accès ».
+  Logique (connexion, mot de passe oublié, demande d'accès) inchangée.
+- **Dashboard** : bloc principal « N fiches vous attendent aujourd'hui, dont X en <matière> » + Réviser maintenant
+  (matière prioritaire) + lien révision mixte + jauge objectif (surligneur). Colonne : série (7 cases) et À venir
+  (dates façon éphéméride + compte à rebours examen + fiches/jour). **Rayon « Vos matières »** : une tranche par
+  espace, hauteur rouge = maîtrise (paliers / PALIER_MAX sur TOUTES les fiches de la matière, non vues = 0), nombre de
+  fiches dues en jaune, lien vers l'espace. `StatRotatif` supprimé (doublon) ; AccesRapide, NotesWidget,
+  ProgressionCard, ModeVacances, OnboardingModal gardés tels quels (pas encore restylés).
+- Vérif visuelle du dashboard faite avec un **faux Supabase local** (auth + PostgREST minimal, `NEXT_PUBLIC_SUPABASE_URL`
+  pointé dessus en `next dev`, cookie `sb-localhost-auth-token` = `base64-<session JSON>`). Script non versionné ;
+  technique réutilisable pour voir les pages connectées.
+- Lint : erreurs préexistantes non corrigées (apostrophes non échappées dans login, `any` et `Date.now()` dans dashboard).
 
 ### 2026-11-20 (suite 46) — Refonte design : étape 3 (accueil)
 - `app/page.tsx` réécrit selon la maquette : nav sobre, hero « Le concours de la magistrature, une fiche à la fois. »

@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase, toutesLesLignes } from '@/lib/supabase'
 import type { Espace, Progression, Profil } from '@/types'
-import { estDue } from '@/lib/spaced-repetition'
+import { estDue, PALIER_MAX } from '@/lib/spaced-repetition'
 import {
   chargerActivite, calculerStreak, derniers7Jours, cartesAujourdhui, OBJECTIF_QUOTIDIEN,
   chargerPauses, ymd, type Pause,
@@ -13,7 +13,6 @@ import NotesWidget from '@/components/NotesWidget'
 import ModeVacances from '@/components/ModeVacances'
 import ProgressionCard from '@/components/ProgressionCard'
 import OnboardingModal from '@/components/OnboardingModal'
-import StatRotatif, { type StatItem } from '@/components/StatRotatif'
 import AccesRapide from '@/components/AccesRapide'
 
 type Evenement = { id: string; titre: string; date_debut: string; heure: string | null; type: string; couleur: string }
@@ -95,7 +94,6 @@ export default function Dashboard() {
   const cartesJour = cartesAujourdhui(activite)
   const totalSemaine = semaine.reduce((s, j) => s + j.cartes, 0)
   const objectifPct = Math.min(100, Math.round((cartesJour / OBJECTIF_QUOTIDIEN) * 100))
-  const maxBarre = Math.max(1, ...semaine.map(j => j.cartes))
 
   const espaceDue = espaces.find(e => {
     const fichesE = fiches.filter(f => f.espace_id === e.id)
@@ -114,12 +112,18 @@ export default function Dashboard() {
   // Matière avec le plus de fiches dues → suggestion prioritaire
   const priorite = matieres.filter(x => x.dues > 0)[0] ?? null
 
-  // Statistiques regroupées dans un widget rotatif unique.
-  const statItems: StatItem[] = [
-    { cle: 'serie', icone: '🔥', iconeBg: 'var(--c-accent-pale)', label: 'Série en cours', valeur: <>{streak} <span style={{ fontSize: 16, color: 'var(--c-annotation-clair)', fontWeight: 700 }}>jour{streak > 1 ? 's' : ''}</span></> },
-    { cle: 'objectif', icone: '🎯', iconeBg: '#FCEFD3', label: 'Objectif du jour', valeur: <>{cartesJour}<span style={{ color: 'var(--c-annotation-clair)' }}>/{OBJECTIF_QUOTIDIEN}</span></>, barPct: objectifPct },
-    { cle: 'semaine', icone: '✨', iconeBg: '#DDF3EE', label: 'Cette semaine', valeur: <>{totalSemaine} <span style={{ fontSize: 16, color: 'var(--c-annotation-clair)', fontWeight: 700 }}>cartes</span></> },
-  ]
+  // Rayon des matières : maîtrise = avancement moyen des paliers sur TOUTES les fiches de la matière (non vues = 0).
+  const progParFiche = new Map(progressions.map(p => [p.fiche_id, p]))
+  const rayon = espaces.map(e => {
+    const fichesE = fiches.filter(f => f.espace_id === e.id)
+    const progsE = fichesE.map(f => progParFiche.get(f.id)).filter((p): p is Progression => !!p)
+    const paliers = progsE.reduce((s, p) => s + Math.min(p.palier ?? 0, PALIER_MAX), 0)
+    return {
+      slug: e.slug, nom: e.nom,
+      maitrise: fichesE.length ? Math.round(paliers / (fichesE.length * PALIER_MAX) * 100) : 0,
+      dues: progsE.filter(p => estDue(p.prochaine_revision)).length,
+    }
+  })
 
   // Compte à rebours ENM : prochain examen (récupéré séparément, toutes dates)
   const joursRestants = dateExamen
@@ -131,146 +135,142 @@ export default function Dashboard() {
     ? Math.ceil((totalFiches - fichesVues) / joursRestants)
     : null
 
+  const bloc: React.CSSProperties = { background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '22px 24px', minWidth: 0 }
+  const titreBloc: React.CSSProperties = { fontFamily: display, fontWeight: 600, fontSize: 19, margin: '0 0 14px' }
+  const btn: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', height: 46, padding: '0 20px', borderRadius: 6, fontFamily: font, fontWeight: 600, fontSize: 15, color: '#fff', background: 'var(--c-accent)', textDecoration: 'none' }
+
   return (
     <div style={{ paddingTop: '34px', fontFamily: font, color: 'var(--c-encre)' }}>
       <OnboardingModal />
 
-      {/* Salutation */}
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ fontFamily: display, fontWeight: 800, fontSize: 30, letterSpacing: '-.01em' }}>
-          Bonjour, {prenom}.
-        </div>
-        <div style={{ fontSize: 15, color: 'var(--c-annotation)', marginTop: 4 }}>
-          {streak > 0 ? `${streak} jour${streak > 1 ? 's' : ''} d'affilée — ${message}` : message}
-        </div>
-      </div>
-
-      {/* Rangée de widgets : stat rotative + accès rapide (extensible) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 2fr', gap: 16, marginBottom: 16, alignItems: 'stretch' }}>
-        <StatRotatif items={statItems} />
-        <AccesRapide matieres={matieres} />
-      </div>
-
       {/* Mode vacances : mettre sa série en pause sans perdre ses flammes */}
       <ModeVacances onChange={rechargerPauses} />
 
-      {/* Hero : révisions du jour + momentum */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.55fr 1fr', gap: 18, marginBottom: 34 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.6fr) minmax(0,1fr)', gap: 20, marginBottom: 20 }}>
 
-        {/* Révisions du jour — bloc soleil */}
-        <div style={{ position: 'relative', background: '#FFC02E', borderRadius: 20, padding: 32, color: 'var(--c-encre)', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', width: 200, height: 200, borderRadius: '50%', background: '#FFCE54', right: -30, top: -50 }} />
-          <div style={{ position: 'absolute', width: 90, height: 90, borderRadius: 20, background: 'var(--c-accent)', right: 90, bottom: -28, transform: 'rotate(16deg)' }} />
-          <div style={{ position: 'absolute', width: 56, height: 56, borderRadius: '50%', background: '#2DAE83', right: 210, top: 24 }} />
-          <div style={{ position: 'relative' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: '#7A5E14' }}>Révisions du jour</span>
-            <div style={{ fontFamily: display, fontWeight: 800, fontSize: 28, lineHeight: 1.1, marginTop: 12, maxWidth: 320 }}>
-              {totalDue > 0 ? `${totalDue} fiches dues, ne prenez pas de retard` : 'Vous êtes à jour — continuez comme ça !'}
+        {/* Bloc principal : les fiches du jour */}
+        <div style={{ ...bloc, padding: '30px 32px' }}>
+          <p style={{ color: 'var(--c-annotation)', margin: '0 0 6px', fontSize: 15.5 }}>Bonjour {prenom},</p>
+          <p style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 'clamp(1.8rem, 3.4vw, 2.6rem)', lineHeight: 1.12, letterSpacing: '-.015em', margin: '0 0 22px', textWrap: 'balance' }}>
+            {totalDue > 0
+              ? <>{totalDue} fiche{totalDue > 1 ? 's' : ''} vous attend{totalDue > 1 ? 'ent' : ''} aujourd&apos;hui{priorite && rayon.filter(r => r.dues > 0).length > 1 ? <>, dont {priorite.dues} en {priorite.nom}</> : null}.</>
+              : <>Vous êtes à jour. {message}</>}
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px 20px', alignItems: 'center' }}>
+            {espaceDue
+              ? <Link href={`/espaces/${(priorite?.slug ?? espaceDue.slug)}/revision`} style={btn}>Réviser maintenant</Link>
+              : <Link href="/espaces" style={btn}>Choisir une matière</Link>}
+            {totalDue > 0 && <Link href="/espaces/_/revision?mixte=1" style={{ fontSize: 14.5, color: 'var(--c-annotation)' }}>Révision mixte, toutes matières</Link>}
+          </div>
+          <div style={{ marginTop: 28 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'var(--c-annotation)', marginBottom: 8 }}>
+              <span>Objectif du jour</span>
+              <span><b style={{ color: 'var(--c-encre)', fontVariantNumeric: 'tabular-nums' }}>{cartesJour}</b> sur {OBJECTIF_QUOTIDIEN} cartes</span>
             </div>
-            <div style={{ fontSize: 14, color: '#5C4A22', marginTop: 10, fontWeight: 600 }}>Score global : {score}%</div>
-            {espaceDue ? (
-              <Link href={`/espaces/${espaceDue.slug}/revision`} style={{
-                display: 'inline-block', marginTop: 22, fontFamily: font, fontWeight: 700, fontSize: 15,
-                color: '#fff', background: 'var(--c-encre)', borderRadius: 12, padding: '13px 24px', textDecoration: 'none',
-              }}>Réviser maintenant →</Link>
-            ) : (
-              <Link href="/espaces" style={{
-                display: 'inline-block', marginTop: 22, fontFamily: font, fontWeight: 700, fontSize: 15,
-                color: '#fff', background: 'var(--c-encre)', borderRadius: 12, padding: '13px 24px', textDecoration: 'none',
-              }}>Choisir un espace →</Link>
-            )}
+            <div role="img" aria-label={`${cartesJour} cartes sur ${OBJECTIF_QUOTIDIEN}`} style={{ height: 10, background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 2, overflow: 'hidden' }}>
+              <div style={{ width: `${objectifPct}%`, height: '100%', background: 'var(--c-surligneur)' }} />
+            </div>
+            <p style={{ fontSize: 13.5, color: 'var(--c-annotation)', margin: '10px 0 0' }}>Progression globale : {score} %. {totalSemaine} cartes revues ces 7 derniers jours.</p>
           </div>
         </div>
 
-        {/* Momentum 7 jours */}
-        <div style={{ position: 'relative', background: 'var(--c-encre)', borderRadius: 20, padding: 28, color: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div style={{ position: 'absolute', width: 130, height: 130, borderRadius: '50%', background: 'var(--c-accent)', right: -36, top: -44, opacity: 0.7 }} />
-          <div style={{ position: 'relative' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: '#FFD9CC' }}>Votre momentum · 7 jours</span>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 12 }}>
-              <div style={{ fontFamily: display, fontWeight: 800, fontSize: 38, lineHeight: 1 }}>{totalSemaine}</div>
-              <div style={{ fontSize: 13, color: '#CDBFA6' }}>cartes revues</div>
+        {/* Colonne : série + à venir */}
+        <div style={{ display: 'grid', gap: 20, alignContent: 'start', minWidth: 0 }}>
+          <div style={bloc}>
+            <h2 style={titreBloc}>Votre série</h2>
+            <p style={{ fontFamily: display, fontSize: 17, margin: '0 0 12px' }}>
+              {streak > 0 ? <><b style={{ fontWeight: 600 }}>{streak} jour{streak > 1 ? 's' : ''}</b> d&apos;affilée.</> : 'Révisez aujourd’hui pour lancer une série.'}
+            </p>
+            <div className="no-collapse" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0,1fr))', gap: 6, textAlign: 'center', fontSize: 12, color: 'var(--c-annotation)' }}>
+              {semaine.map((j, i) => (
+                <div key={i} title={`${j.cartes} carte${j.cartes > 1 ? 's' : ''}`}>
+                  <div style={{
+                    height: 30, borderRadius: 3, marginBottom: 4,
+                    background: j.cartes > 0 ? 'var(--c-encre)' : 'var(--c-papier)',
+                    border: j.estAujourdhui && j.cartes === 0 ? '2px dashed var(--c-accent)' : `1px solid ${j.cartes > 0 ? 'var(--c-encre)' : 'var(--c-filet)'}`,
+                  }} />
+                  {j.lettre}
+                </div>
+              ))}
             </div>
           </div>
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', gap: 7, height: 80, marginTop: 18 }}>
-            {semaine.map((j, i) => (
-              <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                <div style={{
-                  width: '100%', height: `${Math.max(6, (j.cartes / maxBarre) * 64)}px`, borderRadius: 5,
-                  background: j.estAujourdhui ? '#FFC02E' : (j.cartes > 0 ? '#E8694D' : '#4A3A2A'),
-                }} />
-                <span style={{ fontSize: 11, color: j.estAujourdhui ? '#E8694D' : 'var(--c-annotation-clair)', fontWeight: j.estAujourdhui ? 700 : 400 }}>{j.lettre}</span>
-              </div>
-            ))}
+
+          <div style={bloc}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <h2 style={titreBloc}>À venir</h2>
+              <Link href="/calendrier" style={{ fontSize: 13.5, color: 'var(--c-annotation)' }}>Calendrier</Link>
+            </div>
+            {evenements.length === 0 ? (
+              <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: 0 }}>Aucun événement à venir.</p>
+            ) : (
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 12 }}>
+                {evenements.map(ev => {
+                  const d = new Date(ev.date_debut + 'T12:00:00')
+                  const diff = Math.round((d.getTime() - new Date(ymd(new Date()) + 'T12:00:00').getTime()) / 86400000)
+                  return (
+                    <li key={ev.id}>
+                      <Link href="/calendrier" className="no-collapse" style={{ display: 'grid', gridTemplateColumns: '52px minmax(0,1fr)', gap: 12, alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+                        <span style={{ textAlign: 'center', border: '1px solid var(--c-filet)', borderTop: `3px solid ${ev.couleur}`, borderRadius: 4, padding: '3px 0', lineHeight: 1.1 }}>
+                          <b style={{ display: 'block', fontFamily: display, fontSize: 19, fontWeight: 600 }}>{d.getDate()}</b>
+                          <span style={{ fontSize: 11.5, color: 'var(--c-annotation)' }}>{d.toLocaleDateString('fr-FR', { month: 'short' })}</span>
+                        </span>
+                        <span style={{ minWidth: 0 }}>
+                          <b style={{ display: 'block', fontWeight: 600, fontSize: 14.5 }}>{ev.titre}</b>
+                          <span style={{ fontSize: 13, color: 'var(--c-annotation)' }}>
+                            {TYPE_LABELS[ev.type] ?? ev.type}{ev.heure && `, ${ev.heure}`}
+                            {diff === 0 && <b style={{ marginLeft: 6, color: 'var(--c-accent)' }}>aujourd&apos;hui</b>}
+                            {diff > 0 && diff <= 7 && <span style={{ marginLeft: 6 }}>dans {diff} j</span>}
+                          </span>
+                        </span>
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+            {joursRestants !== null && (
+              <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '16px 0 0' }}>
+                Prochain examen dans <b style={{ fontFamily: display, fontSize: 17, fontWeight: 600, color: 'var(--c-encre)' }}>{joursRestants} jours</b>
+                {fichesPourSuivre && fichesPourSuivre > 0 ? <>. {fichesPourSuivre} nouvelle{fichesPourSuivre > 1 ? 's' : ''} fiche{fichesPourSuivre > 1 ? 's' : ''} par jour pour tout voir d&apos;ici là.</> : '.'}
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Bandeaux d'insight (priorité matière + objectif J-X) */}
-      {(priorite || fichesPourSuivre) && (
-        <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
-          {priorite && (
-            <Link href={`/espaces/${priorite.slug}/revision`} style={{ textDecoration: 'none', flex: '1 1 260px' }}>
-              <div style={{ background: '#FFF7E8', border: '1px solid #F5DFB1', borderRadius: 14, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center' }}>
-                <span style={{ fontSize: 22 }}>⚡</span>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-encre)' }}>{priorite.dues} fiche{priorite.dues > 1 ? 's' : ''} due{priorite.dues > 1 ? 's' : ''} en <span style={{ color: 'var(--c-accent)' }}>{priorite.nom}</span></div>
-                  <div style={{ fontSize: 11.5, color: 'var(--c-annotation)', marginTop: 1 }}>Commencer par cette matière →</div>
-                </div>
-              </div>
-            </Link>
-          )}
-          {fichesPourSuivre && fichesPourSuivre > 0 && (
-            <div style={{ flex: '1 1 260px', background: '#F0F8F5', border: '1px solid #BFE6CF', borderRadius: 14, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center' }}>
-              <span style={{ fontSize: 22 }}>🎯</span>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-encre)' }}><span style={{ color: '#0F6E56' }}>{fichesPourSuivre} fiche{fichesPourSuivre > 1 ? 's' : ''}/jour</span> pour finir à J-{joursRestants}</div>
-                <div style={{ fontSize: 11.5, color: 'var(--c-annotation)', marginTop: 1 }}>{totalFiches - fichesVues} fiches non encore abordées</div>
-              </div>
+      {/* Rayon des matières : une tranche de code par matière */}
+      {rayon.length > 0 && (
+        <div style={{ ...bloc, marginBottom: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
+            <h2 style={{ ...titreBloc, margin: 0 }}>Vos matières</h2>
+            <p style={{ margin: 0, fontSize: 13.5, color: 'var(--c-annotation)' }}>La hauteur rouge montre votre maîtrise. En jaune, les fiches à réviser.</p>
+          </div>
+          <div style={{ overflowX: 'auto', paddingBottom: 4 }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', minWidth: Math.max(rayon.length * 64, 300), borderBottom: '6px solid var(--c-filet-fort)', padding: '0 8px' }}>
+              {rayon.map((r, k) => (
+                <Link key={r.slug} href={`/espaces/${r.slug}`} aria-label={`${r.nom} : ${r.maitrise} % maîtrisé, ${r.dues} fiches à réviser`} style={{
+                  flex: '1 1 0', minWidth: 0, height: 200 + (k % 3) * 18, position: 'relative', overflow: 'hidden', textDecoration: 'none',
+                  borderRadius: '3px 3px 0 0', background: '#F4E3E5', border: '1px solid rgba(163,18,42,.3)', borderBottom: 0,
+                }}>
+                  <span style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: `${r.maitrise}%`, background: 'var(--c-accent)' }} />
+                  <span style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', padding: '10px 4px' }}>
+                    <span style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontFamily: display, fontWeight: 600, fontSize: 14, lineHeight: 1.1, color: 'var(--c-encre)', background: '#FFFEFB', padding: '8px 3px', borderRadius: 2, maxHeight: 130, overflow: 'hidden' }}>{r.nom}</span>
+                    <span style={{ display: 'grid', gap: 6, justifyItems: 'center' }}>
+                      {r.dues > 0 && <span style={{ fontSize: 11.5, fontWeight: 600, background: 'var(--c-surligneur)', color: 'var(--c-encre)', borderRadius: 2, padding: '1px 5px' }}>{r.dues}</span>}
+                      <span style={{ fontSize: 12.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: r.maitrise >= 12 ? '#fff' : 'var(--c-encre)' }}>{r.maitrise} %</span>
+                    </span>
+                  </span>
+                </Link>
+              ))}
             </div>
-          )}
+          </div>
         </div>
       )}
 
-      {/* Calendrier + tâches côte à côte */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
-
-        {/* Mini calendrier — événements à venir */}
-        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 18 }}>📅</span>
-              <span style={{ fontFamily: display, fontWeight: 800, fontSize: 15 }}>À venir</span>
-            </div>
-            <Link href="/calendrier" style={{ fontSize: 11, fontWeight: 600, color: '#7C5CBF', textDecoration: 'none' }}>Voir tout →</Link>
-          </div>
-          {evenements.length === 0 ? (
-            <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', textAlign: 'center', padding: '12px 0' }}>Aucun événement à venir.</div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {evenements.map(ev => {
-                const d = new Date(ev.date_debut + 'T12:00:00')
-                const diff = Math.round((d.getTime() - new Date(ymd(new Date()) + 'T12:00:00').getTime()) / 86400000)
-                return (
-                  <Link key={ev.id} href="/calendrier" style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <div style={{ borderLeft: `3px solid ${ev.couleur}`, paddingLeft: 10, paddingTop: 2, paddingBottom: 2 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--c-encre)' }}>{ev.titre}</div>
-                      <div style={{ fontSize: 11, color: 'var(--c-annotation-clair)', marginTop: 1 }}>
-                        {d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-                        {ev.heure && ` · ${ev.heure}`}
-                        {diff === 0 && <span style={{ marginLeft: 6, color: 'var(--c-accent)', fontWeight: 700 }}>auj.</span>}
-                        {diff > 0 && diff <= 7 && <span style={{ marginLeft: 6, color: '#E8A11E', fontWeight: 600 }}>J-{diff}</span>}
-                      </div>
-                      <span style={{ fontSize: 10, fontWeight: 600, color: ev.couleur }}>{TYPE_LABELS[ev.type] ?? ev.type}</span>
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
-          )}
-        </div>
-
-        <NotesWidget titre="Mes tâches" />
+      {/* Raccourcis + tâches */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 20, alignItems: 'start' }}>
+        <div style={{ minWidth: 0 }}><AccesRapide matieres={matieres} /></div>
+        <div style={{ minWidth: 0 }}><NotesWidget titre="Mes tâches" /></div>
       </div>
 
       {/* Progression globale — en bas de page */}
