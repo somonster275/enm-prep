@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin, toutesLesLignes } from '@/lib/supabase'
 import { utilisateurCourant } from '@/lib/auth-serveur'
 
 export const dynamic = 'force-dynamic'
@@ -21,10 +21,13 @@ export async function GET() {
   const admin = getSupabaseAdmin()
   const debut = lundiDeLaSemaine()
 
-  const { data } = await admin
+  // Paginé : au-delà de 1 000 lignes (≈ 140 étudiants actifs sur 7 jours), Supabase tronque.
+  const { data } = await toutesLesLignes((de, a) => admin
     .from('activite_jours')
     .select('utilisateur_id, cartes, jour')
     .gte('jour', debut)
+    .order('utilisateur_id').order('jour')
+    .range(de, a))
 
   const totaux = new Map<string, number>()
   for (const r of (data || []) as { utilisateur_id: string; cartes: number }[]) {

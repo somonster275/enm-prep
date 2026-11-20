@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 34).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 35).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,20 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 35) — Audit v3 : les 7 points restants
+- **Premiers tests du projet** : `npm test` (`tsx --test tests/*.test.ts`, `tsx` en devDependency) — paliers et
+  intervalles de répétition espacée, série (tolérance de la veille, trou, pause sautée), filtre d'adresses,
+  pagination. Vérifié qu'un test échoue si on casse la logique des pauses.
+- `lib/url-publique.ts` : `urlPublique()` (http(s) public seulement : refuse localhost, IP privées/décimales/IPv6,
+  identifiants dans l'URL) utilisé par `/api/actualites` (≤ 20 flux) et `/api/planning` (≤ 10 flux, cache borné à
+  50 entrées) ; `lienSur()` empêche un flux RSS d'injecter un lien `javascript:`. Limite notée en `shortcut:` (pas de
+  vérification de l'IP résolue ni des redirections).
+- Classement paginé (`toutesLesLignes`, tri utilisateur + jour). Changement de mot de passe : refusé sur un AUTRE
+  admin. Suppression d'utilisateur : compte d'auth d'abord, profil ensuite. Repli mort de `enregistrerActivite`
+  supprimé. `@types/dompurify` retiré.
+- L'audit v3 est entièrement traité. Non vérifié : RLS des tables anciennes (`medias`, `mindmaps`, écriture de
+  `fiches` / `modules` / `qcm`) — à lire via `pg_policies` si besoin.
 
 ### 2026-11-20 (suite 34) — Audit v3 : 5 corrections prioritaires (migration 0041, exécutée par le user)
 - Nouvel audit complet (`/ponytail-audit`, 12 constats). Corrigés ici les 5 prioritaires :
