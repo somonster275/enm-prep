@@ -18,9 +18,12 @@ export async function POST(request: NextRequest) {
 
   const admin = getSupabaseAdmin()
 
-  // On ne modifie que les comptes du staff (admin / éditeur), jamais les lecteurs.
   const { data: cible } = await admin.from('profils').select('role').eq('id', id).single()
   if (!cible) return NextResponse.json({ error: 'Compte introuvable' }, { status: 404 })
+  // Un admin ne peut pas changer le mot de passe d'un AUTRE admin (sinon il prend son compte).
+  if (cible.role === 'admin' && id !== user.id) {
+    return NextResponse.json({ error: "Impossible de changer le mot de passe d'un autre administrateur." }, { status: 403 })
+  }
 
   const { error } = await admin.auth.admin.updateUserById(id, { password: String(motDePasse) })
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

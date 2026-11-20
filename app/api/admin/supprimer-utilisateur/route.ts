@@ -19,10 +19,10 @@ export async function POST(request: NextRequest) {
 
   const admin = getSupabaseAdmin()
 
-  // Supprime le profil applicatif puis le compte d'authentification.
-  await admin.from('profils').delete().eq('id', id)
+  // Compte d'authentification d'abord : s'il échoue, la personne garde un profil cohérent.
   const { error } = await admin.auth.admin.deleteUser(id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  await admin.from('profils').delete().eq('id', id)
 
   return NextResponse.json({ ok: true })
 }

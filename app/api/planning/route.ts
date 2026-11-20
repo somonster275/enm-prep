@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { urlPublique } from '@/lib/url-publique'
 
 /**
  * Récupère un planning extraplanning (ex. IEJ Panthéon) rendu en HTML, côté serveur
@@ -131,6 +132,7 @@ async function recupererFeed(feed: Feed): Promise<Ev[]> {
     }
   }
 
+  if (cache.size >= 50) cache.delete(cache.keys().next().value!) // borne la mémoire : retire le plus ancien
   cache.set(feed.url, { t: Date.now(), evs: tous })
   return tous
 }
@@ -139,12 +141,15 @@ export async function POST(request: NextRequest) {
   let feeds: Feed[] = []
   try {
     const body = await request.json()
-    feeds = Array.isArray(body?.feeds) ? body.feeds : []
+    feeds = Array.isArray(body?.feeds) ? body.feeds.slice(0, 10) : []
   } catch {
     return NextResponse.json({ evenements: [] }, { status: 400 })
   }
 
-  const resultats = await Promise.all(feeds.map(f => (f?.url ? recupererFeed(f) : Promise.resolve([]))))
+  const resultats = await Promise.all(feeds.map(f => {
+    const url = urlPublique(f?.url)
+    return url ? recupererFeed({ ...f, url }) : Promise.resolve([])
+  }))
   const evenements = resultats.flat().sort((a, b) =>
     (a.date_debut + a.heure).localeCompare(b.date_debut + b.heure)
   )

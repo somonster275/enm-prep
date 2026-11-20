@@ -12,21 +12,10 @@ export function ymd(d: Date): string {
 }
 
 /** Enregistre l'activité du jour (incrémente le compteur de cartes révisées). */
-export async function enregistrerActivite(userId: string, n = 1): Promise<void> {
+export async function enregistrerActivite(_userId: string, n = 1): Promise<void> {
   const jour = ymd(new Date())
-  // Incrément ATOMIQUE côté serveur (RPC, migration 0035) : pas de course read-then-write.
-  const { error } = await supabase.rpc('incr_activite', { p_jour: jour, p_delta: n })
-  if (!error) return
-  // Repli si la RPC n'existe pas encore (migration non exécutée) : ancien read-then-write.
-  const { data } = await supabase
-    .from('activite_jours').select('cartes')
-    .eq('utilisateur_id', userId).eq('jour', jour).maybeSingle()
-  if (data) {
-    await supabase.from('activite_jours').update({ cartes: data.cartes + n })
-      .eq('utilisateur_id', userId).eq('jour', jour)
-  } else {
-    await supabase.from('activite_jours').insert({ utilisateur_id: userId, jour, cartes: n })
-  }
+  // Incrément ATOMIQUE côté serveur (RPC incr_activite, migrations 0035/0039 : seule écriture permise).
+  await supabase.rpc('incr_activite', { p_jour: jour, p_delta: n })
 }
 
 /** Période de pause (mode vacances) : les jours entre `debut` et `fin` (inclus) ne cassent pas la série. */

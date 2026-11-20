@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { urlPublique, lienSur } from '@/lib/url-publique'
 
 // Récupère et parse des flux RSS / Atom côté serveur (contourne le CORS du navigateur).
 // Entrée  : { feeds: [{ url, nom, couleur }] }
@@ -86,7 +87,7 @@ function parserFlux(xml: string, feed: FeedEntree): Article[] {
 
     articles.push({
       titre: decoderEntites(stripHtml(titre)),
-      lien: lien ? decoderEntites(lien.trim()) : '#',
+      lien: (lien && lienSur(decoderEntites(lien.trim()))) || '#', // un flux ne peut pas injecter de `javascript:`
       date: dateIso(rawDate),
       extrait,
       image,
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
   let feeds: FeedEntree[] = []
   try {
     const body = await request.json()
-    feeds = Array.isArray(body?.feeds) ? body.feeds : []
+    feeds = Array.isArray(body?.feeds) ? body.feeds.slice(0, 20) : []
   } catch {
     return NextResponse.json({ articles: [], erreurs: ['Requête invalide'] }, { status: 400 })
   }
@@ -109,9 +110,10 @@ export async function POST(request: NextRequest) {
   const erreurs: string[] = []
   const resultats = await Promise.all(
     feeds.map(async (feed): Promise<Article[]> => {
-      if (!feed?.url) return []
+      const url = urlPublique(feed?.url)
+      if (!url) { if (feed?.url) erreurs.push(`${feed.nom} : adresse refusée`); return [] }
       try {
-        const res = await fetch(feed.url, {
+        const res = await fetch(url, {
           headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CodexActu/1.0)', Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*' },
           next: { revalidate: 600 }, // 10 min de cache serveur
         })
