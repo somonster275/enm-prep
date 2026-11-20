@@ -111,7 +111,7 @@ export default function ContribuerPage() {
     }
   }
 
-  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: FONT }
+  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: FONT }
   const label: React.CSSProperties = { fontSize: 13, color: 'var(--c-annotation)', fontWeight: 600, display: 'block', marginBottom: 5 }
 
   return (
@@ -131,7 +131,7 @@ export default function ContribuerPage() {
         ))}
       </div>
 
-      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18, padding: 22, marginBottom: 24 }}>
+      <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 22, marginBottom: 24 }}>
         {type === 'fiche' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -176,7 +176,7 @@ export default function ContribuerPage() {
               <textarea value={texteQcm} onChange={e => setTexteQcm(e.target.value)} rows={9}
                 placeholder={EXEMPLE_QCM} style={{ ...champ, resize: 'vertical', fontFamily: 'ui-monospace, monospace', fontSize: 13 }} />
             </label>
-            <div style={{ fontSize: 12, color: 'var(--c-annotation)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 10, padding: '10px 12px', lineHeight: 1.6 }}>
+            <div style={{ fontSize: 12, color: 'var(--c-annotation)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6, padding: '10px 12px', lineHeight: 1.6 }}>
               <b>Format :</b> <code>Q:</code> pour une question, <code>-</code> devant chaque option, une <code>*</code> en fin de ligne marque la bonne réponse (plusieurs possibles), <code>&gt;</code> pour une explication facultative.
             </div>
             {texteQcm.trim() && (
@@ -190,7 +190,7 @@ export default function ContribuerPage() {
         {message && (
           <div style={{ marginTop: 14, fontSize: 13.5, fontWeight: 600, color: message.ok ? '#0E5A47' : '#C0392B' }}>{message.t}</div>
         )}
-        <button onClick={envoyer} disabled={envoi} style={{ marginTop: 16, height: 48, padding: '0 26px', border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: envoi ? 0.7 : 1, fontFamily: FONT }}>
+        <button onClick={envoyer} disabled={envoi} style={{ marginTop: 16, height: 48, padding: '0 26px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: envoi ? 0.7 : 1, fontFamily: FONT }}>
           {envoi ? 'Envoi…' : 'Proposer à la modération →'}
         </button>
       </div>
@@ -203,7 +203,7 @@ export default function ContribuerPage() {
             {mesContribs.map(c => {
               const s = STATUT_LABEL[c.statut] || STATUT_LABEL.nouveau
               return (
-                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '11px 16px' }}>
+                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '11px 16px' }}>
                   <span style={{ fontSize: 18 }}>{c.type === 'qcm' ? '✅' : '📇'}</span>
                   <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{c.titre || (c.type === 'qcm' ? 'QCM' : 'Fiche')}</span>
                   <span style={{ fontSize: 11.5, fontWeight: 700, color: s.c, background: s.bg, borderRadius: 999, padding: '3px 10px' }}>{s.t}</span>

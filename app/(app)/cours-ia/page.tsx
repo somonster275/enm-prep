@@ -334,7 +334,7 @@ export default function CoursIAPage() {
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               {/* Sélecteur Base ENM / Mes documents / Coach IA */}
-              <div style={{ display: 'flex', background: '#fff', border: `1px solid ${border}`, borderRadius: 11, padding: 3, gap: 2, marginRight: 4, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', background: '#FFFEFB', border: `1px solid ${border}`, borderRadius: 6, padding: 3, gap: 2, marginRight: 4, flexWrap: 'wrap' }}>
                 {([['officiel', 'Base ENM'], ['personnel', 'Mes documents']] as [Mode, string][]).map(([m, label]) => {
                   const actif = !vueTuteur && mode === m
                   return (
@@ -358,7 +358,7 @@ export default function CoursIAPage() {
                   En base ENM, les étudiants interrogent toute la base sans voir la liste. */}
               {!vueTuteur && mode === 'personnel' && docs.length > 0 && (
                 <button onClick={() => setSidebarOuverte(o => !o)} style={{
-                  display: 'flex', alignItems: 'center', gap: 7, padding: '8px 14px', borderRadius: 10,
+                  display: 'flex', alignItems: 'center', gap: 7, padding: '8px 14px', borderRadius: 6,
                   background: sidebarOuverte ? coralBg : '#fff', color: sidebarOuverte ? coralDark : textMid,
                   border: `1px solid ${sidebarOuverte ? coralBorder : border}`, cursor: 'pointer', fontSize: 12.5, fontWeight: 600, fontFamily: font,
                 }}>
@@ -371,7 +371,7 @@ export default function CoursIAPage() {
               )}
               {!vueTuteur && (mode === 'personnel' || isAdmin) && (
                 <button onClick={() => setPanelOuvert(o => !o)} style={{
-                  padding: '8px 14px', borderRadius: 10,
+                  padding: '8px 14px', borderRadius: 6,
                   background: panelOuvert ? textDark : '#fff',
                   color: panelOuvert ? '#fff' : textMid,
                   border: `1px solid ${panelOuvert ? textDark : border}`,
@@ -389,14 +389,14 @@ export default function CoursIAPage() {
           <>
           {/* ── Panel admin import ── */}
           {panelOuvert && (mode === 'personnel' || isAdmin) && (
-            <div style={{ background: '#fff', border: `1px solid ${border}`, borderRadius: 18, padding: 20, marginBottom: 18, flexShrink: 0, boxShadow: `0 1px 2px rgba(60,40,20,.04), 0 12px 28px -18px rgba(60,40,20,.18)` }}>
+            <div style={{ background: '#FFFEFB', border: `1px solid ${border}`, borderRadius: 6, padding: 20, marginBottom: 18, flexShrink: 0, boxShadow: `0 1px 2px rgba(60,40,20,.04), 0 12px 28px -18px rgba(60,40,20,.18)` }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: textDark, marginBottom: 14 }}>
                 {mode === 'personnel' ? 'Importer un de mes documents' : 'Importer un document dans la base ENM'}
               </div>
               <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
                 {mode === 'officiel' && (
                   <select value={espaceDoc} onChange={e => setEspaceDoc(e.target.value)} style={{
-                    flex: 1, padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${border}`,
+                    flex: 1, padding: '10px 12px', borderRadius: 6, border: `1.5px solid ${border}`,
                     fontSize: 13, fontFamily: font, background: sand, outline: 'none',
                   }}>
                     <option value="">Toutes les matières</option>
@@ -404,7 +404,7 @@ export default function CoursIAPage() {
                   </select>
                 )}
                 <label style={{
-                  flex: 2, padding: '10px 14px', borderRadius: 10, border: `1.5px dashed ${coral}66`,
+                  flex: 2, padding: '10px 14px', borderRadius: 6, border: `1.5px dashed ${coral}66`,
                   fontSize: 13, fontWeight: 600, color: coral, cursor: 'pointer', background: fichier ? coralBg : sand,
                 }}>
                   {fichier ? `📎 ${fichier.name}` : 'Choisir un fichier (PDF, Word, TXT)…'}
@@ -415,7 +415,7 @@ export default function CoursIAPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ fontSize: 12, color: textMuted }}>PDF, Word et TXT · découpés en passages et indexés</div>
                 <button onClick={importerDoc} disabled={!fichier || uploading} style={{
-                  padding: '10px 22px', borderRadius: 10, background: coral, color: '#fff', border: 'none',
+                  padding: '10px 22px', borderRadius: 6, background: coral, color: '#fff', border: 'none',
                   cursor: fichier && !uploading ? 'pointer' : 'default', fontSize: 13, fontWeight: 700, fontFamily: font,
                   opacity: fichier && !uploading ? 1 : 0.5, boxShadow: fichier && !uploading ? `0 8px 18px -8px rgba(163,18,42,.7)` : 'none',
                 }}>
@@ -428,11 +428,11 @@ export default function CoursIAPage() {
                   <div style={{ fontSize: 11, color: textMuted, marginBottom: 8, fontWeight: 700, letterSpacing: '.08em' }}>DOCUMENTS INDEXÉS</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                     {docsAffiches.map(d => (
-                      <div key={d.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, padding: '8px 12px', background: sand, borderRadius: 10, border: `1px solid ${border}` }}>
+                      <div key={d.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, padding: '8px 12px', background: sand, borderRadius: 6, border: `1px solid ${border}` }}>
                         <div>
                           <span style={{ fontWeight: 600 }}>{d.nom}</span>
                           <span style={{ color: textMuted, marginLeft: 8, fontFamily: "var(--font-texte)", fontSize: 12 }}>· {d.nb_chunks} passages</span>
-                          {d.espaces && <span style={{ marginLeft: 8, fontSize: 11, background: d.espaces.couleur + '20', color: d.espaces.couleur, padding: '1px 6px', borderRadius: 10, fontWeight: 600 }}>#{d.espaces.nom}</span>}
+                          {d.espaces && <span style={{ marginLeft: 8, fontSize: 11, background: d.espaces.couleur + '20', color: d.espaces.couleur, padding: '1px 6px', borderRadius: 6, fontWeight: 600 }}>#{d.espaces.nom}</span>}
                         </div>
                         <div style={{ display: 'flex', gap: 6 }}>
                         {mode === 'officiel' && isAdmin && (
@@ -457,7 +457,7 @@ export default function CoursIAPage() {
             {mode === 'personnel' && docs.length > 0 && sidebarOuverte && (
               <aside style={{
                 width: isMobile ? '100%' : 288, flexShrink: 0, maxHeight: isMobile ? '38vh' : undefined,
-                background: '#fff', border: `1px solid ${border}`, borderRadius: 20,
+                background: '#FFFEFB', border: `1px solid ${border}`, borderRadius: 6,
                 boxShadow: `0 1px 2px rgba(60,40,20,.05), 0 20px 44px -28px rgba(60,40,20,.22)`,
                 display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden',
               }}>
@@ -478,7 +478,7 @@ export default function CoursIAPage() {
                         const checked = documentsSelectionnes.includes(d.id)
                         return (
                           <label key={d.id} onClick={() => setDocumentsSelectionnes(prev => checked ? prev.filter(id => id !== d.id) : [...prev, d.id])} style={{
-                            display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 13,
+                            display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 6,
                             marginBottom: 4, cursor: 'pointer',
                             background: checked ? coralBg : 'transparent',
                             border: `1px solid ${checked ? coralBorder : 'transparent'}`,
@@ -504,7 +504,7 @@ export default function CoursIAPage() {
                     const checked = documentsSelectionnes.includes(d.id)
                     return (
                       <label key={d.id} onClick={() => setDocumentsSelectionnes(prev => checked ? prev.filter(id => id !== d.id) : [...prev, d.id])} style={{
-                        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 13,
+                        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 6,
                         marginBottom: 4, cursor: 'pointer',
                         background: checked ? coralBg : 'transparent',
                         border: `1px solid ${checked ? coralBorder : 'transparent'}`,
@@ -588,7 +588,7 @@ export default function CoursIAPage() {
                     <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                       {/* Carte réponse */}
                       <div style={{
-                        background: '#fff', border: `1px solid ${border}`, borderRadius: 20,
+                        background: '#FFFEFB', border: `1px solid ${border}`, borderRadius: 6,
                         boxShadow: `0 1px 2px rgba(60,40,20,.05), 0 24px 54px -32px rgba(60,40,20,.26)`,
                         overflow: 'hidden',
                       }}>
@@ -652,11 +652,11 @@ export default function CoursIAPage() {
                         {/* Métriques */}
                         {m.tReflexion !== undefined && (
                           <div style={{ display: 'flex', gap: 8, padding: '0 24px 18px', flexWrap: 'wrap' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: textMid, background: '#FBF6EC', border: `1px solid ${border}`, padding: '6px 11px', borderRadius: 10 }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: textMid, background: '#FBF6EC', border: `1px solid ${border}`, padding: '6px 11px', borderRadius: 6 }}>
                               ⚡ Premier mot en <strong style={{ fontFamily: "var(--font-texte)", fontWeight: 600, color: textDark, marginLeft: 3 }}>{fmtSec(m.tReflexion)}</strong>
                             </span>
                             {m.tRedaction !== undefined && (
-                              <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: textMid, background: '#FBF6EC', border: `1px solid ${border}`, padding: '6px 11px', borderRadius: 10 }}>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: textMid, background: '#FBF6EC', border: `1px solid ${border}`, padding: '6px 11px', borderRadius: 6 }}>
                                 ✏️ Rédigé en <strong style={{ fontFamily: "var(--font-texte)", fontWeight: 600, color: textDark, marginLeft: 3 }}>{fmtSec(m.tRedaction)}</strong>
                               </span>
                             )}
@@ -686,7 +686,7 @@ export default function CoursIAPage() {
                 {/* Stop pill flottante */}
                 {phase !== 'idle' && (
                   <div style={{ display: 'flex', justifyContent: 'center', marginTop: 4, flexShrink: 0 }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, background: '#fff', border: `1px solid ${border}`, borderRadius: 999, padding: '7px 8px 7px 16px', boxShadow: `0 6px 20px -8px rgba(163,18,42,.25)` }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, background: '#FFFEFB', border: `1px solid ${border}`, borderRadius: 999, padding: '7px 8px 7px 16px', boxShadow: `0 6px 20px -8px rgba(163,18,42,.25)` }}>
                       <span className="ia-spinner" style={{ borderColor: coralBg, borderTopColor: coral }} />
                       <span style={{ fontSize: 13, fontWeight: 600, color: coral }}>{phase === 'recherche' ? 'Recherche…' : 'Rédaction…'}</span>
                       <button onClick={stopGeneration} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: textDark, color: '#fff', border: 'none', borderRadius: 999, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>
@@ -700,7 +700,7 @@ export default function CoursIAPage() {
 
               {/* ── Barre de saisie ── */}
               <div style={{ flexShrink: 0, marginTop: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#fff', border: `1.5px solid ${border}`, borderRadius: 18, padding: '9px 9px 9px 16px', boxShadow: `0 1px 2px rgba(60,40,20,.05), 0 16px 38px -24px rgba(60,40,20,.22)` }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#FFFEFB', border: `1.5px solid ${border}`, borderRadius: 6, padding: '9px 9px 9px 16px', boxShadow: `0 1px 2px rgba(60,40,20,.05), 0 16px 38px -24px rgba(60,40,20,.22)` }}>
                   {documentsSelectionnes.length > 0 && (
                     <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, fontSize: 12, fontWeight: 600, color: coralDark, background: coralBg, padding: '5px 10px', borderRadius: 9, border: `1px solid ${coralBorder}`, whiteSpace: 'nowrap', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       📄 {documentsSelectionnes.length === 1 ? (docs.find(d => d.id === documentsSelectionnes[0])?.nom ?? '…') : `${documentsSelectionnes.length} documents`}
@@ -717,7 +717,7 @@ export default function CoursIAPage() {
                   <span style={{ flexShrink: 0, fontFamily: "var(--font-texte)", fontSize: 11, color: '#C2B7A0', border: `1px solid #ECE2D0`, padding: '4px 8px', borderRadius: 7 }}>⏎ pour envoyer</span>
                   <button onClick={poserQuestion} disabled={!question.trim() || loading} style={{
                     flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8,
-                    padding: '12px 22px', borderRadius: 13, background: coral, color: '#fff', border: 'none',
+                    padding: '12px 22px', borderRadius: 6, background: coral, color: '#fff', border: 'none',
                     cursor: question.trim() && !loading ? 'pointer' : 'default', fontSize: 14, fontWeight: 700, fontFamily: font,
                     opacity: question.trim() && !loading ? 1 : 0.5,
                     boxShadow: question.trim() && !loading ? `0 8px 20px -8px rgba(163,18,42,.8)` : 'none',

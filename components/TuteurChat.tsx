@@ -154,11 +154,11 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
             <div key={i} style={{ display: 'flex', gap: 9, alignItems: 'flex-start' }}>
               <div style={{ width: compact ? 26 : 34, height: compact ? 26 : 34, borderRadius: '50%', flexShrink: 0, marginTop: 2, background: 'var(--c-encre)', color: 'var(--c-papier)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-titre)', fontWeight: 600, fontSize: compact ? 12 : 14 }} aria-hidden>C</div>
               <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: '4px 14px 14px 14px', padding: compact ? '10px 13px' : '14px 18px', fontSize: compact ? 13.5 : 15, lineHeight: 1.6 }}>
+                <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: '4px 14px 14px 14px', padding: compact ? '10px 13px' : '14px 18px', fontSize: compact ? 13.5 : 15, lineHeight: 1.6 }}>
                   {visible ? <div className="md-response"><ReactMarkdown remarkPlugins={[remarkGfm]} disallowedElements={['img']} unwrapDisallowed>{visible}</ReactMarkdown></div> : <span style={{ color: '#C2B7A0', fontStyle: 'italic' }}>…</span>}
                 </div>
                 {taches.length > 0 && (
-                  <div style={{ background: 'var(--c-papier-chaud)', border: '1px solid #F2D9A0', borderRadius: 12, padding: '10px 12px' }}>
+                  <div style={{ background: 'var(--c-papier-chaud)', border: '1px solid #F2D9A0', borderRadius: 6, padding: '10px 12px' }}>
                     <div style={{ fontSize: 11.5, fontWeight: 700, color: '#8A5A10', marginBottom: 8 }}>📝 Tâches proposées</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {taches.map((t, j) => {

@@ -37,7 +37,7 @@ export default function ChatbotBulle() {
       {/* Bouton bulle */}
       <button onClick={() => setOpen(o => !o)} aria-label="Coach IA" style={{
         position: 'fixed', bottom: 22, right: 22, zIndex: 1000,
-        height: 46, padding: open ? '0 16px' : '0 18px', borderRadius: 23, border: 'none', cursor: 'pointer',
+        height: 46, padding: open ? '0 16px' : '0 18px', borderRadius: 6, border: 'none', cursor: 'pointer',
         background: 'var(--c-encre)', color: 'var(--c-papier)', fontSize: open ? 22 : 14.5, fontWeight: 600, fontFamily: 'var(--font-texte)',
         boxShadow: '0 10px 24px -10px rgba(33,28,25,.6)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',

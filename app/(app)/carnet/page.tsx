@@ -43,7 +43,7 @@ export default function CarnetPage() {
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : items.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
           <div style={{ fontSize: 30, marginBottom: 8 }}>✅</div>
           <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--c-texte-doux)' }}>Ton carnet est vide.</div>
           <div style={{ fontSize: 13, marginTop: 4 }}>Tu n&apos;as rien raté récemment — continue comme ça !</div>
@@ -52,13 +52,13 @@ export default function CarnetPage() {
         <>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
             <div style={{ fontSize: 14, color: 'var(--c-annotation)' }}><b style={{ color: '#C0392B' }}>{items.length}</b> fiche{items.length > 1 ? 's' : ''} à revoir</div>
-            <Link href="/espaces/_/revision?carnet=1" style={{ padding: '11px 22px', borderRadius: 12, background: '#C0392B', color: '#fff', textDecoration: 'none', fontSize: 14.5, fontWeight: 700 }}>
+            <Link href="/espaces/_/revision?carnet=1" style={{ padding: '11px 22px', borderRadius: 6, background: '#C0392B', color: '#fff', textDecoration: 'none', fontSize: 14.5, fontWeight: 700 }}>
               Réviser mon carnet →
             </Link>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {items.map(it => (
-              <div key={it.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 14, padding: 16 }}>
+              <div key={it.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 16 }}>
                 {it.modules?.espaces && (
                   <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--c-annotation-clair)', marginBottom: 6 }}>
                     {it.modules.espaces.nom}{it.modules?.nom ? ` › ${it.modules.nom}` : ''}

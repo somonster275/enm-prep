@@ -132,7 +132,7 @@ export default function QcmPage() {
   // Bouton « Valider » d'une question (réutilisé pour libre et choix multiples).
   const boutonValider = (q: Question) => (
     <button onClick={() => validerQuestion(q)} disabled={!aRepondu(q)} style={{
-      marginTop: 12, height: 42, width: '100%', border: 'none', borderRadius: 10,
+      marginTop: 12, height: 42, width: '100%', border: 'none', borderRadius: 6,
       background: 'var(--c-accent)', color: '#fff', fontSize: 14, fontWeight: 700,
       cursor: aRepondu(q) ? 'pointer' : 'default', opacity: aRepondu(q) ? 1 : 0.5, fontFamily: font,
     }}>Valider</button>
@@ -148,7 +148,7 @@ export default function QcmPage() {
         {modeErreurs && <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginBottom: 16 }}>Rejoue les questions que tu as déjà ratées. Une bonne réponse les retire de ta liste.</div>}
 
         {tousValides && (
-          <div style={{ background: score === questions.length ? '#ECF7F0' : 'var(--c-papier-chaud)', border: `1px solid ${score === questions.length ? '#BFE6CF' : '#F2D9A0'}`, borderRadius: 16, padding: 18, marginBottom: 18, textAlign: 'center' }}>
+          <div style={{ background: score === questions.length ? '#ECF7F0' : 'var(--c-papier-chaud)', border: `1px solid ${score === questions.length ? '#BFE6CF' : '#F2D9A0'}`, borderRadius: 6, padding: 18, marginBottom: 18, textAlign: 'center' }}>
             <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 28 }}>{score} / {questions.length}</div>
             <div style={{ fontSize: 14, color: 'var(--c-texte-doux)', marginTop: 4 }}>{score === questions.length ? '🎉 Sans faute !' : 'Revois les explications ci-dessous.'}</div>
           </div>
@@ -161,8 +161,8 @@ export default function QcmPage() {
             // ----- Question à réponse libre -----
             if (Array.isArray(q.reponses_ok)) {
               return (
-                <div key={q.id} style={{ background: '#fff', border: `1px solid ${v ? (bonne ? '#BFE6CF' : 'var(--c-accent-bord)') : 'var(--c-filet)'}`, borderRadius: 16, padding: 18 }}>
-                  {q.cas && <div style={{ fontSize: 13.5, color: 'var(--c-texte-doux)', marginBottom: 10, background: 'var(--c-papier)', borderRadius: 10, padding: '10px 12px', lineHeight: 1.5, borderLeft: '3px solid var(--c-filet-fort)' }}>{q.cas}</div>}
+                <div key={q.id} style={{ background: '#FFFEFB', border: `1px solid ${v ? (bonne ? '#BFE6CF' : 'var(--c-accent-bord)') : 'var(--c-filet)'}`, borderRadius: 6, padding: 18 }}>
+                  {q.cas && <div style={{ fontSize: 13.5, color: 'var(--c-texte-doux)', marginBottom: 10, background: 'var(--c-papier)', borderRadius: 6, padding: '10px 12px', lineHeight: 1.5, borderLeft: '3px solid var(--c-filet-fort)' }}>{q.cas}</div>}
                   <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 10 }}>
                     {qi + 1}. {q.enonce} {v && <span style={{ fontSize: 13 }}>{bonne ? '✅' : '❌'}</span>}
                   </div>
@@ -174,16 +174,16 @@ export default function QcmPage() {
                     placeholder="Tape ta réponse…"
                     style={{
                       width: '100%', boxSizing: 'border-box', padding: '11px 14px', fontSize: 14, fontFamily: font,
-                      borderRadius: 11, outline: 'none',
+                      borderRadius: 6, outline: 'none',
                       border: `1.5px solid ${v ? (bonne ? '#BFE6CF' : 'var(--c-accent-bord)') : 'var(--c-filet-fort)'}`,
                       background: v ? (bonne ? '#ECF7F0' : '#FCEEEA') : 'var(--c-papier)', color: 'var(--c-encre)',
                     }} />
                   {v && (
-                    <div style={{ marginTop: 10, fontSize: 13.5, color: '#0E5A47', background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 10, padding: '9px 12px', lineHeight: 1.5 }}>
+                    <div style={{ marginTop: 10, fontSize: 13.5, color: '#0E5A47', background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 6, padding: '9px 12px', lineHeight: 1.5 }}>
                       <b>Réponse :</b> {q.reponse_affichee || q.reponses_ok[0]}
                     </div>
                   )}
-                  {v && q.explication && <div style={{ fontSize: 13, color: 'var(--c-texte-doux)', marginTop: 8, background: 'var(--c-papier)', borderRadius: 10, padding: '8px 12px', lineHeight: 1.5 }}>💡 {q.explication}</div>}
+                  {v && q.explication && <div style={{ fontSize: 13, color: 'var(--c-texte-doux)', marginTop: 8, background: 'var(--c-papier)', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}>💡 {q.explication}</div>}
                   {!v && boutonValider(q)}
                 </div>
               )
@@ -192,7 +192,7 @@ export default function QcmPage() {
             const multi = q.options.filter(o => o.c).length > 1
             const choisi = reponses[q.id] || new Set<number>()
             return (
-              <div key={q.id} style={{ background: '#fff', border: `1px solid ${v ? (bonne ? '#BFE6CF' : 'var(--c-accent-bord)') : 'var(--c-filet)'}`, borderRadius: 16, padding: 18 }}>
+              <div key={q.id} style={{ background: '#FFFEFB', border: `1px solid ${v ? (bonne ? '#BFE6CF' : 'var(--c-accent-bord)') : 'var(--c-filet)'}`, borderRadius: 6, padding: 18 }}>
                 <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>
                   {qi + 1}. {q.enonce} {v && <span style={{ fontSize: 13 }}>{bonne ? '✅' : '❌'}</span>}
                 </div>
@@ -208,7 +208,7 @@ export default function QcmPage() {
                     return (
                       <button key={oi} onClick={() => toggle(q.id, oi, multi)} disabled={v} style={{
                         display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left', cursor: v ? 'default' : 'pointer',
-                        border: `1.5px solid ${bd}`, background: bg, borderRadius: 11, padding: '10px 13px', fontSize: 14, fontFamily: font, color: 'var(--c-encre)',
+                        border: `1.5px solid ${bd}`, background: bg, borderRadius: 6, padding: '10px 13px', fontSize: 14, fontFamily: font, color: 'var(--c-encre)',
                       }}>
                         <span style={{ flexShrink: 0, width: 18, height: 18, borderRadius: multi ? 5 : '50%', border: `2px solid ${sel || (v && o.c) ? '#2DAE83' : 'var(--c-discret-clair)'}`, background: (sel || (v && o.c)) ? '#2DAE83' : '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11 }}>{(sel || (v && o.c)) ? '✓' : ''}</span>
                         <span style={{ flex: 1 }}>{o.t}</span>
@@ -216,7 +216,7 @@ export default function QcmPage() {
                     )
                   })}
                 </div>
-                {v && q.explication && <div style={{ fontSize: 13, color: 'var(--c-texte-doux)', marginTop: 10, background: 'var(--c-papier)', borderRadius: 10, padding: '8px 12px', lineHeight: 1.5 }}>💡 {q.explication}</div>}
+                {v && q.explication && <div style={{ fontSize: 13, color: 'var(--c-texte-doux)', marginTop: 10, background: 'var(--c-papier)', borderRadius: 6, padding: '8px 12px', lineHeight: 1.5 }}>💡 {q.explication}</div>}
                 {!v && boutonValider(q)}
               </div>
             )
@@ -225,8 +225,8 @@ export default function QcmPage() {
 
         {tousValides ? (
           <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
-            <button onClick={recommencer} style={{ flex: 1, height: 48, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, background: '#fff', color: 'var(--c-texte-doux)', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>Recommencer</button>
-            <button onClick={retour} style={{ flex: 1, height: 48, border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>Autres QCM</button>
+            <button onClick={recommencer} style={{ flex: 1, height: 48, border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, background: '#FFFEFB', color: 'var(--c-texte-doux)', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>Recommencer</button>
+            <button onClick={retour} style={{ flex: 1, height: 48, border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>Autres QCM</button>
           </div>
         ) : (
           <div style={{ marginTop: 18, textAlign: 'center', fontSize: 13, color: 'var(--c-annotation-clair)' }}>
@@ -244,7 +244,7 @@ export default function QcmPage() {
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 20px' }}>Entraîne-toi avec des QCM auto-corrigés. Chaque QCM terminé compte dans ton activité.</p>
 
       {nbErreurs > 0 && (
-        <button onClick={jouerErreurs} style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 14, background: 'var(--c-accent-pale)', border: '1px solid var(--c-accent-bord)', borderRadius: 14, padding: '14px 18px', marginBottom: 18, cursor: 'pointer', fontFamily: font }}>
+        <button onClick={jouerErreurs} style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 14, background: 'var(--c-accent-pale)', border: '1px solid var(--c-accent-bord)', borderRadius: 6, padding: '14px 18px', marginBottom: 18, cursor: 'pointer', fontFamily: font }}>
           <span style={{ fontSize: 26 }}>🎯</span>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 15, fontWeight: 700, color: '#C0392B' }}>Réviser mes erreurs</div>
@@ -264,14 +264,14 @@ export default function QcmPage() {
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : visibles.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
           <div style={{ fontSize: 30, marginBottom: 8 }}>✅</div>Aucun QCM disponible pour l&apos;instant.
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
           {visibles.map(q => (
-            <button key={q.id} onClick={() => jouer(q)} style={{ textAlign: 'left', background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18, cursor: 'pointer', fontFamily: font }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: q.type === 'libre' ? '#FBEAF0' : '#FCEFD3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 12 }}>{q.type === 'libre' ? '✍️' : '✅'}</div>
+            <button key={q.id} onClick={() => jouer(q)} style={{ textAlign: 'left', background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18, cursor: 'pointer', fontFamily: font }}>
+              <div style={{ width: 44, height: 44, borderRadius: 6, background: q.type === 'libre' ? '#FBEAF0' : '#FCEFD3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 12 }}>{q.type === 'libre' ? '✍️' : '✅'}</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--c-encre)' }}>{q.titre}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, flexWrap: 'wrap' }}>
                 {q.matiere && <span style={{ fontSize: 12.5, color: 'var(--c-annotation-clair)' }}>{q.matiere}</span>}

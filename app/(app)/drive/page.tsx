@@ -132,7 +132,7 @@ export default function DrivePage() {
   }
 
   const champ: React.CSSProperties = {
-    height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '0 14px',
+    height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '0 14px',
     background: 'var(--c-papier)', fontSize: 14, outline: 'none', boxSizing: 'border-box',
     fontFamily: "var(--font-texte)", width: '100%',
   }
@@ -149,9 +149,9 @@ export default function DrivePage() {
       </p>
 
       {/* ───────── Google Drive (connexion + navigation) ───────── */}
-      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 20, marginBottom: 26 }}>
+      <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 20, marginBottom: 26 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: gConnecte ? 16 : 6 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 11, background: '#E8F0FE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📁</div>
+          <div style={{ width: 40, height: 40, borderRadius: 6, background: '#E8F0FE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📁</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 15, fontWeight: 700 }}>Google Drive</div>
             <div style={{ fontSize: 12.5, color: 'var(--c-annotation)' }}>
@@ -159,20 +159,20 @@ export default function DrivePage() {
             </div>
           </div>
           {gConnecte && (
-            <button onClick={deconnecterGoogle} style={{ border: '1.5px solid var(--c-filet-fort)', background: '#fff', borderRadius: 10, padding: '8px 14px', fontSize: 13, fontWeight: 600, color: 'var(--c-annotation)', cursor: 'pointer', fontFamily: "var(--font-texte)" }}>Déconnecter</button>
+            <button onClick={deconnecterGoogle} style={{ border: '1.5px solid var(--c-filet-fort)', background: '#FFFEFB', borderRadius: 6, padding: '8px 14px', fontSize: 13, fontWeight: 600, color: 'var(--c-annotation)', cursor: 'pointer', fontFamily: "var(--font-texte)" }}>Déconnecter</button>
           )}
         </div>
 
         {!gConnecte ? (
           <div>
             {!gConfigure && (
-              <div style={{ fontSize: 13, color: '#B0791E', background: '#FCF3DF', borderRadius: 10, padding: '10px 14px', marginBottom: 12 }}>
+              <div style={{ fontSize: 13, color: '#B0791E', background: '#FCF3DF', borderRadius: 6, padding: '10px 14px', marginBottom: 12 }}>
                 La connexion Google n&apos;est pas encore activée (identifiants serveur manquants).
               </div>
             )}
             <a href="/api/drive/google/connect" style={{
               display: 'inline-flex', alignItems: 'center', gap: 10, height: 46, padding: '0 20px',
-              border: '1.5px solid #DADCE0', borderRadius: 12, background: '#fff', color: '#3C4043',
+              border: '1.5px solid #DADCE0', borderRadius: 6, background: '#FFFEFB', color: '#3C4043',
               fontSize: 14.5, fontWeight: 700, textDecoration: 'none',
               pointerEvents: gConfigure ? 'auto' : 'none', opacity: gConfigure ? 1 : 0.5,
             }}>
@@ -203,7 +203,7 @@ export default function DrivePage() {
             ) : gFiles.length === 0 ? (
               <div style={{ color: 'var(--c-annotation-clair)', padding: 16, fontSize: 14 }}>Ce dossier est vide.</div>
             ) : (
-              <div style={{ border: '1px solid var(--c-filet)', borderRadius: 12, overflow: 'hidden' }}>
+              <div style={{ border: '1px solid var(--c-filet)', borderRadius: 6, overflow: 'hidden' }}>
                 {gFiles.map((f, i) => {
                   const dossier = f.mimeType === DOSSIER_MIME
                   return (
@@ -236,7 +236,7 @@ export default function DrivePage() {
       <div style={{ fontSize: 17, fontWeight: 'var(--titre-poids)', fontFamily: "var(--font-titre)", margin: '0 0 14px' }}>Mes liens</div>
 
       {/* Formulaire d'ajout */}
-      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 20, marginBottom: 26 }}>
+      <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 20, marginBottom: 26 }}>
         <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>Ajouter un lien</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <input value={titre} onChange={e => setTitre(e.target.value)} placeholder="Nom (ex. « Cours de droit civil »)" style={champ} />
@@ -254,7 +254,7 @@ export default function DrivePage() {
         </div>
         {erreur && <div style={{ marginTop: 12, fontSize: 13.5, color: 'var(--c-accent)' }}>{erreur}</div>}
         <button onClick={ajouter} disabled={saving} style={{
-          marginTop: 16, height: 46, padding: '0 22px', border: 'none', borderRadius: 12,
+          marginTop: 16, height: 46, padding: '0 22px', border: 'none', borderRadius: 6,
           background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer',
           opacity: saving ? 0.7 : 1, fontFamily: "var(--font-texte)",
         }}>
@@ -266,7 +266,7 @@ export default function DrivePage() {
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : liens.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
           <div style={{ fontSize: 30, marginBottom: 8 }}>🗂️</div>
           <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--c-texte-doux)' }}>Aucun lien pour l&apos;instant.</div>
           <div style={{ fontSize: 13, marginTop: 4 }}>Ajoute le lien partagé de ton dossier de cours ci-dessus.</div>
@@ -276,9 +276,9 @@ export default function DrivePage() {
           {liens.map(l => {
             const f = FOURNISSEURS[l.fournisseur || 'autre'] || FOURNISSEURS.autre
             return (
-              <div key={l.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18, display: 'flex', flexDirection: 'column' }}>
+              <div key={l.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18, display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  <div style={{ width: 42, height: 42, borderRadius: 11, background: f.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icone}</div>
+                  <div style={{ width: 42, height: 42, borderRadius: 6, background: f.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icone}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 15, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.titre}</div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: f.fg, marginTop: 2 }}>{f.label}</div>
@@ -290,7 +290,7 @@ export default function DrivePage() {
                 )}
                 <a href={l.url} target="_blank" rel="noopener noreferrer" style={{
                   marginTop: 14, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  border: '1.5px solid var(--c-filet-fort)', borderRadius: 11, background: 'var(--c-papier)',
+                  border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, background: 'var(--c-papier)',
                   color: 'var(--c-encre)', fontSize: 14, fontWeight: 700, textDecoration: 'none',
                 }}>
                   Ouvrir

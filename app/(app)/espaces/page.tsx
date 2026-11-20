@@ -61,7 +61,7 @@ function ModalAjoutEspace({ onFermer, onAjoute }: { onFermer: () => void; onAjou
   useEchap(true, onFermer) // la modale n'est montée que lorsqu'elle est ouverte
 
   const champ: React.CSSProperties = {
-    width: '100%', height: 44, border: '1.5px solid var(--c-filet-fort)', borderRadius: 10,
+    width: '100%', height: 44, border: '1.5px solid var(--c-filet-fort)', borderRadius: 6,
     padding: '0 12px', background: 'var(--c-papier)', fontSize: 14, outline: 'none',
     boxSizing: 'border-box', fontFamily: font, color: 'var(--c-encre)',
   }
@@ -69,7 +69,7 @@ function ModalAjoutEspace({ onFermer, onAjoute }: { onFermer: () => void; onAjou
   return (
     <div onClick={onFermer} style={{ position: 'fixed', inset: 0, background: 'rgba(40,30,20,.45)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" style={{
-        background: '#fff', borderRadius: 20, width: '100%', maxWidth: 520,
+        background: '#FFFEFB', borderRadius: 6, width: '100%', maxWidth: 520,
         fontFamily: font, color: 'var(--c-encre)', boxShadow: '0 30px 80px -30px rgba(40,30,20,.5)',
         maxHeight: '90vh', overflowY: 'auto',
       }}>
@@ -89,7 +89,7 @@ function ModalAjoutEspace({ onFermer, onAjoute }: { onFermer: () => void; onAjou
               <div style={{ fontSize: 12, fontWeight: 600, color: '#5C4A22', marginBottom: 6 }}>Icône</div>
               <div style={{ position: 'relative' }}>
                 <select value={icone} onChange={e => setIcone(e.target.value)} style={{
-                  height: 44, border: '1.5px solid var(--c-filet-fort)', borderRadius: 10, padding: '0 28px 0 10px',
+                  height: 44, border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '0 28px 0 10px',
                   background: 'var(--c-papier)', fontSize: 20, cursor: 'pointer', outline: 'none', appearance: 'none',
                 }}>
                   {ICONES.map(i => <option key={i} value={i}>{i}</option>)}
@@ -136,10 +136,10 @@ function ModalAjoutEspace({ onFermer, onAjoute }: { onFermer: () => void; onAjou
           </div>
 
           {/* Aperçu */}
-          <div style={{ background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 14, padding: '14px 16px' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--c-annotation-clair)', marginBottom: 10 }}>Aperçu</div>
+          <div style={{ background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '14px 16px' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.06em', color: 'var(--c-annotation-clair)', marginBottom: 10 }}>Aperçu</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 42, height: 42, borderRadius: 12, background: couleur + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{icone}</div>
+              <div style={{ width: 42, height: 42, borderRadius: 6, background: couleur + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{icone}</div>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 16 }}>{nom || 'Nom de la matière'}</div>
                 {description && <div style={{ fontSize: 12.5, color: 'var(--c-annotation-clair)', marginTop: 2 }}>{description}</div>}
@@ -155,10 +155,10 @@ function ModalAjoutEspace({ onFermer, onAjoute }: { onFermer: () => void; onAjou
 
         {/* Footer */}
         <div style={{ padding: '14px 24px', borderTop: '1px solid var(--c-filet)', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-          <button onClick={onFermer} style={{ height: 40, padding: '0 18px', border: '1px solid var(--c-filet-fort)', borderRadius: 10, background: 'transparent', color: 'var(--c-annotation)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>
+          <button onClick={onFermer} style={{ height: 40, padding: '0 18px', border: '1px solid var(--c-filet-fort)', borderRadius: 6, background: 'transparent', color: 'var(--c-annotation)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>
             Annuler
           </button>
-          <button onClick={valider} disabled={loading} style={{ height: 40, padding: '0 22px', border: 'none', borderRadius: 10, background: 'var(--c-accent)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: loading ? 'wait' : 'pointer', fontFamily: font, opacity: loading ? 0.7 : 1 }}>
+          <button onClick={valider} disabled={loading} style={{ height: 40, padding: '0 22px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: loading ? 'wait' : 'pointer', fontFamily: font, opacity: loading ? 0.7 : 1 }}>
             {loading ? 'Création…' : 'Créer l\'espace'}
           </button>
         </div>
@@ -208,7 +208,7 @@ export default function EspacesPage() {
         {estAdmin && (
           <button onClick={() => setModalOuvert(true)} style={{
             display: 'flex', alignItems: 'center', gap: 7, height: 40, padding: '0 18px',
-            border: '1.5px dashed var(--c-accent)', borderRadius: 12, background: '#FFF4F2',
+            border: '1.5px dashed var(--c-accent)', borderRadius: 6, background: '#FFF4F2',
             color: 'var(--c-accent)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: font,
           }}>
             + Ajouter un espace
@@ -224,8 +224,8 @@ export default function EspacesPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
           {/* Carte « Révision mixte » */}
           <Link href="/espaces/_/revision?mixte=1" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ background: '#FCEFE9', borderRadius: 18, padding: 22, border: '1.5px solid var(--c-accent-bord)', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ width: 46, height: 46, borderRadius: 13, background: 'var(--c-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>🔀</div>
+            <div style={{ background: '#FCEFE9', borderRadius: 6, padding: 22, border: '1.5px solid var(--c-accent-bord)', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ width: 46, height: 46, borderRadius: 6, background: 'var(--c-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>🔀</div>
               <div style={{ fontWeight: 700, fontSize: 17 }}>Révision mixte</div>
               <div style={{ fontSize: 13, color: '#A8705F', marginTop: 4 }}>40 fiches dues tirées au hasard, toutes matières mélangées — l&apos;entraînement le plus efficace.</div>
               <div style={{ marginTop: 16 }}>
@@ -236,8 +236,8 @@ export default function EspacesPage() {
 
           {/* Carte « Carnet d'erreurs » */}
           <Link href="/carnet" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ background: '#FCEEEA', borderRadius: 18, padding: 22, border: '1.5px solid var(--c-accent-bord)', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ width: 46, height: 46, borderRadius: 13, background: '#C0392B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>📕</div>
+            <div style={{ background: '#FCEEEA', borderRadius: 6, padding: 22, border: '1.5px solid var(--c-accent-bord)', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ width: 46, height: 46, borderRadius: 6, background: '#C0392B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>📕</div>
               <div style={{ fontWeight: 700, fontSize: 17 }}>Carnet d&apos;erreurs</div>
               <div style={{ fontSize: 13, color: '#A8705F', marginTop: 4 }}>Tes fiches difficiles (mal notées) rassemblées pour les revoir en priorité.</div>
               <div style={{ marginTop: 16 }}>
@@ -248,8 +248,8 @@ export default function EspacesPage() {
 
           {/* Carte « Mes favoris » */}
           <Link href="/espaces/_/revision?favoris=1" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ background: '#FDF3DD', borderRadius: 18, padding: 22, border: '1.5px solid #F0DBA6', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ width: 46, height: 46, borderRadius: 13, background: '#E8A11E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>★</div>
+            <div style={{ background: '#FDF3DD', borderRadius: 6, padding: 22, border: '1.5px solid #F0DBA6', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ width: 46, height: 46, borderRadius: 6, background: '#E8A11E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>★</div>
               <div style={{ fontWeight: 700, fontSize: 17 }}>Mes favoris</div>
               <div style={{ fontSize: 13, color: '#9A7B33', marginTop: 4 }}>Réviser les fiches que tu as étoilées comme importantes.</div>
               <div style={{ marginTop: 16 }}>
@@ -260,8 +260,8 @@ export default function EspacesPage() {
 
           {/* Carte « Recherche » */}
           <Link href="/recherche" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ background: '#fff', borderRadius: 18, padding: 22, border: '1px solid var(--c-filet)', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
-              <div style={{ width: 46, height: 46, borderRadius: 13, background: '#EFE7D7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>🔎</div>
+            <div style={{ background: '#FFFEFB', borderRadius: 6, padding: 22, border: '1px solid var(--c-filet)', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ width: 46, height: 46, borderRadius: 6, background: '#EFE7D7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>🔎</div>
               <div style={{ fontWeight: 700, fontSize: 17 }}>Recherche</div>
               <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)', marginTop: 4 }}>Retrouver une notion par mot-clé dans toutes les fiches.</div>
               <div style={{ marginTop: 16 }}>
@@ -272,8 +272,8 @@ export default function EspacesPage() {
 
           {espaces.map(espace => (
             <Link key={espace.id} href={`/espaces/${espace.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ background: '#fff', borderRadius: 18, padding: 22, border: '1px solid var(--c-filet)', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
-                <div style={{ width: 46, height: 46, borderRadius: 13, background: espace.couleur + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>
+              <div style={{ background: '#FFFEFB', borderRadius: 6, padding: 22, border: '1px solid var(--c-filet)', cursor: 'pointer', height: '100%', boxSizing: 'border-box' }}>
+                <div style={{ width: 46, height: 46, borderRadius: 6, background: espace.couleur + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 14 }}>
                   {espace.icone || '📚'}
                 </div>
                 <div style={{ fontWeight: 700, fontSize: 17 }}>{espace.nom}</div>
@@ -290,12 +290,12 @@ export default function EspacesPage() {
           {/* Card admin : ajouter un espace */}
           {estAdmin && (
             <button onClick={() => setModalOuvert(true)} style={{
-              background: 'var(--c-papier)', borderRadius: 18, padding: 22,
+              background: 'var(--c-papier)', borderRadius: 6, padding: 22,
               border: '2px dashed var(--c-filet-fort)', cursor: 'pointer', textAlign: 'left',
               fontFamily: font, color: 'var(--c-annotation-clair)', display: 'flex', flexDirection: 'column',
               alignItems: 'flex-start', gap: 8, minHeight: 140,
             }}>
-              <div style={{ width: 46, height: 46, borderRadius: 13, background: 'var(--c-filet)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>＋</div>
+              <div style={{ width: 46, height: 46, borderRadius: 6, background: 'var(--c-filet)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>＋</div>
               <div style={{ fontWeight: 700, fontSize: 16, color: '#5C4A22' }}>Ajouter une matière</div>
               <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)' }}>Créer un nouvel espace de révision.</div>
             </button>

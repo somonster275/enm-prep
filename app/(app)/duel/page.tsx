@@ -106,7 +106,7 @@ export default function DuelAccueil() {
     router.push(`/duel/${v}`)
   }
 
-  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: FONT }
+  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: FONT }
 
   return (
     <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: FONT, color: 'var(--c-encre)' }}>
@@ -119,19 +119,19 @@ export default function DuelAccueil() {
       </p>
 
       {/* Rejoindre par code */}
-      <div style={{ background: 'var(--c-encre)', borderRadius: 18, padding: 22, marginBottom: 20, color: '#fff', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ background: 'var(--c-encre)', borderRadius: 6, padding: 22, marginBottom: 20, color: '#fff', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 200px' }}>
           <div style={{ fontWeight: 700, fontSize: 16 }}>Rejoindre un match</div>
           <div style={{ fontSize: 13, color: '#CDBFA6', marginTop: 2 }}>Entre le code partagé par l&apos;organisateur.</div>
         </div>
         <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} onKeyDown={e => { if (e.key === 'Enter') rejoindre(code) }}
           placeholder="CODE" maxLength={6}
-          style={{ width: 140, textAlign: 'center', letterSpacing: 4, fontWeight: 800, fontSize: 18, border: 'none', borderRadius: 12, padding: '12px 10px', background: '#fff', color: 'var(--c-encre)', outline: 'none', fontFamily: DISPLAY }} />
-        <button onClick={() => rejoindre(code)} disabled={code.trim().length < 4} style={{ height: 48, padding: '0 22px', border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', opacity: code.trim().length < 4 ? 0.5 : 1, fontFamily: FONT }}>Rejoindre</button>
+          style={{ width: 140, textAlign: 'center', letterSpacing: 4, fontWeight: 800, fontSize: 18, border: 'none', borderRadius: 6, padding: '12px 10px', background: '#FFFEFB', color: 'var(--c-encre)', outline: 'none', fontFamily: DISPLAY }} />
+        <button onClick={() => rejoindre(code)} disabled={code.trim().length < 4} style={{ height: 48, padding: '0 22px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', opacity: code.trim().length < 4 ? 0.5 : 1, fontFamily: FONT }}>Rejoindre</button>
       </div>
 
       {/* Créer un match */}
-      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18, padding: 22, marginBottom: 26 }}>
+      <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 22, marginBottom: 26 }}>
         <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 14 }}>Créer un match</div>
         {/* Type de duel : temps réel (ensemble, live) ou asynchrone (chacun sous 48 h) */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
@@ -142,7 +142,7 @@ export default function DuelAccueil() {
             <button key={o.k} onClick={() => setMode(o.k)} style={{
               flex: '1 1 200px', textAlign: 'left', cursor: 'pointer', fontFamily: FONT,
               border: `1.5px solid ${mode === o.k ? 'var(--c-accent)' : 'var(--c-filet-fort)'}`, background: mode === o.k ? '#FCEFD3' : 'var(--c-papier)',
-              borderRadius: 12, padding: '10px 14px',
+              borderRadius: 6, padding: '10px 14px',
             }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--c-encre)' }}>{o.t}</div>
               <div style={{ fontSize: 12, color: 'var(--c-annotation)', marginTop: 1 }}>{o.d}</div>
@@ -193,7 +193,7 @@ export default function DuelAccueil() {
             )}
           </div>
           {erreur && <div style={{ fontSize: 13.5, color: 'var(--c-accent)' }}>{erreur}</div>}
-          <button onClick={creer} disabled={creating} style={{ alignSelf: 'flex-start', height: 48, padding: '0 26px', border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: creating ? 0.7 : 1, fontFamily: FONT }}>
+          <button onClick={creer} disabled={creating} style={{ alignSelf: 'flex-start', height: 48, padding: '0 26px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: creating ? 0.7 : 1, fontFamily: FONT }}>
             {creating ? 'Création…' : 'Créer le salon →'}
           </button>
         </div>
@@ -202,13 +202,13 @@ export default function DuelAccueil() {
       {/* Salons ouverts */}
       <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 18, marginBottom: 12 }}>Salons en attente</div>
       {ouverts.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>
+        <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
           Aucun salon ouvert. Crée le tien et partage le code !
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {ouverts.map(m => (
-            <div key={m.code} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '12px 16px' }}>
+            <div key={m.code} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '12px 16px' }}>
               <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 16, letterSpacing: 2, color: 'var(--c-accent)' }}>{m.code}</span>
               <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{m.titre || 'Match'}</span>
               <span style={{ fontSize: 12.5, color: 'var(--c-annotation-clair)' }}>{m.n} joueur{m.n > 1 ? 's' : ''}</span>

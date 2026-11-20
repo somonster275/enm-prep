@@ -85,7 +85,7 @@ export default function ForumPage() {
   }
 
   const font = "var(--font-texte)"
-  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: font }
+  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: font }
   const visibles = filtre ? questions.filter(q => q.matiere === filtre) : questions
   const dateFr = (s: string) => new Date(s).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
 
@@ -93,12 +93,12 @@ export default function ForumPage() {
     <div style={{ paddingTop: 34, maxWidth: 760, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 28, margin: 0 }}>Forum d&apos;entraide</h1>
-        {!formOuvert && <button onClick={() => setFormOuvert(true)} style={{ padding: '10px 18px', borderRadius: 11, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: font }}>Poser une question</button>}
+        {!formOuvert && <button onClick={() => setFormOuvert(true)} style={{ padding: '10px 18px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: font }}>Poser une question</button>}
       </div>
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 22px' }}>Posez vos questions, répondez à celles des autres. On avance ensemble.</p>
 
       {formOuvert && (
-        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18, marginBottom: 22, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18, marginBottom: 22, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <input value={titre} onChange={e => setTitre(e.target.value)} placeholder="Ta question en une phrase…" style={champ} />
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <select value={matiere} onChange={e => setMatiere(e.target.value)} style={{ ...champ, flex: '1 1 200px' }}>
@@ -108,8 +108,8 @@ export default function ForumPage() {
           </div>
           <textarea value={corps} onChange={e => setCorps(e.target.value)} rows={3} placeholder="Détaille si besoin…" style={{ ...champ, resize: 'vertical', lineHeight: 1.5 }} />
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={poser} disabled={posting || !titre.trim()} style={{ height: 44, padding: '0 20px', border: 'none', borderRadius: 11, background: 'var(--c-accent)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: posting || !titre.trim() ? 0.6 : 1, fontFamily: font }}>{posting ? 'Publication…' : 'Publier'}</button>
-            <button onClick={() => setFormOuvert(false)} style={{ height: 44, padding: '0 16px', border: '1.5px solid var(--c-filet-fort)', borderRadius: 11, background: '#fff', color: 'var(--c-texte-doux)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>Annuler</button>
+            <button onClick={poser} disabled={posting || !titre.trim()} style={{ height: 44, padding: '0 20px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: posting || !titre.trim() ? 0.6 : 1, fontFamily: font }}>{posting ? 'Publication…' : 'Publier'}</button>
+            <button onClick={() => setFormOuvert(false)} style={{ height: 44, padding: '0 16px', border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, background: '#FFFEFB', color: 'var(--c-texte-doux)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>Annuler</button>
           </div>
         </div>
       )}
@@ -127,14 +127,14 @@ export default function ForumPage() {
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : visibles.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>Aucune question pour l&apos;instant. Lance la discussion !</div>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>Aucune question pour l&apos;instant. Lance la discussion !</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {visibles.map(q => {
             const open = ouvert === q.id
             const reps = reponses[q.id] || []
             return (
-              <div key={q.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18 }}>
+              <div key={q.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                   <div {...activable} onClick={() => ouvrirFil(q.id)} style={{ flex: 1, cursor: 'pointer' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
@@ -158,7 +158,7 @@ export default function ForumPage() {
                     {reps.length === 0 && <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)', marginBottom: 10 }}>Aucune réponse — sois le premier à aider.</div>}
                     {reps.map(r => (
                       <div key={r.id} style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
-                        <div style={{ flex: 1, background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '10px 12px' }}>
+                        <div style={{ flex: 1, background: 'var(--c-papier)', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '10px 12px' }}>
                           <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginBottom: 3 }}>{r.auteur || 'Étudiant'} · {dateFr(r.created_at)}</div>
                           <div style={{ fontSize: 14, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{r.corps}</div>
                         </div>
@@ -169,7 +169,7 @@ export default function ForumPage() {
                     ))}
                     <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                       <input value={reponse} onChange={e => setReponse(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') repondre(q.id) }} placeholder="Ta réponse…" style={{ ...champ, flex: 1 }} />
-                      <button onClick={() => repondre(q.id)} disabled={!reponse.trim()} style={{ padding: '0 18px', borderRadius: 11, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, opacity: reponse.trim() ? 1 : 0.5, fontFamily: font }}>Envoyer</button>
+                      <button onClick={() => repondre(q.id)} disabled={!reponse.trim()} style={{ padding: '0 18px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, opacity: reponse.trim() ? 1 : 0.5, fontFamily: font }}>Envoyer</button>
                     </div>
                   </div>
                 )}

@@ -103,7 +103,7 @@ export default function ActualitesPage() {
   }
 
   const inp: React.CSSProperties = {
-    padding: '10px 12px', borderRadius: 10, border: '1.5px solid var(--c-filet-fort)',
+    padding: '10px 12px', borderRadius: 6, border: '1.5px solid var(--c-filet-fort)',
     fontSize: 13, fontFamily: font, background: 'var(--c-papier)', outline: 'none', boxSizing: 'border-box',
   }
 
@@ -124,14 +124,14 @@ export default function ActualitesPage() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#A3122A22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📰</div>
+            <div style={{ width: 44, height: 44, borderRadius: 6, background: '#A3122A22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📰</div>
             <div style={{ fontFamily: display, fontWeight: 800, fontSize: 26 }}>Actualités</div>
           </div>
           <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '6px 0 0 56px' }}>L'actualité juridique de la semaine, en direct des sites de référence.</p>
         </div>
         {!tableManquante && sources.length > 0 && (
           <button onClick={() => synchroniser(sources)} disabled={sync} style={{
-            padding: '10px 18px', borderRadius: 11, background: '#fff', color: 'var(--c-annotation)',
+            padding: '10px 18px', borderRadius: 6, background: '#FFFEFB', color: 'var(--c-annotation)',
             border: '1px solid var(--c-filet)', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: font,
             display: 'flex', alignItems: 'center', gap: 7,
           }}>
@@ -142,9 +142,9 @@ export default function ActualitesPage() {
       </div>
 
       {tableManquante && (
-        <div style={{ fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '14px 18px', borderRadius: 12, marginBottom: 24 }}>
+        <div style={{ fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '14px 18px', borderRadius: 6, marginBottom: 24 }}>
           La table <strong>sources_actualites</strong> n'existe pas encore. Exécute le SQL ci-dessous dans Supabase.
-          <pre style={{ marginTop: 10, fontSize: 11, background: '#fff', padding: 12, borderRadius: 8, overflowX: 'auto', color: 'var(--c-encre)' }}>{`CREATE TABLE sources_actualites (
+          <pre style={{ marginTop: 10, fontSize: 11, background: '#FFFEFB', padding: 12, borderRadius: 8, overflowX: 'auto', color: 'var(--c-encre)' }}>{`CREATE TABLE sources_actualites (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   nom TEXT NOT NULL,
   url TEXT NOT NULL,
@@ -161,7 +161,7 @@ CREATE POLICY "src_write" ON sources_actualites FOR ALL TO authenticated
 
       {/* Gestion des sources (admin) */}
       {isAdmin && !tableManquante && (
-        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 20, marginBottom: 28 }}>
+        <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 20, marginBottom: 28 }}>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Sources de flux (RSS)</div>
           <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginBottom: 14 }}>
             Colle l'adresse du flux RSS d'un site juridique (ex. Dalloz Actualité, Village de la Justice, Conseil constitutionnel…).
@@ -191,7 +191,7 @@ CREATE POLICY "src_write" ON sources_actualites FOR ALL TO authenticated
               ))}
             </div>
             <button onClick={ajouterSource} disabled={!nom.trim() || !url.trim()} style={{
-              padding: '10px 20px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff',
+              padding: '10px 20px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff',
               border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: font,
               opacity: (!nom.trim() || !url.trim()) ? 0.5 : 1, whiteSpace: 'nowrap',
             }}>Ajouter</button>
@@ -201,7 +201,7 @@ CREATE POLICY "src_write" ON sources_actualites FOR ALL TO authenticated
       )}
 
       {erreurs.length > 0 && (
-        <div style={{ fontSize: 12, color: '#9A7A2A', background: '#FCF3DD', padding: '10px 14px', borderRadius: 10, marginBottom: 18 }}>
+        <div style={{ fontSize: 12, color: '#9A7A2A', background: '#FCF3DD', padding: '10px 14px', borderRadius: 6, marginBottom: 18 }}>
           ⚠️ {erreurs.join(' · ')}
         </div>
       )}
@@ -222,7 +222,7 @@ CREATE POLICY "src_write" ON sources_actualites FOR ALL TO authenticated
           {articles.map((a, i) => (
             <a key={i} href={a.lien} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
               <div style={{
-                background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, overflow: 'hidden',
+                background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, overflow: 'hidden',
                 cursor: 'pointer', height: '100%', display: 'flex', flexDirection: 'column',
               }}>
                 {a.image && (

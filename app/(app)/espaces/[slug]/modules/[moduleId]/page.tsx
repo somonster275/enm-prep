@@ -208,7 +208,7 @@ export default function ModulePage() {
   const totalFiches = fiches.length
 
   const inputStyle: React.CSSProperties = {
-    padding: '10px 12px', borderRadius: 10, border: '1.5px solid var(--c-filet-fort)',
+    padding: '10px 12px', borderRadius: 6, border: '1.5px solid var(--c-filet-fort)',
     fontSize: 13, fontFamily: font, background: 'var(--c-papier)', outline: 'none',
   }
 
@@ -234,7 +234,7 @@ export default function ModulePage() {
       </div>
 
       {/* En-tête */}
-      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 18, padding: '24px 28px', marginBottom: 24 }}>
+      <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '24px 28px', marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
           <div>
             <div style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 24, color: espace.couleur }}>
@@ -257,13 +257,13 @@ export default function ModulePage() {
           {/* Boutons */}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
             <Link href={`/espaces/${slug}/revision?module=${moduleId}`} style={{
-              padding: '10px 18px', borderRadius: 10, background: espace.couleur, color: '#fff',
+              padding: '10px 18px', borderRadius: 6, background: espace.couleur, color: '#fff',
               fontSize: 13, fontWeight: 700, textDecoration: 'none', fontFamily: font, whiteSpace: 'nowrap',
             }}>
               Réviser tout{due > 0 ? ` (${due} dues)` : ''}
             </Link>
             <Link href={`/espaces/${slug}/revision?module=${moduleId}&mode=tout`} style={{
-              padding: '10px 18px', borderRadius: 10, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)',
+              padding: '10px 18px', borderRadius: 6, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)',
               fontSize: 13, textDecoration: 'none', fontFamily: font, border: '1px solid var(--c-filet-fort)', whiteSpace: 'nowrap',
             }}>
               Mode aléatoire
@@ -271,7 +271,7 @@ export default function ModulePage() {
 
             {isAdmin && (
               <button onClick={() => { setShowMove(v => !v); setConfirmDeleteModule(false) }} style={{
-                padding: '10px 14px', borderRadius: 10, background: showMove ? 'var(--c-accent)' : '#FCE3D3',
+                padding: '10px 14px', borderRadius: 6, background: showMove ? 'var(--c-accent)' : '#FCE3D3',
                 color: showMove ? '#fff' : 'var(--c-accent)', border: 'none', cursor: 'pointer',
                 fontSize: 13, fontWeight: 600, fontFamily: font,
               }}>Déplacer</button>
@@ -280,13 +280,13 @@ export default function ModulePage() {
             {isAdmin && (
               <div style={{ position: 'relative' }}>
                 <button onClick={() => { setConfirmDeleteModule(v => !v); setShowMove(false) }} style={{
-                  padding: '10px 14px', borderRadius: 10, background: 'var(--c-accent-pale)', color: 'var(--c-accent)',
+                  padding: '10px 14px', borderRadius: 6, background: 'var(--c-accent-pale)', color: 'var(--c-accent)',
                   border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: font,
                 }}>Supprimer</button>
                 {confirmDeleteModule && (
                   <div style={{
                     position: 'absolute', top: 46, right: 0, width: 260, zIndex: 50,
-                    background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12,
+                    background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6,
                     boxShadow: '0 8px 24px -8px rgba(40,30,60,.18)', padding: '14px',
                   }}>
                     <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Supprimer ce module ?</div>
@@ -325,7 +325,7 @@ export default function ModulePage() {
                 </select>
               </div>
               <button onClick={deplacerModule} disabled={moving} style={{
-                padding: '10px 20px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff',
+                padding: '10px 20px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff',
                 border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: font,
                 opacity: moving ? 0.6 : 1, whiteSpace: 'nowrap',
               }}>{moving ? 'Déplacement…' : 'Confirmer'}</button>
@@ -338,7 +338,7 @@ export default function ModulePage() {
       </div>
 
       {msg && (
-        <div style={{ fontSize: 13, padding: '10px 14px', borderRadius: 10, marginBottom: 16, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63', background: msg.startsWith('❌') ? 'var(--c-accent-pale)' : '#DDF3EE' }}>{msg}</div>
+        <div style={{ fontSize: 13, padding: '10px 14px', borderRadius: 6, marginBottom: 16, color: msg.startsWith('❌') ? 'var(--c-accent)' : '#0E7C63', background: msg.startsWith('❌') ? 'var(--c-accent-pale)' : '#DDF3EE' }}>{msg}</div>
       )}
 
       {/* ===== SOUS-MODULES ===== */}
@@ -356,18 +356,18 @@ export default function ModulePage() {
         </div>
 
         {creatingSousModule && (
-          <div style={{ display: 'flex', gap: 8, marginBottom: 12, padding: '12px', background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12 }}>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 12, padding: '12px', background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6 }}>
             <input value={nomSousModule} onChange={e => setNomSousModule(e.target.value)} autoFocus
               onKeyDown={e => { if (e.key === 'Enter') creerSousModule(); if (e.key === 'Escape') { setCreatingSousModule(false); setNomSousModule('') } }}
               placeholder="Nom du sous-module…"
               style={{ ...inputStyle, flex: 1 }} />
             <button onClick={creerSousModule} disabled={!nomSousModule.trim()} style={{
-              padding: '10px 16px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff',
+              padding: '10px 16px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff',
               border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: font,
               opacity: !nomSousModule.trim() ? 0.5 : 1,
             }}>Créer</button>
             <button onClick={() => { setCreatingSousModule(false); setNomSousModule('') }} style={{
-              padding: '10px 12px', borderRadius: 10, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)',
+              padding: '10px 12px', borderRadius: 6, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)',
               border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 13, fontFamily: font,
             }}>✕</button>
           </div>
@@ -380,7 +380,7 @@ export default function ModulePage() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {sousModules.map(sm => (
-              <div key={sm.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, overflow: 'hidden' }}>
+              <div key={sm.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, overflow: 'hidden' }}>
                 <Link href={`/espaces/${slug}/modules/${sm.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
                   <div style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -421,7 +421,7 @@ export default function ModulePage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {cours.map(c => (
                 <Link key={c.id} href={`/cours?c=${c.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                  <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, fontWeight: 600 }}>
                       <span>{c.type === 'pdf' ? '📕' : '📘'}</span>{c.titre}
                     </div>
@@ -448,7 +448,7 @@ export default function ModulePage() {
               <div key={fiche.id} style={{
                 background: fiche.suspendu ? '#FBF6EE' : '#fff',
                 border: fiche.suspendu ? '1px dashed #E0A93B' : '1px solid var(--c-filet)',
-                borderRadius: 14, opacity: fiche.suspendu ? 0.85 : 1,
+                borderRadius: 6, opacity: fiche.suspendu ? 0.85 : 1,
               }}>
                 {isAdmin && editFiche?.id === fiche.id ? (
                   <div style={{ padding: '16px' }}>
@@ -474,7 +474,7 @@ export default function ModulePage() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
-                          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--c-annotation-clair)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fiche {i + 1}</span>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--c-annotation-clair)', letterSpacing: '0.06em' }}>Fiche {i + 1}</span>
                           {fiche.suspendu && <span style={{ fontSize: 10, fontWeight: 700, color: '#9A6A12', background: '#FBEAC6', padding: '2px 8px', borderRadius: 999 }}>⏸️ Suspendue</span>}
                         </div>
                         <RichContent html={fiche.question} style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-encre)', lineHeight: 1.5, marginBottom: 10 }} />
@@ -493,7 +493,7 @@ export default function ModulePage() {
                         {isAdmin ? (
                           <>
                             <button onClick={() => { setEditFiche(fiche); setQuestion(fiche.question); setReponse(fiche.reponse); setTagsFiche(nettoyerTags(fiche.tags)) }}
-                              style={{ padding: '6px 12px', borderRadius: 8, background: '#fff', color: 'var(--c-annotation)', border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
+                              style={{ padding: '6px 12px', borderRadius: 8, background: '#FFFEFB', color: 'var(--c-annotation)', border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: font }}>
                               Modifier
                             </button>
                             <button onClick={() => basculerSuspension(fiche)}

@@ -20,7 +20,7 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
 
   const font = "var(--font-texte)"
   const coral = '#A3122A'
-  const champ: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 10, border: '1.5px solid var(--c-filet-fort)', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: 'var(--c-papier)', outline: 'none' }
+  const champ: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 6, border: '1.5px solid var(--c-filet-fort)', fontSize: 13, boxSizing: 'border-box', fontFamily: font, background: 'var(--c-papier)', outline: 'none' }
 
   const generer = async () => {
     if (!texte.trim()) { setMsg('❌ Indique un sujet ou colle un texte de cours.'); return }
@@ -53,7 +53,7 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
   }
 
   return (
-    <div style={{ background: 'var(--c-papier-chaud)', border: '1px solid #F2D9A0', borderRadius: 16, padding: '1.1rem 1.25rem', marginBottom: 16 }}>
+    <div style={{ background: 'var(--c-papier-chaud)', border: '1px solid #F2D9A0', borderRadius: 6, padding: '1.1rem 1.25rem', marginBottom: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} {...activable} aria-expanded={ouvert} onClick={() => setOuvert(o => !o)}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
           <span style={{ fontSize: 18 }}>✨</span>
@@ -73,7 +73,7 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
               <input type="number" min={1} max={20} value={nombre} onChange={e => setNombre(Math.min(20, Math.max(1, parseInt(e.target.value) || 1)))}
                 style={{ ...champ, width: 70, padding: '7px 9px' }} />
             </label>
-            <button onClick={generer} disabled={loading} style={{ padding: '10px 20px', borderRadius: 10, background: coral, color: '#fff', border: 'none', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', opacity: loading ? 0.7 : 1, fontFamily: font }}>
+            <button onClick={generer} disabled={loading} style={{ padding: '10px 20px', borderRadius: 6, background: coral, color: '#fff', border: 'none', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', opacity: loading ? 0.7 : 1, fontFamily: font }}>
               {loading ? 'Génération…' : 'Générer'}
             </button>
           </div>
@@ -87,7 +87,7 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
                 {items.map((it, i) => (
-                  <div key={i} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: 12, opacity: it.selected ? 1 : 0.5 }}>
+                  <div key={i} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 12, opacity: it.selected ? 1 : 0.5 }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--c-annotation)', marginBottom: 8, cursor: 'pointer' }}>
                       <input type="checkbox" checked={it.selected} onChange={() => setItems(arr => arr.map((x, j) => j === i ? { ...x, selected: !x.selected } : x))} />
                       Fiche {i + 1}
@@ -97,7 +97,7 @@ export default function GenerateurFiches({ moduleId, onAjoutees }: {
                   </div>
                 ))}
               </div>
-              <button onClick={ajouter} disabled={saving} style={{ padding: '11px 22px', borderRadius: 10, background: '#0F6E56', color: '#fff', border: 'none', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: font }}>
+              <button onClick={ajouter} disabled={saving} style={{ padding: '11px 22px', borderRadius: 6, background: '#0F6E56', color: '#fff', border: 'none', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: font }}>
                 {saving ? 'Ajout…' : `Ajouter ${items.filter(i => i.selected).length} fiche(s) au module`}
               </button>
             </div>

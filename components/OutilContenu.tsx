@@ -118,7 +118,7 @@ export default function OutilContenu({ table, accent, icone, titre, description,
   }
 
   const inp: React.CSSProperties = {
-    padding: '10px 12px', borderRadius: 10, border: '1.5px solid var(--c-filet-fort)',
+    padding: '10px 12px', borderRadius: 6, border: '1.5px solid var(--c-filet-fort)',
     fontSize: 13, fontFamily: font, background: 'var(--c-papier)', outline: 'none', boxSizing: 'border-box',
   }
 
@@ -127,19 +127,19 @@ export default function OutilContenu({ table, accent, icone, titre, description,
   return (
     <div style={{ paddingTop: '34px', maxWidth: 900, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 6 }}>
-        <div style={{ width: 48, height: 48, borderRadius: 14, background: accent + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>{icone}</div>
+        <div style={{ width: 48, height: 48, borderRadius: 6, background: accent + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>{icone}</div>
         <div style={{ fontFamily: display, fontWeight: 800, fontSize: 28 }}>{titre}</div>
       </div>
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '0 0 28px' }}>{description}</p>
 
       {tableManquante && (
-        <div style={{ fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '12px 16px', borderRadius: 10, marginBottom: 24 }}>
+        <div style={{ fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '12px 16px', borderRadius: 6, marginBottom: 24 }}>
           La table <strong>{table}</strong> n'existe pas encore dans Supabase. Exécute le SQL fourni pour activer cet outil.
         </div>
       )}
 
       {isAdmin && !tableManquante && (
-        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 20, marginBottom: 28 }}>
+        <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 20, marginBottom: 28 }}>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>Ajouter un contenu</div>
           <div style={{ display: 'grid', gridTemplateColumns: withType ? '1.4fr 1fr 1fr' : '1.6fr 1fr', gap: 10, marginBottom: 10 }}>
             <input value={nom} onChange={e => setNom(e.target.value)} placeholder="Titre…" style={inp} />
@@ -168,7 +168,7 @@ export default function OutilContenu({ table, accent, icone, titre, description,
               <>
                 <span style={{ fontSize: 12, color: 'var(--c-annotation-clair)', flexShrink: 0 }}>ou</span>
                 <label style={{
-                  padding: '10px 14px', borderRadius: 10, border: `1.5px dashed ${accent}66`,
+                  padding: '10px 14px', borderRadius: 6, border: `1.5px dashed ${accent}66`,
                   fontSize: 12, fontWeight: 600, color: accent, cursor: 'pointer', whiteSpace: 'nowrap',
                   background: fichier ? accent + '10' : 'var(--c-papier)', flexShrink: 0,
                 }}>
@@ -195,7 +195,7 @@ export default function OutilContenu({ table, accent, icone, titre, description,
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <button onClick={ajouter} disabled={!canAdd} style={{
-              padding: '10px 22px', borderRadius: 10, background: accent, color: '#fff',
+              padding: '10px 22px', borderRadius: 6, background: accent, color: '#fff',
               border: 'none', cursor: canAdd ? 'pointer' : 'default', fontSize: 14, fontWeight: 700, fontFamily: font,
               opacity: canAdd ? 1 : 0.5,
             }}>
@@ -215,7 +215,7 @@ export default function OutilContenu({ table, accent, icone, titre, description,
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {items.map(it => (
-            <div key={it.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+            <div key={it.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>
                   {it.titre}

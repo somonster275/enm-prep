@@ -55,7 +55,7 @@ export default function AstucesFiche({ ficheId, uid, auteur, isAdmin }: { ficheI
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
               {items.map(a => (
-                <div key={a.id} style={{ display: 'flex', gap: 8, background: 'var(--c-papier-chaud)', border: '1px solid #F2D9A0', borderRadius: 10, padding: '8px 10px' }}>
+                <div key={a.id} style={{ display: 'flex', gap: 8, background: 'var(--c-papier-chaud)', border: '1px solid #F2D9A0', borderRadius: 6, padding: '8px 10px' }}>
                   <span style={{ flexShrink: 0 }}>💡</span>
                   <div style={{ flex: 1, fontSize: 13, lineHeight: 1.45, color: '#3A3226' }}>
                     {a.texte}

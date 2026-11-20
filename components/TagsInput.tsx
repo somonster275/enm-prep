@@ -26,7 +26,7 @@ export default function TagsInput({
   return (
     <div style={{
       display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6,
-      border: '1.5px solid var(--c-filet-fort)', borderRadius: 11, padding: '7px 10px',
+      border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '7px 10px',
       background: 'var(--c-papier)', fontFamily: FONT, minHeight: 44, boxSizing: 'border-box',
     }}>
       {value.map(t => (

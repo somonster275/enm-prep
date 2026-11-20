@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 48).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 49).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,16 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-20 (suite 49) — Refonte design : composants restants + passe d'harmonisation
+- Poussé sur `main` (demande du user) jusqu'à `bf55e82` ; ce lot est sur la branche `claude/beautiful-noether-faylt4`.
+- Composants restylés (style seul) : `ModeVacances` (plus de violet ni 🌴, carte papier, bouton encre), `AccesRapide`
+  (liens texte avec filet de couleur à gauche au lieu des tuiles emoji ; champ `icone` supprimé), `NotesWidget`,
+  `ProgressionCard`, `NotifCloche` (bouton carré discret, panneau rayon 6), `ChatbotBulle` (pilule encre « Coach IA »
+  au lieu du rond rouge 📕), `TuteurChat` (sans 📕, avatar « C », champ et bouton rayon 6).
+- **Passe mécanique** sur toutes les pages `app/(app)` + `components` (hors Logo) : `borderRadius` 10–24 → 6,
+  `background: '#fff'` → `#FFFEFB`, suppression des `textTransform: 'uppercase'`. Restent : emoji en tête de section
+  et sur les cartes de matières (`espaces/page.tsx`, `espaces/[slug]/page.tsx`), pilules arrondies 999.
 
 ### 2026-11-20 (suite 48) — Refonte design : navigation + page de révision
 - **`components/TopNav.tsx`** (style seul, mêmes liens/menus) : fond #FFFEFB, page active = soulignement rouge

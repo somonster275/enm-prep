@@ -33,10 +33,10 @@ export default function ClassementPage() {
       </p>
 
       {/* Défi (piloté par l'admin) */}
-      <div style={{ background: '#FFC02E', borderRadius: 20, padding: 26, color: 'var(--c-encre)', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ background: '#FFC02E', borderRadius: 6, padding: 26, color: 'var(--c-encre)', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', width: 150, height: 150, borderRadius: '50%', background: '#FFCE54', right: -40, top: -50 }} />
         <div style={{ position: 'relative' }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: '#7A5E14' }}>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.08em', color: '#7A5E14' }}>
             {config?.titre || (libre ? 'Défi de la semaine' : 'Ton défi')}
             {config?.matiere && <span> · {config.matiere}</span>}
           </div>
@@ -69,14 +69,14 @@ export default function ClassementPage() {
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : !data || data.classement.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
           Personne n&apos;a encore révisé cette semaine. Sois le premier !
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {data.classement.map(l => (
             <div key={l.rang} style={{
-              display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', borderRadius: 12,
+              display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', borderRadius: 6,
               background: l.moi ? 'var(--c-accent-pale)' : '#fff', border: `1px solid ${l.moi ? 'var(--c-accent-bord)' : 'var(--c-filet)'}`,
             }}>
               <span style={{ fontSize: 16, fontWeight: 800, width: 34, textAlign: 'center', color: l.rang <= 3 ? 'var(--c-encre)' : 'var(--c-annotation-clair)' }}>{medaille(l.rang)}</span>
@@ -87,7 +87,7 @@ export default function ClassementPage() {
             </div>
           ))}
           {data.moi.rang > 15 && data.moi.rang > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', borderRadius: 12, background: 'var(--c-accent-pale)', border: '1px solid var(--c-accent-bord)', marginTop: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', borderRadius: 6, background: 'var(--c-accent-pale)', border: '1px solid var(--c-accent-bord)', marginTop: 6 }}>
               <span style={{ fontSize: 14, fontWeight: 800, width: 34, textAlign: 'center', color: 'var(--c-annotation-clair)' }}>#{data.moi.rang}</span>
               <span style={{ flex: 1, fontSize: 14.5, fontWeight: 700, color: '#C0392B' }}>Toi</span>
               <span style={{ fontSize: 14.5, fontWeight: 700 }}>{data.moi.cartes} <span style={{ color: 'var(--c-annotation-clair)', fontWeight: 400, fontSize: 13 }}>cartes</span></span>

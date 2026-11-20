@@ -78,15 +78,15 @@ export default function ComptePage() {
   }
 
   const champ: React.CSSProperties = {
-    width: '100%', height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12,
+    width: '100%', height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 6,
     padding: '0 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', boxSizing: 'border-box',
     fontFamily: "var(--font-texte)",
   }
   const carte: React.CSSProperties = {
-    background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: '1.5rem',
+    background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '1.5rem',
   }
   const bouton = (disabled: boolean): React.CSSProperties => ({
-    marginTop: 18, height: 48, width: '100%', border: 'none', borderRadius: 12,
+    marginTop: 18, height: 48, width: '100%', border: 'none', borderRadius: 6,
     background: 'var(--c-accent)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer',
     opacity: disabled ? 0.7 : 1, fontFamily: "var(--font-texte)",
   })
@@ -147,7 +147,7 @@ export default function ComptePage() {
       {/* Widget ENT Paris 1 */}
       <div style={{ ...carte, marginTop: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 12, background: '#EEF2FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>🎓</div>
+          <div style={{ width: 48, height: 48, borderRadius: 6, background: '#EEF2FB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>🎓</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 15, fontWeight: 700 }}>ENT — Université Paris 1</div>
             <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginTop: 2 }}>Ton environnement numérique de travail (Panthéon-Sorbonne).</div>
@@ -155,7 +155,7 @@ export default function ComptePage() {
         </div>
         <a href="https://ent.univ-paris1.fr/" target="_blank" rel="noopener noreferrer" style={{
           marginTop: 16, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-          border: '1.5px solid #C9D6F0', borderRadius: 12, background: '#F5F8FE',
+          border: '1.5px solid #C9D6F0', borderRadius: 6, background: '#F5F8FE',
           color: '#274690', fontSize: 14.5, fontWeight: 700, textDecoration: 'none',
         }}>
           Ouvrir mon ENT
@@ -173,13 +173,13 @@ export default function ComptePage() {
 
         <a href="/api/compte/exporter" style={{
           height: 46, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-          border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, background: 'var(--c-papier)',
+          border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, background: 'var(--c-papier)',
           color: 'var(--c-encre)', fontSize: 14, fontWeight: 700, textDecoration: 'none',
         }}>Exporter mes données (JSON)</a>
 
         <button onClick={() => { setSuppOuvert(true); setConfirmTxt(''); setSuppErr('') }} style={{
-          marginTop: 10, height: 46, width: '100%', border: '1.5px solid var(--c-accent-bord)', borderRadius: 12,
-          background: '#fff', color: 'var(--c-accent)', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+          marginTop: 10, height: 46, width: '100%', border: '1.5px solid var(--c-accent-bord)', borderRadius: 6,
+          background: '#FFFEFB', color: 'var(--c-accent)', fontSize: 14, fontWeight: 700, cursor: 'pointer',
           fontFamily: "var(--font-texte)",
         }}>Supprimer mon compte</button>
       </div>
@@ -187,19 +187,19 @@ export default function ComptePage() {
       {/* Modal de confirmation de suppression */}
       {suppOuvert && (
         <div onClick={() => !suppLoading && setSuppOuvert(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(40,30,20,.45)', zIndex: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Supprimer mon compte" style={{ background: '#fff', borderRadius: 18, padding: 24, width: '100%', maxWidth: 440, fontFamily: "var(--font-texte)", color: 'var(--c-encre)' }}>
+          <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Supprimer mon compte" style={{ background: '#FFFEFB', borderRadius: 6, padding: 24, width: '100%', maxWidth: 440, fontFamily: "var(--font-texte)", color: 'var(--c-encre)' }}>
             <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 6 }}>Supprimer mon compte</div>
             <div style={{ fontSize: 14, color: 'var(--c-annotation)', lineHeight: 1.5, marginBottom: 14 }}>
               Cette action est <b>irréversible</b>. Toutes tes données (progression, notes, fiche d&apos;entraide,
               liens, remarques…) seront <b>définitivement supprimées</b>. Pour confirmer, écris <b>SUPPRIMER</b> ci-dessous.
             </div>
             <input value={confirmTxt} onChange={e => setConfirmTxt(e.target.value)} placeholder="SUPPRIMER"
-              style={{ width: '100%', height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '0 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "var(--font-texte)" }} />
+              style={{ width: '100%', height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '0 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: "var(--font-texte)" }} />
             {suppErr && <div style={{ color: 'var(--c-accent)', fontSize: 13, marginTop: 8 }}>{suppErr}</div>}
             <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-              <button onClick={() => setSuppOuvert(false)} disabled={suppLoading} style={{ flex: 1, height: 46, border: '1.5px solid var(--c-filet-fort)', background: '#fff', borderRadius: 11, fontSize: 14, fontWeight: 600, color: 'var(--c-texte-doux)', cursor: 'pointer', fontFamily: "var(--font-texte)" }}>Annuler</button>
+              <button onClick={() => setSuppOuvert(false)} disabled={suppLoading} style={{ flex: 1, height: 46, border: '1.5px solid var(--c-filet-fort)', background: '#FFFEFB', borderRadius: 6, fontSize: 14, fontWeight: 600, color: 'var(--c-texte-doux)', cursor: 'pointer', fontFamily: "var(--font-texte)" }}>Annuler</button>
               <button onClick={supprimerCompte} disabled={suppLoading || confirmTxt.trim().toUpperCase() !== 'SUPPRIMER'} style={{
-                flex: 2, height: 46, border: 'none', borderRadius: 11, background: 'var(--c-accent)', color: '#fff',
+                flex: 2, height: 46, border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff',
                 fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "var(--font-texte)",
                 opacity: (suppLoading || confirmTxt.trim().toUpperCase() !== 'SUPPRIMER') ? 0.5 : 1,
               }}>{suppLoading ? 'Suppression…' : 'Supprimer définitivement'}</button>

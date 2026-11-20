@@ -45,7 +45,7 @@ export default function Approfondir({ tags }: { tags: string[] }) {
   if (liens.length === 0) return null
 
   return (
-    <div style={{ marginTop: 14, border: '1px solid #E4D8F0', borderRadius: 14, overflow: 'hidden', fontFamily: FONT }}>
+    <div style={{ marginTop: 14, border: '1px solid #E4D8F0', borderRadius: 6, overflow: 'hidden', fontFamily: FONT }}>
       <button onClick={() => setOuvert(o => !o)} style={{
         width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px',
         background: '#F6F1FD', border: 'none', cursor: 'pointer', fontFamily: FONT, textAlign: 'left',
@@ -57,10 +57,10 @@ export default function Approfondir({ tags }: { tags: string[] }) {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C5CBF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: ouvert ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }}><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       {ouvert && (
-        <div style={{ padding: 10, display: 'flex', flexDirection: 'column', gap: 6, background: '#fff' }}>
+        <div style={{ padding: 10, display: 'flex', flexDirection: 'column', gap: 6, background: '#FFFEFB' }}>
           {liens.map((l, i) => (
             <a key={i} href={l.href} target="_blank" rel="noopener noreferrer" style={{
-              display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10,
+              display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 6,
               border: '1px solid var(--c-filet)', background: 'var(--c-papier)', textDecoration: 'none', color: 'var(--c-encre)',
             }}>
               <span style={{ fontSize: 18, flexShrink: 0 }}>{l.emoji}</span>

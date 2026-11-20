@@ -34,7 +34,7 @@ export default function OnboardingModal() {
   return (
     <div onClick={fermer} style={{ position: 'fixed', inset: 0, background: 'rgba(40,30,20,.5)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Bienvenue" style={{
-        background: '#fff', borderRadius: 20, width: '100%', maxWidth: 620, maxHeight: '88vh',
+        background: '#FFFEFB', borderRadius: 6, width: '100%', maxWidth: 620, maxHeight: '88vh',
         display: 'flex', flexDirection: 'column', fontFamily: FONT, color: 'var(--c-encre)',
         boxShadow: '0 30px 80px -30px rgba(40,30,20,.6)', overflow: 'hidden',
       }}>
@@ -49,11 +49,11 @@ export default function OnboardingModal() {
 
         <div style={{ padding: '14px 26px', borderTop: '1px solid var(--c-filet)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <button onClick={fermer} style={{
-            height: 40, padding: '0 18px', border: '1px solid var(--c-filet-fort)', borderRadius: 10, background: 'transparent', color: '#A89880',
+            height: 40, padding: '0 18px', border: '1px solid var(--c-filet-fort)', borderRadius: 6, background: 'transparent', color: '#A89880',
             fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: FONT,
           }}>Passer</button>
           <button onClick={fermer} style={{
-            height: 46, padding: '0 26px', border: 'none', borderRadius: 12, background: 'var(--c-accent)', color: '#fff',
+            height: 46, padding: '0 26px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff',
             fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: FONT,
           }}>C&apos;est parti !</button>
         </div>

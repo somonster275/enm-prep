@@ -63,7 +63,7 @@ export default function RichEditor({ value, onChange, placeholder, minHeight = 1
 
 
   return (
-    <div style={{ border: '1.5px solid var(--c-filet-fort)', borderRadius: 10, overflow: 'hidden', background: '#fff' }}>
+    <div style={{ border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, overflow: 'hidden', background: '#FFFEFB' }}>
       {/* Barre d'outils */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: 8, borderBottom: '1px solid var(--c-filet)', background: 'var(--c-papier)', position: 'relative' }}>
         <Btn onClick={() => cmd('bold')} title="Gras"><b>G</b></Btn>
@@ -77,7 +77,7 @@ export default function RichEditor({ value, onChange, placeholder, minHeight = 1
         <div style={{ position: 'relative' }}>
           <Btn onClick={() => { setShowColors(s => !s); setShowHighlight(false) }} title="Couleur du texte"><span style={{ color: 'var(--c-accent)', fontWeight: 700 }}>A</span></Btn>
           {showColors && (
-            <div style={{ position: 'absolute', top: 36, left: 0, zIndex: 30, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 10, padding: 8, boxShadow: '0 6px 18px -6px rgba(40,30,60,.2)', display: 'flex', gap: 6 }}>
+            <div style={{ position: 'absolute', top: 36, left: 0, zIndex: 30, background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 8, boxShadow: '0 6px 18px -6px rgba(40,30,60,.2)', display: 'flex', gap: 6 }}>
               {COULEURS_TEXTE.map(c => (
                 <button key={c} type="button" aria-label={`Couleur ${c}`} onMouseDown={e => { e.preventDefault(); cmd('foreColor', c); setShowColors(false) }}
                   style={{ width: 22, height: 22, borderRadius: '50%', background: c, border: '2px solid #fff', boxShadow: '0 0 0 1px var(--c-filet-fort)', cursor: 'pointer' }} />
@@ -90,14 +90,14 @@ export default function RichEditor({ value, onChange, placeholder, minHeight = 1
         <div style={{ position: 'relative' }}>
           <Btn onClick={() => { setShowHighlight(s => !s); setShowColors(false) }} title="Surligner"><span style={{ background: '#FFF3A3', padding: '0 3px', borderRadius: 3 }}>H</span></Btn>
           {showHighlight && (
-            <div style={{ position: 'absolute', top: 36, left: 0, zIndex: 30, background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 10, padding: 8, boxShadow: '0 6px 18px -6px rgba(40,30,60,.2)', display: 'flex', gap: 6, alignItems: 'center' }}>
+            <div style={{ position: 'absolute', top: 36, left: 0, zIndex: 30, background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 8, boxShadow: '0 6px 18px -6px rgba(40,30,60,.2)', display: 'flex', gap: 6, alignItems: 'center' }}>
               {COULEURS_SURLIGNAGE.map(c => (
                 <button key={c} type="button" aria-label={`Surlignage ${c}`} onMouseDown={e => { e.preventDefault(); cmd('hiliteColor', c); setShowHighlight(false) }}
                   style={{ width: 22, height: 22, borderRadius: 6, background: c, border: '1px solid var(--c-filet-fort)', cursor: 'pointer' }} />
               ))}
               <button type="button" onMouseDown={e => { e.preventDefault(); cmd('hiliteColor', 'transparent'); setShowHighlight(false) }}
                 title="Retirer le surlignage" aria-label="Retirer le surlignage"
-                style={{ width: 22, height: 22, borderRadius: 6, background: '#fff', border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 12 }}>✕</button>
+                style={{ width: 22, height: 22, borderRadius: 6, background: '#FFFEFB', border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 12 }}>✕</button>
             </div>
           )}
         </div>
@@ -124,7 +124,7 @@ export default function RichEditor({ value, onChange, placeholder, minHeight = 1
         onBlur={emit}
         style={{
           minHeight, padding: '12px 14px', fontSize: 14, lineHeight: 1.7,
-          color: 'var(--c-encre)', fontFamily: font, background: '#fff',
+          color: 'var(--c-encre)', fontFamily: font, background: '#FFFEFB',
         }}
       />
     </div>

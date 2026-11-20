@@ -98,14 +98,14 @@ export default function RecherchePage() {
       <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
         <input value={q} onChange={e => setQ(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') lancer() }} autoFocus
           placeholder="Ex. « prescription », « dol », ou « #droit-penal »…"
-          style={{ flex: 1, border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '12px 16px', background: 'var(--c-papier)', fontSize: 15, outline: 'none', fontFamily: font }} />
-        <button onClick={lancer} disabled={q.trim().length < 2} style={{ padding: '0 22px', borderRadius: 12, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14.5, fontWeight: 700, opacity: q.trim().length < 2 ? 0.5 : 1, fontFamily: font }}>Chercher</button>
+          style={{ flex: 1, border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '12px 16px', background: 'var(--c-papier)', fontSize: 15, outline: 'none', fontFamily: font }} />
+        <button onClick={lancer} disabled={q.trim().length < 2} style={{ padding: '0 22px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14.5, fontWeight: 700, opacity: q.trim().length < 2 ? 0.5 : 1, fontFamily: font }}>Chercher</button>
       </div>
 
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Recherche…</div>
       ) : cherche && total === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>Aucun résultat pour « {q} ».</div>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>Aucun résultat pour « {q} ».</div>
       ) : total > 0 ? (
         <>
           <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)', marginBottom: 14 }}>{total} résultat{total > 1 ? 's' : ''}</div>
@@ -120,7 +120,7 @@ export default function RecherchePage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {grp.items.map(it => (
                     <Link key={it.id} href={it.href} style={{ textDecoration: 'none', color: 'inherit' }}>
-                      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 12, padding: '12px 15px', borderLeft: `3px solid ${grp.couleur}` }}>
+                      <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '12px 15px', borderLeft: `3px solid ${grp.couleur}` }}>
                         <div style={{ fontSize: 14.5, fontWeight: 600, lineHeight: 1.35 }}>{it.titre}</div>
                         {it.sous && <div style={{ fontSize: 12.5, color: 'var(--c-annotation-clair)', marginTop: 3 }}>{it.sous}</div>}
                       </div>

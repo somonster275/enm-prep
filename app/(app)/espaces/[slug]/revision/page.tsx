@@ -468,11 +468,11 @@ export default function RevisionPage() {
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={sauvegarderEdition} style={{
-              padding: '11px 22px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff',
+              padding: '11px 22px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff',
               border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: font,
             }}>Enregistrer</button>
             <button onClick={() => setEditing(false)} style={{
-              padding: '11px 16px', borderRadius: 10, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)',
+              padding: '11px 16px', borderRadius: 6, background: 'var(--c-papier-teinte)', color: 'var(--c-annotation)',
               border: '1px solid var(--c-filet-fort)', cursor: 'pointer', fontSize: 14, fontFamily: font,
             }}>Annuler</button>
           </div>
@@ -527,11 +527,11 @@ export default function RevisionPage() {
         <div style={{ marginBottom: '1rem' }}>
           {!brouillonOuvert ? (
             <button onClick={() => setBrouillonOuvert(true)} style={{
-              width: '100%', padding: '11px', borderRadius: 12, border: '1px dashed #E3D6BE',
+              width: '100%', padding: '11px', borderRadius: 6, border: '1px dashed #E3D6BE',
               background: '#FFFDF8', color: 'var(--c-annotation)', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: font,
             }}>Ouvrir un brouillon</button>
           ) : (
-            <div style={{ border: '1px solid var(--c-filet)', borderRadius: 12, background: '#fff', padding: 12 }}>
+            <div style={{ border: '1px solid var(--c-filet)', borderRadius: 6, background: '#FFFEFB', padding: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                 <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-encre)' }}>
                   Brouillon {flipped && <span style={{ fontWeight: 400, color: 'var(--c-annotation)' }}>— compare avec la réponse</span>}
@@ -540,7 +540,7 @@ export default function RevisionPage() {
               </div>
               <textarea value={brouillon} onChange={e => setBrouillon(e.target.value)} rows={4}
                 placeholder="Écris ta réponse ici, puis retourne la carte pour comparer…"
-                style={{ width: '100%', boxSizing: 'border-box', border: '1px dashed #E3D6BE', borderRadius: 10, background: '#FFFDF8', padding: '10px 12px', fontSize: 12.5, lineHeight: 1.55, color: '#5C5448', fontFamily: font, outline: 'none', resize: 'vertical' }} />
+                style={{ width: '100%', boxSizing: 'border-box', border: '1px dashed #E3D6BE', borderRadius: 6, background: '#FFFDF8', padding: '10px 12px', fontSize: 12.5, lineHeight: 1.55, color: '#5C5448', fontFamily: font, outline: 'none', resize: 'vertical' }} />
               <div style={{ fontSize: 10.5, color: 'var(--c-discret)', marginTop: 6 }}>Non enregistré — se vide à la carte suivante.</div>
             </div>
           )}
@@ -599,7 +599,7 @@ export default function RevisionPage() {
         <button onClick={() => setBrouillonOuvert(true)} title="Ouvrir le brouillon"
           style={{
             position: 'fixed', right: 0, top: '42%', transform: 'translateY(-50%)', zIndex: 120,
-            background: '#fff', border: '1px solid var(--c-filet)', borderRight: 'none', borderRadius: '12px 0 0 12px',
+            background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRight: 'none', borderRadius: '12px 0 0 12px',
             padding: '12px 9px', cursor: 'pointer', boxShadow: '0 8px 24px -12px rgba(60,40,20,.3)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
             fontFamily: font, color: 'var(--c-annotation)', fontSize: 12, fontWeight: 700,
@@ -611,8 +611,8 @@ export default function RevisionPage() {
       {!editing && !isMobile && brouillonOuvert && (
         <div style={{
           position: 'fixed', right: 16, top: '50%', transform: 'translateY(-50%)', zIndex: 120,
-          width: 'min(320px, 92vw)', maxHeight: '78vh', background: '#fff',
-          border: '1px solid var(--c-filet)', borderRadius: 16, boxShadow: '0 20px 50px -20px rgba(60,40,20,.4)',
+          width: 'min(320px, 92vw)', maxHeight: '78vh', background: '#FFFEFB',
+          border: '1px solid var(--c-filet)', borderRadius: 6, boxShadow: '0 20px 50px -20px rgba(60,40,20,.4)',
           display: 'flex', flexDirection: 'column', padding: 14, fontFamily: font,
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
@@ -625,7 +625,7 @@ export default function RevisionPage() {
             placeholder="Écris ta réponse ici, puis retourne la carte pour comparer…"
             style={{
               flex: 1, minHeight: 200, width: '100%', boxSizing: 'border-box', border: '1px dashed #E3D6BE',
-              borderRadius: 12, background: '#FFFDF8', padding: '10px 12px', fontSize: 13, lineHeight: 1.55,
+              borderRadius: 6, background: '#FFFDF8', padding: '10px 12px', fontSize: 13, lineHeight: 1.55,
               color: '#5C5448', fontFamily: font, outline: 'none', resize: 'none',
             }}
           />

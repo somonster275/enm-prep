@@ -81,7 +81,7 @@ export default function EntraidePage() {
 
   const font = "var(--font-texte)"
   const champ: React.CSSProperties = {
-    width: '100%', border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '11px 14px',
+    width: '100%', border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '11px 14px',
     background: 'var(--c-papier)', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: font,
   }
   const jePublie = liste.some(e => e.user_id === userId)
@@ -96,11 +96,11 @@ export default function EntraidePage() {
       </p>
 
       {/* Ma fiche d'entraide */}
-      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 20, marginBottom: 28 }}>
+      <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 20, marginBottom: 28 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
           <div style={{ fontSize: 15, fontWeight: 700 }}>{jePublie ? 'Ma fiche d’entraide' : 'Proposer mon aide'}</div>
           {!formOuvert && (
-            <button onClick={() => setFormOuvert(true)} style={{ padding: '8px 16px', borderRadius: 10, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13.5, fontWeight: 700, fontFamily: font }}>
+            <button onClick={() => setFormOuvert(true)} style={{ padding: '8px 16px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13.5, fontWeight: 700, fontFamily: font }}>
               {jePublie ? 'Modifier' : 'Publier ma fiche'}
             </button>
           )}
@@ -117,12 +117,12 @@ export default function EntraidePage() {
             <textarea value={message} onChange={e => setMessage(e.target.value)} rows={2} placeholder="Petit mot (facultatif)" style={{ ...champ, resize: 'vertical', lineHeight: 1.5 }} />
             {msg && <div style={{ fontSize: 13.5, color: msg.type === 'ok' ? '#0F6E56' : 'var(--c-accent)' }}>{msg.texte}</div>}
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <button onClick={enregistrer} disabled={saving} style={{ height: 46, padding: '0 22px', border: 'none', borderRadius: 11, background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: font }}>
+              <button onClick={enregistrer} disabled={saving} style={{ height: 46, padding: '0 22px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: font }}>
                 {saving ? 'Publication…' : 'Publier'}
               </button>
-              <button onClick={() => { setFormOuvert(false); setMsg(null) }} style={{ height: 46, padding: '0 18px', border: '1.5px solid var(--c-filet-fort)', borderRadius: 11, background: '#fff', color: 'var(--c-texte-doux)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>Annuler</button>
+              <button onClick={() => { setFormOuvert(false); setMsg(null) }} style={{ height: 46, padding: '0 18px', border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, background: '#FFFEFB', color: 'var(--c-texte-doux)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: font }}>Annuler</button>
               {jePublie && (
-                <button onClick={retirer} style={{ height: 46, padding: '0 18px', border: 'none', borderRadius: 11, background: 'var(--c-accent-pale)', color: 'var(--c-accent)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: font, marginLeft: 'auto' }}>Retirer ma fiche</button>
+                <button onClick={retirer} style={{ height: 46, padding: '0 18px', border: 'none', borderRadius: 6, background: 'var(--c-accent-pale)', color: 'var(--c-accent)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: font, marginLeft: 'auto' }}>Retirer ma fiche</button>
               )}
             </div>
           </div>
@@ -141,7 +141,7 @@ export default function EntraidePage() {
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : liste.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
           <div style={{ fontSize: 30, marginBottom: 8 }}>🤝</div>
           <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--c-texte-doux)' }}>Personne pour l&apos;instant.</div>
           <div style={{ fontSize: 13, marginTop: 4 }}>Sois le premier à proposer ton aide !</div>
@@ -149,7 +149,7 @@ export default function EntraidePage() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
           {liste.map(e => (
-            <div key={e.user_id} style={{ background: '#fff', border: e.user_id === userId ? '1.5px solid var(--c-accent)' : '1px solid var(--c-filet)', borderRadius: 16, padding: 18 }}>
+            <div key={e.user_id} style={{ background: '#FFFEFB', border: e.user_id === userId ? '1.5px solid var(--c-accent)' : '1px solid var(--c-filet)', borderRadius: 6, padding: 18 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                 <div style={{ fontSize: 15.5, fontWeight: 700 }}>{nomComplet(e)}</div>
                 {e.user_id === userId && <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '2px 8px', borderRadius: 999 }}>Toi</span>}

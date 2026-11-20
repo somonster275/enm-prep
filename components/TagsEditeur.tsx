@@ -45,7 +45,7 @@ export default function TagsEditeur({
         <TagsInput value={tags} onChange={setTags} accent={accent} />
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={enregistrer} disabled={saving} style={{ height: 34, padding: '0 16px', border: 'none', borderRadius: 9, background: accent, color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT, opacity: saving ? 0.6 : 1 }}>{saving ? 'Enregistrement…' : 'Enregistrer les tags'}</button>
-          <button onClick={() => { setTags(nettoyerTags(initial)); setEdit(false) }} style={{ height: 34, padding: '0 12px', border: '1px solid var(--c-filet-fort)', borderRadius: 9, background: '#fff', color: 'var(--c-annotation)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>Annuler</button>
+          <button onClick={() => { setTags(nettoyerTags(initial)); setEdit(false) }} style={{ height: 34, padding: '0 12px', border: '1px solid var(--c-filet-fort)', borderRadius: 9, background: '#FFFEFB', color: 'var(--c-annotation)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>Annuler</button>
         </div>
       </div>
     )

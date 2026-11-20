@@ -148,7 +148,7 @@ function CoursContenu() {
     }
   }
 
-  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 12, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: FONT }
+  const champ: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '11px 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: FONT }
   const visibles = filtre ? liste.filter(c => c.matiere === filtre) : liste
 
   // ---------- Visionneuse d'un cours ----------
@@ -164,13 +164,13 @@ function CoursContenu() {
           </div>
           {actif.description && <p style={{ fontSize: 14, color: 'var(--c-texte-doux)', margin: '10px 0 0', maxWidth: 640, lineHeight: 1.5 }}>{actif.description}</p>}
         </div>
-        <a href={actif.fichier_url} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0, height: 40, display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0 16px', border: '1.5px solid var(--c-filet-fort)', borderRadius: 11, background: 'var(--c-papier)', color: 'var(--c-encre)', fontSize: 13.5, fontWeight: 700, textDecoration: 'none' }}>
+        <a href={actif.fichier_url} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0, height: 40, display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0 16px', border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, background: 'var(--c-papier)', color: 'var(--c-encre)', fontSize: 13.5, fontWeight: 700, textDecoration: 'none' }}>
           Télécharger ↗
         </a>
       </div>
 
       {/* Document */}
-      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, overflow: 'hidden', marginBottom: 22 }}>
+      <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, overflow: 'hidden', marginBottom: 22 }}>
         <iframe
           src={urlVisionneuse(actif)}
           title={actif.titre}
@@ -179,18 +179,18 @@ function CoursContenu() {
       </div>
 
       {/* Remarque (comme pour les fiches) */}
-      <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18 }}>
+      <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18 }}>
         <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>💬 Une remarque sur ce cours ?</div>
         <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginBottom: 10 }}>Erreur, passage peu clair, question… ton retour est envoyé à l&apos;équipe.</div>
         {remarqueOk ? (
-          <div style={{ background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 12, padding: '12px 14px', fontSize: 13.5, color: '#0E5A47' }}>
+          <div style={{ background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 6, padding: '12px 14px', fontSize: 13.5, color: '#0E5A47' }}>
             ✅ Merci, ta remarque a bien été envoyée.
             <button onClick={() => setRemarqueOk(false)} style={{ marginLeft: 10, background: 'none', border: 'none', color: '#0F6E56', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>En ajouter une autre</button>
           </div>
         ) : (
           <>
             <textarea value={remarque} onChange={e => setRemarque(e.target.value)} rows={3} placeholder="Ta remarque…" style={{ ...champ, resize: 'vertical', lineHeight: 1.5 }} />
-            <button onClick={envoyerRemarque} disabled={!remarque.trim() || envoiRemarque} style={{ marginTop: 10, height: 42, padding: '0 22px', border: 'none', borderRadius: 11, background: 'var(--c-accent)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: (!remarque.trim() || envoiRemarque) ? 0.6 : 1, fontFamily: FONT }}>
+            <button onClick={envoyerRemarque} disabled={!remarque.trim() || envoiRemarque} style={{ marginTop: 10, height: 42, padding: '0 22px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: (!remarque.trim() || envoiRemarque) ? 0.6 : 1, fontFamily: FONT }}>
               {envoiRemarque ? 'Envoi…' : 'Envoyer ma remarque'}
             </button>
           </>
@@ -204,13 +204,13 @@ function CoursContenu() {
     <div style={{ paddingTop: 34, maxWidth: 820, margin: '0 auto', fontFamily: FONT, color: 'var(--c-encre)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <h1 style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 28, margin: 0 }}>Cours</h1>
-        {isAdmin && !formOuvert && <button onClick={() => setFormOuvert(true)} style={{ padding: '10px 18px', borderRadius: 11, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: FONT }}>+ Ajouter un cours</button>}
+        {isAdmin && !formOuvert && <button onClick={() => setFormOuvert(true)} style={{ padding: '10px 18px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: FONT }}>+ Ajouter un cours</button>}
       </div>
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 22px' }}>Les supports de cours (PDF, Word) mis à disposition. Consulte-les en ligne et laisse une remarque si besoin.</p>
 
       {/* Formulaire admin */}
       {isAdmin && formOuvert && (
-        <div style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18, marginBottom: 22, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18, marginBottom: 22, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <input value={titre} onChange={e => setTitre(e.target.value)} placeholder="Titre du cours" style={champ} />
           <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} placeholder="Description (facultatif)" style={{ ...champ, resize: 'vertical' }} />
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -225,7 +225,7 @@ function CoursContenu() {
               </select>
             )}
           </div>
-          <label style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', borderRadius: 12, border: `1.5px dashed ${fichier ? 'var(--c-accent)' : 'var(--c-filet-fort)'}`, background: fichier ? '#FFF4F2' : 'var(--c-papier)', color: fichier ? 'var(--c-accent)' : 'var(--c-annotation)', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}>
+          <label style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', borderRadius: 6, border: `1.5px dashed ${fichier ? 'var(--c-accent)' : 'var(--c-filet-fort)'}`, background: fichier ? '#FFF4F2' : 'var(--c-papier)', color: fichier ? 'var(--c-accent)' : 'var(--c-annotation)', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}>
             {fichier ? `📎 ${fichier.name}` : 'Choisir un fichier (PDF ou Word)…'}
             <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style={{ display: 'none' }}
               onChange={e => setFichier(e.target.files?.[0] || null)} />
@@ -236,8 +236,8 @@ function CoursContenu() {
           </div>
           {erreur && <div style={{ fontSize: 13, color: 'var(--c-accent)' }}>{erreur}</div>}
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={televerser} disabled={saving} style={{ height: 44, padding: '0 22px', border: 'none', borderRadius: 11, background: 'var(--c-accent)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.6 : 1, fontFamily: FONT }}>{saving ? 'Envoi…' : 'Publier le cours'}</button>
-            <button onClick={() => { setFormOuvert(false); setErreur('') }} style={{ height: 44, padding: '0 16px', border: '1.5px solid var(--c-filet-fort)', borderRadius: 11, background: '#fff', color: 'var(--c-texte-doux)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>Annuler</button>
+            <button onClick={televerser} disabled={saving} style={{ height: 44, padding: '0 22px', border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.6 : 1, fontFamily: FONT }}>{saving ? 'Envoi…' : 'Publier le cours'}</button>
+            <button onClick={() => { setFormOuvert(false); setErreur('') }} style={{ height: 44, padding: '0 16px', border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, background: '#FFFEFB', color: 'var(--c-texte-doux)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>Annuler</button>
           </div>
         </div>
       )}
@@ -255,22 +255,22 @@ function CoursContenu() {
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : visibles.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 16 }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
           <div style={{ fontSize: 30, marginBottom: 8 }}>📘</div>Aucun cours pour l&apos;instant.
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
           {visibles.map(c => (
-            <div key={c.id} style={{ background: '#fff', border: '1px solid var(--c-filet)', borderRadius: 16, padding: 18, display: 'flex', flexDirection: 'column' }}>
+            <div key={c.id} style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 18, display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                <span style={{ width: 40, height: 40, borderRadius: 11, background: estPdf(c) ? '#FCEEEA' : '#E8F0FE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{estPdf(c) ? '📕' : '📘'}</span>
+                <span style={{ width: 40, height: 40, borderRadius: 6, background: estPdf(c) ? '#FCEEEA' : '#E8F0FE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{estPdf(c) ? '📕' : '📘'}</span>
                 {c.matiere && <span style={{ fontSize: 11.5, fontWeight: 600, color: '#8A5A10', background: '#FCEFD3', padding: '2px 9px', borderRadius: 999 }}>{c.matiere}</span>}
                 {isAdmin && <button onClick={() => supprimer(c.id)} title="Supprimer" style={{ marginLeft: 'auto', border: 'none', background: 'transparent', color: 'var(--c-discret-clair)', cursor: 'pointer', fontSize: 14 }}>✕</button>}
               </div>
               <div style={{ fontSize: 15.5, fontWeight: 700 }}>{c.titre}</div>
               {c.description && <div style={{ fontSize: 12.5, color: 'var(--c-annotation-clair)', marginTop: 3, lineHeight: 1.45 }}>{c.description}</div>}
               <TagsEditeur table="cours" id={c.id} initial={c.tags} accent="#3B82D9" canEdit={isAdmin} />
-              <button onClick={() => ouvrir(c)} style={{ marginTop: 14, height: 40, border: 'none', borderRadius: 11, background: '#FCEFD3', color: '#8A5A10', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
+              <button onClick={() => ouvrir(c)} style={{ marginTop: 14, height: 40, border: 'none', borderRadius: 6, background: '#FCEFD3', color: '#8A5A10', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
                 Consulter →
               </button>
             </div>
