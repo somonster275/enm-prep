@@ -81,17 +81,21 @@ export async function instantane(): Promise<Instantane | null> {
 // ---------- File d'envoi ----------
 type OpEnFile = Op & { uid: string; oid: string }
 const estReseau = (m: string) => !navigator.onLine || /fetch|network|load failed|timeout/i.test(m)
-// Toutes les lectures-écritures de la file passent par ce verrou : un ajout pendant un envoi n'est jamais perdu.
-let verrou: Promise<unknown> = Promise.resolve()
-const modifierFile = <T>(fn: (file: OpEnFile[]) => [OpEnFile[], T] | Promise<[OpEnFile[], T]>): Promise<T> => {
-  const suite = verrou.then(async () => {
+// Toutes les lectures-écritures de la file passent par ce verrou, partagé entre onglets (app installée + navigateur) :
+// un ajout pendant un envoi n'est jamais perdu. Sans Web Locks (vieux navigateurs), verrou limité à l'onglet.
+const verrous = new Map<string, Promise<unknown>>() // une chaîne par nom : « envoi » appelle « file », une seule chaîne s'interbloquerait
+const exclusif = <T>(nom: string, fn: () => Promise<T>): Promise<T> => {
+  if (typeof navigator !== 'undefined' && navigator.locks) return navigator.locks.request(nom, fn) as Promise<T>
+  const suite = (verrous.get(nom) ?? Promise.resolve()).then(fn)
+  verrous.set(nom, suite.catch(() => {}))
+  return suite
+}
+const modifierFile = <T>(fn: (file: OpEnFile[]) => [OpEnFile[], T] | Promise<[OpEnFile[], T]>): Promise<T> =>
+  exclusif('codex-file', async () => {
     const [file, r] = await fn((await kv<OpEnFile[]>('file')) || [])
     await kv('file', file)
     return r
   })
-  verrou = suite.catch(() => {})
-  return suite
-}
 
 async function executer(op: Op): Promise<{ message: string } | null> {
   try {
@@ -107,7 +111,8 @@ async function executer(op: Op): Promise<{ message: string } | null> {
 let envoi: Promise<void> | null = null
 /** Envoie à Supabase, dans l'ordre, les écritures en attente du compte connecté. S'arrête à la première coupure réseau. */
 export function vider(): Promise<void> {
-  return envoi ??= (async () => {
+  // Un seul envoi à la fois, tous onglets confondus : sinon une écriture partirait deux fois (activité comptée double).
+  return envoi ??= exclusif('codex-envoi', async () => {
     try {
       const uid = await uidSession()
       if (!uid) return
@@ -122,7 +127,7 @@ export function vider(): Promise<void> {
       }
     } catch (e) { console.error('File hors ligne :', e) }
     finally { envoi = null }
-  })()
+  })
 }
 
 /** Met une écriture en file (sans copie locale à modifier : activité du jour). */
@@ -150,6 +155,8 @@ export async function muter(op: Op): Promise<{ error: { message: string } | null
 }
 
 /** Envoie la file puis recharge la copie depuis Supabase. Hors ligne : renvoie la copie locale. */
+// shortcut: recharge tout « Mon espace » à chaque page perso ouverte ; passer à un chargement incrémental
+// (colonne updated_at) quand un étudiant dépasse quelques milliers de fiches.
 export async function rafraichir(): Promise<Instantane | null> {
   if (navigator.onLine) {
     await vider()
@@ -206,8 +213,15 @@ export async function preparerPages(ids: string[]): Promise<void> {
   }
 }
 
+/** Fichier de notre stockage Supabase (déposé par le staff) : les seuls gardés et servis hors ligne (cf. public/sw.js). */
+export function estFichierStockage(u: string): boolean {
+  try { const x = new URL(u); return x.protocol === 'https:' && x.hostname.endsWith('.supabase.co') && x.pathname.startsWith('/storage/v1/object/public/') }
+  catch { return false }
+}
+
 /** Télécharge des fichiers (cours PDF, mind maps) pour les ouvrir sans réseau. Renvoie le nombre mis en cache. */
 export async function telechargerFichiers(urls: string[]): Promise<number> {
+  urls = urls.filter(estFichierStockage)
   const c = await caches.open(CACHE_FICHIERS)
   let n = 0
   for (const u of urls) {
@@ -224,4 +238,4 @@ export async function fichiersEnCache(urls: string[]): Promise<number> {
 
 /** Lien vers un fichier : direct en ligne, servi par le service worker hors ligne. */
 export const lienFichier = (u: string) =>
-  typeof navigator !== 'undefined' && !navigator.onLine ? `/fichier-hors-ligne?u=${encodeURIComponent(u)}` : u
+  typeof navigator !== 'undefined' && !navigator.onLine && estFichierStockage(u) ? `/fichier-hors-ligne?u=${encodeURIComponent(u)}` : u

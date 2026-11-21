@@ -4,6 +4,13 @@ const PAGES = 'codex-pages-v1'
 const STATIQUE = 'codex-statique-v1'
 const FICHIERS = 'codex-fichiers-v1'
 
+// Seuls les fichiers de notre stockage Supabase (déposés par le staff) sont servis hors ligne.
+// Même règle que estFichierStockage() dans lib/hors-ligne.ts.
+const estFichierStockage = u => {
+  try { const x = new URL(u); return x.protocol === 'https:' && x.hostname.endsWith('.supabase.co') && x.pathname.startsWith('/storage/v1/object/public/') }
+  catch { return false }
+}
+
 self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()))
 
@@ -23,8 +30,10 @@ self.addEventListener('fetch', e => {
 
   // Fichier téléchargé pour le hors ligne (cours PDF, mind map).
   if (url.pathname === '/fichier-hors-ligne') {
+    // Cache uniquement, jamais le réseau : sinon n'importe quel site pourrait être servi sous codexprepa.com.
     const u = url.searchParams.get('u') || ''
-    e.respondWith(caches.open(FICHIERS).then(c => c.match(u)).then(r => r || fetch(u)).catch(pageHorsLigne))
+    e.respondWith((estFichierStockage(u) ? caches.open(FICHIERS).then(c => c.match(u)) : Promise.resolve(undefined))
+      .then(r => r || new Response('Fichier non disponible hors ligne.', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8' } })))
     return
   }
 
@@ -47,7 +56,11 @@ self.addEventListener('fetch', e => {
         if (r.ok && !r.redirected && await pages.match(req.url)) pages.put(req.url, r.clone())
         return r
       } catch {
-        return (await pages.match(req.url)) || pageHorsLigne()
+        const page = await pages.match(req.url)
+        if (page) return page
+        // Ex. l'app installée qui s'ouvre sur le tableau de bord dans le train : on va droit à « Mon espace ».
+        if (url.pathname !== '/mon-espace' && await pages.match('/mon-espace')) return Response.redirect(new URL('/mon-espace', self.location.origin).href, 302)
+        return pageHorsLigne()
       }
     })())
   }

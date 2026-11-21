@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { lienSur } from '@/lib/url-publique'
-import { rafraichir, instantane, muter, telechargerFichiers, fichiersEnCache, lienFichier } from '@/lib/hors-ligne'
+import { rafraichir, instantane, muter, telechargerFichiers, fichiersEnCache, lienFichier, estFichierStockage } from '@/lib/hors-ligne'
 import { paquet, exporterFichier, partageExistant, partager, arreterPartage } from '@/lib/partage'
 import RichContent from '@/components/RichContent'
 import RichEditor from '@/components/RichEditor'
@@ -61,7 +61,7 @@ export default function CopiePersoPage() {
     setPm(m)
     setElements(liste)
     setLoading(false)
-    const urls = liste.flatMap(e => lienSur(e.contenu.fichier_url ?? e.contenu.url) ?? [])
+    const urls = liste.flatMap(e => lienSur(e.contenu.fichier_url ?? e.contenu.url) ?? []).filter(estFichierStockage)
     setFichiers({ total: urls.length, enCache: await fichiersEnCache(urls) })
     // Les nouveautés de l'original ne se comparent qu'en ligne.
     if (viaReseau && navigator.onLine && m?.source_type && m.source_id) {
@@ -75,7 +75,7 @@ export default function CopiePersoPage() {
 
   const garderFichiers = async () => {
     setOccupe(true)
-    const urls = elements.filter(e => !e.supprime).flatMap(e => lienSur(e.contenu.fichier_url ?? e.contenu.url) ?? [])
+    const urls = elements.filter(e => !e.supprime).flatMap(e => lienSur(e.contenu.fichier_url ?? e.contenu.url) ?? []).filter(estFichierStockage)
     const n = await telechargerFichiers(urls)
     setFichiers({ total: urls.length, enCache: n })
     setOccupe(false)

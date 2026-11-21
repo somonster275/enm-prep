@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 56).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 57).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -112,6 +112,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - `rafraichir()` recharge **tout** « Mon espace » à chaque ouverture de page perso : à rendre incrémental
   (colonne `updated_at`) si les espaces deviennent gros.
 - Cache `codex-statique-v1` du SW grossit à chaque déploiement : à purger par version un jour.
+- Fichiers hors ligne : seuls ceux du stockage Supabase sont gardés ; une mind map en lien externe ne l'est pas.
 - Seules les pages perso sont hors ligne (pas la lecture directe des modules officiels, choix de l'utilisateur).
 - Page de révision : erreur de lint `set-state-in-effect` **préexistante** (ligne `setBrouillon('')`), non traitée.
 
@@ -123,6 +124,20 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-21 (suite 57) — Relecture ponytail de « Mon espace » et corrections
+- Étape 6 poussée sur `main` (`f13865f`), migration 0049 exécutée.
+- Relecture (ponytail-review) de tout le travail 1-6 ; 6 points corrigés :
+  1. **Sécurité** `public/sw.js` : `/fichier-hors-ligne?u=` allait chercher N'IMPORTE QUELLE adresse sur le
+     réseau et la servait sous codexprepa.com (hameçonnage). Désormais cache uniquement + seulement les fichiers
+     du stockage Supabase (`estFichierStockage`, même règle dans `lib/hors-ligne.ts`), sinon 404.
+  2. Révision et QCM perso lisaient la copie locale (périmée si l'onglet restait ouvert) → écrasaient les progrès
+     d'un autre appareil. Ils appellent maintenant `rafraichir()` (frais en ligne, local hors ligne).
+  3. Verrous de la file partagés entre onglets (`navigator.locks`, `exclusif()`), un seul envoi à la fois ;
+     repli sans Web Locks : une chaîne PAR NOM (une chaîne unique s'interbloquait, trouvé par le test).
+  4. Test de la file dans `npm test` : `tests/file-hors-ligne.test.ts` (dev-dépendance `fake-indexeddb`).
+  5. SW : navigation hors ligne vers une page non gardée → redirige vers `/mon-espace` s'il est en cache.
+  6. Commentaire `shortcut:` sur le rechargement complet dans `rafraichir()`.
 
 ### 2026-11-21 (suite 56) — « Mon espace » étape 6 : partage par lien + export/import (plan terminé)
 - Étape 5 poussée sur `main` (`07cfbc0`). Étape 6 sur la branche. **Les 6 étapes du plan « façon Anki » sont codées.**

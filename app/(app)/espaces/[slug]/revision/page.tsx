@@ -15,7 +15,7 @@ import { nouvellesRestantes, marquerNouvellesVues } from '@/lib/nouvelles-cartes
 import { melange } from '@/lib/aleatoire'
 import { useIsMobile } from '@/lib/useIsMobile'
 import { getAllModuleIds } from '@/lib/espace-perso'
-import { instantane, rafraichir, muter } from '@/lib/hors-ligne'
+import { rafraichir, muter } from '@/lib/hors-ligne'
 
 
 export default function RevisionPage() {
@@ -65,8 +65,8 @@ export default function RevisionPage() {
 
   useEffect(() => {
     const load = async () => {
-      // Copie perso : lue dans la copie locale (marche hors ligne, où getUser échoue).
-      const snap = perso ? (await instantane()) ?? (await rafraichir()) : null
+      // Copie perso : rechargée en ligne (sinon les progrès d'un autre appareil seraient écrasés), locale hors ligne.
+      const snap = perso ? await rafraichir() : null
       const uid = snap?.uid ?? (await supabase.auth.getUser()).data.user?.id
       if (!uid) return
       setUserId(uid)

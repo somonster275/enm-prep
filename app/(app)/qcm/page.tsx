@@ -6,7 +6,7 @@ import { enregistrerActivite } from '@/lib/streaks'
 import { reponseCorrecte } from '@/lib/qcm-parse'
 import { melange } from '@/lib/aleatoire'
 import TelechargerPerso from '@/components/TelechargerPerso'
-import { instantane, rafraichir } from '@/lib/hors-ligne'
+import { rafraichir } from '@/lib/hors-ligne'
 
 type Qcm = { id: string; titre: string; matiere: string | null; type?: string }
 type Question = {
@@ -72,7 +72,7 @@ export default function QcmPage() {
     const pid = params.get('perso')
     if (pid) {
       // Copie perso : lue dans la copie locale (marche hors ligne) ; rien n'est écrit dans les tables officielles.
-      instantane().then(async s => s ?? rafraichir()).then(s => {
+      rafraichir().then(s => {
         const pm = s?.modules.find(m => m.id === pid)
         if (!s || !pm) return
         setUid(s.uid)
