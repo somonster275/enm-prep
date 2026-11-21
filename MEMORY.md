@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 58).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 59).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -124,6 +124,15 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-21 (suite 59) — Test Playwright connecté + bug mind maps des espaces
+- Environnement cloud perso « enm-prep » créé : autorise `hoduewjiaowlvhkngoum.supabase.co` (+ script graphify).
+- Tester l'appli connectée en local : `NODE_USE_ENV_PROXY=1` (sinon le serveur Node ne passe pas par le proxy du
+  conteneur → redirigé vers /login) + `NEXT_PUBLIC_SUPABASE_URL/ANON_KEY` (valeurs de `proxy.ts`). Sans
+  `SUPABASE_SERVICE_ROLE_KEY`, les routes `/api/admin/*`, `/api/classement`, `/api/storage/init`,
+  `/api/drive/google/status` répondent 500 : propre au local, pas un bug.
+- **Bug corrigé** `espaces/[slug]/page.tsx` : `fetchTool` demandait `type` à `mindmaps` (colonne absente) → 400,
+  les mind maps d'une matière n'apparaissaient jamais sur sa page.
 
 ### 2026-11-21 (suite 58) — Test Playwright (webapp-testing), titres d'onglet, erreur réseau du login
 - Test navigateur (pages publiques + redirection /login, ordi et mobile) : RAS, sauf 2 points corrigés.

@@ -47,8 +47,9 @@ export default function EspacePage() {
 
       // Contenus des autres outils, filtrés sur cette matière (#). Robuste si la table n'existe pas encore.
       const fetchTool = async (table: string): Promise<ToolItem[]> => {
-        const { data } = await supabase.from(table).select('id, titre, url, type').eq('espace_id', esp.id).is('deleted_at', null).order('created_at', { ascending: false })
-        return (data as ToolItem[]) || []
+        // mindmaps n'a pas de colonne `type` : la demander fait échouer toute la requête.
+        const { data } = await supabase.from(table).select(table === 'mindmaps' ? 'id, titre, url' : 'id, titre, url, type').eq('espace_id', esp.id).is('deleted_at', null).order('created_at', { ascending: false })
+        return (data as unknown as ToolItem[]) || []
       }
       const [mm, md, qc] = await Promise.all([fetchTool('mindmaps'), fetchTool('medias'), fetchTool('qcm')])
       setTools({ mindmaps: mm, medias: md, qcm: qc })
