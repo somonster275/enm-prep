@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 60).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 61).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -124,6 +124,18 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-21 (suite 61) — Tests Playwright (e2e) + skills app-building
+- **`npm run test:e2e`** (`@playwright/test` 1.63, version du navigateur préinstallé dans le cloud ; en local :
+  `npx playwright install chromium` une fois). Config `playwright.config.ts`, tests dans `e2e/` :
+  - `public.spec.ts` (toujours) : titres des pages publiques, redirection /login, message « mauvais identifiants ».
+  - `revision.spec.ts` + `qcm.spec.ts` : seulement si `E2E_EMAIL` / `E2E_PASSWORD` (compte de test, connexion via
+    `auth.setup.ts`, session dans `e2e/.auth/` ignoré par git). ⚠️ Écrivent dans la vraie base (compte de test).
+  - Révision : note/annulation/persistance + culture générale ; ignoré s'il n'y a plus de carte due ce jour-là.
+- En session cloud : préfixer `NODE_USE_ENV_PROXY=1 NEXT_PUBLIC_SUPABASE_URL=… NEXT_PUBLIC_SUPABASE_ANON_KEY=…`
+  (valeurs de `proxy.ts`). Compte de test : somonster275@gmail.com (rôle admin) — mot de passe NON stocké ici.
+- Skills github.com/takleb3rry/claude-global-appbuilding-skills installés via le script de démarrage de
+  l'environnement cloud « enm-prep ». `/comprehensive-test` : tsc/tests/build OK, ESLint 74 erreurs (non bloquant).
 
 ### 2026-11-21 (suite 60) — Tests des parcours révision / QCM : 2 bugs graves
 - **`progression.palier` n'existait pas en base** (aucune migration ne la créait, absente de `schema.sql`) alors que
