@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { supabase, toutesLesLignes } from '@/lib/supabase'
+import { supabase, toutesLesLignes, progressionDe } from '@/lib/supabase'
 import { useParams, useSearchParams } from 'next/navigation'
 import type { Fiche, Progression, Espace, Module } from '@/types'
 import { NIVEAUX, PALIER_MAX, prochaineRevision, intervalleMinutes, palierApres, formatIntervalle, estDue } from '@/lib/spaced-repetition'
@@ -170,7 +170,7 @@ export default function RevisionPage() {
       const ids = new Set(fichList.map(f => f.id))
       const { data: prog, error: errProg } = snap
         ? { data: snap.progression.filter(p => ids.has(p.fiche_id)) as Progression[], error: null }
-        : await supabase.from('progression').select('*').eq('utilisateur_id', uid).in('fiche_id', [...ids])
+        : await progressionDe(uid, ids)
       if (errProg) { setErreurChargement(true); return }
       const progMap: Record<string, Progression> = {}
       ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })

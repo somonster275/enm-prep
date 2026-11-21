@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { supabase, ecrire } from '@/lib/supabase'
+import { supabase, ecrire, progressionDe } from '@/lib/supabase'
 import type { Espace, Module, Fiche, Profil } from '@/types'
 import { scoreGlobal, estDue } from '@/lib/spaced-repetition'
 import Link from 'next/link'
@@ -91,8 +91,7 @@ export default function ModulePage() {
       if (esp) setMoveEspaceId(esp.id)
 
       if (fich && fich.length > 0) {
-        const { data: prog } = await supabase.from('progression').select('*')
-          .eq('utilisateur_id', user.id).in('fiche_id', fich.map((f: Fiche) => f.id))
+        const { data: prog } = await progressionDe(user.id, fich.map((f: Fiche) => f.id))
         setProgressions(prog || [])
       }
 

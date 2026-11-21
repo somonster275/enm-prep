@@ -1,5 +1,6 @@
 import { createBrowserClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js' // utilisé uniquement pour getSupabaseAdmin
+import type { Progression } from '@/types'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hoduewjiaowlvhkngoum.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvZHVld2ppYW93bHZoa25nb3VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5NTY1MDEsImV4cCI6MjA5NDUzMjUwMX0._7BQ2UQteV8Mb-n8-hPQM56bZBDPbx5Oksx0Qo6RuCM'
@@ -43,4 +44,13 @@ export async function toutesLesLignes<T>(
     lignes.push(...(data || []))
     if (!data || data.length < PAGE) return { data: lignes, error: null }
   }
+}
+
+// Progression d'un élève sur ces fiches. Pas de .in('fiche_id', ids) : au-delà de quelques centaines
+// d'UUID l'URL dépasse la taille admise et Supabase répond 400. On lit tout (paginé) et on filtre.
+export async function progressionDe(uid: string, ficheIds: Iterable<string>) {
+  const ids = new Set(ficheIds)
+  const { data, error } = await toutesLesLignes<Progression>((de, a) =>
+    supabase.from('progression').select('*').eq('utilisateur_id', uid).order('fiche_id').range(de, a))
+  return { data: data.filter(p => ids.has(p.fiche_id)), error }
 }

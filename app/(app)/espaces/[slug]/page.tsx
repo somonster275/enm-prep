@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, progressionDe } from '@/lib/supabase'
 import { useParams } from 'next/navigation'
 import type { Espace, Module, Fiche, Progression } from '@/types'
 import { scoreGlobal, estDue } from '@/lib/spaced-repetition'
@@ -42,7 +42,7 @@ export default function EspacePage() {
       const { data: fich } = await supabase.from('fiches').select('*').in('module_id', modIds).is('deleted_at', null).eq('suspendu', false)
       setFiches(fich || [])
       const fichIds = (fich || []).map((f: Fiche) => f.id)
-      const { data: prog } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id).in('fiche_id', fichIds)
+      const { data: prog } = await progressionDe(user.id, fichIds)
       setProgressions(prog || [])
 
       // Contenus des autres outils, filtrés sur cette matière (#). Robuste si la table n'existe pas encore.

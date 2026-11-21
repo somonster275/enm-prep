@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 59).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 60).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -124,6 +124,16 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-21 (suite 60) — Tests des parcours révision / QCM : 2 bugs graves
+- **`progression.palier` n'existait pas en base** (aucune migration ne la créait, absente de `schema.sql`) alors que
+  révision, duel (correction), dashboard, tuteur l'utilisent → TOUTE note de révision refusée (PGRST204, toast
+  « Note non enregistrée »). Migration **0050_progression_palier.sql** (à exécuter). Lignes existantes : palier 0.
+- **`.in('fiche_id', ids)` avec ~800 fiches** (culture générale) → URL de 31 Ko, 400 → « Impossible de charger ta
+  progression ». Nouveau `progressionDe(uid, ids)` dans `lib/supabase.ts` (lit toute la progression paginée, filtre en
+  JS), utilisé par la révision, la page d'espace et la page de module. Reste en `.in()` : carnet et favoris (listes
+  courtes en pratique). ⚠️ La requête `fiches` des pages d'espace n'est pas paginée (plafond 1000 lignes).
+- QCM testé de bout en bout : OK. Duel non testable en local (routes `/api/duel/*` = clé service).
 
 ### 2026-11-21 (suite 59) — Test Playwright connecté + bug mind maps des espaces
 - Environnement cloud perso « enm-prep » créé : autorise `hoduewjiaowlvhkngoum.supabase.co` (+ script graphify).
