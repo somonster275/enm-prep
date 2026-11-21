@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
+  /* Site en thème clair uniquement : sans ceci, le mode nuit du système assombrit les champs de formulaire. */
+  color-scheme: light;
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #211C19;
 
   /* Jetons de design : toute l'app lit ces variables (styles inline compris).
      Changer une valeur ici recolore l'app entière. Direction « code annoté » (cf. MEMORY.md). */
@@ -73,13 +75,6 @@
 .md-response code { background: #F5F0E8; padding: 2px 5px; border-radius: 4px; font-size: 12px; font-family: monospace; }
 .md-response blockquote { border-left: 3px solid var(--c-filet-fort); margin: 0.5em 0; padding: 4px 12px; color: var(--c-annotation); }
 .md-response hr { border: none; border-top: 1px solid var(--c-filet); margin: 0.75em 0; }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
 
 body {
   background: var(--background);

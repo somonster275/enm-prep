@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 63).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 53).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -124,6 +124,12 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-21 (suite 53) — Correctif mode nuit (texte illisible)
+- Bug signalé : en mode nuit du système, les textes sans couleur explicite (titres, noms dans Admin > Utilisateurs)
+  étaient blanc cassé sur fond clair. Cause : bloc `@media (prefers-color-scheme: dark)` d'origine Next.js dans
+  `globals.css` qui passait `--foreground` à #ededed. Supprimé ; `--foreground` = encre #211C19 ;
+  `color-scheme: light` sur `:root` (champs et barres de défilement restent clairs). Le site n'a pas de thème sombre.
 
 ### 2026-11-21 (suite 63) — ESLint : 22 avertissements → 0 (`npx eslint .` est propre)
 - Variables/imports inutilisés supprimés ; directives eslint-disable devenues inutiles retirées ; ternaires utilisés
