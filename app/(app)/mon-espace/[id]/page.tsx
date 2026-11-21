@@ -1,9 +1,9 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { supabase, ecrire, toutesLesLignes } from '@/lib/supabase'
 import { lienSur } from '@/lib/url-publique'
+import { rafraichir, instantane, muter, telechargerFichiers, fichiersEnCache, lienFichier } from '@/lib/hors-ligne'
 import RichContent from '@/components/RichContent'
 import RichEditor from '@/components/RichEditor'
 import {
@@ -44,22 +44,25 @@ export default function CopiePersoPage() {
   const [edition, setEdition] = useState<{ id: string | null; type: TypeElement; brouillon: Contenu } | null>(null)
   const [msg, setMsg] = useState('')
   const [occupe, setOccupe] = useState(false)
+  const [fichiers, setFichiers] = useState<{ total: number; enCache: number }>({ total: 0, enCache: 0 })
   const [version, setVersion] = useState(0) // +1 = recharger après une modification
-  const charger = () => setVersion(v => v + 1)
+  // Après une écriture locale, relire la copie locale suffit ; le réseau sert à l'ouverture et après une mise à jour.
+  const reseau = useRef(true)
+  const charger = (viaReseau = false) => { reseau.current = viaReseau; setVersion(v => v + 1) }
 
   useEffect(() => { (async () => {
-    const [{ data: m }, { data: els, error: errEls }] = await Promise.all([
-      supabase.from('perso_modules').select('*').eq('id', id).maybeSingle(),
-      // Pagination : une copie tronquée ferait reproposer ses éléments manquants comme nouveautés.
-      toutesLesLignes<PersoElement>((de, a) => supabase.from('perso_elements').select('*').eq('perso_module_id', id)
-        .order('ordre').order('created_at').order('id').range(de, a)),
-    ])
-    if (errEls) { setLoading(false); setMsg('Erreur : copie non chargée, recharge la page'); return }
-    const liste = els
-    setPm(m as PersoModule | null)
+    const viaReseau = reseau.current
+    const s = viaReseau ? await rafraichir() : await instantane()
+    const m = s?.modules.find(x => x.id === id) ?? null
+    const liste = (s?.elements || []).filter(e => e.perso_module_id === id)
+      .sort((a, b) => a.ordre - b.ordre || a.created_at.localeCompare(b.created_at))
+    setPm(m)
     setElements(liste)
     setLoading(false)
-    if (m?.source_type && m.source_id) {
+    const urls = liste.flatMap(e => lienSur(e.contenu.fichier_url ?? e.contenu.url) ?? [])
+    setFichiers({ total: urls.length, enCache: await fichiersEnCache(urls) })
+    // Les nouveautés de l'original ne se comparent qu'en ligne.
+    if (viaReseau && navigator.onLine && m?.source_type && m.source_id) {
       const off = await contenuOfficiel(m.source_type, m.source_id)
       setNouv(off ? calculerNouveautes(liste, off.elements) : null)
     }
@@ -68,22 +71,35 @@ export default function CopiePersoPage() {
   const afficher = (m: string) => { setMsg(m); setTimeout(() => setMsg(''), 3500) }
   const ordreMax = elements.reduce((mx, e) => Math.max(mx, e.ordre), 0)
 
+  const garderFichiers = async () => {
+    setOccupe(true)
+    const urls = elements.filter(e => !e.supprime).flatMap(e => lienSur(e.contenu.fichier_url ?? e.contenu.url) ?? [])
+    const n = await telechargerFichiers(urls)
+    setFichiers({ total: urls.length, enCache: n })
+    setOccupe(false)
+    afficher(n === urls.length ? 'Fichiers disponibles hors ligne' : `Erreur : ${urls.length - n} fichier(s) non téléchargé(s)`)
+  }
+
   const recuperer = async () => {
     if (!nouv) return
     setOccupe(true)
     const err = await appliquerNouveautes(id, nouv, ordreMax)
     setOccupe(false)
     afficher(err ? 'Erreur : ' + err : 'Mise à jour récupérée')
-    charger()
+    setNouv(null)
+    charger(true)
   }
 
   const enregistrer = async (brouillon: Contenu) => {
     if (!edition) return
     const { id: eid, type } = edition
-    const q = eid
-      ? supabase.from('perso_elements').update({ contenu: brouillon }).eq('id', eid).select('id')
-      : supabase.from('perso_elements').insert({ perso_module_id: id, type, contenu: brouillon, ordre: ordreMax + 1 }).select('id')
-    if (!(await ecrire(q))) return
+    // Id créé ici : l'ajout peut attendre le réseau sans risque de doublon.
+    await muter(eid
+      ? { table: 'perso_elements', action: 'update', filtre: { id: eid }, champs: { contenu: brouillon } }
+      : { table: 'perso_elements', action: 'upsert', ligne: {
+          id: crypto.randomUUID(), perso_module_id: id, type, contenu: brouillon, ordre: ordreMax + 1,
+          source_id: null, origine: null, supprime: false, created_at: new Date().toISOString(),
+        } })
     setEdition(null)
     afficher(eid ? 'Modification enregistrée' : 'Ajouté')
     charger()
@@ -92,15 +108,14 @@ export default function CopiePersoPage() {
   const supprimer = async (e: PersoElement) => {
     if (!confirm('Supprimer cet élément de ta copie ?')) return
     // Élément issu de l'officiel : on le marque supprimé pour que la prochaine mise à jour ne le repropose pas.
-    const q = e.source_id
-      ? supabase.from('perso_elements').update({ supprime: true }).eq('id', e.id).select('id')
-      : supabase.from('perso_elements').delete().eq('id', e.id).select('id')
-    if (!(await ecrire(q))) return
+    await muter(e.source_id
+      ? { table: 'perso_elements', action: 'update', filtre: { id: e.id }, champs: { supprime: true } }
+      : { table: 'perso_elements', action: 'delete', filtre: { id: e.id } })
     charger()
   }
 
   const maj = async (e: PersoElement, champs: Partial<PersoElement>, m: string) => {
-    if (!(await ecrire(supabase.from('perso_elements').update(champs).eq('id', e.id).select('id')))) return
+    await muter({ table: 'perso_elements', action: 'update', filtre: { id: e.id }, champs })
     afficher(m)
     charger()
   }
@@ -130,6 +145,11 @@ export default function CopiePersoPage() {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
           {nb('fiche') > 0 && <Link href={`/espaces/mon-espace/revision?perso=${id}`} style={{ padding: '10px 18px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>Réviser</Link>}
           {nb('qcm_question') > 0 && <Link href={`/qcm?perso=${id}`} style={{ padding: '10px 18px', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>Faire le QCM</Link>}
+          {fichiers.total > 0 && (fichiers.enCache >= fichiers.total
+            ? <span style={{ fontSize: 12.5, color: '#0E7C63', alignSelf: 'center' }}>Fichiers gardés hors ligne</span>
+            : <button onClick={garderFichiers} disabled={occupe} style={{ ...bouton('var(--c-papier-teinte)', 'var(--c-encre)'), padding: '10px 14px', fontSize: 13, border: '1px solid var(--c-filet-fort)', opacity: occupe ? 0.6 : 1 }}>
+                Garder les fichiers hors ligne ({fichiers.total - fichiers.enCache})
+              </button>)}
           {ajoutable && <button onClick={() => setEdition({ id: null, type: ajoutable, brouillon: structuredClone(VIDES[ajoutable]) })} style={{ ...bouton('var(--c-papier-teinte)', 'var(--c-encre)'), padding: '10px 14px', fontSize: 13, border: '1px solid var(--c-filet-fort)' }}>
             + {ajoutable === 'fiche' ? 'Fiche' : 'Question'}
           </button>}
@@ -218,7 +238,7 @@ function Apercu({ e }: { e: PersoElement }) {
     <>
       <div style={{ fontSize: 14.5, fontWeight: 600 }}>{String(c.titre ?? '')}{c.type === 'pdf' && <span style={{ fontSize: 12, color: 'var(--c-annotation)', fontWeight: 400 }}> PDF</span>}</div>
       {!!c.description && <div style={{ fontSize: 13, color: 'var(--c-texte-doux)', marginTop: 4, whiteSpace: 'pre-wrap' }}>{String(c.description)}</div>}
-      {lien && <a href={lien} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginTop: 6, fontSize: 12.5, color: '#3B82D9', fontWeight: 600, textDecoration: 'none' }}>Ouvrir →</a>}
+      {lien && <a href={lienFichier(lien)} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginTop: 6, fontSize: 12.5, color: '#3B82D9', fontWeight: 600, textDecoration: 'none' }}>Ouvrir →</a>}
     </>
   )
 }

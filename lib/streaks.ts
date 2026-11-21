@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { mettreEnFile } from '@/lib/hors-ligne'
 
 /** Objectif quotidien de cartes révisées (pour la barre "Objectif du jour"). */
 export const OBJECTIF_QUOTIDIEN = 20
@@ -15,8 +16,12 @@ export function ymd(d: Date): string {
 export async function enregistrerActivite(_userId: string, n = 1): Promise<void> {
   const jour = ymd(new Date())
   // Incrément ATOMIQUE côté serveur (RPC incr_activite, migrations 0035/0039 : seule écriture permise).
-  const { error } = await supabase.rpc('incr_activite', { p_jour: jour, p_delta: n })
-  if (error) console.error('Activité du jour non enregistrée :', error.message)
+  const args = { p_jour: jour, p_delta: n }
+  const { error } = await supabase.rpc('incr_activite', args)
+  if (!error) return
+  // Hors ligne : rejouée au retour du réseau (le serveur accepte la veille, donc à condition de revenir vite).
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return mettreEnFile({ rpc: 'incr_activite', args })
+  console.error('Activité du jour non enregistrée :', error.message)
 }
 
 /** Période de pause (mode vacances) : les jours entre `debut` et `fin` (inclus) ne cassent pas la série. */

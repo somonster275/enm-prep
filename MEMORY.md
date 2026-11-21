@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 54).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 55).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,32 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-21 (suite 55) — « Mon espace » étape 5 : hors ligne + synchronisation
+- Étape 4 poussée sur `main` (`e6baec0`). Étape 5 sur la branche.
+- **`lib/hors-ligne.ts`** (local-first, façon Anki) : copie de « Mon espace » (`perso_modules`, `perso_elements`,
+  `perso_progression`) dans IndexedDB (`codex` / store `kv`, clés `perso` et `file`).
+  - `rafraichir()` : vide la file puis recharge tout depuis Supabase (pas d'écrasement si une écriture attend) ;
+    hors ligne → copie locale. `instantane()` : copie locale, seulement si elle est au compte connecté.
+  - `muter(op)` : applique en local (`appliquerLocal`, pur, testé dans `tests/hors-ligne.test.ts`) + met en file
+    + `vider()`. Ids créés côté client (ajouts rejouables sans doublon). Conflit : dernière écriture envoyée gagne.
+  - File protégée par un verrou (`modifierFile`) + id d'op (`oid`) ; un refus serveur abandonne l'op (log),
+    une coupure réseau arrête l'envoi. IndexedDB indisponible → écriture directe.
+  - `oublierCopieLocale()` à la déconnexion (copie + caches pages/fichiers).
+- **`public/sw.js`** : `_next/static` + `/fonts` en cache d'abord ; pages en réseau d'abord avec repli sur
+  `codex-pages-v1` puis page « Hors connexion » ; `/fichier-hors-ligne?u=` sert les fichiers de `codex-fichiers-v1`.
+  `preparerPages(ids)` (appelé par /mon-espace et après un téléchargement) met en cache `/mon-espace`,
+  `/mon-espace/<id>`, `/espaces/mon-espace/revision?perso=<id>`, `/qcm?perso=<id>` + leurs scripts.
+  ⚠️ `sw.js` exclu du matcher de `proxy.ts` (sinon 307 → enregistrement refusé).
+- `components/HorsLigne.tsx` (dans `(app)/layout`) : enregistre le SW (prod seulement), `vider()` au retour du
+  réseau, bandeau « Hors connexion ». `AuthGuard` : hors ligne sans session → laisse passer.
+- Pages branchées sur la copie locale : `/mon-espace`, `/mon-espace/[id]` (bouton « Garder les fichiers hors
+  ligne » pour PDF/mind maps ; nouveautés de l'original comparées seulement en ligne), révision `?perso=`
+  (uid tiré de la copie, `getUser` échoue hors ligne), QCM `?perso=`. `enregistrerActivite` hors ligne → file
+  (le serveur n'accepte que veille/jour/lendemain).
+- Vérifié dans Chromium : SW hors ligne (pages gardées + JS, repli, fichiers, clic sur lien interne) ; file
+  testée avec un faux Supabase (rien n'est envoyé hors ligne, envoi ordonné au retour, pas de renvoi).
+  Non testé : parcours connecté réel (pas de compte de test).
 
 ### 2026-11-21 (suite 54) — « Mon espace » étape 4 : app installable (PWA)
 - Étapes 1-3 poussées sur `main` (`cecec85`), migration 0048 **exécutée** par l'utilisateur.

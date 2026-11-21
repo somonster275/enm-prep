@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { copieExistante, telecharger, type SourceType } from '@/lib/espace-perso'
+import { rafraichir, preparerPages } from '@/lib/hors-ligne'
 
 /** Bouton « Télécharger dans mon espace » ; devient un lien vers la copie une fois téléchargé. */
 export default function TelechargerPerso({ type, id }: { type: SourceType; id: string }) {
@@ -21,7 +22,11 @@ export default function TelechargerPerso({ type, id }: { type: SourceType; id: s
 
   const lancer = async () => {
     setEnCours(true); setErreur('')
-    try { setCopie(await telecharger(type, id)) }
+    try {
+      const pid = await telecharger(type, id)
+      setCopie(pid)
+      rafraichir().then(() => preparerPages([pid])) // disponible hors ligne tout de suite
+    }
     catch (e) { setErreur('Erreur : ' + (e as Error).message) }
     setEnCours(false)
   }

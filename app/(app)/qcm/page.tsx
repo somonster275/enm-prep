@@ -6,6 +6,7 @@ import { enregistrerActivite } from '@/lib/streaks'
 import { reponseCorrecte } from '@/lib/qcm-parse'
 import { melange } from '@/lib/aleatoire'
 import TelechargerPerso from '@/components/TelechargerPerso'
+import { instantane, rafraichir } from '@/lib/hors-ligne'
 
 type Qcm = { id: string; titre: string; matiere: string | null; type?: string }
 type Question = {
@@ -40,7 +41,7 @@ export default function QcmPage() {
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       const id = data.user?.id || ''
-      setUid(id)
+      if (id) setUid(id) // hors ligne getUser échoue : ne pas effacer l'uid lu dans la copie locale
       if (id) chargerErreurs(id)
     })
     supabase.from('qcm').select('id, titre, matiere, type').order('created_at', { ascending: false })
@@ -70,14 +71,14 @@ export default function QcmPage() {
     const params = new URLSearchParams(window.location.search)
     const pid = params.get('perso')
     if (pid) {
-      // Copie perso : mêmes questions, lues dans perso_elements ; rien n'est écrit dans les tables officielles.
-      Promise.all([
-        supabase.from('perso_modules').select('id, nom').eq('id', pid).maybeSingle(),
-        supabase.from('perso_elements').select('id, contenu, ordre').eq('perso_module_id', pid)
-          .eq('type', 'qcm_question').eq('supprime', false).order('ordre').order('created_at'),
-      ]).then(([{ data: pm }, { data: els }]) => {
-        if (!pm) return
-        setQuestions((els || []).map(e => ({ ...e.contenu, id: e.id, qcm_id: pid, ordre: e.ordre }) as Question))
+      // Copie perso : lue dans la copie locale (marche hors ligne) ; rien n'est écrit dans les tables officielles.
+      instantane().then(async s => s ?? rafraichir()).then(s => {
+        const pm = s?.modules.find(m => m.id === pid)
+        if (!s || !pm) return
+        setUid(s.uid)
+        const els = s.elements.filter(e => e.perso_module_id === pid && e.type === 'qcm_question' && !e.supprime)
+          .sort((a, b) => a.ordre - b.ordre || a.created_at.localeCompare(b.created_at))
+        setQuestions(els.map(e => ({ ...e.contenu, id: e.id, qcm_id: pid, ordre: e.ordre }) as Question))
         setReponses({}); setSaisies({}); setValides(new Set()); setPerso(pid); setActif({ id: pid, titre: pm.nom, matiere: null })
       })
       return

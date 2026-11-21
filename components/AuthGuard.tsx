@@ -10,7 +10,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const check = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
+      // Hors ligne, un jeton expiré ne peut pas être renouvelé : on laisse passer, seule la copie locale de « Mon espace » s'affiche.
+      if (!session && navigator.onLine) {
         router.replace('/login')
         return
       }

@@ -1,8 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { supabase, ecrire } from '@/lib/supabase'
 import type { PersoModule } from '@/lib/espace-perso'
+import { rafraichir, muter, preparerPages } from '@/lib/hors-ligne'
 
 const LIBELLES = { module: 'Module', qcm: 'QCM', mindmap: 'Mind map' } as const
 
@@ -12,18 +12,18 @@ export default function MonEspacePage() {
   const [tableManquante, setTableManquante] = useState(false)
 
   useEffect(() => {
-    supabase.from('perso_modules').select('*, perso_elements(count)').eq('perso_elements.supprime', false).order('created_at', { ascending: false })
-      .then(({ data, error }) => {
-        if (error) setTableManquante(true) // migration 0048 pas encore passée
-        setModules(((data || []) as (PersoModule & { perso_elements: { count: number }[] })[])
-          .map(m => ({ ...m, nb: m.perso_elements?.[0]?.count ?? 0 })))
-        setLoading(false)
-      })
+    // Copie locale (rechargée depuis Supabase si le réseau est là) : la page marche aussi hors ligne.
+    rafraichir().then(s => {
+      if (!s) setTableManquante(true)
+      setModules((s?.modules || []).map(m => ({ ...m, nb: s!.elements.filter(e => e.perso_module_id === m.id && !e.supprime).length })))
+      setLoading(false)
+      if (s) preparerPages(s.modules.map(m => m.id)) // pages gardées pour les ouvrir sans réseau
+    })
   }, [])
 
   const supprimer = async (m: PersoModule) => {
     if (!confirm(`Retirer « ${m.nom} » de ton espace ? Tes modifications et ta progression sur cette copie seront perdues.`)) return
-    if (!(await ecrire(supabase.from('perso_modules').delete().eq('id', m.id).select('id')))) return
+    await muter({ table: 'perso_modules', action: 'delete', filtre: { id: m.id } })
     setModules(l => l.filter(x => x.id !== m.id))
   }
 
@@ -39,7 +39,7 @@ export default function MonEspacePage() {
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>
       ) : tableManquante ? (
-        <div role="alert" style={{ color: 'var(--c-accent)', padding: 20 }}>Mon espace n&apos;est pas encore activé (migration 0048 à exécuter).</div>
+        <div role="alert" style={{ color: 'var(--c-accent)', padding: 20 }}>Mon espace n&apos;a pas pu être chargé. Connecte-toi à internet une première fois pour le télécharger sur cet appareil.</div>
       ) : modules.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--c-annotation-clair)', background: 'var(--c-papier)', border: '1px dashed var(--c-filet-fort)', borderRadius: 6 }}>
           Ton espace est vide. <Link href="/espaces" style={{ color: 'var(--c-accent)', fontWeight: 600 }}>Parcourir les espaces</Link>

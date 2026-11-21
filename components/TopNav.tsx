@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import InstallerApp from '@/components/InstallerApp'
+import { oublierCopieLocale } from '@/lib/hors-ligne'
 import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useEffect, useState } from 'react'
@@ -45,6 +46,7 @@ export default function TopNav() {
 
   const logout = async () => {
     await supabase.auth.signOut()
+    await oublierCopieLocale() // le prochain compte de ce navigateur ne doit pas voir « Mon espace » de celui-ci
     window.location.href = '/login'
   }
 

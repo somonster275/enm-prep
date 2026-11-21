@@ -54,6 +54,6 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  // manifest + icônes : le navigateur les charge sans cookies, une redirection vers /login casserait l'installation.
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon|fonts/|icons/|manifest.webmanifest).*)'],
+  // manifest, icônes, service worker : le navigateur les charge sans cookies, une redirection vers /login casserait l'installation.
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon|fonts/|icons/|manifest.webmanifest|sw.js).*)'],
 }

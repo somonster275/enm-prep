@@ -14,7 +14,8 @@ import { enregistrerActivite, chargerActivite, calculerStreak, chargerPauses } f
 import { nouvellesRestantes, marquerNouvellesVues } from '@/lib/nouvelles-cartes'
 import { melange } from '@/lib/aleatoire'
 import { useIsMobile } from '@/lib/useIsMobile'
-import { getAllModuleIds, type Contenu } from '@/lib/espace-perso'
+import { getAllModuleIds } from '@/lib/espace-perso'
+import { instantane, rafraichir, muter } from '@/lib/hors-ligne'
 
 
 export default function RevisionPage() {
@@ -26,7 +27,6 @@ export default function RevisionPage() {
   const carnet = searchParams.get('carnet') === '1' // carnet d'erreurs : fiches mal notées
   const favoris = searchParams.get('favoris') === '1' // révision des fiches favorites
   const perso = searchParams.get('perso') // copie « Mon espace » : fiches et progression perso
-  const tableProg = perso ? 'perso_progression' : 'progression'
 
   const [espace, setEspace] = useState<Espace | null>(null)
   const [moduleLabel, setModuleLabel] = useState<string | null>(null)
@@ -65,10 +65,12 @@ export default function RevisionPage() {
 
   useEffect(() => {
     const load = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      setUserId(user.id)
-      const { data: prof } = await supabase.from('profils').select('role').eq('id', user.id).single()
+      // Copie perso : lue dans la copie locale (marche hors ligne, où getUser échoue).
+      const snap = perso ? (await instantane()) ?? (await rafraichir()) : null
+      const uid = snap?.uid ?? (await supabase.auth.getUser()).data.user?.id
+      if (!uid) return
+      setUserId(uid)
+      const { data: prof } = await supabase.from('profils').select('role').eq('id', uid).single()
       setIsAdmin(prof?.role === 'admin' || prof?.role === 'editeur')
 
       // ===== Révision MIXTE (entrelacement) : cartes dues, toutes matières confondues =====
@@ -81,7 +83,7 @@ export default function RevisionPage() {
           .select('id, module_id, question, reponse, tags, suspendu, created_at')
           .is('deleted_at', null).eq('suspendu', false).order('id').range(de, a))
         const fichList = (fich || []) as Fiche[]
-        const { data: prog, error: errProg } = await toutesLesLignes<Progression>((de, a) => supabase.from('progression').select('*').eq('utilisateur_id', user.id).order('fiche_id').range(de, a))
+        const { data: prog, error: errProg } = await toutesLesLignes<Progression>((de, a) => supabase.from('progression').select('*').eq('utilisateur_id', uid).order('fiche_id').range(de, a))
         if (errProg) { setErreurChargement(true); return } // sinon des fiches déjà vues passeraient pour nouvelles et leur palier serait écrasé
         const progMap: Record<string, Progression> = {}
         ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
@@ -99,7 +101,7 @@ export default function RevisionPage() {
       if (carnet) {
         setEspace({ id: '', nom: "Carnet d'erreurs", slug: '', description: '', couleur: '#C0392B', ordre: 0 } as Espace)
         setModuleLabel('À revoir')
-        const { data: prog, error: errProg } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id).lte('niveau', 1)
+        const { data: prog, error: errProg } = await supabase.from('progression').select('*').eq('utilisateur_id', uid).lte('niveau', 1)
         if (errProg) { setErreurChargement(true); return }
         const ids = (prog || []).map((p: Progression) => p.fiche_id)
         if (ids.length === 0) { setLoaded(true); return }
@@ -116,11 +118,11 @@ export default function RevisionPage() {
       if (favoris) {
         setEspace({ id: '', nom: 'Mes favoris', slug: '', description: '', couleur: '#E8A11E', ordre: 0 } as Espace)
         setModuleLabel('Favoris')
-        const { data: fav } = await supabase.from('favoris').select('fiche_id').eq('user_id', user.id)
+        const { data: fav } = await supabase.from('favoris').select('fiche_id').eq('user_id', uid)
         const ids = (fav || []).map((x: { fiche_id: string }) => x.fiche_id)
         if (ids.length === 0) { setLoaded(true); return }
         const { data: fich } = await supabase.from('fiches').select('*').in('id', ids).is('deleted_at', null).eq('suspendu', false)
-        const { data: prog, error: errProg } = await supabase.from('progression').select('*').eq('utilisateur_id', user.id).in('fiche_id', ids)
+        const { data: prog, error: errProg } = await supabase.from('progression').select('*').eq('utilisateur_id', uid).in('fiche_id', ids)
         if (errProg) { setErreurChargement(true); return }
         const progMap: Record<string, Progression> = {}
         ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
@@ -132,13 +134,11 @@ export default function RevisionPage() {
 
       let fichList: Fiche[]
       if (perso) {
-        const { data: pm } = await supabase.from('perso_modules').select('nom').eq('id', perso).maybeSingle()
+        const pm = snap?.modules.find(m => m.id === perso)
         if (!pm) { setLoaded(true); return }
         setEspace({ id: '', nom: 'Mon espace', slug: '', description: '', couleur: '#A3122A', ordre: 0 } as Espace)
         setModuleLabel(pm.nom)
-        const { data: els } = await toutesLesLignes<{ id: string; contenu: Contenu; created_at: string }>((de, a) =>
-          supabase.from('perso_elements').select('id, contenu, created_at')
-            .eq('perso_module_id', perso).eq('type', 'fiche').eq('supprime', false).order('id').range(de, a))
+        const els = snap!.elements.filter(e => e.perso_module_id === perso && e.type === 'fiche' && !e.supprime)
         fichList = els.map(e => ({
           id: e.id, module_id: perso, question: String(e.contenu.question ?? ''), reponse: String(e.contenu.reponse ?? ''),
           tags: (e.contenu.tags as string[]) ?? [], created_at: e.created_at,
@@ -167,9 +167,10 @@ export default function RevisionPage() {
         fichList = (fich || []) as Fiche[]
       }
 
-      const { data: prog, error: errProg } = await supabase.from(tableProg).select('*')
-        .eq('utilisateur_id', user.id)
-        .in('fiche_id', fichList.map((f: Fiche) => f.id))
+      const ids = new Set(fichList.map(f => f.id))
+      const { data: prog, error: errProg } = snap
+        ? { data: snap.progression.filter(p => ids.has(p.fiche_id)) as Progression[], error: null }
+        : await supabase.from('progression').select('*').eq('utilisateur_id', uid).in('fiche_id', [...ids])
       if (errProg) { setErreurChargement(true); return }
       const progMap: Record<string, Progression> = {}
       ;(prog || []).forEach((p: Progression) => { progMap[p.fiche_id] = p })
@@ -186,7 +187,7 @@ export default function RevisionPage() {
         // NOUVELLES cartes (jamais vues) : plafonnées à la limite quotidienne restante
         // (compteur en base, cross-device), pour éviter l'avalanche démotivante.
         const nouvelles = melange(fichList.filter((f: Fiche) => !progMap[f.id]))
-        const restantes = await nouvellesRestantes(user.id)
+        const restantes = await nouvellesRestantes(uid)
         setNouvellesEnAttente(Math.max(0, nouvelles.length - restantes))
         d = melange([...revues, ...nouvelles.slice(0, restantes)])
       }
@@ -198,7 +199,7 @@ export default function RevisionPage() {
       setLoaded(true)
     }
     load()
-  }, [slug, modeAlea, moduleFilter, mixte, carnet, favoris, perso, tableProg])
+  }, [slug, modeAlea, moduleFilter, mixte, carnet, favoris, perso])
 
   // En dessous de ce seuil, la carte revient dans la session en cours (1 min, 15 min…).
   const SEUIL_REQUEUE = 30 // minutes
@@ -230,7 +231,9 @@ export default function RevisionPage() {
       prochaine_revision: nextRev.toISOString(),
       derniere_revision: new Date().toISOString()
     }
-    const { error } = await supabase.from(tableProg).upsert(prog, { onConflict: 'utilisateur_id,fiche_id' })
+    const { error } = perso
+      ? await muter({ table: 'perso_progression', action: 'upsert', ligne: prog })
+      : await supabase.from('progression').upsert(prog, { onConflict: 'utilisateur_id,fiche_id' })
     if (error) {
       // On reste sur la carte : l'étudiant peut renoter une fois la connexion revenue.
       setToast('Note non enregistrée — vérifie ta connexion et renote la carte')
@@ -262,8 +265,10 @@ export default function RevisionPage() {
     if (!lastAction || !userId) return
     const { ficheId, prevProg, idxBefore, requeued, bouton, etaitNouvelle } = lastAction
     const { error } = prevProg
-      ? await supabase.from(tableProg).upsert(prevProg, { onConflict: 'utilisateur_id,fiche_id' })
-      : await supabase.from(tableProg).delete().eq('utilisateur_id', userId).eq('fiche_id', ficheId)
+      ? (perso ? await muter({ table: 'perso_progression', action: 'upsert', ligne: { ...prevProg } })
+        : await supabase.from('progression').upsert(prevProg, { onConflict: 'utilisateur_id,fiche_id' }))
+      : (perso ? await muter({ table: 'perso_progression', action: 'delete', filtre: { utilisateur_id: userId, fiche_id: ficheId } })
+        : await supabase.from('progression').delete().eq('utilisateur_id', userId).eq('fiche_id', ficheId))
     if (error) {
       setToast('Annulation non enregistrée — vérifie ta connexion et réessaie')
       setTimeout(() => setToast(null), 4000)
@@ -314,7 +319,7 @@ export default function RevisionPage() {
     const c = deck[idx]
     if (!c) return
     const { error } = perso
-      ? await supabase.from('perso_elements').update({ contenu: { question: editQ, reponse: editR, tags: c.tags ?? [] } }).eq('id', c.id)
+      ? await muter({ table: 'perso_elements', action: 'update', filtre: { id: c.id }, champs: { contenu: { question: editQ, reponse: editR, tags: c.tags ?? [] } } })
       : await supabase.from('fiches').update({ question: editQ, reponse: editR }).eq('id', c.id)
     if (error) return
     setDeck(d => d.map((f, i) => i === idx ? { ...f, question: editQ, reponse: editR } : f))
