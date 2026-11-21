@@ -30,13 +30,13 @@ export default function TagsEditeur({
     if (!error) { setEdit(false); setEnregistre(true); setTimeout(() => setEnregistre(false), 2000) }
   }
 
-  const chips = (interactif: boolean) => tags.map(t => (
+  const chips = () => tags.map(t => (
     <span key={t} style={{ fontSize: 11, fontWeight: 700, color: accent, background: accent + '18', borderRadius: 999, padding: '2px 9px' }}>#{t}</span>
   ))
 
   if (!canEdit) {
     if (tags.length === 0) return null
-    return <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 6 }}>{chips(false)}</div>
+    return <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 6 }}>{chips()}</div>
   }
 
   if (edit) {
@@ -53,7 +53,7 @@ export default function TagsEditeur({
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginTop: 6 }} onClick={e => e.stopPropagation()}>
-      {chips(true)}
+      {chips()}
       <button onClick={() => setEdit(true)} style={{
         fontSize: 11.5, fontWeight: 700, color: accent, background: 'transparent',
         border: `1px dashed ${accent}66`, borderRadius: 999, padding: '2px 10px', cursor: 'pointer', fontFamily: FONT,

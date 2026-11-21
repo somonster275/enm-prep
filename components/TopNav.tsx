@@ -48,6 +48,7 @@ export default function TopNav() {
   const logout = async () => {
     await supabase.auth.signOut()
     await oublierCopieLocale() // le prochain compte de ce navigateur ne doit pas voir « Mon espace » de celui-ci
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- rechargement complet voulu : session changée
     window.location.href = '/login'
   }
 

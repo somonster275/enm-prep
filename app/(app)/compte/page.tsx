@@ -55,6 +55,7 @@ export default function ComptePage() {
     setMessage({ type: 'ok', texte: 'Mot de passe modifié — tu vas être déconnecté pour des raisons de sécurité.' })
     setTimeout(async () => {
       await supabase.auth.signOut()
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- rechargement complet voulu : session changée
       window.location.href = '/login'
     }, 2500)
   }
@@ -74,6 +75,7 @@ export default function ComptePage() {
       setSuppLoading(false); setSuppErr(j.error || 'La suppression a échoué.'); return
     }
     await supabase.auth.signOut()
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- rechargement complet voulu : session changée
     window.location.assign('/')
   }
 

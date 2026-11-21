@@ -15,7 +15,6 @@ const DISPLAY = "var(--font-titre)"
 
 export default function DuelAccueil() {
   const router = useRouter()
-  const [uid, setUid] = useState('')
   const [qcms, setQcms] = useState<Qcm[]>([])
   const [espaces, setEspaces] = useState<Espace[]>([])
   const [ouverts, setOuverts] = useState<MatchOuvert[]>([])
@@ -48,7 +47,6 @@ export default function DuelAccueil() {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      setUid(user.id)
       const [{ data: q }, { data: e }] = await Promise.all([
         supabase.from('qcm').select('id, titre, matiere').order('created_at', { ascending: false }),
         supabase.from('espaces').select('id, nom').order('ordre'),

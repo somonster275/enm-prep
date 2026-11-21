@@ -166,7 +166,7 @@ export default function CalendrierPage() {
       await chargerPlanning(fluxList)
     }
     init()
-  }, []) // eslint-disable-line
+  }, [])
 
   // Fusion manuel + planning fac
   const tous: EvUnifie[] = useMemo(() => {

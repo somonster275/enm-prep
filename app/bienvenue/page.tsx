@@ -102,11 +102,13 @@ export default function BienvenuePage() {
       // l'étudiant doit se connecter manuellement.
       setDone(true)
       // On laisse 2 s pour lire le message, puis on envoie vers /login.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- rechargement complet voulu : session changée
       setTimeout(() => { window.location.assign('/login') }, 2500)
       return
     }
 
     setDone(true)
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- rechargement complet voulu : session changée
     window.location.assign('/dashboard')
   }
 

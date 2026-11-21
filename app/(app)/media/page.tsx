@@ -98,7 +98,7 @@ export default function MediaPage() {
 
   const toggleVu = async (mediaId: string) => {
     const dejaVu = vues.has(mediaId)
-    setVues(s => { const n = new Set(s); dejaVu ? n.delete(mediaId) : n.add(mediaId); return n })
+    setVues(s => { const n = new Set(s); if (dejaVu) n.delete(mediaId); else n.add(mediaId); return n })
     if (dejaVu) await supabase.from('media_vues').delete().eq('user_id', uid).eq('media_id', mediaId)
     else await supabase.from('media_vues').upsert({ user_id: uid, media_id: mediaId }, { onConflict: 'user_id,media_id' })
   }

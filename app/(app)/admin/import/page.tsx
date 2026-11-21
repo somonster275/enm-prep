@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
 import type { Espace, Module } from '@/types'
 import { activable } from '@/lib/a11y'
 
@@ -197,6 +198,7 @@ async function parseApkg(file: File): Promise<CartePreview[]> {
 }
 
 export default function ImportPage() {
+  const router = useRouter()
   const [etape, setEtape] = useState<Etape>('upload')
   const [cartes, setCartes] = useState<CartePreview[]>([])
   const [erreur, setErreur] = useState('')
@@ -477,7 +479,7 @@ export default function ImportPage() {
           </div>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
             <button style={btnS} onClick={reset}>Importer un autre fichier</button>
-            <button style={btnP} onClick={() => window.location.href = '/dashboard'}>Aller au dashboard →</button>
+            <button style={btnP} onClick={() => router.push('/dashboard')}>Aller au dashboard →</button>
           </div>
         </div>
       )}

@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase, ecrire } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
 
 const RETENTION_JOURS = 30
 const MS_JOUR = 24 * 60 * 60 * 1000
@@ -25,7 +24,6 @@ type FicheSupprimee = {
 
 export default function CorbeillePage() {
   const [maintenant] = useState(Date.now) // heure figée au montage : un rendu doit rester pur
-  const router = useRouter()
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
   const [modules, setModules] = useState<ModuleSupprime[]>([])
   const [fiches, setFiches] = useState<FicheSupprimee[]>([])

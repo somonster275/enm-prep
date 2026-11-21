@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 62).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 63).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -125,6 +125,13 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 
 ## Journal des sessions
 
+### 2026-11-21 (suite 63) — ESLint : 22 avertissements → 0 (`npx eslint .` est propre)
+- Variables/imports inutilisés supprimés ; directives eslint-disable devenues inutiles retirées ; ternaires utilisés
+  comme instructions (`n.has(x) ? n.delete(x) : n.add(x)`) réécrits en if/else.
+- `window.location` après (dé)connexion (compte, bienvenue, TopNav) : gardé exprès (rechargement complet = session et
+  état client remis à zéro), avec eslint-disable commenté. Import : « Aller au dashboard » passe par `router.push`.
+- drive : effet au montage seulement, eslint-disable exhaustive-deps commenté (même convention que le reste).
+
 ### 2026-11-21 (suite 62) — ESLint : 74 erreurs → 0
 - `react-hooks/set-state-in-effect` désactivée dans `eslint.config.mjs` (23 cas = charger() au montage / remise à
   zéro sur changement de filtre : schéma voulu). Toutes les autres erreurs corrigées dans le code :
@@ -134,7 +141,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   - `Date.now()` pendant le rendu → `const [maintenant] = useState(Date.now)` (actualités, corbeille, dashboard,
     DuelAsync) ; NotifCloche le recalcule à chaque ouverture ; TuteurChat = faux positif (gestionnaire), disable commenté.
   - `finir` (duel/[code]) et `chargerCorrection` (DuelAsync) déclarées avant l'effet qui les utilise.
-- Restent 22 avertissements (non traités).
+- Les 22 avertissements restants traités en suite 63.
 
 ### 2026-11-21 (suite 61) — Tests Playwright (e2e) + skills app-building
 - **`npm run test:e2e`** (`@playwright/test` 1.63, version du navigateur préinstallé dans le cloud ; en local :

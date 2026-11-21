@@ -87,14 +87,13 @@ export default function QcmPage() {
     if (!id) return
     supabase.from('qcm').select('id, titre, matiere, type').eq('id', id).maybeSingle()
       .then(({ data }) => { if (data) jouer(data as Qcm) })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const toggle = (qid: string, oi: number, multi: boolean) => {
     if (valides.has(qid)) return
     setReponses(r => {
       const cur = new Set(r[qid] || [])
-      if (multi) { cur.has(oi) ? cur.delete(oi) : cur.add(oi) }
+      if (multi) { if (cur.has(oi)) cur.delete(oi); else cur.add(oi) }
       else { cur.clear(); cur.add(oi) }
       return { ...r, [qid]: cur }
     })

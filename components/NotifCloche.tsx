@@ -41,7 +41,7 @@ export default function NotifCloche() {
         .subscribe()
     }
     const desabonner = () => { if (canal) { supabase.removeChannel(canal); canal = null } }
-    const onVis = () => { document.visibilityState === 'visible' ? sabonner() : desabonner() }
+    const onVis = () => { if (document.visibilityState === 'visible') sabonner(); else desabonner() }
 
     if (document.visibilityState === 'visible') sabonner()
     document.addEventListener('visibilitychange', onVis)

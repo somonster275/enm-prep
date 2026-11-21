@@ -103,6 +103,7 @@ export default function DrivePage() {
       if (g === 'config') setGErreur("Google Drive n'est pas encore configuré côté serveur.")
       window.history.replaceState({}, '', '/drive')
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- au montage seulement
   }, [])
 
   const ajouter = async () => {

@@ -9,7 +9,6 @@ export default function NotesWidget({ titre = 'Mes tâches' }: { titre?: string 
   const [userId, setUserId] = useState('')
   const [texte, setTexte] = useState('')
   const font = "var(--font-texte)"
-  const coral = '#A3122A'
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {

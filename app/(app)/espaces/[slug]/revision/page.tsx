@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase, toutesLesLignes, progressionDe } from '@/lib/supabase'
 import { useParams, useSearchParams } from 'next/navigation'
-import type { Fiche, Progression, Espace, Module } from '@/types'
+import type { Fiche, Progression, Espace } from '@/types'
 import { NIVEAUX, PALIER_MAX, prochaineRevision, intervalleMinutes, palierApres, formatIntervalle, estDue } from '@/lib/spaced-repetition'
 import Link from 'next/link'
 import RichContent from '@/components/RichContent'

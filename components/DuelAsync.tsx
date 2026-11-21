@@ -73,7 +73,7 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
 
   const choisir = (oi: number, multi: boolean) => {
     if (verrou) return
-    setSelection(s => { const n = new Set(s); if (multi) { n.has(oi) ? n.delete(oi) : n.add(oi) } else { n.clear(); n.add(oi) } return n })
+    setSelection(s => { const n = new Set(s); if (multi) { if (n.has(oi)) n.delete(oi); else n.add(oi) } else { n.clear(); n.add(oi) } return n })
   }
 
   const valider = async () => {
@@ -107,7 +107,7 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
     setIdx(n); setSelection(new Set()); setVerrou(false); setDeplie(new Set())
   }
 
-  const basculer = (cle: string) => setDeplie(s => { const n = new Set(s); n.has(cle) ? n.delete(cle) : n.add(cle); return n })
+  const basculer = (cle: string) => setDeplie(s => { const n = new Set(s); if (n.has(cle)) n.delete(cle); else n.add(cle); return n })
 
   const moi = joueurs.find(j => j.user_id === uid)
   const adversaires = joueurs.filter(j => j.user_id !== uid)

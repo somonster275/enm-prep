@@ -45,7 +45,7 @@ export default function SalleDuel() {
   // Options dépliées (texte intégral) dans le débrief, clé « questionIdx-optionIdx ».
   const [deplie, setDeplie] = useState<Set<string>>(new Set())
   const basculerDeplie = (cle: string) => setDeplie(s => {
-    const n = new Set(s); n.has(cle) ? n.delete(cle) : n.add(cle); return n
+    const n = new Set(s); if (n.has(cle)) n.delete(cle); else n.add(cle); return n
   })
 
   // Le score est calculé par le serveur. Côté client on garde juste de quoi
@@ -223,7 +223,7 @@ export default function SalleDuel() {
     if (verrou) return
     setSelection(s => {
       const n = new Set(s)
-      if (multi) { n.has(oi) ? n.delete(oi) : n.add(oi) } else { n.clear(); n.add(oi) }
+      if (multi) { if (n.has(oi)) n.delete(oi); else n.add(oi) } else { n.clear(); n.add(oi) }
       return n
     })
   }
@@ -431,7 +431,7 @@ export default function SalleDuel() {
                   <span
                     role="button"
                     tabIndex={0}
-                    onClick={e => { e.stopPropagation(); setDeplieJeu(s => { const n = new Set(s); n.has(oi) ? n.delete(oi) : n.add(oi); return n }) }}
+                    onClick={e => { e.stopPropagation(); setDeplieJeu(s => { const n = new Set(s); if (n.has(oi)) n.delete(oi); else n.add(oi); return n }) }}
                     style={{ display: 'inline-block', marginTop: 6, fontSize: 12, fontWeight: 700, color: '#B8860B', cursor: 'pointer' }}
                   >
                     {ouvert ? '  ▲ Réduire' : '  ▼ Voir toute la carte'}
