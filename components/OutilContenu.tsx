@@ -6,6 +6,7 @@ import type { Espace } from '@/types'
 import TagsInput from '@/components/TagsInput'
 import TagsEditeur from '@/components/TagsEditeur'
 import { lienSur } from '@/lib/url-publique'
+import TelechargerPerso from '@/components/TelechargerPerso'
 
 type Props = {
   table: string            // 'mindmaps' | 'medias' | 'qcm'
@@ -229,6 +230,8 @@ export default function OutilContenu({ table, accent, titre, description, withTy
                 </div>
                 <TagsEditeur table={table} id={it.id} initial={it.tags} accent={accent} canEdit={isAdmin} />
               </div>
+              {/* shortcut: une requête par élément pour savoir s'il est déjà copié, à grouper si la liste dépasse ~100 */}
+              {table === 'mindmaps' && <TelechargerPerso type="mindmap" id={it.id} />}
               {isAdmin && (
                 <button onClick={() => supprimer(it.id)} style={{
                   padding: '6px 12px', borderRadius: 8, background: 'var(--c-accent-pale)', color: 'var(--c-accent)',

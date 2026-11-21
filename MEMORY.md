@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-20 (suite 52).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 53).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,29 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-21 (suite 53) — « Mon espace » façon Anki : étapes 1 à 3 (copies perso)
+- **Plan validé avec l'utilisateur (6 étapes)** : 1 copie perso des fiches · 2 mises à jour de l'admin
+  (option « 3b » : prévenu, choisit de récupérer ; ses éléments modifiés sont gardés) · 3 tous les contenus
+  (QCM, cours, mind maps) · 4 app installable (PWA) · 5 hors ligne + synchro · 6 partage/export.
+  Choix : synchro sur le compte (pas local seul), progression repartie de zéro sur une copie, lecture directe
+  ET téléchargement coexistent. **Étapes 1-3 faites (branche), 4-6 à faire.**
+- Migration **`0048_espace_perso.sql`** (À EXÉCUTER) : `perso_modules` (source_type module|qcm|mindmap + source_id),
+  `perso_elements` (type fiche|qcm_question|cours|mindmap, `contenu` = version étudiant, `origine` = version
+  officielle au dernier téléchargement/màj, `supprime` = tombstone pour ne pas reproposer), `perso_progression`
+  (même forme que `progression`, fiche_id = id d'élément perso). RLS : chacun son espace.
+- `lib/espace-perso.ts` : `contenuOfficiel` (un module emporte ses sous-modules : fiches + cours),
+  `telecharger` (réutilise une copie existante), `calculerNouveautes` (pur, testé dans `tests/espace-perso.test.ts`),
+  `appliquerNouveautes`. « Modifié » = `contenu ≠ origine` (comparaison à clés triées). `getAllModuleIds` déplacé ici
+  depuis la page de révision.
+- UI : `components/TelechargerPerso.tsx` (page module, QCM en cours, liste des mind maps) ; `/mon-espace` (liste)
+  et `/mon-espace/[id]` (aperçu, modifier, supprimer, + fiche / + question, badges Modifié / Ajouté par toi /
+  Retiré de l'original, « Rétablir l'original », « Garder », bandeau « Récupérer » la mise à jour) ; lien TopNav.
+- Réutilisation plutôt que duplication : révision via `/espaces/mon-espace/revision?perso=<id>` (table
+  `perso_progression`, édition dans `perso_elements`) ; QCM via `/qcm?perso=<id>` (n'écrit pas dans
+  `qcm_reponses`/`qcm_resultats`).
+- Pas fait : créer un module perso vide, ajouter ses propres fichiers (cours/mind maps : seuls titre et notes
+  sont modifiables), renommer une copie.
 
 ### 2026-11-20 (suite 52) — Refonte design : fin du nettoyage des emoji (admin + pages restantes)
 - `main` à jour jusqu'à `49f5c11` (poussé sur demande). Ce lot : sur la branche.

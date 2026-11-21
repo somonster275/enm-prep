@@ -14,24 +14,8 @@ import { enregistrerActivite, chargerActivite, calculerStreak, chargerPauses } f
 import { nouvellesRestantes, marquerNouvellesVues } from '@/lib/nouvelles-cartes'
 import { melange } from '@/lib/aleatoire'
 import { useIsMobile } from '@/lib/useIsMobile'
+import { getAllModuleIds, type Contenu } from '@/lib/espace-perso'
 
-// Tous les IDs de modules descendants d'un module (lui inclus). UNE seule requête :
-// on charge la carte parent→enfants puis on descend l'arbre en mémoire (évite le N+1).
-async function getAllModuleIds(rootId: string): Promise<string[]> {
-  const { data } = await supabase.from('modules').select('id, parent_id').is('deleted_at', null)
-  const enfantsDe = new Map<string, string[]>()
-  for (const m of (data || []) as { id: string; parent_id: string | null }[]) {
-    if (m.parent_id) { const l = enfantsDe.get(m.parent_id) || []; l.push(m.id); enfantsDe.set(m.parent_id, l) }
-  }
-  const ids: string[] = []
-  const pile = [rootId]
-  while (pile.length) {
-    const cur = pile.pop()!
-    ids.push(cur)
-    for (const c of enfantsDe.get(cur) || []) pile.push(c)
-  }
-  return ids
-}
 
 export default function RevisionPage() {
   const { slug } = useParams()
@@ -41,6 +25,8 @@ export default function RevisionPage() {
   const mixte = searchParams.get('mixte') === '1' // révision transversale (entrelacement)
   const carnet = searchParams.get('carnet') === '1' // carnet d'erreurs : fiches mal notées
   const favoris = searchParams.get('favoris') === '1' // révision des fiches favorites
+  const perso = searchParams.get('perso') // copie « Mon espace » : fiches et progression perso
+  const tableProg = perso ? 'perso_progression' : 'progression'
 
   const [espace, setEspace] = useState<Espace | null>(null)
   const [moduleLabel, setModuleLabel] = useState<string | null>(null)
@@ -144,29 +130,44 @@ export default function RevisionPage() {
         return
       }
 
-      const { data: esp } = await supabase.from('espaces').select('*').eq('slug', slug).single()
-      if (!esp) return
-      setEspace(esp)
-
-      let modIds: string[]
-
-      if (moduleFilter) {
-        // Révision d'un module spécifique (+ ses sous-modules)
-        const { data: mod } = await supabase.from('modules').select('nom').eq('id', moduleFilter).single()
-        setModuleLabel(mod?.nom ?? null)
-        modIds = await getAllModuleIds(moduleFilter)
+      let fichList: Fiche[]
+      if (perso) {
+        const { data: pm } = await supabase.from('perso_modules').select('nom').eq('id', perso).maybeSingle()
+        if (!pm) { setLoaded(true); return }
+        setEspace({ id: '', nom: 'Mon espace', slug: '', description: '', couleur: '#A3122A', ordre: 0 } as Espace)
+        setModuleLabel(pm.nom)
+        const { data: els } = await toutesLesLignes<{ id: string; contenu: Contenu; created_at: string }>((de, a) =>
+          supabase.from('perso_elements').select('id, contenu, created_at')
+            .eq('perso_module_id', perso).eq('type', 'fiche').eq('supprime', false).order('id').range(de, a))
+        fichList = els.map(e => ({
+          id: e.id, module_id: perso, question: String(e.contenu.question ?? ''), reponse: String(e.contenu.reponse ?? ''),
+          tags: (e.contenu.tags as string[]) ?? [], created_at: e.created_at,
+        }))
       } else {
-        // Révision de tout l'espace
-        const { data: mods } = await supabase.from('modules').select('id').eq('espace_id', esp.id).is('deleted_at', null)
-        modIds = (mods || []).map((m: { id: string }) => m.id)
+        const { data: esp } = await supabase.from('espaces').select('*').eq('slug', slug).single()
+        if (!esp) return
+        setEspace(esp)
+
+        let modIds: string[]
+
+        if (moduleFilter) {
+          // Révision d'un module spécifique (+ ses sous-modules)
+          const { data: mod } = await supabase.from('modules').select('nom').eq('id', moduleFilter).single()
+          setModuleLabel(mod?.nom ?? null)
+          modIds = await getAllModuleIds(moduleFilter)
+        } else {
+          // Révision de tout l'espace
+          const { data: mods } = await supabase.from('modules').select('id').eq('espace_id', esp.id).is('deleted_at', null)
+          modIds = (mods || []).map((m: { id: string }) => m.id)
+        }
+
+        if (modIds.length === 0) { setLoaded(true); return }
+
+        const { data: fich } = await supabase.from('fiches').select('*').in('module_id', modIds).is('deleted_at', null).eq('suspendu', false)
+        fichList = (fich || []) as Fiche[]
       }
 
-      if (modIds.length === 0) { setLoaded(true); return }
-
-      const { data: fich } = await supabase.from('fiches').select('*').in('module_id', modIds).is('deleted_at', null).eq('suspendu', false)
-      const fichList = fich || []
-
-      const { data: prog, error: errProg } = await supabase.from('progression').select('*')
+      const { data: prog, error: errProg } = await supabase.from(tableProg).select('*')
         .eq('utilisateur_id', user.id)
         .in('fiche_id', fichList.map((f: Fiche) => f.id))
       if (errProg) { setErreurChargement(true); return }
@@ -197,7 +198,7 @@ export default function RevisionPage() {
       setLoaded(true)
     }
     load()
-  }, [slug, modeAlea, moduleFilter, mixte, carnet, favoris])
+  }, [slug, modeAlea, moduleFilter, mixte, carnet, favoris, perso, tableProg])
 
   // En dessous de ce seuil, la carte revient dans la session en cours (1 min, 15 min…).
   const SEUIL_REQUEUE = 30 // minutes
@@ -229,7 +230,7 @@ export default function RevisionPage() {
       prochaine_revision: nextRev.toISOString(),
       derniere_revision: new Date().toISOString()
     }
-    const { error } = await supabase.from('progression').upsert(prog, { onConflict: 'utilisateur_id,fiche_id' })
+    const { error } = await supabase.from(tableProg).upsert(prog, { onConflict: 'utilisateur_id,fiche_id' })
     if (error) {
       // On reste sur la carte : l'étudiant peut renoter une fois la connexion revenue.
       setToast('Note non enregistrée — vérifie ta connexion et renote la carte')
@@ -261,8 +262,8 @@ export default function RevisionPage() {
     if (!lastAction || !userId) return
     const { ficheId, prevProg, idxBefore, requeued, bouton, etaitNouvelle } = lastAction
     const { error } = prevProg
-      ? await supabase.from('progression').upsert(prevProg, { onConflict: 'utilisateur_id,fiche_id' })
-      : await supabase.from('progression').delete().eq('utilisateur_id', userId).eq('fiche_id', ficheId)
+      ? await supabase.from(tableProg).upsert(prevProg, { onConflict: 'utilisateur_id,fiche_id' })
+      : await supabase.from(tableProg).delete().eq('utilisateur_id', userId).eq('fiche_id', ficheId)
     if (error) {
       setToast('Annulation non enregistrée — vérifie ta connexion et réessaie')
       setTimeout(() => setToast(null), 4000)
@@ -312,7 +313,9 @@ export default function RevisionPage() {
   const sauvegarderEdition = async () => {
     const c = deck[idx]
     if (!c) return
-    const { error } = await supabase.from('fiches').update({ question: editQ, reponse: editR }).eq('id', c.id)
+    const { error } = perso
+      ? await supabase.from('perso_elements').update({ contenu: { question: editQ, reponse: editR, tags: c.tags ?? [] } }).eq('id', c.id)
+      : await supabase.from('fiches').update({ question: editQ, reponse: editR }).eq('id', c.id)
     if (error) return
     setDeck(d => d.map((f, i) => i === idx ? { ...f, question: editQ, reponse: editR } : f))
     setEditing(false)
@@ -325,7 +328,9 @@ export default function RevisionPage() {
     }
   }, [done, userId])
 
-  const retourHref = carnet
+  const retourHref = perso
+    ? `/mon-espace/${perso}`
+    : carnet
     ? '/carnet'
     : (mixte || favoris)
       ? '/espaces'
@@ -350,7 +355,7 @@ export default function RevisionPage() {
     // maintenant. C'est un état DÉSIRABLE (≠ espace vide) : on félicite au lieu de
     // resservir tout le deck, et on propose de réviser quand même en option.
     const aJour = fichesExistent && !carnet && !favoris && !modeAlea
-    const reviseToutHref = `/espaces/${slug}/revision?mode=tout${moduleFilter ? `&module=${moduleFilter}` : ''}`
+    const reviseToutHref = `/espaces/${slug}/revision?mode=tout${moduleFilter ? `&module=${moduleFilter}` : ''}${perso ? `&perso=${perso}` : ''}`
     return (
     <div style={{ padding: '3rem', textAlign: 'center', maxWidth: 480, margin: '0 auto', fontFamily: font }}>
       <h2 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 30, letterSpacing: '-.015em', margin: '0 0 10px' }}>{aJour ? 'Tu es à jour !' : 'Aucune fiche à réviser'}</h2>
@@ -493,7 +498,7 @@ export default function RevisionPage() {
             {prog && <span style={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }} title="Échelon dans l'échelonnage">Échelon {Math.min(prog.palier ?? 0, PALIER_MAX)} sur {PALIER_MAX}</span>}
           </div>
           <div style={{ padding: '1.5rem 1.75rem 56px 52px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          {isAdmin ? (
+          {isAdmin || perso ? (
             <button onClick={e => { e.stopPropagation(); ouvrirEdition() }} style={{
               position: 'absolute', bottom: 10, right: 12, padding: '4px 10px', borderRadius: 4,
               background: 'transparent', color: 'var(--c-annotation)', border: '1px solid var(--c-filet-fort)',

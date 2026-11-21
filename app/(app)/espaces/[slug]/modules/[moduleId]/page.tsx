@@ -12,6 +12,7 @@ import { nettoyerTags } from '@/lib/tags'
 import RemarqueButton from '@/components/RemarqueButton'
 import AstucesFiche from '@/components/AstucesFiche'
 import FavoriButton from '@/components/FavoriButton'
+import TelechargerPerso from '@/components/TelechargerPerso'
 
 export default function ModulePage() {
   const { slug, moduleId } = useParams() as { slug: string; moduleId: string }
@@ -268,6 +269,7 @@ export default function ModulePage() {
             }}>
               Mode aléatoire
             </Link>
+            <TelechargerPerso type="module" id={moduleId} />
 
             {isAdmin && (
               <button onClick={() => { setShowMove(v => !v); setConfirmDeleteModule(false) }} style={{

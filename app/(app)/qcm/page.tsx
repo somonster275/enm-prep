@@ -1,9 +1,11 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { enregistrerActivite } from '@/lib/streaks'
 import { reponseCorrecte } from '@/lib/qcm-parse'
 import { melange } from '@/lib/aleatoire'
+import TelechargerPerso from '@/components/TelechargerPerso'
 
 type Qcm = { id: string; titre: string; matiere: string | null; type?: string }
 type Question = {
@@ -17,6 +19,8 @@ export default function QcmPage() {
   const [loading, setLoading] = useState(true)
   const [filtre, setFiltre] = useState('')
   const [nbErreurs, setNbErreurs] = useState(0)
+  const router = useRouter()
+  const [perso, setPerso] = useState<string | null>(null) // id d'une copie « Mon espace » jouée (?perso=)
 
   const [actif, setActif] = useState<Qcm | null>(null)
   const [modeErreurs, setModeErreurs] = useState(false)
@@ -63,7 +67,22 @@ export default function QcmPage() {
 
   // Lien profond : /qcm?id=<qcmId> ouvre directement ce QCM (utilisé par « Approfondir »).
   useEffect(() => {
-    const id = new URLSearchParams(window.location.search).get('id')
+    const params = new URLSearchParams(window.location.search)
+    const pid = params.get('perso')
+    if (pid) {
+      // Copie perso : mêmes questions, lues dans perso_elements ; rien n'est écrit dans les tables officielles.
+      Promise.all([
+        supabase.from('perso_modules').select('id, nom').eq('id', pid).maybeSingle(),
+        supabase.from('perso_elements').select('id, contenu, ordre').eq('perso_module_id', pid)
+          .eq('type', 'qcm_question').eq('supprime', false).order('ordre').order('created_at'),
+      ]).then(([{ data: pm }, { data: els }]) => {
+        if (!pm) return
+        setQuestions((els || []).map(e => ({ ...e.contenu, id: e.id, qcm_id: pid, ordre: e.ordre }) as Question))
+        setReponses({}); setSaisies({}); setValides(new Set()); setPerso(pid); setActif({ id: pid, titre: pm.nom, matiere: null })
+      })
+      return
+    }
+    const id = params.get('id')
     if (!id) return
     supabase.from('qcm').select('id, titre, matiere, type').eq('id', id).maybeSingle()
       .then(({ data }) => { if (data) jouer(data as Qcm) })
@@ -101,7 +120,7 @@ export default function QcmPage() {
   // Finalisation quand toutes les questions sont validées : score global + activité.
   const finaliser = async () => {
     if (!uid) return
-    if (actif) await supabase.from('qcm_resultats').insert({ user_id: uid, qcm_id: actif.id, score, total: questions.length })
+    if (actif && !perso) await supabase.from('qcm_resultats').insert({ user_id: uid, qcm_id: actif.id, score, total: questions.length })
     enregistrerActivite(uid) // compte dans l'activité / la série
     chargerErreurs(uid)
     window.scrollTo({ top: 0 })
@@ -112,7 +131,7 @@ export default function QcmPage() {
     if (valides.has(q.id) || !aRepondu(q)) return
     const next = new Set(valides); next.add(q.id)
     setValides(next)
-    if (uid) {
+    if (uid && !perso) {
       const { error } = await supabase.from('qcm_reponses').upsert(
         [{ user_id: uid, question_id: q.id, qcm_id: q.qcm_id, juste: estBonne(q) }],
         { onConflict: 'user_id,question_id' }
@@ -126,7 +145,7 @@ export default function QcmPage() {
   const font = "var(--font-texte)"
   const matieres = [...new Set(qcms.map(q => q.matiere).filter(Boolean))] as string[]
   const visibles = filtre ? qcms.filter(q => q.matiere === filtre) : qcms
-  const retour = () => { setActif(null); setModeErreurs(false) }
+  const retour = () => { if (perso) { router.push(`/mon-espace/${perso}`); return } setActif(null); setModeErreurs(false) }
   const recommencer = () => { setReponses({}); setSaisies({}); setValides(new Set()); window.scrollTo({ top: 0 }) }
 
   // Bouton « Valider » d'une question (réutilisé pour libre et choix multiples).
@@ -142,9 +161,10 @@ export default function QcmPage() {
   if (actif || modeErreurs) {
     return (
       <div style={{ paddingTop: 34, maxWidth: 720, margin: '0 auto', fontFamily: font, color: 'var(--c-encre)' }}>
-        <button onClick={retour} style={{ background: 'none', border: 'none', color: 'var(--c-annotation-clair)', fontSize: 13, cursor: 'pointer', padding: 0, marginBottom: 12 }}>← Tous les QCM</button>
+        <button onClick={retour} style={{ background: 'none', border: 'none', color: 'var(--c-annotation-clair)', fontSize: 13, cursor: 'pointer', padding: 0, marginBottom: 12 }}>{perso ? '← Mon espace' : '← Tous les QCM'}</button>
         <h1 style={{ fontFamily: "var(--font-titre)", fontWeight: 'var(--titre-poids)', fontSize: 24, margin: '0 0 4px' }}>{actif ? actif.titre : 'Mes erreurs'}</h1>
         {actif?.matiere && <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginBottom: 16 }}>{actif.matiere}</div>}
+        {actif && !perso && <div style={{ marginBottom: 16 }}><TelechargerPerso type="qcm" id={actif.id} /></div>}
         {modeErreurs && <div style={{ fontSize: 13, color: 'var(--c-annotation)', marginBottom: 16 }}>Rejoue les questions que tu as déjà ratées. Une bonne réponse les retire de ta liste.</div>}
 
         {tousValides && (
@@ -226,7 +246,7 @@ export default function QcmPage() {
         {tousValides ? (
           <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
             <button onClick={recommencer} style={{ flex: 1, height: 48, border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, background: '#FFFEFB', color: 'var(--c-texte-doux)', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>Recommencer</button>
-            <button onClick={retour} style={{ flex: 1, height: 48, border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>Autres QCM</button>
+            <button onClick={retour} style={{ flex: 1, height: 48, border: 'none', borderRadius: 6, background: 'var(--c-accent)', color: '#fff', fontSize: 14.5, fontWeight: 700, cursor: 'pointer', fontFamily: font }}>{perso ? 'Mon espace' : 'Autres QCM'}</button>
           </div>
         ) : (
           <div style={{ marginTop: 18, textAlign: 'center', fontSize: 13, color: 'var(--c-annotation-clair)' }}>

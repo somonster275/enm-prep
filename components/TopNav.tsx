@@ -63,6 +63,7 @@ export default function TopNav() {
   const liens: { href: string; label: string }[] = [
     { href: '/dashboard', label: 'Accueil' },
     { href: '/espaces', label: 'Espaces' },
+    { href: '/mon-espace', label: 'Mon espace' },
     { href: '/actualites', label: 'Actualités' },
   ]
   // Ressources pédagogiques (regroupées sous « Ressources »).
