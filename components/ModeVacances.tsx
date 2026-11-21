@@ -91,8 +91,8 @@ export default function ModeVacances({ onChange }: { onChange?: () => void }) {
     return (
       <div style={{ ...boxStyle, background: '#EAF7F0', border: '1px solid #BFE6CF', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 240px' }}>
-          <div style={{ fontSize: 14.5, fontWeight: 600, color: '#0F6E56' }}>En pause jusqu'au {formatFr(enCours.fin)}</div>
-          <div style={{ fontSize: 13, color: '#4E6A5C', marginTop: 1 }}>Ta série est protégée — profite de ta pause, tes flammes t'attendent.</div>
+          <div style={{ fontSize: 14.5, fontWeight: 600, color: '#0F6E56' }}>En pause jusqu&apos;au {formatFr(enCours.fin)}</div>
+          <div style={{ fontSize: 13, color: '#4E6A5C', marginTop: 1 }}>Ta série est protégée — profite de ta pause, tes flammes t&apos;attendent.</div>
         </div>
         <button onClick={() => reprendre(enCours.id)} style={{ ...boutonLeger, color: '#0F6E56', borderColor: '#BFE6CF' }}>Reprendre maintenant</button>
       </div>

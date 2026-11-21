@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase, ecrire, progressionDe } from '@/lib/supabase'
-import type { Espace, Module, Fiche, Profil } from '@/types'
+import type { Espace, Module, Fiche, Profil, Progression } from '@/types'
 import { scoreGlobal, estDue } from '@/lib/spaced-repetition'
 import Link from 'next/link'
 import RichContent from '@/components/RichContent'
@@ -23,7 +23,7 @@ export default function ModulePage() {
   const [sousModules, setSousModules] = useState<Module[]>([])
   const [fiches, setFiches] = useState<Fiche[]>([])
   const [cours, setCours] = useState<{ id: string; titre: string; type: string | null }[]>([])
-  const [progressions, setProgressions] = useState<any[]>([])
+  const [progressions, setProgressions] = useState<Progression[]>([])
   const [profil, setProfil] = useState<Profil | null>(null)
   const [favSet, setFavSet] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
@@ -321,7 +321,7 @@ export default function ModulePage() {
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--c-annotation)', display: 'block', marginBottom: 5 }}>Module parent (optionnel)</label>
                 <select value={moveParentId} onChange={e => setMoveParentId(e.target.value)}
                   style={{ ...inputStyle, width: '100%', boxSizing: 'border-box' } as React.CSSProperties}>
-                  <option value="">— Racine de l'espace —</option>
+                  <option value="">— Racine de l&apos;espace —</option>
                   {parentOptions.map(m => <option key={m.id} value={m.id}>{m.nom}</option>)}
                 </select>
               </div>

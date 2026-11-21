@@ -139,7 +139,7 @@ export default function EspacePage() {
         })}
         {modules.length === 0 && (
           <div style={{ fontSize: 14, color: 'var(--c-annotation-clair)', padding: '1rem 0' }}>
-            Aucun module dans cette matière. Créez-en depuis l'éditeur.
+            Aucun module dans cette matière. Créez-en depuis l&apos;éditeur.
           </div>
         )}
       </div>
@@ -187,7 +187,7 @@ export default function EspacePage() {
             </div>
             {items.length === 0 ? (
               <div style={{ fontSize: 13, color: 'var(--c-annotation-clair)', padding: '0.5rem 0' }}>
-                Aucun contenu dans cette matière pour l'instant.
+                Aucun contenu dans cette matière pour l&apos;instant.
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

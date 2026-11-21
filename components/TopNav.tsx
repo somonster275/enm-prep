@@ -26,8 +26,9 @@ export default function TopNav() {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      let { data: prof, error } = await supabase.from('profils').select('*').eq('id', user.id).maybeSingle()
+      const { data, error } = await supabase.from('profils').select('*').eq('id', user.id).maybeSingle()
       if (error) return // lecture en échec ≠ profil absent : ne pas tenter de le recréer
+      let prof = data
       if (!prof) {
         const { data: newProf } = await supabase.from('profils').insert({
           id: user.id, email: user.email, role: 'lecteur'

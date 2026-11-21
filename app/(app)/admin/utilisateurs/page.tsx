@@ -120,7 +120,7 @@ export default function AdminUtilisateurs() {
       setTimeout(() => setMessage(''), 4000)
       return
     }
-    setUtilisateurs(u => u.map(p => p.id === id ? { ...p, role: newRole as any } : p))
+    setUtilisateurs(u => u.map(p => p.id === id ? { ...p, role: newRole as Profil['role'] } : p))
   }
 
   return (
@@ -176,7 +176,7 @@ export default function AdminUtilisateurs() {
           </div>
           <div>
             <label style={{ fontSize: 12, display: 'block', marginBottom: 4, color: '#555' }}>Rôle</label>
-            <select value={role} onChange={e => setRole(e.target.value as any)}
+            <select value={role} onChange={e => setRole(e.target.value as 'editeur' | 'lecteur')}
               style={{ width: '100%', padding: '9px 11px', borderRadius: 8, border: '1px solid #E0E0E0', fontSize: 13, boxSizing: 'border-box' }}>
               <option value="lecteur">Lecteur</option>
               <option value="editeur">Éditeur</option>

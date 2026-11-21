@@ -283,7 +283,7 @@ export default function Editeur() {
                 </div>
               )}
               {!moduleId && modules.length === 0 && (
-                <p style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginTop: 8 }}>Cet espace n'a pas encore de module. Créez-en un pour ajouter des fiches.</p>
+                <p style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginTop: 8 }}>Cet espace n&apos;a pas encore de module. Créez-en un pour ajouter des fiches.</p>
               )}
             </div>
           )}

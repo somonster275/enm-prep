@@ -133,7 +133,7 @@ export default function OutilContenu({ table, accent, titre, description, withTy
 
       {tableManquante && (
         <div style={{ fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '12px 16px', borderRadius: 6, marginBottom: 24 }}>
-          La table <strong>{table}</strong> n'existe pas encore dans Supabase. Exécute le SQL fourni pour activer cet outil.
+          La table <strong>{table}</strong> n&apos;existe pas encore dans Supabase. Exécute le SQL fourni pour activer cet outil.
         </div>
       )}
 

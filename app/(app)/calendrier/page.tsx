@@ -303,7 +303,7 @@ export default function CalendrierPage() {
 
       {tableManquante && (
         <div style={{ fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '14px 18px', borderRadius: 6, marginBottom: 24 }}>
-          La table <strong>evenements</strong> n'existe pas encore. Exécute le SQL ci-dessous dans Supabase.
+          La table <strong>evenements</strong> n&apos;existe pas encore. Exécute le SQL ci-dessous dans Supabase.
           <pre style={{ marginTop: 10, fontSize: 11, background: '#FFFEFB', padding: 12, borderRadius: 8, overflowX: 'auto', color: 'var(--c-encre)' }}>{`CREATE TABLE evenements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   titre TEXT NOT NULL,
@@ -330,12 +330,12 @@ CREATE POLICY "ev_write" ON evenements FOR ALL TO authenticated
         <div style={{ background: '#FFFEFB', border: '1px solid #DDD6FE', borderRadius: 6, padding: 20, marginBottom: 24 }}>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Flux de planning (fac)</div>
           <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginBottom: 14 }}>
-            Colle l'adresse de ton planning en ligne (extraplanning / IEJ). Les cours s'affichent automatiquement dans le calendrier (lecture seule).
+            Colle l&apos;adresse de ton planning en ligne (extraplanning / IEJ). Les cours s&apos;affichent automatiquement dans le calendrier (lecture seule).
           </div>
 
           {fluxTableManquante ? (
             <div style={{ fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '12px 14px', borderRadius: 6 }}>
-              La table <strong>calendrier_flux</strong> n'existe pas encore. Exécute le SQL ci-dessous dans Supabase.
+              La table <strong>calendrier_flux</strong> n&apos;existe pas encore. Exécute le SQL ci-dessous dans Supabase.
               <pre style={{ marginTop: 10, fontSize: 11, background: '#FFFEFB', padding: 12, borderRadius: 8, overflowX: 'auto', color: 'var(--c-encre)' }}>{`CREATE TABLE calendrier_flux (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   nom TEXT NOT NULL,
@@ -556,7 +556,7 @@ CREATE POLICY "cf_write" ON calendrier_flux FOR ALL TO authenticated
                     {ev.heure && ` · ${ev.heure}`}
                     {ev.lieu && ` · ${ev.lieu}`}
                   </div>
-                  {isEvToday && <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--c-accent)', marginTop: 4 }}>Aujourd'hui</div>}
+                  {isEvToday && <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--c-accent)', marginTop: 4 }}>Aujourd&apos;hui</div>}
                   {!isEvToday && diff <= 7 && <div style={{ fontSize: 11, color: '#E8A11E', fontWeight: 600, marginTop: 4 }}>Dans {diff} jour{diff > 1 ? 's' : ''}</div>}
                 </div>
               )

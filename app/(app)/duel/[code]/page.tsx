@@ -119,6 +119,21 @@ export default function SalleDuel() {
     }).catch(() => { traitees.current.delete(qIdx) }) // réseau KO : on autorise une nouvelle tentative
   }, [match])
 
+  const finir = useCallback(async () => {
+    if (finiRef.current) return
+    finiRef.current = true
+    setFini(true)
+    if (match) {
+      enregistrerActivite(uid)
+      // N'importe quel participant peut demander la clôture : le serveur vérifie
+      // que le temps est écoulé (plus de match « fantôme » si l'hôte quitte).
+      fetch('/api/duel/terminer', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: match.code }),
+      }).catch(() => {})
+    }
+  }, [match, uid])
+
   // --- Horloge synchronisée : l'index de question découle de started_at ---
   useEffect(() => {
     if (!match || match.mode === 'async' || match.statut !== 'en_cours' || !match.started_at) return
@@ -181,20 +196,6 @@ export default function SalleDuel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fini, match?.statut])
 
-  const finir = useCallback(async () => {
-    if (finiRef.current) return
-    finiRef.current = true
-    setFini(true)
-    if (match) {
-      enregistrerActivite(uid)
-      // N'importe quel participant peut demander la clôture : le serveur vérifie
-      // que le temps est écoulé (plus de match « fantôme » si l'hôte quitte).
-      fetch('/api/duel/terminer', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: match.code }),
-      }).catch(() => {})
-    }
-  }, [match, uid])
 
   // --- Actions ---
   const lancer = async () => {

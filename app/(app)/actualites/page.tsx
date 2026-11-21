@@ -18,6 +18,7 @@ const SOURCES_DEFAUT = [
 ]
 
 export default function ActualitesPage() {
+  const [maintenant] = useState(Date.now) // heure figée au montage : un rendu doit rester pur
   const [isAdmin, setIsAdmin] = useState(false)
   const [sources, setSources] = useState<Source[]>([])
   const [articles, setArticles] = useState<Article[]>([])
@@ -110,7 +111,7 @@ export default function ActualitesPage() {
   const formatDate = (iso: string | null) => {
     if (!iso) return ''
     const d = new Date(iso)
-    const diff = Math.round((Date.now() - d.getTime()) / 86400000)
+    const diff = Math.round((maintenant - d.getTime()) / 86400000)
     if (diff === 0) return "Aujourd'hui"
     if (diff === 1) return 'Hier'
     if (diff < 7) return `Il y a ${diff} jours`
@@ -126,7 +127,7 @@ export default function ActualitesPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ fontFamily: display, fontWeight: 'var(--titre-poids)', fontSize: 26 }}>Actualités</div>
           </div>
-          <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '6px 0 0' }}>L'actualité juridique de la semaine, en direct des sites de référence.</p>
+          <p style={{ fontSize: 14, color: 'var(--c-annotation)', margin: '6px 0 0' }}>L&apos;actualité juridique de la semaine, en direct des sites de référence.</p>
         </div>
         {!tableManquante && sources.length > 0 && (
           <button onClick={() => synchroniser(sources)} disabled={sync} style={{
@@ -142,7 +143,7 @@ export default function ActualitesPage() {
 
       {tableManquante && (
         <div style={{ fontSize: 13, color: 'var(--c-accent)', background: 'var(--c-accent-pale)', padding: '14px 18px', borderRadius: 6, marginBottom: 24 }}>
-          La table <strong>sources_actualites</strong> n'existe pas encore. Exécute le SQL ci-dessous dans Supabase.
+          La table <strong>sources_actualites</strong> n&apos;existe pas encore. Exécute le SQL ci-dessous dans Supabase.
           <pre style={{ marginTop: 10, fontSize: 11, background: '#FFFEFB', padding: 12, borderRadius: 8, overflowX: 'auto', color: 'var(--c-encre)' }}>{`CREATE TABLE sources_actualites (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   nom TEXT NOT NULL,
@@ -163,7 +164,7 @@ CREATE POLICY "src_write" ON sources_actualites FOR ALL TO authenticated
         <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: 20, marginBottom: 28 }}>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Sources de flux (RSS)</div>
           <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)', marginBottom: 14 }}>
-            Colle l'adresse du flux RSS d'un site juridique (ex. Dalloz Actualité, Village de la Justice, Conseil constitutionnel…).
+            Colle l&apos;adresse du flux RSS d&apos;un site juridique (ex. Dalloz Actualité, Village de la Justice, Conseil constitutionnel…).
           </div>
 
           {sources.length > 0 && (
@@ -235,7 +236,7 @@ CREATE POLICY "src_write" ON sources_actualites FOR ALL TO authenticated
                   </div>
                   <div style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.35, marginBottom: 8 }}>{a.titre}</div>
                   {a.extrait && <div style={{ fontSize: 13, color: 'var(--c-annotation)', lineHeight: 1.5, flex: 1 }}>{a.extrait}</div>}
-                  <div style={{ fontSize: 12, fontWeight: 600, color: a.couleur, marginTop: 12 }}>Lire l'article →</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: a.couleur, marginTop: 12 }}>Lire l&apos;article →</div>
                 </div>
               </div>
             </a>

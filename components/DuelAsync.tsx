@@ -24,9 +24,10 @@ type Repondu = { juste: boolean; choix: number[]; correct: number[] }
 // immédiat après chaque question (le serveur corrige et verrouille sa réponse).
 // À la fin, comparaison des scores + débrief (mêmes routes serveur que le temps réel).
 export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; uid: string; joueurs: Joueur[] }) {
+  const [maintenant] = useState(Date.now) // heure figée au montage : un rendu doit rester pur
   const router = useRouter()
   const total = match.deck.length
-  const expire = !!match.expire_at && Date.parse(match.expire_at) < Date.now()
+  const expire = !!match.expire_at && Date.parse(match.expire_at) < maintenant
 
   const [answered, setAnswered] = useState<Record<number, Repondu>>({})
   const [idx, setIdx] = useState(0)
@@ -37,6 +38,17 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
   const [correction, setCorrection] = useState<Correction | null>(null)
   const [deplie, setDeplie] = useState<Set<string>>(new Set())
   const initialise = useRef(false)
+
+  const chargerCorrection = async () => {
+    try {
+      const res = await fetch('/api/duel/correction', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: match.code }),
+      })
+      const j = await res.json().catch(() => null)
+      if (res.ok && j) setCorrection(j as Correction)
+    } catch { /* silencieux */ }
+  }
 
   // Reprise : charge les réponses déjà données pour repartir à la 1re question non traitée.
   useEffect(() => {
@@ -58,16 +70,6 @@ export default function DuelAsync({ match, uid, joueurs }: { match: MatchAsync; 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const chargerCorrection = async () => {
-    try {
-      const res = await fetch('/api/duel/correction', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: match.code }),
-      })
-      const j = await res.json().catch(() => null)
-      if (res.ok && j) setCorrection(j as Correction)
-    } catch { /* silencieux */ }
-  }
 
   const choisir = (oi: number, multi: boolean) => {
     if (verrou) return

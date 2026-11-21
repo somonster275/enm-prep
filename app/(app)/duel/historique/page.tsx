@@ -30,7 +30,8 @@ export default function HistoriqueDuels() {
         .order('joined_at', { ascending: false })
         .limit(40)
 
-      const rows = (miennes || []) as any[]
+      type MatchJoint = { titre: string; statut: string; ended_at: string | null; deck: unknown[] | null }
+      const rows = (miennes || []) as { match_id: string; score: number; justes: number; matchs: MatchJoint | MatchJoint[] | null }[]
       if (rows.length === 0) { setLoading(false); return }
 
       // Tous les joueurs de ces matchs, pour calculer le rang et le nb de participants.

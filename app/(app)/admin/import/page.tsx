@@ -237,8 +237,8 @@ export default function ImportPage() {
       if (parsed.length === 0) throw new Error('Aucune carte trouvée dans ce fichier.')
       setCartes(parsed)
       setEtape('preview')
-    } catch (e: any) {
-      setErreur(e.message ?? 'Erreur lors de la lecture du fichier.')
+    } catch (e) {
+      setErreur(e instanceof Error ? e.message : 'Erreur lors de la lecture du fichier.')
     } finally {
       setParsing(false)
     }
@@ -341,7 +341,7 @@ export default function ImportPage() {
             ) : (
               <>
                 <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-encre)', marginBottom: 4 }}>
-                  Glisse le fichier ici ou clique pour l'ouvrir
+                  Glisse le fichier ici ou clique pour l&apos;ouvrir
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--c-annotation-clair)' }}>
                   Formats supportés : <strong>.apkg</strong> · <strong>.txt</strong>
@@ -373,7 +373,7 @@ export default function ImportPage() {
               <strong style={{ color: 'var(--c-encre)' }}>Export .txt</strong><br />
               1. Anki → Fichier → Exporter<br />
               2. Format : <strong>Notes in Plain Text</strong><br />
-              3. Décoche "Inclure les tags"<br />
+              3. Décoche &quot;Inclure les tags&quot;<br />
               4. Clique Exporter
             </div>
           </div>
@@ -450,7 +450,7 @@ export default function ImportPage() {
           <div style={{ ...card, background: 'var(--c-papier-teinte)', border: '1px solid var(--c-filet-fort)' }}>
             <div style={{ fontSize: 14, color: 'var(--c-annotation)' }}>
               <strong style={{ color: 'var(--c-encre)' }}>{cartes.length} cartes</strong> seront importées
-              {moduleId && modules.find(m => m.id === moduleId) && <> dans <strong style={{ color: 'var(--c-encre)' }}>"{modules.find(m => m.id === moduleId)?.nom}"</strong></>}
+              {moduleId && modules.find(m => m.id === moduleId) && <> dans <strong style={{ color: 'var(--c-encre)' }}>&quot;{modules.find(m => m.id === moduleId)?.nom}&quot;</strong></>}
               {espaceId && espaces.find(e => e.id === espaceId) && <> — espace <strong style={{ color: 'var(--c-encre)' }}>{espaces.find(e => e.id === espaceId)?.nom}</strong></>}.
             </div>
           </div>

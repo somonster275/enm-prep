@@ -9,6 +9,10 @@ type Groupe = { cle: string; label: string; couleur: string; items: Res[] }
 
 const stripHtml = (s: string) => (s || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
 
+// Supabase (sans types générés) type les jointures en tableaux ; ce sont des objets (relations « vers un »).
+type LigneFiche = { id: string; question: string; reponse: string; module_id: string; modules: { nom: string; espaces: { nom: string; slug: string } | null } | null }
+type LigneMedia = { id: string; titre: string; description: string | null; url?: string | null; espaces: { nom: string } | null }
+
 export default function RecherchePage() {
   const [q, setQ] = useState('')
   const [groupes, setGroupes] = useState<Groupe[]>([])
@@ -37,23 +41,23 @@ export default function RecherchePage() {
     ])
 
     const g: Groupe[] = []
-    const ff = (fiches.data || []).map((r: any) => ({
+    const ff = (fiches.data as unknown as LigneFiche[] | null || []).map(r => ({
       id: r.id, titre: stripHtml(r.question).slice(0, 140),
       sous: [r.modules?.espaces?.nom, r.modules?.nom].filter(Boolean).join(' › ') || stripHtml(r.reponse).slice(0, 90),
       href: r.modules?.espaces ? `/espaces/${r.modules.espaces.slug}/modules/${r.module_id}` : '#',
     }))
     if (ff.length) g.push({ cle: 'fiches', label: 'Fiches', couleur: '#A3122A', items: ff })
 
-    const qq = (qcms.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'QCM', href: '/qcm' }))
+    const qq = (qcms.data || []).map(r => ({ id: r.id, titre: r.titre, sous: r.matiere || 'QCM', href: '/qcm' }))
     if (qq.length) g.push({ cle: 'qcm', label: 'QCM', couleur: '#E8A11E', items: qq })
 
-    const mm = (medias.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: [r.espaces?.nom, stripHtml(r.description || '').slice(0, 70)].filter(Boolean).join(' · ') || 'Vidéo / audio', href: '/media' }))
+    const mm = (medias.data as unknown as LigneMedia[] | null || []).map(r => ({ id: r.id, titre: r.titre, sous: [r.espaces?.nom, stripHtml(r.description || '').slice(0, 70)].filter(Boolean).join(' · ') || 'Vidéo / audio', href: '/media' }))
     if (mm.length) g.push({ cle: 'media', label: 'Audio & Vidéo', couleur: '#3B82D9', items: mm })
 
-    const aa = (annales.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'Annale', href: '/annales' }))
+    const aa = (annales.data || []).map(r => ({ id: r.id, titre: r.titre, sous: r.matiere || 'Annale', href: '/annales' }))
     if (aa.length) g.push({ cle: 'annales', label: 'Annales', couleur: '#1A56C4', items: aa })
 
-    const pp = (forum.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'Forum', href: '/forum' }))
+    const pp = (forum.data || []).map(r => ({ id: r.id, titre: r.titre, sous: r.matiere || 'Forum', href: '/forum' }))
     if (pp.length) g.push({ cle: 'forum', label: 'Forum', couleur: '#0F6E56', items: pp })
 
     setGroupes(g)
@@ -71,17 +75,17 @@ export default function RecherchePage() {
       supabase.from('cours').select('id, titre, matiere, type').overlaps('tags', tags).limit(15),
     ])
     const g: Groupe[] = []
-    const ff = (fiches.data || []).map((r: any) => ({
+    const ff = (fiches.data as unknown as LigneFiche[] | null || []).map(r => ({
       id: r.id, titre: stripHtml(r.question).slice(0, 140),
       sous: [r.modules?.espaces?.nom, r.modules?.nom].filter(Boolean).join(' › ') || stripHtml(r.reponse).slice(0, 90),
       href: r.modules?.espaces ? `/espaces/${r.modules.espaces.slug}/modules/${r.module_id}` : '#',
     }))
     if (ff.length) g.push({ cle: 'fiches', label: 'Fiches', couleur: '#A3122A', items: ff })
-    const qq = (qcms.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'QCM', href: '/qcm' }))
+    const qq = (qcms.data || []).map(r => ({ id: r.id, titre: r.titre, sous: r.matiere || 'QCM', href: '/qcm' }))
     if (qq.length) g.push({ cle: 'qcm', label: 'QCM', couleur: '#E8A11E', items: qq })
-    const mm = (medias.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.espaces?.nom || 'Vidéo / audio', href: r.url || '/media' }))
+    const mm = (medias.data as unknown as LigneMedia[] | null || []).map(r => ({ id: r.id, titre: r.titre, sous: r.espaces?.nom || 'Vidéo / audio', href: r.url || '/media' }))
     if (mm.length) g.push({ cle: 'media', label: 'Audio & Vidéo', couleur: '#3B82D9', items: mm })
-    const cc = (cours.data || []).map((r: any) => ({ id: r.id, titre: r.titre, sous: r.matiere || 'Cours', href: `/cours?c=${r.id}` }))
+    const cc = (cours.data || []).map(r => ({ id: r.id, titre: r.titre, sous: r.matiere || 'Cours', href: `/cours?c=${r.id}` }))
     if (cc.length) g.push({ cle: 'cours', label: 'Cours', couleur: '#3B82D9', items: cc })
     setGroupes(g)
     setLoading(false)

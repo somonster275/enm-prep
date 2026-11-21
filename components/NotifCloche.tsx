@@ -11,6 +11,7 @@ export default function NotifCloche() {
   const [uid, setUid] = useState('')
   const [items, setItems] = useState<Notif[]>([])
   const [open, setOpen] = useState(false)
+  const [maintenant, setMaintenant] = useState(Date.now) // « il y a X min » : recalculé à chaque ouverture
   const boxRef = useRef<HTMLDivElement>(null)
 
   const charger = async (userId: string) => {
@@ -71,7 +72,7 @@ export default function NotifCloche() {
   }
 
   const tempsRelatif = (s: string) => {
-    const d = (Date.now() - new Date(s).getTime()) / 1000
+    const d = (maintenant - new Date(s).getTime()) / 1000
     if (d < 60) return "à l'instant"
     if (d < 3600) return `il y a ${Math.floor(d / 60)} min`
     if (d < 86400) return `il y a ${Math.floor(d / 3600)} h`
@@ -80,7 +81,7 @@ export default function NotifCloche() {
 
   return (
     <div ref={boxRef} style={{ position: 'relative' }}>
-      <button onClick={() => setOpen(o => !o)} aria-label="Notifications" style={{
+      <button onClick={() => { setMaintenant(Date.now()); setOpen(o => !o) }} aria-label="Notifications" style={{
         width: 36, height: 36, borderRadius: 6, background: 'transparent', border: '1px solid transparent',
         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
       }}>

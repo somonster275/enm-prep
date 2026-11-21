@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 61).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 62).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -124,6 +124,17 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-21 (suite 62) — ESLint : 74 erreurs → 0
+- `react-hooks/set-state-in-effect` désactivée dans `eslint.config.mjs` (23 cas = charger() au montage / remise à
+  zéro sur changement de filtre : schéma voulu). Toutes les autres erreurs corrigées dans le code :
+  - 25 apostrophes/guillemets en JSX → `&apos;` / `&quot;` (rendu identique).
+  - 17 `any` : jointures Supabase typées (`recherche`, `dashboard` : Supabase sans types générés type les relations
+    « vers un » en tableaux → cast `as unknown as LigneX[]`), `Progression[]`, `Profil['role']`, `catch (e)`.
+  - `Date.now()` pendant le rendu → `const [maintenant] = useState(Date.now)` (actualités, corbeille, dashboard,
+    DuelAsync) ; NotifCloche le recalcule à chaque ouverture ; TuteurChat = faux positif (gestionnaire), disable commenté.
+  - `finir` (duel/[code]) et `chargerCorrection` (DuelAsync) déclarées avant l'effet qui les utilise.
+- Restent 22 avertissements (non traités).
 
 ### 2026-11-21 (suite 61) — Tests Playwright (e2e) + skills app-building
 - **`npm run test:e2e`** (`@playwright/test` 1.63, version du navigateur préinstallé dans le cloud ; en local :

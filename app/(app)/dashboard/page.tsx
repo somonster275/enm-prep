@@ -27,6 +27,7 @@ const MESSAGES = [
 ]
 
 export default function Dashboard() {
+  const [maintenant] = useState(Date.now) // heure figée au montage : un rendu doit rester pur
   const [espaces, setEspaces] = useState<Espace[]>([])
   const [progressions, setProgressions] = useState<Progression[]>([])
   const [fiches, setFiches] = useState<{ id: string, espace_id: string, module_id: string }[]>([])
@@ -59,11 +60,11 @@ export default function Dashboard() {
       setEspaces(esp || [])
       setProgressions(prog || [])
       setModulesTotal((mods || []).length)
-      setFiches((fich || []).map((f: any) => ({ id: f.id, espace_id: f.modules?.espace_id, module_id: f.module_id })))
+      setFiches((fich as unknown as { id: string; module_id: string; modules: { espace_id: string } }[]).map(f => ({ id: f.id, espace_id: f.modules?.espace_id, module_id: f.module_id })))
       setProfil(prof)
       setActivite(act)
       setPauses(pz)
-      setEvenements((evs as any)?.data || [])
+      setEvenements((evs.data || []) as Evenement[])
       setLoading(false)
     }
     load()
@@ -127,7 +128,7 @@ export default function Dashboard() {
 
   // Compte à rebours ENM : prochain examen (récupéré séparément, toutes dates)
   const joursRestants = dateExamen
-    ? Math.max(0, Math.round((new Date(dateExamen + 'T12:00:00').getTime() - Date.now()) / 86400000))
+    ? Math.max(0, Math.round((new Date(dateExamen + 'T12:00:00').getTime() - maintenant) / 86400000))
     : null
   const totalFiches = fiches.length
   const fichesVues = new Set(progressions.map(p => p.fiche_id)).size

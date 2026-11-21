@@ -197,14 +197,14 @@ export default function LoginPage() {
 
           {modeDemande && dStatut === 'ok' && (
             <div style={{ background: '#ECF7F0', border: '1px solid #BFE6CF', borderRadius: 6, padding: '14px 16px', fontSize: 13.5, color: '#0F6E56', textAlign: 'center' }}>
-              ✅ Demande envoyée ! Un administrateur l'examinera et créera ton accès. Tu seras recontacté(e) par email.
+              ✅ Demande envoyée ! Un administrateur l&apos;examinera et créera ton accès. Tu seras recontacté(e) par email.
             </div>
           )}
 
           {modeDemande && dStatut !== 'ok' && (
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--c-encre)', marginBottom: 4 }}>Demander un accès</div>
-              <div style={{ fontSize: 12.5, color: 'var(--c-annotation)', marginBottom: 14 }}>Ta demande est envoyée à l'administrateur, qui valide la création de ton compte.</div>
+              <div style={{ fontSize: 12.5, color: 'var(--c-annotation)', marginBottom: 14 }}>Ta demande est envoyée à l&apos;administrateur, qui valide la création de ton compte.</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <input value={dNom} onChange={e => setDNom(e.target.value)} placeholder="Ton nom"
                   style={{ height: 46, border: '1.5px solid var(--c-filet-fort)', borderRadius: 6, padding: '0 14px', background: 'var(--c-papier)', fontSize: 14, outline: 'none', fontFamily: "var(--font-texte)" }} />

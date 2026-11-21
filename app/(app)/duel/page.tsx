@@ -38,7 +38,7 @@ export default function DuelAccueil() {
     const { data } = await supabase.from('matchs')
       .select('code, titre, statut, hote_id, match_joueurs(count)')
       .eq('statut', 'attente').order('created_at', { ascending: false }).limit(12)
-    const lignes = (data || []).map((m: any) => ({
+    const lignes = (data || []).map(m => ({
       code: m.code, titre: m.titre, hote: '', n: m.match_joueurs?.[0]?.count ?? 0,
     })) as MatchOuvert[]
     setOuverts(lignes)

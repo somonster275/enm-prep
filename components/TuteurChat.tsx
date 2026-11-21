@@ -75,6 +75,7 @@ export default function TuteurChat({ variant = 'full' }: { variant?: 'full' | 'b
     const q = (texte ?? question).trim()
     if (!q || loading) return
     setQuestion('')
+    // eslint-disable-next-line react-hooks/purity -- gestionnaire d'événement, pas un rendu (faux positif)
     const base = [...messages, { role: 'user' as const, contenu: q, ts: Date.now() }]
     setMessages(base); persister('user', q)
     setLoading(true)

@@ -24,6 +24,7 @@ type FicheSupprimee = {
 }
 
 export default function CorbeillePage() {
+  const [maintenant] = useState(Date.now) // heure figée au montage : un rendu doit rester pur
   const router = useRouter()
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
   const [modules, setModules] = useState<ModuleSupprime[]>([])
@@ -64,7 +65,7 @@ export default function CorbeillePage() {
 
   // Jours restants avant purge automatique
   const joursRestants = (deletedAt: string) => {
-    const reste = RETENTION_JOURS - Math.floor((Date.now() - new Date(deletedAt).getTime()) / MS_JOUR)
+    const reste = RETENTION_JOURS - Math.floor((maintenant - new Date(deletedAt).getTime()) / MS_JOUR)
     return Math.max(0, reste)
   }
 

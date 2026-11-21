@@ -560,7 +560,7 @@ export default function CoursIAPage() {
                         ? <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-accent)' }}>Aucun document personnel — clique sur « + Importer » pour ajouter le tien.</div>
                         : isAdmin
                           ? <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-accent)' }}>Base ENM vide — cliquez sur « + Importer » pour commencer.</div>
-                          : <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-accent)' }}>Aucun document n'a encore été importé dans la base ENM.</div>
+                          : <div style={{ marginTop: 12, fontSize: 13, color: 'var(--c-accent)' }}>Aucun document n&apos;a encore été importé dans la base ENM.</div>
                     )}
                   </div>
                 )}
