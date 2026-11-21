@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 58).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 57).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -124,10 +124,6 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
-
-### 2026-11-21 (suite 58) — Ajout du skill webapp-testing
-- Copié depuis `anthropics/skills` dans `.claude/skills/webapp-testing/` (chargé automatiquement par Claude Code
-  sur ce dépôt). Il utilise Playwright **Python** : `pip install playwright` si absent (navigateur déjà dans le conteneur cloud).
 
 ### 2026-11-21 (suite 57) — Relecture ponytail de « Mon espace » et corrections
 - Étape 6 poussée sur `main` (`f13865f`), migration 0049 exécutée.
