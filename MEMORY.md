@@ -100,6 +100,21 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
   `supabase/migrations/0001_rag_documents.sql`. Seul `0002_rag_cours.sql` subsiste.
   `lib/embeddings.ts` + `lib/auth-serveur.ts` conservés (utilisés par `/api/cours/*`).
 
+## Limites connues de « Mon espace » hors ligne (étape 5, à garder en tête)
+- **Parcours connecté réel non testé** par Claude (pas de compte de test) : seuls le SW (pages publiques) et la
+  file (faux Supabase) ont été testés dans Chromium. Si un bug remonte, suspecter d'abord ce parcours.
+- Il faut avoir ouvert « Mon espace » **une fois en ligne** sur l'appareil après le déploiement (copie locale +
+  pages en cache). Une copie jamais ouverte depuis n'a pas sa page en cache (`preparerPages`).
+- Activité hors ligne : `incr_activite` n'accepte que veille / jour / lendemain → au-delà d'un jour sans réseau,
+  les révisions hors ligne ne comptent plus pour la série (op abandonnée).
+- Plafond quotidien de nouvelles cartes **non appliqué hors ligne** (compteur en base).
+- Conflits : la dernière écriture envoyée gagne (pas de fusion) ; acceptable car une copie = un seul étudiant.
+- `rafraichir()` recharge **tout** « Mon espace » à chaque ouverture de page perso : à rendre incrémental
+  (colonne `updated_at`) si les espaces deviennent gros.
+- Cache `codex-statique-v1` du SW grossit à chaque déploiement : à purger par version un jour.
+- Seules les pages perso sont hors ligne (pas la lecture directe des modules officiels, choix de l'utilisateur).
+- Page de révision : erreur de lint `set-state-in-effect` **préexistante** (ligne `setBrouillon('')`), non traitée.
+
 ## Environnement de dev
 - Shell + git **fonctionnels** (le blocage espace disque de la 1ʳᵉ session est résolu).
   `npm run dev` tourne sur **port 3000** ; `npx tsc --noEmit` passe sans erreur.
