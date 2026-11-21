@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { lienSur } from '@/lib/url-publique'
 import { rafraichir, instantane, muter, telechargerFichiers, fichiersEnCache, lienFichier } from '@/lib/hors-ligne'
+import { paquet, exporterFichier, partageExistant, partager, arreterPartage } from '@/lib/partage'
 import RichContent from '@/components/RichContent'
 import RichEditor from '@/components/RichEditor'
 import {
@@ -44,6 +45,7 @@ export default function CopiePersoPage() {
   const [edition, setEdition] = useState<{ id: string | null; type: TypeElement; brouillon: Contenu } | null>(null)
   const [msg, setMsg] = useState('')
   const [occupe, setOccupe] = useState(false)
+  const [partage, setPartage] = useState<{ ouvert: boolean; id: string | null }>({ ouvert: false, id: null })
   const [fichiers, setFichiers] = useState<{ total: number; enCache: number }>({ total: 0, enCache: 0 })
   const [version, setVersion] = useState(0) // +1 = recharger après une modification
   // Après une écriture locale, relire la copie locale suffit ; le réseau sert à l'ouverture et après une mise à jour.
@@ -78,6 +80,21 @@ export default function CopiePersoPage() {
     setFichiers({ total: urls.length, enCache: n })
     setOccupe(false)
     afficher(n === urls.length ? 'Fichiers disponibles hors ligne' : `Erreur : ${urls.length - n} fichier(s) non téléchargé(s)`)
+  }
+
+  const ouvrirPartage = async () => {
+    if (partage.ouvert) { setPartage(p => ({ ...p, ouvert: false })); return }
+    if (!navigator.onLine) { afficher('Erreur : le partage demande une connexion internet'); return }
+    setPartage({ ouvert: true, id: await partageExistant(id) })
+  }
+  const lienPartage = partage.id ? `${location.origin}/partage/${partage.id}` : ''
+  const actionPartage = async (arreter: boolean) => {
+    setOccupe(true)
+    try {
+      if (arreter) { await arreterPartage(id); setPartage({ ouvert: true, id: null }); afficher('Partage arrêté : le lien ne marche plus') }
+      else { const pid = await partager(id, paquet(pm!, elements)); setPartage({ ouvert: true, id: pid }); afficher(partage.id ? 'Partage mis à jour' : 'Lien de partage créé') }
+    } catch (e) { afficher('Erreur : ' + (e as Error).message) }
+    setOccupe(false)
   }
 
   const recuperer = async () => {
@@ -153,8 +170,27 @@ export default function CopiePersoPage() {
           {ajoutable && <button onClick={() => setEdition({ id: null, type: ajoutable, brouillon: structuredClone(VIDES[ajoutable]) })} style={{ ...bouton('var(--c-papier-teinte)', 'var(--c-encre)'), padding: '10px 14px', fontSize: 13, border: '1px solid var(--c-filet-fort)' }}>
             + {ajoutable === 'fiche' ? 'Fiche' : 'Question'}
           </button>}
+          <button onClick={() => exporterFichier(paquet(pm, elements))} style={{ ...bouton('var(--c-papier-teinte)', 'var(--c-encre)'), padding: '10px 14px', fontSize: 13, border: '1px solid var(--c-filet-fort)' }}>Exporter</button>
+          <button onClick={ouvrirPartage} aria-expanded={partage.ouvert} style={{ ...bouton('var(--c-papier-teinte)', 'var(--c-encre)'), padding: '10px 14px', fontSize: 13, border: '1px solid var(--c-filet-fort)' }}>Partager</button>
         </div>
       </div>
+
+      {partage.ouvert && (
+        <div style={{ background: '#FFFEFB', border: '1px solid var(--c-filet)', borderRadius: 6, padding: '14px 18px', marginBottom: 20, fontSize: 13.5, lineHeight: 1.5 }}>
+          {partage.id ? <>
+            <div style={{ marginBottom: 8 }}>Toute personne connectée à codex qui a ce lien peut ajouter <b>la version partagée</b> de cette copie à son espace. Tes modifications ultérieures ne sont visibles qu&apos;après « Mettre à jour le partage ».</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <input readOnly value={lienPartage} onFocus={e => e.target.select()} aria-label="Lien de partage" style={{ ...input, flex: '1 1 260px', width: 'auto' }} />
+              <button onClick={() => navigator.clipboard.writeText(lienPartage).then(() => afficher('Lien copié'))} style={{ ...bouton('var(--c-accent)', '#fff'), padding: '9px 14px', fontSize: 13 }}>Copier</button>
+              <button onClick={() => actionPartage(false)} disabled={occupe} style={{ ...bouton('var(--c-papier-teinte)', 'var(--c-encre)'), padding: '9px 14px', fontSize: 13 }}>Mettre à jour le partage</button>
+              <button onClick={() => actionPartage(true)} disabled={occupe} style={{ ...bouton('var(--c-accent-pale)', 'var(--c-accent)'), padding: '9px 14px', fontSize: 13 }}>Arrêter le partage</button>
+            </div>
+          </> : <>
+            <div style={{ marginBottom: 8 }}>Crée un lien pour qu&apos;un autre étudiant ajoute une copie de ce module à son espace. Il reçoit la version actuelle ; ta copie reste à toi.</div>
+            <button onClick={() => actionPartage(false)} disabled={occupe} style={{ ...bouton('var(--c-accent)', '#fff'), padding: '9px 14px', fontSize: 13 }}>Créer le lien</button>
+          </>}
+        </div>
+      )}
 
       {aMettreAJour > 0 && nouv && (
         <div style={{ background: 'var(--c-papier-chaud)', border: '1px solid #F2D9A0', borderRadius: 6, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>

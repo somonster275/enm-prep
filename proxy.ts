@@ -44,7 +44,10 @@ export async function proxy(req: NextRequest) {
     if (path.startsWith('/api/')) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
     }
-    return NextResponse.redirect(new URL('/login', req.url))
+    const login = new URL('/login', req.url)
+    // Retour à la page demandée après connexion (ex. un lien de partage).
+    if (path !== '/') login.searchParams.set('suite', path + req.nextUrl.search)
+    return NextResponse.redirect(login)
   }
   if (user && isAuthPage) {
     return NextResponse.redirect(new URL('/dashboard', req.url))

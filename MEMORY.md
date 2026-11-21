@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 55).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 56).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -123,6 +123,22 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-21 (suite 56) — « Mon espace » étape 6 : partage par lien + export/import (plan terminé)
+- Étape 5 poussée sur `main` (`07cfbc0`). Étape 6 sur la branche. **Les 6 étapes du plan « façon Anki » sont codées.**
+- Format unique « paquet » (`lib/partage.ts`) : `{ format: 'codex-module', version: 1, nom, source_type, source_id,
+  elements: [{ type, source_id, contenu, origine, ordre }] }` (éléments supprimés exclus). Garde les liens vers
+  l'officiel → la copie importée reçoit aussi les mises à jour de l'admin.
+  - `lirePaquet` valide tout paquet externe (format, uuid, types, forme de chaque contenu, ≤ 5000 éléments ;
+    fichier ≤ 10 Mo) — testé dans `tests/partage.test.ts`. `importer` : insertion par lots de 500, annule la
+    copie si un lot échoue ; en ligne uniquement.
+- Export : bouton « Exporter » d'une copie → `<nom>.codex.json`. Import : « Importer un fichier » sur `/mon-espace`.
+- Partage : migration **`0049_partages.sql`** (À EXÉCUTER) — table `partages` (id = jeton du lien, une ligne par
+  copie, `contenu` = paquet instantané), RLS propriétaire ; lecture par lien via `lire_partage(uuid)` SECURITY
+  DEFINER (personne ne peut lister les partages des autres). Panneau « Partager » : créer / copier le lien /
+  mettre à jour le partage / arrêter. Page `/partage/[id]` : aperçu + « Ajouter à mon espace ».
+- `proxy.ts` : la redirection vers /login ajoute `?suite=<chemin>` ; la page de connexion y retourne si l'URL
+  analysée reste sur le même site (contrôle d'origine, pas de regex : `/\t/evil.com` passerait une regex).
 
 ### 2026-11-21 (suite 55) — « Mon espace » étape 5 : hors ligne + synchronisation
 - Étape 4 poussée sur `main` (`e6baec0`). Étape 5 sur la branche.

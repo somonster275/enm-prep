@@ -1,6 +1,8 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { lirePaquet, importer, TAILLE_MAX } from '@/lib/partage'
 import type { PersoModule } from '@/lib/espace-perso'
 import { rafraichir, muter, preparerPages } from '@/lib/hors-ligne'
 
@@ -10,6 +12,23 @@ export default function MonEspacePage() {
   const [modules, setModules] = useState<(PersoModule & { nb: number })[]>([])
   const [loading, setLoading] = useState(true)
   const [tableManquante, setTableManquante] = useState(false)
+  const [importMsg, setImportMsg] = useState('')
+  const fichierRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
+
+  const importerFichier = async (f: File | undefined) => {
+    if (!f) return
+    setImportMsg('Import en cours…')
+    try {
+      if (f.size > TAILLE_MAX) throw new Error('Fichier trop lourd (10 Mo maximum).')
+      let brut: unknown
+      try { brut = JSON.parse(await f.text()) } catch { throw new Error("Ce fichier n'est pas un module codex.") }
+      const pid = await importer(lirePaquet(brut))
+      await rafraichir()
+      router.push(`/mon-espace/${pid}`)
+    } catch (e) { setImportMsg('Erreur : ' + (e as Error).message) }
+    if (fichierRef.current) fichierRef.current.value = ''
+  }
 
   useEffect(() => {
     // Copie locale (rechargée depuis Supabase si le réseau est là) : la page marche aussi hors ligne.
@@ -33,8 +52,14 @@ export default function MonEspacePage() {
       <h1 style={{ fontFamily: 'var(--font-titre)', fontWeight: 'var(--titre-poids)', fontSize: 28, margin: 0 }}>Mon espace</h1>
       <p style={{ fontSize: 15, color: 'var(--c-annotation)', margin: '8px 0 20px' }}>
         Tes copies personnelles des modules, QCM et mind maps. Modifie-les librement : toi seul les vois.
-        Pour en ajouter, ouvre un module, un QCM ou une mind map et choisis « Télécharger dans mon espace ».
+        Pour en ajouter, ouvre un module, un QCM ou une mind map et choisis « Télécharger dans mon espace »,
+        ou importe un fichier exporté depuis codex.
       </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
+        <input ref={fichierRef} type="file" accept=".json,application/json" hidden onChange={e => importerFichier(e.target.files?.[0])} />
+        <button onClick={() => fichierRef.current?.click()} style={{ padding: '9px 14px', borderRadius: 6, fontSize: 13, fontWeight: 600, fontFamily: font, cursor: 'pointer', background: 'var(--c-papier-teinte)', color: 'var(--c-encre)', border: '1px solid var(--c-filet-fort)' }}>Importer un fichier</button>
+        {importMsg && <span role="status" style={{ fontSize: 13, color: importMsg.startsWith('Erreur') ? 'var(--c-accent)' : 'var(--c-annotation)' }}>{importMsg}</span>}
+      </div>
 
       {loading ? (
         <div style={{ color: 'var(--c-annotation-clair)', textAlign: 'center', padding: 30 }}>Chargement…</div>

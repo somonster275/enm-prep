@@ -65,7 +65,9 @@ export default function LoginPage() {
       setLoading(false)
       return
     }
-    window.location.assign('/dashboard')
+    // « suite » vient de l'URL : on n'y va que si elle reste sur ce site (sinon redirection ouverte).
+    const suite = new URL(new URLSearchParams(window.location.search).get('suite') || '/dashboard', window.location.origin)
+    window.location.assign(suite.origin === window.location.origin ? suite.pathname + suite.search : '/dashboard')
   }
 
   const inputStyle = (focused: boolean): React.CSSProperties => ({
