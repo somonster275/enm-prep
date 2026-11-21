@@ -133,7 +133,7 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
     fichier ≤ 10 Mo) — testé dans `tests/partage.test.ts`. `importer` : insertion par lots de 500, annule la
     copie si un lot échoue ; en ligne uniquement.
 - Export : bouton « Exporter » d'une copie → `<nom>.codex.json`. Import : « Importer un fichier » sur `/mon-espace`.
-- Partage : migration **`0049_partages.sql`** (À EXÉCUTER) — table `partages` (id = jeton du lien, une ligne par
+- Partage : migration **`0049_partages.sql`** (EXÉCUTÉE) — table `partages` (id = jeton du lien, une ligne par
   copie, `contenu` = paquet instantané), RLS propriétaire ; lecture par lien via `lire_partage(uuid)` SECURITY
   DEFINER (personne ne peut lister les partages des autres). Panneau « Partager » : créer / copier le lien /
   mettre à jour le partage / arrêter. Page `/partage/[id]` : aperçu + « Ajouter à mon espace ».
