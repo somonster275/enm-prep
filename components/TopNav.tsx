@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import InstallerApp from '@/components/InstallerApp'
 import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useEffect, useState } from 'react'
@@ -197,6 +198,7 @@ export default function TopNav() {
                 </div>
               </div>
               <Link href="/compte" onClick={() => setMenuOpen(false)} style={{ display: 'block', padding: '9px 14px', borderRadius: 8, color: 'var(--c-annotation)', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Mon compte</Link>
+              <InstallerApp style={{ width: '100%', textAlign: 'left', padding: '9px 14px', borderRadius: 8, background: 'transparent', border: 'none', color: 'var(--c-annotation)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "var(--font-texte)" }} />
               <button onClick={logout} style={{ width: '100%', textAlign: 'left', padding: '9px 14px', borderRadius: 8, background: 'transparent', border: 'none', color: 'var(--c-annotation)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "var(--font-texte)" }}>Déconnexion</button>
             </div>
           )}

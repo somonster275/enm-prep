@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 53).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 54).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -108,6 +108,18 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-21 (suite 54) — « Mon espace » étape 4 : app installable (PWA)
+- Étapes 1-3 poussées sur `main` (`cecec85`), migration 0048 **exécutée** par l'utilisateur.
+- `app/manifest.ts` (start_url `/dashboard`, standalone, couleurs papier `#F7F5F1`), icônes PNG générées depuis
+  `app/icon.svg` : `public/icons/icon-{192,512}.png`, `icon-maskable-512.png` (fond plein, logo à 80 %),
+  `app/apple-icon.png` (180). `layout.tsx` : `appleWebApp` + `themeColor`.
+- ⚠️ `proxy.ts` : matcher exclut `icons/` et `manifest.webmanifest` — le navigateur charge le manifeste SANS
+  cookies, une redirection vers /login casserait l'installation.
+- `components/InstallerApp.tsx` dans le menu compte : invite native (Chrome/Edge, `beforeinstallprompt` écouté
+  au chargement du module) ou consigne Safari sur iPhone ; masqué si déjà installé.
+- Pas de service worker (inutile pour installer, selon la doc Next 16) : il arrive à l'étape 5 (hors ligne).
+- Vérifié : build prod, manifeste/icônes en 200 sans session, `Page.getInstallabilityErrors` de Chromium vide.
 
 ### 2026-11-21 (suite 53) — « Mon espace » façon Anki : étapes 1 à 3 (copies perso)
 - **Plan validé avec l'utilisateur (6 étapes)** : 1 copie perso des fiches · 2 mises à jour de l'admin
