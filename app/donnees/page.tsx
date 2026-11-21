@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { LogoBadge } from '@/components/Logo'
 
-export const metadata = { title: 'Confidentialité & données — codex' }
+export const metadata = { title: 'Confidentialité & données' }
 
 const MAJ = '27 juin 2026'
 

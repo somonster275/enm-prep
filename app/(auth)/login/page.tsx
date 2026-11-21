@@ -57,7 +57,8 @@ export default function LoginPage() {
     if (error) {
       const m = error.message
       setError(
-        m === 'Invalid login credentials' ? 'Email ou mot de passe incorrect.'
+        error.name === 'AuthRetryableFetchError' ? 'Connexion au serveur impossible. Vérifie ta connexion internet et réessaie.'
+        : m === 'Invalid login credentials' ? 'Email ou mot de passe incorrect.'
         : m === 'Email not confirmed' ? "Ton email n'est pas encore confirmé."
         : m.toLowerCase().includes('rate limit') ? 'Trop de tentatives, réessaie dans quelques minutes.'
         : m

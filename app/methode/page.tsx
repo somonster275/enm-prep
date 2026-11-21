@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { LogoBadge } from '@/components/Logo'
 import MethodeContenu from '@/components/MethodeContenu'
 
-export const metadata = { title: 'Méthode — codex' }
+export const metadata = { title: 'Méthode' }
 
 export default function MethodePage() {
   return (

@@ -4,7 +4,7 @@ import './globals.css'
 import SiteFooter from '@/components/SiteFooter'
 
 export const metadata: Metadata = {
-  title: 'codex',
+  title: { default: 'codex', template: '%s — codex' }, // chaque section fixe son titre dans son layout.tsx
   description: 'codex — préparation au concours ENM',
   appleWebApp: { capable: true, title: 'codex', statusBarStyle: 'default' }, // plein écran une fois ajouté à l'écran d'accueil iOS
 }

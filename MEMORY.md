@@ -1,6 +1,6 @@
 # Sauvegarde mémoire — enm-prep
 
-> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 57).
+> Snapshot du projet pour reprise de contexte. Dernière mise à jour : 2026-11-21 (suite 58).
 
 ## Vue d'ensemble
 Application web de préparation à l'**ENM** (École Nationale de la Magistrature).
@@ -124,6 +124,16 @@ Migration à exécuter dans Supabase : `supabase/migrations/0002_rag_cours.sql` 
 - Projet versionné avec git (remote `origin` configuré).
 
 ## Journal des sessions
+
+### 2026-11-21 (suite 58) — Test Playwright (webapp-testing), titres d'onglet, erreur réseau du login
+- Test navigateur (pages publiques + redirection /login, ordi et mobile) : RAS, sauf 2 points corrigés.
+- **Titres d'onglet** : modèle `'%s — codex'` dans `app/layout.tsx` ; chaque section a un `layout.tsx` minimal
+  (`export const metadata = { title }`, renvoie `children`) car presque toutes les pages sont client. Pas de
+  layout sur `admin/` : un titre à ce niveau casserait le modèle pour les sous-pages admin.
+  ⚠️ Un `document.title` posé dans un `useEffect` est écrasé par Next 16 : passer par `metadata`.
+- **Login** : erreur réseau (`AuthRetryableFetchError`) → « Connexion au serveur impossible… » au lieu de
+  « Failed to fetch ».
+- Piège : après suppression d'un `layout.tsx`, `npm run build` échoue sur `.next/dev/types` → `rm -rf .next`.
 
 ### 2026-11-21 (suite 57) — Relecture ponytail de « Mon espace » et corrections
 - Étape 6 poussée sur `main` (`f13865f`), migration 0049 exécutée.
